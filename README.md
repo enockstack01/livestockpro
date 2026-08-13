@@ -63,6 +63,7 @@ server/            Express API
     dataRoutes.js      generic CRUD for animals, health, feeding, breeding,
                        production, finance, tasks, profiles
     rpcRoutes.js       account deletion
+    adminRoutes.js     platform-wide admin/super_admin endpoints
   index.js           app entry point: serves the API and client/dist (with
                      SPA fallback to index.html for client-side routing)
 
@@ -80,7 +81,7 @@ client/             React (Vite) frontend
       topbarSearch.jsx    lets a page put a search box in the shared topbar
     pages/               one component per route: Login, Dashboard, Animals,
                          Health, Feeding, Breeding, Production, Finance,
-                         Tasks, Reports, Settings
+                         Tasks, Reports, Settings, AdminDashboard
     style.css            shared stylesheet (design system, unchanged)
   dist/               production build output (git-ignored, created by `npm run build`)
 ```
@@ -100,6 +101,67 @@ client/             React (Vite) frontend
 - "Manage Account Security" in Settings opens Clerk's `openUserProfile()`
   modal for password/email changes.
 
+## Roles & admin access
+
+Three roles: `user` (default — their own farm data only), `admin`, and
+`super_admin`. The role lives in Clerk's `publicMetadata.role` on the user;
+the backend re-derives it from Clerk on every admin request (never trusts
+the client), via `server/authMiddleware.js`'s `getRole()`/`requireRole()`.
+
+- **Bootstrapping the first super admin** — either:
+  1. Run a one-off script calling `clerkClient.users.updateUserMetadata(userId, { publicMetadata: { role: 'super_admin' } })`, or
+  2. Set the `SUPER_ADMIN_EMAILS` env var (comma-separated emails) — anyone
+     signing in with one of those addresses is treated as `super_admin`
+     even before any metadata is set. Useful for a fresh deploy (e.g. Render)
+     that doesn't have console/script access yet.
+- **`admin`** can: view platform-wide stats, the full user list, and the
+  spatial map; ban/unban regular (`user`-role) accounts; promote a `user` to
+  `admin` (nothing else — can't touch existing admins, can't grant
+  `super_admin`).
+- **`super_admin`** can additionally: ban/unban other admins, set *any* role
+  on *any* user (promote to `admin`/`super_admin`, or demote), and
+  permanently delete a user's account and data. A super_admin can't change
+  their own role/status (avoids accidental lockout), and the last remaining
+  super_admin can't be demoted.
+- The "Admin Panel" sidebar link only renders for `admin`/`super_admin`
+  (`Layout.jsx`'s `useRole()`, backed by `GET /api/admin/role`); `AdminDashboard.jsx`
+  also redirects a plain user away from `/admin` client-side. Real enforcement
+  is entirely server-side in `adminRoutes.js`.
+
+## Spatial distribution
+
+Every record form (Animals, Health, Feeding, Breeding, Production, Finance,
+Tasks) auto-captures the device's GPS coordinates via the browser
+Geolocation API when the "Add" modal opens (`client/src/lib/geolocation.jsx`'s
+`useGeoCapture()` + `<LocationCaptureBadge>`), and attaches `latitude`/
+`longitude` to the record on save. It never blocks saving — a denied/failed
+capture just means that one record has no coordinates. Editing an existing
+record leaves its stored coordinates untouched.
+
+The Admin Panel's **Spatial Distribution** tab (visible to both `admin` and
+`super_admin`) renders every georeferenced record platform-wide on a
+[Leaflet](https://leafletjs.com) map (`client/src/components/SpatialMap.jsx`),
+fed by `GET /api/admin/spatial`:
+
+- One color/icon-coded marker layer per record type, each independently
+  toggleable via the legend (which also explains the symbology and shows
+  live counts).
+- Nearby points cluster together (`leaflet.markercluster`) and expand on
+  click/zoom — necessary since many demo records share a district-level
+  coordinate rather than a unique GPS point.
+- Three basemaps (Street/OpenStreetMap, Satellite/Esri, Light/CARTO),
+  switchable via Leaflet's layer control — all free tile sources, no API key.
+- Marker popups show the record's type, title, status, date, district, and
+  which farm/user it belongs to.
+- Each layer can independently switch between **markers** (clustered pins)
+  and **density** (a `leaflet.heat` heatmap tinted to that layer's color) via
+  a small toggle next to its legend row.
+- Rwanda's country outline and all 30 district boundaries render as a
+  separate overlay (`client/public/geo/rwanda-{country,districts}.geojson`,
+  real administrative boundaries from [geoBoundaries.org](https://www.geoboundaries.org),
+  CC BY 4.0) — visible on top of every basemap, each independently
+  toggleable, with district names on hover.
+
 ## API overview
 
 All endpoints are namespaced under `/api` and require a `Bearer` Clerk session
@@ -112,3 +174,12 @@ single document (mapped to Mongo's `_id`).
   `production_records`, `finance_records`, `tasks`
 - `POST /api/rpc/delete_user` — deletes all of the user's MongoDB documents
   and their Clerk account
+- `GET /api/admin/role` — any authenticated user; returns their own resolved role
+- `GET /api/admin/stats`, `GET /api/admin/users`, `GET /api/admin/spatial` — `admin`+
+- `PATCH /api/admin/users/:id/status` `{ banned }` — `admin`+ (admins may only
+  target `user`-role accounts; `super_admin` may target anyone but themselves)
+- `PATCH /api/admin/users/:id/role` `{ role }` — `admin`+, but an `admin` may
+  only set `role: 'admin'` on a target whose current role is `user`; any
+  other combination (granting `super_admin`, touching an existing admin,
+  demoting) requires `super_admin`
+- `DELETE /api/admin/users/:id` — `super_admin` only

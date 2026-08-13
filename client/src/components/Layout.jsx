@@ -19,6 +19,23 @@ const NAV_ITEMS = [
 
 const NOTIF_ORDER = { red: 0, orange: 1, blue: 2, purple: 3, green: 4 };
 
+/* Resolved server-side (Clerk publicMetadata.role, with an env-var bootstrap
+   fallback) rather than trusted from the client — this only drives UI, the
+   backend re-checks on every /api/admin/* call regardless. */
+function useRole() {
+  const api = useApi();
+  const [role, setRole] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    api.myRole().then((res) => { if (!cancelled) setRole((res.data && res.data.role) || 'user'); });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return role;
+}
+
 function useNotifications() {
   const api = useApi();
   const [items, setItems] = useState([]);
@@ -42,27 +59,27 @@ function useNotifications() {
 
       tasks.forEach((t) => {
         if (t.due_date && t.status !== 'Completed' && new Date(t.due_date) < now) {
-          notifItems.push({ icon: 'fa-clock', color: 'red', title: 'Overdue: ' + t.title, sub: 'Was due ' + new Date(t.due_date).toLocaleDateString(), link: '/tasks' });
+          notifItems.push({ id: 'task-overdue-' + t.id, icon: 'fa-clock', color: 'red', title: 'Overdue: ' + t.title, sub: 'Was due ' + new Date(t.due_date).toLocaleDateString(), link: '/tasks' });
         }
       });
       animals.forEach((a) => {
         if (a.health_status === 'Critical') {
-          notifItems.push({ icon: 'fa-triangle-exclamation', color: 'red', title: 'Critical: ' + a.tag_id, sub: 'Animal needs immediate attention', link: '/health' });
+          notifItems.push({ id: 'animal-critical-' + a.id, icon: 'fa-triangle-exclamation', color: 'red', title: 'Critical: ' + a.tag_id, sub: 'Animal needs immediate attention', link: '/health' });
         }
       });
       animals.forEach((a) => {
         if (a.health_status === 'Under Treatment') {
-          notifItems.push({ icon: 'fa-stethoscope', color: 'orange', title: 'Treatment: ' + a.tag_id, sub: 'Currently under treatment', link: '/health' });
+          notifItems.push({ id: 'animal-treatment-' + a.id, icon: 'fa-stethoscope', color: 'orange', title: 'Treatment: ' + a.tag_id, sub: 'Currently under treatment', link: '/health' });
         }
       });
       health.forEach((h) => {
         if (h.next_check_date) {
           const daysUntil = Math.ceil((new Date(h.next_check_date) - now) / (1000 * 60 * 60 * 24));
           if (daysUntil <= 3 && daysUntil >= 0 && h.status !== 'Recovered') {
-            notifItems.push({ icon: 'fa-calendar-check', color: 'blue', title: 'Check-up due: ' + (h.tag_id || '—'), sub: daysUntil === 0 ? 'Today!' : 'In ' + daysUntil + ' day' + (daysUntil > 1 ? 's' : '') + ' — ' + (h.disease || ''), link: '/health' });
+            notifItems.push({ id: 'health-due-' + h.id, icon: 'fa-calendar-check', color: 'blue', title: 'Check-up due: ' + (h.tag_id || '—'), sub: daysUntil === 0 ? 'Today!' : 'In ' + daysUntil + ' day' + (daysUntil > 1 ? 's' : '') + ' — ' + (h.disease || ''), link: '/health' });
           }
           if (daysUntil < 0 && h.status !== 'Recovered') {
-            notifItems.push({ icon: 'fa-calendar-xmark', color: 'red', title: 'Missed check-up: ' + (h.tag_id || '—'), sub: 'Was due ' + Math.abs(daysUntil) + ' day' + (Math.abs(daysUntil) > 1 ? 's' : '') + ' ago', link: '/health' });
+            notifItems.push({ id: 'health-missed-' + h.id, icon: 'fa-calendar-xmark', color: 'red', title: 'Missed check-up: ' + (h.tag_id || '—'), sub: 'Was due ' + Math.abs(daysUntil) + ' day' + (Math.abs(daysUntil) > 1 ? 's' : '') + ' ago', link: '/health' });
           }
         }
       });
@@ -70,7 +87,7 @@ function useNotifications() {
         if (b.expected_birth_date && b.pregnancy_status === 'Pregnant') {
           const daysUntil = Math.ceil((new Date(b.expected_birth_date) - now) / (1000 * 60 * 60 * 24));
           if (daysUntil <= 7 && daysUntil >= 0) {
-            notifItems.push({ icon: 'fa-baby', color: 'purple', title: 'Expected birth: ' + (b.tag_id || '—'), sub: daysUntil === 0 ? 'Today!' : 'In ' + daysUntil + ' day' + (daysUntil > 1 ? 's' : ''), link: '/breeding' });
+            notifItems.push({ id: 'breeding-birth-' + b.id, icon: 'fa-baby', color: 'purple', title: 'Expected birth: ' + (b.tag_id || '—'), sub: daysUntil === 0 ? 'Today!' : 'In ' + daysUntil + ' day' + (daysUntil > 1 ? 's' : ''), link: '/breeding' });
           }
         }
       });
@@ -83,6 +100,43 @@ function useNotifications() {
   }, []);
 
   return items;
+}
+
+/* Tracks which notifications the user has dismissed, persisted per-account
+   in localStorage so "read" status survives a reload but never leaks
+   between different accounts sharing a browser. */
+function useReadNotifications(userId) {
+  const storageKey = userId ? `livestockpro_read_notifs_${userId}` : null;
+  const [readIds, setReadIds] = useState(new Set());
+
+  useEffect(() => {
+    if (!storageKey) { setReadIds(new Set()); return; }
+    try {
+      const raw = localStorage.getItem(storageKey);
+      setReadIds(raw ? new Set(JSON.parse(raw)) : new Set());
+    } catch (e) {
+      setReadIds(new Set());
+    }
+  }, [storageKey]);
+
+  function persist(nextSet) {
+    setReadIds(nextSet);
+    if (storageKey) {
+      try { localStorage.setItem(storageKey, JSON.stringify([...nextSet])); } catch (e) { /* storage unavailable */ }
+    }
+  }
+
+  function markRead(id) {
+    if (readIds.has(id)) return;
+    persist(new Set(readIds).add(id));
+  }
+  function markAllRead(ids) {
+    const next = new Set(readIds);
+    ids.forEach((id) => next.add(id));
+    persist(next);
+  }
+
+  return { readIds, markRead, markAllRead };
 }
 
 function TopbarSearchInput() {
@@ -106,6 +160,10 @@ function LayoutInner() {
   const { signOut } = useClerk();
   const navigate = useNavigate();
   const notifItems = useNotifications();
+  const { readIds, markRead, markAllRead } = useReadNotifications(user?.id);
+  const unreadCount = notifItems.filter((n) => !readIds.has(n.id)).length;
+  const role = useRole();
+  const isAdmin = role === 'admin' || role === 'super_admin';
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
 
@@ -133,6 +191,11 @@ function LayoutInner() {
               <i className={`fas ${item.icon}`}></i> {item.label}
             </NavLink>
           ))}
+          {isAdmin && (
+            <NavLink to="/admin" className={({ isActive }) => 'nav-item nav-item-admin' + (isActive ? ' active' : '')} onClick={() => setSidebarOpen(false)}>
+              <i className="fas fa-user-shield"></i> Admin Panel
+            </NavLink>
+          )}
           <a href="#" className="nav-item logout-item" onClick={handleLogout}>
             <i className="fas fa-right-from-bracket"></i> Logout
           </a>
@@ -149,23 +212,23 @@ function LayoutInner() {
           <div className="notif-wrapper">
             <button className="topbar-btn" style={{ position: 'relative' }} onClick={(e) => { e.stopPropagation(); setNotifOpen((v) => !v); }}>
               <i className="fas fa-bell"></i>
-              <span className="badge-dot" style={{ display: notifItems.length > 0 ? 'block' : 'none' }}></span>
+              <span className="badge-dot" style={{ display: unreadCount > 0 ? 'block' : 'none' }}></span>
               <span style={{
                 position: 'absolute', top: 2, right: 2, minWidth: 16, height: 16, borderRadius: 8,
                 background: 'var(--red)', color: '#fff', fontSize: 9, fontWeight: 700,
-                display: notifItems.length > 0 ? 'flex' : 'none', alignItems: 'center', justifyContent: 'center', padding: '0 4px'
-              }}>{notifItems.length}</span>
+                display: unreadCount > 0 ? 'flex' : 'none', alignItems: 'center', justifyContent: 'center', padding: '0 4px'
+              }}>{unreadCount}</span>
             </button>
             <div className={`notif-dropdown${notifOpen ? ' show' : ''}`}>
               <div className="notif-header">
                 <h4><i className="fas fa-bell" style={{ marginRight: 6, color: 'var(--primary)' }}></i> Notifications</h4>
-                <span onClick={() => setNotifOpen(false)}>Mark all read</span>
+                <span onClick={() => markAllRead(notifItems.map((n) => n.id))}>Mark all read</span>
               </div>
               <div className="notif-list">
                 {notifItems.length === 0 ? (
                   <div className="notif-empty"><i className="fas fa-bell-slash"></i><p>No notifications</p></div>
-                ) : notifItems.map((n, i) => (
-                  <NavLink key={i} to={n.link} className="notif-item" onClick={() => setNotifOpen(false)}>
+                ) : notifItems.map((n) => (
+                  <NavLink key={n.id} to={n.link} className={`notif-item${readIds.has(n.id) ? ' read' : ''}`} onClick={() => { markRead(n.id); setNotifOpen(false); }}>
                     <div className={`notif-icon ${n.color}`}><i className={`fas ${n.icon}`}></i></div>
                     <div className="notif-text"><p>{n.title}</p><span>{n.sub}</span></div>
                   </NavLink>
@@ -184,7 +247,7 @@ function LayoutInner() {
       </header>
 
       <main className="main-content">
-        <Outlet />
+        <Outlet context={{ role }} />
       </main>
     </>
   );

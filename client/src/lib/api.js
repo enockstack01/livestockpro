@@ -61,6 +61,27 @@ export function useApi() {
     },
     async rpc(fn, args) {
       return request(getToken, `/rpc/${fn}`, { method: 'POST', body: JSON.stringify(args || {}) });
+    },
+    async myRole() {
+      return request(getToken, '/admin/role');
+    },
+    async adminStats() {
+      return request(getToken, '/admin/stats');
+    },
+    async adminUsers() {
+      return request(getToken, '/admin/users');
+    },
+    async adminSpatial() {
+      return request(getToken, '/admin/spatial');
+    },
+    async setUserStatus(userId, banned) {
+      return request(getToken, `/admin/users/${encodeURIComponent(userId)}/status`, { method: 'PATCH', body: JSON.stringify({ banned }) });
+    },
+    async setUserRole(userId, role) {
+      return request(getToken, `/admin/users/${encodeURIComponent(userId)}/role`, { method: 'PATCH', body: JSON.stringify({ role }) });
+    },
+    async deleteUserAccount(userId) {
+      return request(getToken, `/admin/users/${encodeURIComponent(userId)}`, { method: 'DELETE' });
     }
   }), [getToken]);
 }

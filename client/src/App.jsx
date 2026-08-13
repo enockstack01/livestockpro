@@ -12,6 +12,7 @@ import Finance from './pages/Finance.jsx';
 import Tasks from './pages/Tasks.jsx';
 import Reports from './pages/Reports.jsx';
 import Settings from './pages/Settings.jsx';
+import AdminDashboard from './pages/AdminDashboard.jsx';
 
 function RequireAuth({ children }) {
   const { isLoaded, isSignedIn } = useAuth();
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/admin" element={<AdminDashboard />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

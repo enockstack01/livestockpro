@@ -3,6 +3,7 @@ import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import { StatusBadge, PriorityBadge, fmtDate } from '../lib/badges.jsx';
+import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
 
 const EMPTY_FORM = { title: '', description: '', due_date: '', priority: 'Medium', status: 'Pending' };
@@ -11,6 +12,7 @@ const FILTER_TABS = ['all', 'Pending', 'In Progress', 'Completed'];
 export default function Tasks() {
   const api = useApi();
   const showToast = useToast();
+  const geo = useGeoCapture();
 
   const [tasks, setTasks] = useState([]);
   const [search, setSearch] = useState('');
@@ -45,10 +47,11 @@ export default function Tasks() {
     return matchSearch && matchFilter;
   });
 
-  function openAdd() { setEditingId(null); setForm(EMPTY_FORM); setModalOpen(true); }
+  function openAdd() { setEditingId(null); setForm(EMPTY_FORM); geo.capture(); setModalOpen(true); }
   function openEdit(t) {
     setEditingId(t.id);
     setForm({ title: t.title || '', description: t.description || '', due_date: t.due_date || '', priority: t.priority || 'Medium', status: t.status || 'Pending' });
+    geo.reset();
     setModalOpen(true);
   }
 
@@ -61,6 +64,7 @@ export default function Tasks() {
       if (error) { showToast('Update failed: ' + error.message, 'error'); return; }
       showToast('Task updated.', 'success');
     } else {
+      if (geo.status === 'success') { payload.latitude = geo.coords.latitude; payload.longitude = geo.coords.longitude; }
       const { error } = await api.insert('tasks', [payload]);
       if (error) { showToast('Insert failed: ' + error.message, 'error'); return; }
       showToast('Task added.', 'success');
@@ -139,6 +143,7 @@ export default function Tasks() {
         open={modalOpen} onClose={() => setModalOpen(false)} title={editingId ? 'Edit Task' : 'Add Task'}
         footer={<><button className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button><button className="btn btn-primary" onClick={save}><i className="fas fa-check"></i> Save</button></>}
       >
+        {!editingId && <LocationCaptureBadge geo={geo} />}
         <div className="form-group"><label>Task Title *</label><input type="text" className="form-control" placeholder="e.g. Vaccinate cattle in Pen B" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
         <div className="form-group"><label>Description</label><textarea className="form-control" placeholder="Details about this task..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
         <div className="form-row">

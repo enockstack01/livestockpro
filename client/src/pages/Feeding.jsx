@@ -3,6 +3,7 @@ import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import { fmtDate } from '../lib/badges.jsx';
+import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
 
 const EMPTY_FORM = { feed_type: '', quantity: '', unit: 'kg', cost: '', feeding_date: '', animal_group: '', notes: '' };
@@ -10,6 +11,7 @@ const EMPTY_FORM = { feed_type: '', quantity: '', unit: 'kg', cost: '', feeding_
 export default function Feeding() {
   const api = useApi();
   const showToast = useToast();
+  const geo = useGeoCapture();
 
   const [records, setRecords] = useState([]);
   const [search, setSearch] = useState('');
@@ -46,10 +48,11 @@ export default function Feeding() {
     return Object.entries(groups).filter(([, info]) => info.count <= 2).map(([type, info]) => ({ type, count: info.count }));
   }, [records]);
 
-  function openAdd() { setEditingId(null); setForm(EMPTY_FORM); setModalOpen(true); }
+  function openAdd() { setEditingId(null); setForm(EMPTY_FORM); geo.capture(); setModalOpen(true); }
   function openEdit(f) {
     setEditingId(f.id);
     setForm({ feed_type: f.feed_type || '', quantity: f.quantity ?? '', unit: f.unit || 'kg', cost: f.cost ?? '', feeding_date: f.feeding_date || '', animal_group: f.animal_group || '', notes: f.notes || '' });
+    geo.reset();
     setModalOpen(true);
   }
 
@@ -61,6 +64,7 @@ export default function Feeding() {
       if (error) { showToast('Update failed.', 'error'); return; }
       showToast('Feeding record updated.', 'success');
     } else {
+      if (geo.status === 'success') { payload.latitude = geo.coords.latitude; payload.longitude = geo.coords.longitude; }
       const { error } = await api.insert('feeding_records', [payload]);
       if (error) { showToast('Insert failed.', 'error'); return; }
       showToast('Feeding record added.', 'success');
@@ -131,6 +135,7 @@ export default function Feeding() {
         open={modalOpen} onClose={() => setModalOpen(false)} title={editingId ? 'Edit Feeding Record' : 'Add Feeding Record'}
         footer={<><button className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button><button className="btn btn-primary" onClick={save}><i className="fas fa-check"></i> Save</button></>}
       >
+        {!editingId && <LocationCaptureBadge geo={geo} />}
         <div className="form-group"><label>Feed Type *</label><input type="text" className="form-control" placeholder="e.g. Hay, Grain, Silage" value={form.feed_type} onChange={(e) => setForm({ ...form, feed_type: e.target.value })} /></div>
         <div className="form-row">
           <div className="form-group"><label>Quantity</label><input type="number" className="form-control" placeholder="0" step="0.1" min="0" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} /></div>

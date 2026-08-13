@@ -3,6 +3,7 @@ import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import { PregnancyBadge, fmtDate } from '../lib/badges.jsx';
+import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
 
 const EMPTY_FORM = { tag_id: '', breeding_date: '', pregnancy_status: 'Not Confirmed', expected_birth_date: '', birth_date: '', newborn_count: '', newborn_details: '', notes: '' };
@@ -10,6 +11,7 @@ const EMPTY_FORM = { tag_id: '', breeding_date: '', pregnancy_status: 'Not Confi
 export default function Breeding() {
   const api = useApi();
   const showToast = useToast();
+  const geo = useGeoCapture();
 
   const [records, setRecords] = useState([]);
   const [search, setSearch] = useState('');
@@ -36,10 +38,11 @@ export default function Breeding() {
     return matchSearch && matchStatus;
   });
 
-  function openAdd() { setEditingId(null); setForm(EMPTY_FORM); setModalOpen(true); }
+  function openAdd() { setEditingId(null); setForm(EMPTY_FORM); geo.capture(); setModalOpen(true); }
   function openEdit(b) {
     setEditingId(b.id);
     setForm({ tag_id: b.tag_id || '', breeding_date: b.breeding_date || '', pregnancy_status: b.pregnancy_status || 'Not Confirmed', expected_birth_date: b.expected_birth_date || '', birth_date: b.birth_date || '', newborn_count: b.newborn_count ?? '', newborn_details: b.newborn_details || '', notes: b.notes || '' });
+    geo.reset();
     setModalOpen(true);
   }
 
@@ -51,6 +54,7 @@ export default function Breeding() {
       if (error) { showToast('Update failed.', 'error'); return; }
       showToast('Breeding record updated.', 'success');
     } else {
+      if (geo.status === 'success') { payload.latitude = geo.coords.latitude; payload.longitude = geo.coords.longitude; }
       const { error } = await api.insert('breeding_records', [payload]);
       if (error) { showToast('Insert failed.', 'error'); return; }
       showToast('Breeding record added.', 'success');
@@ -124,6 +128,7 @@ export default function Breeding() {
         open={modalOpen} onClose={() => setModalOpen(false)} title={editingId ? 'Edit Breeding Record' : 'Add Breeding Record'}
         footer={<><button className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button><button className="btn btn-primary" onClick={save}><i className="fas fa-check"></i> Save</button></>}
       >
+        {!editingId && <LocationCaptureBadge geo={geo} />}
         <div className="form-group"><label>Animal Tag ID *</label><input type="text" className="form-control" placeholder="e.g. COW-001" value={form.tag_id} onChange={(e) => setForm({ ...form, tag_id: e.target.value })} /></div>
         <div className="form-row">
           <div className="form-group"><label>Breeding Date</label><input type="date" className="form-control" value={form.breeding_date} onChange={(e) => setForm({ ...form, breeding_date: e.target.value })} /></div>

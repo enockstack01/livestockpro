@@ -3,6 +3,7 @@ import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import { StatusBadge, fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
+import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
 
 const EMPTY_FORM = { tag_id: '', disease: '', treatment: '', medicine: '', vet_name: '', check_date: '', next_check_date: '', status: 'Under Treatment', notes: '' };
@@ -10,6 +11,7 @@ const EMPTY_FORM = { tag_id: '', disease: '', treatment: '', medicine: '', vet_n
 export default function Health() {
   const api = useApi();
   const showToast = useToast();
+  const geo = useGeoCapture();
 
   const [records, setRecords] = useState([]);
   const [search, setSearch] = useState('');
@@ -33,10 +35,11 @@ export default function Health() {
     return !q || [h.tag_id, h.disease, h.treatment, h.vet_name].some((v) => (v || '').toLowerCase().includes(q));
   });
 
-  function openAdd() { setEditingId(null); setForm(EMPTY_FORM); setModalOpen(true); }
+  function openAdd() { setEditingId(null); setForm(EMPTY_FORM); geo.capture(); setModalOpen(true); }
   function openEdit(h) {
     setEditingId(h.id);
     setForm({ tag_id: h.tag_id || '', disease: h.disease || '', treatment: h.treatment || '', medicine: h.medicine || '', vet_name: h.vet_name || '', check_date: h.check_date || '', next_check_date: h.next_check_date || '', status: h.status || 'Under Treatment', notes: h.notes || '' });
+    geo.reset();
     setModalOpen(true);
   }
 
@@ -47,7 +50,8 @@ export default function Health() {
       if (error) { showToast('Update failed: ' + error.message, 'error'); return; }
       showToast('Health record updated.', 'success');
     } else {
-      const { error } = await api.insert('health_records', [form]);
+      const payload = geo.status === 'success' ? { ...form, latitude: geo.coords.latitude, longitude: geo.coords.longitude } : form;
+      const { error } = await api.insert('health_records', [payload]);
       if (error) { showToast('Insert failed: ' + error.message, 'error'); return; }
       showToast('Health record added.', 'success');
     }
@@ -119,6 +123,7 @@ export default function Health() {
         open={modalOpen} onClose={() => setModalOpen(false)} title={editingId ? 'Edit Health Record' : 'Add Health Record'}
         footer={<><button className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button><button className="btn btn-primary" onClick={save}><i className="fas fa-check"></i> Save</button></>}
       >
+        {!editingId && <LocationCaptureBadge geo={geo} />}
         <div className="form-group"><label>Animal Tag ID *</label><input type="text" className="form-control" placeholder="e.g. COW-001" value={form.tag_id} onChange={(e) => setForm({ ...form, tag_id: e.target.value })} /></div>
         <div className="form-row">
           <div className="form-group"><label>Disease / Condition</label><input type="text" className="form-control" placeholder="e.g. Mastitis" value={form.disease} onChange={(e) => setForm({ ...form, disease: e.target.value })} /></div>

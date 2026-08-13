@@ -3,6 +3,7 @@ import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import { StatusBadge, calcAge, fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
+import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
 
 const EMPTY_FORM = { tag_id: '', name: '', species: '', breed: '', sex: '', date_of_birth: '', location: '', health_status: 'Healthy', notes: '' };
@@ -12,6 +13,7 @@ export default function Animals() {
   const api = useApi();
   const showToast = useToast();
   const fileInputRef = useRef(null);
+  const geo = useGeoCapture();
 
   const [animals, setAnimals] = useState([]);
   const [search, setSearch] = useState('');
@@ -51,12 +53,14 @@ export default function Animals() {
   function openAdd() {
     setEditingId(null);
     setForm(EMPTY_FORM);
+    geo.capture();
     setModalOpen(true);
   }
 
   function openEdit(a) {
     setEditingId(a.id);
     setForm({ tag_id: a.tag_id || '', name: a.name || '', species: a.species || '', breed: a.breed || '', sex: a.sex || '', date_of_birth: a.date_of_birth || '', location: a.location || '', health_status: a.health_status || 'Healthy', notes: a.notes || '' });
+    geo.reset();
     setModalOpen(true);
   }
 
@@ -67,7 +71,8 @@ export default function Animals() {
       if (error) { showToast('Update failed: ' + error.message, 'error'); return; }
       showToast('Animal updated successfully.', 'success');
     } else {
-      const { error } = await api.insert('animals', [form]);
+      const payload = geo.status === 'success' ? { ...form, latitude: geo.coords.latitude, longitude: geo.coords.longitude } : form;
+      const { error } = await api.insert('animals', [payload]);
       if (error) { showToast('Insert failed: ' + error.message, 'error'); return; }
       showToast('Animal added successfully.', 'success');
     }
@@ -198,6 +203,7 @@ export default function Animals() {
         open={modalOpen} onClose={() => setModalOpen(false)} title={editingId ? 'Edit Animal' : 'Add New Animal'}
         footer={<><button className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button><button className="btn btn-primary" onClick={save}><i className="fas fa-check"></i> Save</button></>}
       >
+        {!editingId && <LocationCaptureBadge geo={geo} />}
         <div className="form-group"><label>Tag ID *</label><input type="text" className="form-control" placeholder="e.g. COW-001" value={form.tag_id} onChange={(e) => setForm({ ...form, tag_id: e.target.value })} /></div>
         <div className="form-row">
           <div className="form-group"><label>Name</label><input type="text" className="form-control" placeholder="Optional name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>

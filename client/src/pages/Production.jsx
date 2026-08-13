@@ -3,6 +3,7 @@ import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import { fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
+import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
 
 const EMPTY_FORM = { tag_id: '', production_type: 'Milk', quantity: '', unit: 'liters', production_date: '', notes: '' };
@@ -13,6 +14,7 @@ const UNIT_MAP = { Milk: 'liters', Eggs: 'units', Meat: 'kg' };
 export default function Production() {
   const api = useApi();
   const showToast = useToast();
+  const geo = useGeoCapture();
 
   const [records, setRecords] = useState([]);
   const [search, setSearch] = useState('');
@@ -48,10 +50,11 @@ export default function Production() {
     return { milk, eggs, meat };
   }, [records]);
 
-  function openAdd() { setEditingId(null); setForm(EMPTY_FORM); setModalOpen(true); }
+  function openAdd() { setEditingId(null); setForm(EMPTY_FORM); geo.capture(); setModalOpen(true); }
   function openEdit(p) {
     setEditingId(p.id);
     setForm({ tag_id: p.tag_id || '', production_type: p.production_type || 'Milk', quantity: p.quantity ?? '', unit: p.unit || 'liters', production_date: p.production_date || '', notes: p.notes || '' });
+    geo.reset();
     setModalOpen(true);
   }
 
@@ -63,6 +66,7 @@ export default function Production() {
       if (error) { showToast('Update failed.', 'error'); return; }
       showToast('Production record updated.', 'success');
     } else {
+      if (geo.status === 'success') { payload.latitude = geo.coords.latitude; payload.longitude = geo.coords.longitude; }
       const { error } = await api.insert('production_records', [payload]);
       if (error) { showToast('Insert failed.', 'error'); return; }
       showToast('Production record added.', 'success');
@@ -147,6 +151,7 @@ export default function Production() {
         open={modalOpen} onClose={() => setModalOpen(false)} title={editingId ? 'Edit Production Record' : 'Add Production Record'}
         footer={<><button className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button><button className="btn btn-primary" onClick={save}><i className="fas fa-check"></i> Save</button></>}
       >
+        {!editingId && <LocationCaptureBadge geo={geo} />}
         <div className="form-row">
           <div className="form-group">
             <label>Production Type *</label>

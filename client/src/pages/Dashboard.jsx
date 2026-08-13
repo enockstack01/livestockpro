@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Chart from 'chart.js/auto';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { StatusBadge, PriorityBadge, fmtDate } from '../lib/badges.jsx';
+import { useCanvasChart } from '../lib/useChart.js';
 import Modal from '../components/Modal.jsx';
 
 export default function Dashboard() {
@@ -117,6 +117,10 @@ export default function Dashboard() {
           <div className="card-header"><h3>Production Trend</h3></div>
           <div className="card-body"><ProductionChart production={data.production} /></div>
         </div>
+        <div className="card">
+          <div className="card-header"><h3>Task Status</h3></div>
+          <div className="card-body"><TaskChart tasks={t} /></div>
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
@@ -223,23 +227,6 @@ export default function Dashboard() {
   );
 }
 
-function useCanvasChart(build, deps) {
-  const canvasRef = useRef(null);
-  const chartRef = useRef(null);
-
-  useEffect(() => {
-    if (!canvasRef.current) return;
-    const config = build();
-    if (!config) { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } return; }
-    if (chartRef.current) chartRef.current.destroy();
-    chartRef.current = new Chart(canvasRef.current, config);
-    return () => { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
-
-  return canvasRef;
-}
-
 function HealthChart({ healthy, treatment, critical }) {
   const total = healthy + treatment + critical;
   const canvasRef = useCanvasChart(() => {
@@ -301,5 +288,24 @@ function ProductionChart({ production }) {
   }, [JSON.stringify(prodData)]);
 
   if (!hasData) return <div className="empty-state" style={{ padding: '30px 10px' }}><i className="fas fa-chart-line"></i><h3>No production data yet</h3><p>Add milk, egg, or meat records to see trends.</p></div>;
+  return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
+}
+
+function TaskChart({ tasks }) {
+  const pending = tasks.filter((t) => t.status === 'Pending').length;
+  const inProgress = tasks.filter((t) => t.status === 'In Progress').length;
+  const completed = tasks.filter((t) => t.status === 'Completed').length;
+  const total = pending + inProgress + completed;
+
+  const canvasRef = useCanvasChart(() => {
+    if (total === 0) return null;
+    return {
+      type: 'doughnut',
+      data: { labels: ['Pending', 'In Progress', 'Completed'], datasets: [{ data: [pending, inProgress, completed], backgroundColor: ['#F9A825', '#1976D2', '#2E7D32'], borderWidth: 0, spacing: 2 }] },
+      options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true, pointStyleWidth: 10, font: { size: 12 } } } } }
+    };
+  }, [pending, inProgress, completed]);
+
+  if (total === 0) return <div className="empty-state" style={{ padding: '30px 10px' }}><i className="fas fa-clipboard-list"></i><h3>No tasks yet</h3><p>Add a task to see status breakdown.</p></div>;
   return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
 }

@@ -3,6 +3,7 @@ import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import { fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
+import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
 
 const EMPTY_FORM = { type: 'Income', amount: '', category: '', date: '', description: '' };
@@ -11,6 +12,7 @@ const CATEGORIES = ['Milk Sales', 'Egg Sales', 'Meat Sales', 'Animal Sales', 'Ot
 export default function Finance() {
   const api = useApi();
   const showToast = useToast();
+  const geo = useGeoCapture();
 
   const [records, setRecords] = useState([]);
   const [search, setSearch] = useState('');
@@ -45,10 +47,11 @@ export default function Finance() {
     return { totalIncome, totalExpense, pl: totalIncome - totalExpense };
   }, [records]);
 
-  function openAdd() { setEditingId(null); setForm({ ...EMPTY_FORM, date: new Date().toISOString().split('T')[0] }); setModalOpen(true); }
+  function openAdd() { setEditingId(null); setForm({ ...EMPTY_FORM, date: new Date().toISOString().split('T')[0] }); geo.capture(); setModalOpen(true); }
   function openEdit(f) {
     setEditingId(f.id);
     setForm({ type: f.type || 'Income', amount: f.amount ?? '', category: f.category || '', date: f.date || '', description: f.description || '' });
+    geo.reset();
     setModalOpen(true);
   }
 
@@ -62,6 +65,7 @@ export default function Finance() {
       if (error) { showToast('Update failed.', 'error'); return; }
       showToast('Finance record updated.', 'success');
     } else {
+      if (geo.status === 'success') { payload.latitude = geo.coords.latitude; payload.longitude = geo.coords.longitude; }
       const { error } = await api.insert('finance_records', [payload]);
       if (error) { showToast('Insert failed.', 'error'); return; }
       showToast('Finance record added.', 'success');
@@ -146,6 +150,7 @@ export default function Finance() {
         open={modalOpen} onClose={() => setModalOpen(false)} title={editingId ? 'Edit Finance Record' : 'Add Finance Record'}
         footer={<><button className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button><button className="btn btn-primary" onClick={save}><i className="fas fa-check"></i> Save</button></>}
       >
+        {!editingId && <LocationCaptureBadge geo={geo} />}
         <div className="form-row">
           <div className="form-group">
             <label>Type *</label>
