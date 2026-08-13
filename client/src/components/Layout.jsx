@@ -87,7 +87,7 @@ function useNotifications() {
         if (b.expected_birth_date && b.pregnancy_status === 'Pregnant') {
           const daysUntil = Math.ceil((new Date(b.expected_birth_date) - now) / (1000 * 60 * 60 * 24));
           if (daysUntil <= 7 && daysUntil >= 0) {
-            notifItems.push({ id: 'breeding-birth-' + b.id, icon: 'fa-baby', color: 'purple', title: 'Expected birth: ' + (b.tag_id || '—'), sub: daysUntil === 0 ? 'Today!' : 'In ' + daysUntil + ' day' + (daysUntil > 1 ? 's' : ''), link: '/breeding' });
+            notifItems.push({ id: 'breeding-birth-' + b.id, icon: 'fa-paw', color: 'purple', title: 'Expected birth: ' + (b.tag_id || '—'), sub: daysUntil === 0 ? 'Today!' : 'In ' + daysUntil + ' day' + (daysUntil > 1 ? 's' : ''), link: '/breeding' });
           }
         }
       });
@@ -182,7 +182,7 @@ function LayoutInner() {
     <>
       <aside className={`sidebar${sidebarOpen ? ' open' : ''}`}>
         <div className="sidebar-header">
-          <div className="sidebar-logo"><i className="fas fa-leaf"></i><span>LivestockPro</span></div>
+          <div className="sidebar-logo"><i className="fas fa-cow"></i><span>LivestockPro</span></div>
           <button className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fas fa-xmark"></i></button>
         </div>
         <nav className="sidebar-nav">

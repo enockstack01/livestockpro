@@ -16,7 +16,7 @@ export default function Login() {
   return (
     <div className="auth-page">
       <div className="auth-brand">
-        <div className="auth-brand-icon"><i className="fas fa-leaf"></i></div>
+        <div className="auth-brand-icon"><i className="fas fa-cow"></i></div>
         <h1>LivestockPro</h1>
         <p>Streamline your farm operations. Track animals, health, breeding, feeding, production, and finances — all in one place.</p>
       </div>

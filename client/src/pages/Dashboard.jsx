@@ -76,7 +76,7 @@ export default function Dashboard() {
     { icon: 'fa-heart-pulse', color: 'green', label: 'Healthy', value: healthyCount, link: '/animals' },
     { icon: 'fa-stethoscope', color: 'orange', label: 'Under Treatment', value: treatmentCount, link: '/health' },
     { icon: 'fa-triangle-exclamation', color: 'red', label: 'Critical Cases', value: criticalCount, link: '/health' },
-    { icon: 'fa-baby', color: 'purple', label: 'Pregnant', value: pregnantCount, link: '/breeding' },
+    { icon: 'fa-paw', color: 'purple', label: 'Pregnant', value: pregnantCount, link: '/breeding' },
     { icon: 'fa-egg', color: 'blue', label: 'Newborns', value: newbornCount, link: '/breeding' },
     { icon: 'fa-list-check', color: overdueTasks > 0 ? 'red' : 'orange', label: 'Pending Tasks', value: pendingTasks, link: '/tasks' },
     { icon: 'fa-arrow-trend-up', color: 'green', label: 'Monthly Income', value: '$' + monthIncome.toLocaleString(), link: '/finance' },
