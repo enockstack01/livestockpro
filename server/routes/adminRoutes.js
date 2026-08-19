@@ -223,6 +223,172 @@ router.patch('/users/:id/role', async (req, res) => {
   }
 });
 
+/* ── One Health intelligence ───────────────────────────────────────────────
+   Computed on demand from live health_records/animals data — no separate
+   store, no background job. Priority watchlist of zoonotic and major
+   transboundary livestock diseases, matched against the free-text `disease`
+   field; not exhaustive, meant as a sensible starting point. */
+const ONE_HEALTH_WATCHLIST = [
+  { disease: 'Anthrax', keywords: ['anthrax'], zoonotic: true, severity: 'critical' },
+  { disease: 'Rabies', keywords: ['rabies', 'rabid'], zoonotic: true, severity: 'critical' },
+  { disease: 'Highly Pathogenic Avian Influenza', keywords: ['avian influenza', 'bird flu', 'h5n1', 'h5n8', 'hpai'], zoonotic: true, severity: 'critical' },
+  { disease: 'Rift Valley Fever', keywords: ['rift valley fever', 'rvf'], zoonotic: true, severity: 'critical' },
+  { disease: 'Brucellosis', keywords: ['brucellosis', 'brucella'], zoonotic: true, severity: 'high' },
+  { disease: 'Bovine Tuberculosis', keywords: ['bovine tuberculosis', 'bovine tb'], zoonotic: true, severity: 'high' },
+  { disease: 'Q Fever', keywords: ['q fever', 'coxiella'], zoonotic: true, severity: 'high' },
+  { disease: 'Leptospirosis', keywords: ['leptospirosis', 'leptospira'], zoonotic: true, severity: 'high' },
+  { disease: 'Trypanosomiasis', keywords: ['trypanosomiasis', 'nagana'], zoonotic: true, severity: 'medium' },
+  { disease: 'Foot-and-Mouth Disease', keywords: ['foot-and-mouth', 'foot and mouth', 'fmd'], zoonotic: false, severity: 'high' },
+  { disease: 'Peste des Petits Ruminants', keywords: ['peste des petits ruminants', 'ppr'], zoonotic: false, severity: 'high' },
+  { disease: 'African Swine Fever', keywords: ['african swine fever', 'asf'], zoonotic: false, severity: 'high' },
+  { disease: 'Newcastle Disease', keywords: ['newcastle disease'], zoonotic: false, severity: 'medium' },
+  { disease: 'Lumpy Skin Disease', keywords: ['lumpy skin disease'], zoonotic: false, severity: 'medium' },
+  { disease: 'Contagious Bovine Pleuropneumonia', keywords: ['contagious bovine pleuropneumonia', 'cbpp'], zoonotic: false, severity: 'medium' }
+];
+
+const SEVERITY_RANK = { low: 0, medium: 1, high: 2, critical: 3 };
+function bumpSeverity(base, extra) {
+  const order = ['low', 'medium', 'high', 'critical'];
+  return order[Math.min(order.length - 1, SEVERITY_RANK[base] + Math.max(0, Math.floor(extra / 3)))];
+}
+function isoDate(daysAgo) {
+  return new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
+/* GET /api/admin/onehealth — disease risk alerts computed live from this
+   farm network's health records. admin or super_admin only. */
+router.get('/onehealth', async (req, res) => {
+  try {
+    const db = getDb();
+    const since30 = isoDate(30);
+    const since7 = isoDate(7);
+    const since14 = isoDate(14);
+
+    const [records, criticalAnimals, userList, profiles] = await Promise.all([
+      db.collection('health_records').find({ check_date: { $gte: since30 } }).toArray(),
+      db.collection('animals').find({ health_status: 'Critical' }).toArray(),
+      clerkClient.users.getUserList({ limit: 500 }),
+      db.collection('profiles').find({}).toArray()
+    ]);
+
+    const farmByUser = {};
+    profiles.forEach((p) => { farmByUser[p.user_id] = p.farm_name || ''; });
+    const emailByUser = {};
+    userList.data.forEach((u) => { emailByUser[u.id] = primaryEmail(u); });
+    const farmLabel = (userId) => farmByUser[userId] || emailByUser[userId] || 'Unknown farm';
+
+    const alerts = new Map();
+    const upsert = (key, alert) => {
+      const existing = alerts.get(key);
+      if (!existing) { alerts.set(key, alert); return; }
+      existing.farms = [...new Set([...existing.farms, ...alert.farms])];
+      existing.count += alert.count;
+      existing.recordIds = [...new Set([...existing.recordIds, ...alert.recordIds])];
+      if (SEVERITY_RANK[alert.severity] > SEVERITY_RANK[existing.severity]) existing.severity = alert.severity;
+      if (alert.detectedAt > existing.detectedAt) existing.detectedAt = alert.detectedAt;
+    };
+
+    /* 1) Watchlist keyword matches on disease/notes text */
+    records.forEach((r) => {
+      const text = `${r.disease || ''} ${r.notes || ''}`.toLowerCase();
+      if (!text.trim()) return;
+      ONE_HEALTH_WATCHLIST.forEach((entry) => {
+        if (!entry.keywords.some((k) => text.includes(k))) return;
+        upsert(`watchlist:${entry.disease}:${r.user_id}`, {
+          type: 'watchlist',
+          disease: entry.disease,
+          zoonotic: entry.zoonotic,
+          severity: entry.severity,
+          title: `${entry.disease} suspected — ${farmLabel(r.user_id)}`,
+          description: `${entry.disease}${entry.zoonotic ? ' (zoonotic)' : ''} matched on a health record${r.district ? ` in ${r.district}` : ''}.`,
+          farms: [farmLabel(r.user_id)],
+          count: 1,
+          district: r.district || null,
+          detectedAt: r.check_date || since30,
+          recordIds: [r._id]
+        });
+      });
+    });
+
+    /* 2) Critical-status clustering per farm — this schema has no death/mortality
+       field, so a burst of Critical statuses is the closest available severity signal */
+    const criticalByFarm = new Map();
+    const pushCritical = (userId, item) => {
+      if (!criticalByFarm.has(userId)) criticalByFarm.set(userId, []);
+      criticalByFarm.get(userId).push(item);
+    };
+    criticalAnimals.filter((a) => (a.last_check_date || '') >= since7).forEach((a) => pushCritical(a.user_id, a));
+    records.filter((r) => r.status === 'Critical' && (r.check_date || '') >= since7).forEach((r) => pushCritical(r.user_id, r));
+    criticalByFarm.forEach((items, userId) => {
+      if (items.length < 3) return;
+      upsert(`critical:${userId}`, {
+        type: 'critical_cluster',
+        disease: null,
+        zoonotic: false,
+        severity: bumpSeverity('medium', items.length - 3),
+        title: `Critical health cluster — ${farmLabel(userId)}`,
+        description: `${items.length} animals/records marked Critical at this farm in the last 7 days.`,
+        farms: [farmLabel(userId)],
+        count: items.length,
+        district: items.find((i) => i.district)?.district || null,
+        detectedAt: isoDate(0),
+        recordIds: items.map((i) => i._id)
+      });
+    });
+
+    /* 3) Cross-farm disease clustering by district — the strongest early signal
+       of a possible outbreak, since it needs no diagnosis on the watchlist */
+    const byDistrictDisease = new Map();
+    records.filter((r) => (r.check_date || '') >= since14 && r.disease && r.disease.trim()).forEach((r) => {
+      const district = r.district || 'Unknown district';
+      const key = `${district}::${r.disease.trim().toLowerCase()}`;
+      if (!byDistrictDisease.has(key)) byDistrictDisease.set(key, []);
+      byDistrictDisease.get(key).push(r);
+    });
+    byDistrictDisease.forEach((items, key) => {
+      const farmSet = new Set(items.map((r) => r.user_id));
+      if (farmSet.size < 3) return;
+      const district = key.split('::')[0];
+      const label = items[0].disease.trim();
+      const latest = items.reduce((a, b) => ((b.check_date || '') > (a.check_date || '') ? b : a));
+      upsert(`cluster:${key}`, {
+        type: 'outbreak_cluster',
+        disease: label,
+        zoonotic: false,
+        severity: bumpSeverity('medium', farmSet.size - 3),
+        title: `Possible outbreak cluster — "${label}" in ${district}`,
+        description: `"${label}" reported across ${farmSet.size} different farms in ${district} within the last 14 days.`,
+        farms: [...farmSet].map(farmLabel),
+        count: items.length,
+        district,
+        detectedAt: latest.check_date || since14,
+        recordIds: items.map((i) => i._id)
+      });
+    });
+
+    const list = [...alerts.values()].sort((a, b) => (b.detectedAt || '').localeCompare(a.detectedAt || ''));
+    res.json({
+      data: {
+        alerts: list,
+        summary: {
+          total: list.length,
+          zoonotic: list.filter((a) => a.zoonotic).length,
+          bySeverity: {
+            critical: list.filter((a) => a.severity === 'critical').length,
+            high: list.filter((a) => a.severity === 'high').length,
+            medium: list.filter((a) => a.severity === 'medium').length,
+            low: list.filter((a) => a.severity === 'low').length
+          },
+          recordsScanned: records.length
+        }
+      },
+      error: null
+    });
+  } catch (err) {
+    res.status(500).json({ error: { message: err.message } });
+  }
+});
+
 /* DELETE /api/admin/users/:id — super_admin only. Wipes the user's Mongo
    documents and their Clerk account entirely. */
 router.delete('/users/:id', requireRole('super_admin'), async (req, res) => {

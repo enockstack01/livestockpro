@@ -7,6 +7,7 @@ import { useCanvasChart } from '../lib/useChart.js';
 import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import Modal from '../components/Modal.jsx';
 import SpatialMap from '../components/SpatialMap.jsx';
+import { fmtDate } from '../lib/badges.jsx';
 
 const RESOURCE_LABELS = {
   animals: { label: 'Animals', icon: 'fa-cow', color: '#2E7D32' },
@@ -255,6 +256,7 @@ export default function AdminDashboard() {
             <button className={`tab-btn${tab === 'users' ? ' active' : ''}`} onClick={() => setTab('users')}><i className="fas fa-users"></i> Users <span className="tab-count">{users.length}</span></button>
             <button className={`tab-btn${tab === 'admins' ? ' active' : ''}`} onClick={() => setTab('admins')}><i className="fas fa-user-shield"></i> Admins <span className="tab-count">{admins.length}</span></button>
             <button className={`tab-btn${tab === 'map' ? ' active' : ''}`} onClick={() => setTab('map')}><i className="fas fa-map-location-dot"></i> Spatial Distribution</button>
+            <button className={`tab-btn${tab === 'onehealth' ? ' active' : ''}`} onClick={() => setTab('onehealth')}><i className="fas fa-shield-virus"></i> One Health</button>
           </div>
 
           {tab === 'overview' && (
@@ -494,6 +496,12 @@ export default function AdminDashboard() {
               <SpatialMap />
             </div>
           )}
+
+          {tab === 'onehealth' && (
+            <div className="admin-fade-in">
+              <OneHealthPanel />
+            </div>
+          )}
         </>
       )}
 
@@ -638,4 +646,126 @@ function SignupTrendChart({ buckets }) {
 
   if (!hasData) return <div className="empty-state" style={{ padding: '30px 10px' }}><i className="fas fa-arrow-trend-up"></i><h3>No signups in the last 14 days</h3></div>;
   return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
+}
+
+const OH_SEVERITY_BADGE = { critical: 'badge-red', high: 'badge-orange', medium: 'badge-blue', low: 'badge-gray' };
+const OH_TYPE_LABEL = { watchlist: 'Watchlist disease', critical_cluster: 'Critical health cluster', outbreak_cluster: 'Outbreak cluster' };
+const OH_TYPE_ICON = { watchlist: 'fa-skull-crossbones', critical_cluster: 'fa-heart-crack', outbreak_cluster: 'fa-diagram-project' };
+
+function OneHealthPanel() {
+  const api = useApi();
+  const showToast = useToast();
+  const [alerts, setAlerts] = useState([]);
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [severityFilter, setSeverityFilter] = useState('');
+  const [zoonoticOnly, setZoonoticOnly] = useState(false);
+
+  async function load(isRefresh) {
+    if (isRefresh) setRefreshing(true);
+    const { data, error } = await api.adminOneHealth();
+    if (error) showToast('Failed to load One Health data: ' + error.message, 'error');
+    else { setAlerts(data.alerts); setSummary(data.summary); }
+    setLoading(false);
+    setRefreshing(false);
+  }
+
+  useEffect(() => {
+    const t = setTimeout(() => load(false), 0);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const filtered = useMemo(() => alerts.filter((a) =>
+    (!severityFilter || a.severity === severityFilter) && (!zoonoticOnly || a.zoonotic)
+  ), [alerts, severityFilter, zoonoticOnly]);
+
+  if (loading) {
+    return <div className="empty-state" style={{ padding: '60px 20px' }}><i className="fas fa-spinner fa-spin"></i><h3>Scanning health records for risk signals...</h3></div>;
+  }
+
+  return (
+    <>
+      <div className="page-header" style={{ marginBottom: 16 }}>
+        <div>
+          <h4 style={{ margin: 0 }}>Disease risk signals across every farm on the platform</h4>
+          <p style={{ margin: '4px 0 0', fontSize: 13 }}>Scanned {summary?.recordsScanned ?? 0} health records from the last 30 days.</p>
+        </div>
+        <button className="btn btn-secondary" onClick={() => load(true)} disabled={refreshing}>
+          {refreshing ? <><i className="fas fa-spinner fa-spin"></i> Analyzing...</> : <><i className="fas fa-rotate"></i> Refresh</>}
+        </button>
+      </div>
+
+      <div className="summary-grid" style={{ marginBottom: 20 }}>
+        <StatCard icon="fa-shield-virus" color="red" label="Open alerts" value={summary?.total ?? 0} />
+        <StatCard icon="fa-skull" color="orange" label="Zoonotic risk" value={summary?.zoonotic ?? 0} />
+        <StatCard icon="fa-triangle-exclamation" color="red" label="Critical" value={summary?.bySeverity?.critical ?? 0} />
+        <StatCard icon="fa-circle-exclamation" color="orange" label="High" value={summary?.bySeverity?.high ?? 0} />
+      </div>
+
+      <div className="filter-bar">
+        <select className="form-control" value={severityFilter} onChange={(e) => setSeverityFilter(e.target.value)}>
+          <option value="">All Severities</option>
+          <option value="critical">Critical</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, cursor: 'pointer' }}>
+          <input type="checkbox" checked={zoonoticOnly} onChange={(e) => setZoonoticOnly(e.target.checked)} />
+          Zoonotic only
+        </label>
+        {(severityFilter || zoonoticOnly) && (
+          <button className="btn btn-secondary btn-sm" onClick={() => { setSeverityFilter(''); setZoonoticOnly(false); }}>
+            <i className="fas fa-xmark"></i> Clear filters
+          </button>
+        )}
+      </div>
+
+      <div className="card">
+        <div className="card-header"><h3>Risk Alerts</h3><span className="badge badge-green">{filtered.length} of {alerts.length}</span></div>
+        <div className="card-body" style={{ padding: 0 }}>
+          {filtered.length === 0 ? (
+            <div className="empty-state">
+              <i className="fas fa-shield-heart"></i>
+              <h3>No risk signals detected</h3>
+              <p>{alerts.length === 0 ? 'No watchlist diseases, critical clusters, or cross-farm outbreak patterns found in the last 30 days.' : 'No alerts match the current filters.'}</p>
+            </div>
+          ) : (
+            <div className="table-wrapper">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Alert</th>
+                    <th>Type</th>
+                    <th>Severity</th>
+                    <th>Farms</th>
+                    <th>District</th>
+                    <th>Detected</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((a, i) => (
+                    <tr key={i}>
+                      <td>
+                        <div className="fw-600"><i className={`fas ${OH_TYPE_ICON[a.type] || 'fa-triangle-exclamation'}`} style={{ marginRight: 6, color: 'var(--red)' }}></i>{a.title}</div>
+                        <div className="text-muted" style={{ fontSize: 12, marginTop: 2 }}>{a.description}</div>
+                        {a.zoonotic && <span className="badge badge-purple" style={{ marginTop: 4, display: 'inline-block' }}>Zoonotic</span>}
+                      </td>
+                      <td>{OH_TYPE_LABEL[a.type] || a.type}</td>
+                      <td><span className={`badge ${OH_SEVERITY_BADGE[a.severity]}`}>{a.severity}</span></td>
+                      <td>{a.farms.join(', ')}</td>
+                      <td>{a.district || '—'}</td>
+                      <td>{fmtDate(a.detectedAt)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
 }

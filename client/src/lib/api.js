@@ -74,6 +74,9 @@ export function useApi() {
     async adminSpatial() {
       return request(getToken, '/admin/spatial');
     },
+    async adminOneHealth() {
+      return request(getToken, '/admin/onehealth');
+    },
     async setUserStatus(userId, banned) {
       return request(getToken, `/admin/users/${encodeURIComponent(userId)}/status`, { method: 'PATCH', body: JSON.stringify({ banned }) });
     },
