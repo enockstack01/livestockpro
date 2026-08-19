@@ -119,7 +119,9 @@ async function main() {
     makeAnimal('seed-oh-farm-nyagatare-1', 'NY1-003', 'Cattle', 'Friesian', 'Critical', 3),
     makeAnimal('seed-oh-farm-nyagatare-1', 'NY1-004', 'Cattle', 'Ankole', 'Healthy', 20),
     makeAnimal('seed-oh-farm-nyagatare-2', 'NY2-001', 'Poultry', 'Layer', 'Critical', 2),
-    makeAnimal('seed-oh-farm-nyagatare-2', 'NY2-002', 'Poultry', 'Layer', 'Healthy', 15),
+    makeAnimal('seed-oh-farm-nyagatare-2', 'NY2-002', 'Poultry', 'Layer', 'Deceased', 1),
+    makeAnimal('seed-oh-farm-nyagatare-2', 'NY2-003', 'Poultry', 'Layer', 'Deceased', 2),
+    makeAnimal('seed-oh-farm-nyagatare-2', 'NY2-004', 'Poultry', 'Layer', 'Healthy', 15),
     makeAnimal('seed-oh-farm-huye-1', 'HY1-001', 'Sheep', 'Local', 'Healthy', 12),
     makeAnimal('seed-oh-farm-huye-1', 'HY1-002', 'Cattle', 'Ankole', 'Under Treatment', 6),
     makeAnimal('seed-oh-farm-huye-2', 'HY2-001', 'Goat', 'Boer', 'Under Treatment', 9),
@@ -145,33 +147,41 @@ async function main() {
     makeRecord('seed-oh-farm-huye-2', 'HY2-001', 'Brucellosis confirmed by lab test', 'Under Treatment', 9,
       'Positive serology, isolated from herd.'),
 
-    /* ── C) Critical-status cluster at one farm — the closest available
-       severity signal, since this schema has no mortality/death field. */
+    /* ── C) Critical-status cluster at one farm — animals seriously unwell
+       but not (yet, or not confirmed) deceased. */
     makeRecord('seed-oh-farm-nyagatare-1', 'NY1-001', 'Unexplained weight loss and weakness', 'Critical', 1, ''),
     makeRecord('seed-oh-farm-nyagatare-1', 'NY1-002', 'Loss of appetite and high fever', 'Critical', 2, ''),
     makeRecord('seed-oh-farm-nyagatare-1', 'NY1-003', 'Severe lethargy, not responding to treatment', 'Critical', 3, ''),
 
-    /* ── D) A deliberate FALSE NEGATIVE — "mad dog disease" is a real
-       colloquial term for rabies, but the watchlist only matches "rabies" /
-       "rabid", so this is missed. This is the clearest, most honest way to
-       show a current limitation: keyword matching has blind spots for
-       local/informal terminology. */
+    /* ── D) Colloquial terminology — "mad dog disease" is a real informal
+       name for rabies, now on the Rabies watchlist entry alongside the
+       clinical term, and "suspected" in the text tags it with 'suspected'
+       confidence rather than 'confirmed'. */
     makeRecord('seed-oh-farm-huye-1', 'HY1-002', 'Mad dog disease suspected after erratic behaviour', 'Under Treatment', 6,
       'Animal became aggressive and disoriented; bitten by a stray dog 3 weeks ago.'),
 
-    /* ── E) A deliberate FALSE POSITIVE — this is a routine preventive
-       vaccination, not a disease case, but it will still match the "fmd"
-       keyword and get flagged. Shows the detector cannot yet tell "protecting
-       against X" apart from "diagnosed with X". */
+    /* ── E) Preventive vaccination, correctly NOT flagged — mentions "FMD"
+       but only in a routine booster context with no confirming/suspecting
+       language and a Healthy status, so the preventive-only guard excludes
+       it from the watchlist match. */
     makeRecord('seed-oh-farm-musanze-2', 'MZ2-002', 'Annual FMD vaccination — booster dose', 'Healthy', 4,
       'Routine preventive vaccination, animal shows no symptoms.'),
 
     /* ── F) Ordinary, healthy records — correctly generate no alert at all. */
     makeRecord('seed-oh-farm-musanze-1', 'MZ1-002', 'Routine check-up', 'Healthy', 10, 'No concerns.'),
     makeRecord('seed-oh-farm-nyagatare-1', 'NY1-004', 'Routine deworming', 'Healthy', 20, ''),
-    makeRecord('seed-oh-farm-nyagatare-2', 'NY2-002', 'Routine check-up', 'Healthy', 15, ''),
+    makeRecord('seed-oh-farm-nyagatare-2', 'NY2-004', 'Routine check-up', 'Healthy', 15, ''),
     makeRecord('seed-oh-farm-huye-1', 'HY1-001', 'Routine check-up', 'Healthy', 12, ''),
-    makeRecord('seed-oh-farm-huye-2', 'HY2-002', 'Routine vaccination — Newcastle', 'Recovered', 18, 'Preventive, no active disease.')
+    makeRecord('seed-oh-farm-huye-2', 'HY2-002', 'Routine vaccination — Newcastle', 'Recovered', 18, 'Preventive, no active disease.'),
+
+    /* ── G) Mortality cluster — two genuine deaths (Deceased status, matching
+       the two animals above) at the same poultry farm within a week,
+       reinforcing the suspected Avian Influenza case above with an actual
+       mortality signal rather than only a Critical-status proxy. */
+    makeRecord('seed-oh-farm-nyagatare-2', 'NY2-002', 'Sudden death, suspected Avian Influenza', 'Deceased', 1,
+      'Found dead in coop, no prior signs of illness.'),
+    makeRecord('seed-oh-farm-nyagatare-2', 'NY2-003', 'Sudden death, suspected Avian Influenza', 'Deceased', 2,
+      'Second bird found dead this week.')
   ];
 
   await db.collection('profiles').insertMany(profiles);
@@ -180,11 +190,11 @@ async function main() {
 
   console.log(`Inserted ${profiles.length} farm profiles, ${animals.length} animals, ${records.length} health records.`);
   console.log('\nExpect the One Health dashboard to show:');
-  console.log('  - 1 outbreak cluster alert  ("Sudden high fever and lameness" — Musanze, 3 farms)');
-  console.log('  - 2 watchlist alerts        (Avian Influenza — Nyagatare; Brucellosis — Huye)');
-  console.log('  - 1 critical cluster alert  (Nyagatare Ranch — 3 Critical records in 7 days)');
-  console.log('  - 1 false positive          (FMD vaccination record wrongly matched — worth pointing out)');
-  console.log('  - 1 known miss              ("Mad dog disease" / rabies — not on the keyword list, no alert)');
+  console.log('  - 1 outbreak cluster alert    ("Sudden high fever and lameness" — Musanze, 3 farms)');
+  console.log('  - 3 watchlist alerts          (Avian Influenza — suspected, Nyagatare; Brucellosis — confirmed, Huye; Rabies — suspected via "mad dog disease", Huye)');
+  console.log('  - 1 mortality cluster alert   (Akagera Poultry Estate — 2 deaths in 7 days)');
+  console.log('  - 1 critical cluster alert    (Nyagatare Ranch — 3 Critical records in 7 days)');
+  console.log('  - 2 correctly-quiet records   (FMD and Newcastle vaccination mentions — preventive-only guard keeps these from alerting)');
 
   await client.close();
 }

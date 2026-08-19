@@ -130,7 +130,7 @@ export default function Health() {
           <div className="form-group">
             <label>Status</label>
             <select className="form-control" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
-              <option value="Under Treatment">Under Treatment</option><option value="Healthy">Healthy</option><option value="Critical">Critical</option><option value="Recovered">Recovered</option>
+              <option value="Under Treatment">Under Treatment</option><option value="Healthy">Healthy</option><option value="Critical">Critical</option><option value="Recovered">Recovered</option><option value="Deceased">Deceased</option>
             </select>
           </div>
         </div>

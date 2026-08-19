@@ -567,7 +567,7 @@ function RoleChart({ users }) {
   return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
 }
 
-const HEALTH_COLORS = { Healthy: '#2E7D32', 'Under Treatment': '#F9A825', Critical: '#D32F2F', Unspecified: '#90A4AE' };
+const HEALTH_COLORS = { Healthy: '#2E7D32', 'Under Treatment': '#F9A825', Critical: '#D32F2F', Deceased: '#424242', Unspecified: '#90A4AE' };
 
 function HealthBreakdownChart({ breakdown }) {
   const entries = Object.entries(breakdown || {});

@@ -1,5 +1,5 @@
 const STATUS_MAP = {
-  Healthy: 'badge-green', 'Under Treatment': 'badge-orange', Critical: 'badge-red',
+  Healthy: 'badge-green', 'Under Treatment': 'badge-orange', Critical: 'badge-red', Deceased: 'badge-gray',
   Pregnant: 'badge-purple', Completed: 'badge-green', Pending: 'badge-orange',
   'In Progress': 'badge-blue', Recovered: 'badge-green', 'Not Confirmed': 'badge-gray'
 };

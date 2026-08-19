@@ -226,25 +226,36 @@ router.patch('/users/:id/role', async (req, res) => {
 /* ── One Health intelligence ───────────────────────────────────────────────
    Computed on demand from live health_records/animals data — no separate
    store, no background job. Priority watchlist of zoonotic and major
-   transboundary livestock diseases, matched against the free-text `disease`
-   field; not exhaustive, meant as a sensible starting point. */
+   transboundary/regional livestock diseases (East African context), each
+   with verified alternate/colloquial names in addition to the clinical
+   term, plus typo-tolerant fuzzy matching on single-word terms. */
 const ONE_HEALTH_WATCHLIST = [
-  { disease: 'Anthrax', keywords: ['anthrax'], zoonotic: true, severity: 'critical' },
-  { disease: 'Rabies', keywords: ['rabies', 'rabid'], zoonotic: true, severity: 'critical' },
-  { disease: 'Highly Pathogenic Avian Influenza', keywords: ['avian influenza', 'bird flu', 'h5n1', 'h5n8', 'hpai'], zoonotic: true, severity: 'critical' },
+  { disease: 'Anthrax', keywords: ['anthrax', 'splenic fever'], zoonotic: true, severity: 'critical' },
+  { disease: 'Rabies', keywords: ['rabies', 'rabid', 'mad dog disease', 'hydrophobia'], zoonotic: true, severity: 'critical' },
+  { disease: 'Highly Pathogenic Avian Influenza', keywords: ['avian influenza', 'bird flu', 'h5n1', 'h5n8', 'hpai', 'fowl plague'], zoonotic: true, severity: 'critical' },
   { disease: 'Rift Valley Fever', keywords: ['rift valley fever', 'rvf'], zoonotic: true, severity: 'critical' },
-  { disease: 'Brucellosis', keywords: ['brucellosis', 'brucella'], zoonotic: true, severity: 'high' },
+  { disease: 'Brucellosis', keywords: ['brucellosis', 'brucella', "bang's disease", 'contagious abortion', 'undulant fever'], zoonotic: true, severity: 'high' },
   { disease: 'Bovine Tuberculosis', keywords: ['bovine tuberculosis', 'bovine tb'], zoonotic: true, severity: 'high' },
-  { disease: 'Q Fever', keywords: ['q fever', 'coxiella'], zoonotic: true, severity: 'high' },
-  { disease: 'Leptospirosis', keywords: ['leptospirosis', 'leptospira'], zoonotic: true, severity: 'high' },
-  { disease: 'Trypanosomiasis', keywords: ['trypanosomiasis', 'nagana'], zoonotic: true, severity: 'medium' },
-  { disease: 'Foot-and-Mouth Disease', keywords: ['foot-and-mouth', 'foot and mouth', 'fmd'], zoonotic: false, severity: 'high' },
-  { disease: 'Peste des Petits Ruminants', keywords: ['peste des petits ruminants', 'ppr'], zoonotic: false, severity: 'high' },
+  { disease: 'Q Fever', keywords: ['q fever', 'coxiella', 'query fever'], zoonotic: true, severity: 'high' },
+  { disease: 'Leptospirosis', keywords: ['leptospirosis', 'leptospira', "weil's disease", "swineherd's disease"], zoonotic: true, severity: 'high' },
+  { disease: 'Trypanosomiasis', keywords: ['trypanosomiasis', 'nagana', 'sleeping sickness', 'tsetse disease'], zoonotic: true, severity: 'medium' },
+  { disease: 'Foot-and-Mouth Disease', keywords: ['foot-and-mouth', 'foot and mouth', 'fmd', 'hoof and mouth', 'aphthous fever'], zoonotic: false, severity: 'high' },
+  { disease: 'Peste des Petits Ruminants', keywords: ['peste des petits ruminants', 'ppr', 'goat plague', 'sheep and goat plague'], zoonotic: false, severity: 'high' },
   { disease: 'African Swine Fever', keywords: ['african swine fever', 'asf'], zoonotic: false, severity: 'high' },
-  { disease: 'Newcastle Disease', keywords: ['newcastle disease'], zoonotic: false, severity: 'medium' },
-  { disease: 'Lumpy Skin Disease', keywords: ['lumpy skin disease'], zoonotic: false, severity: 'medium' },
-  { disease: 'Contagious Bovine Pleuropneumonia', keywords: ['contagious bovine pleuropneumonia', 'cbpp'], zoonotic: false, severity: 'medium' }
+  { disease: 'Classical Swine Fever', keywords: ['classical swine fever', 'hog cholera', 'csf'], zoonotic: false, severity: 'high' },
+  { disease: 'Newcastle Disease', keywords: ['newcastle disease', 'ranikhet disease', 'fowl pest'], zoonotic: false, severity: 'medium' },
+  { disease: 'Lumpy Skin Disease', keywords: ['lumpy skin disease', 'lsd'], zoonotic: false, severity: 'medium' },
+  { disease: 'Contagious Bovine Pleuropneumonia', keywords: ['contagious bovine pleuropneumonia', 'cbpp', 'lung plague'], zoonotic: false, severity: 'medium' },
+  { disease: 'East Coast Fever', keywords: ['east coast fever', 'theileriosis', 'ecf'], zoonotic: false, severity: 'high' },
+  { disease: 'Blackleg', keywords: ['blackleg', 'black leg', 'black quarter'], zoonotic: false, severity: 'medium' }
 ];
+
+/* A record mentioning a preventive action (vaccination etc.) without any
+   confirming/suspecting language is treated as routine, not a case — this is
+   what stops "Annual FMD vaccination" from being read as an FMD outbreak. */
+const PREVENTIVE_KEYWORDS = ['vaccination', 'vaccine', 'vaccinated', 'booster', 'prophylactic', 'preventive', 'immunization', 'immunisation'];
+const CONFIRMED_KEYWORDS = ['confirmed', 'diagnosed', 'positive', 'lab test', 'laboratory', 'test result'];
+const SUSPECTED_KEYWORDS = ['suspected', 'suspect', 'presumptive', 'possible', 'query', 'probable'];
 
 const SEVERITY_RANK = { low: 0, medium: 1, high: 2, critical: 3 };
 function bumpSeverity(base, extra) {
@@ -255,18 +266,66 @@ function isoDate(daysAgo) {
   return new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 }
 
+/* Small edit-distance check so a typo or slightly different phrasing of a
+   single-word term still matches. Kept conservative: multi-word phrases must
+   match exactly (fuzzing a whole phrase is too error-prone), tolerance scales
+   with word length, and very short words never fuzz at all to avoid noise. */
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({ length: m + 1 }, (_, i) => [i, ...new Array(n).fill(0)]);
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] : 1 + Math.min(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1]);
+    }
+  }
+  return dp[m][n];
+}
+function fuzzyTolerance(len) {
+  if (len <= 5) return 0;
+  if (len <= 8) return 1;
+  return 2;
+}
+function textMatchesKeyword(text, keyword) {
+  if (text.includes(keyword)) return true;
+  if (keyword.includes(' ')) return false;
+  const tolerance = fuzzyTolerance(keyword.length);
+  if (tolerance === 0) return false;
+  return text.split(/[^a-z0-9]+/).filter(Boolean)
+    .some((w) => Math.abs(w.length - keyword.length) <= tolerance && levenshtein(w, keyword) <= tolerance);
+}
+
+function isLikelyPreventiveOnly(text, status) {
+  if (status === 'Critical' || status === 'Under Treatment') return false;
+  const hasPreventive = PREVENTIVE_KEYWORDS.some((k) => text.includes(k));
+  if (!hasPreventive) return false;
+  const hasConfirmingLanguage = CONFIRMED_KEYWORDS.some((k) => text.includes(k)) || SUSPECTED_KEYWORDS.some((k) => text.includes(k));
+  return !hasConfirmingLanguage;
+}
+function confidenceOf(text) {
+  if (CONFIRMED_KEYWORDS.some((k) => text.includes(k))) return 'confirmed';
+  if (SUSPECTED_KEYWORDS.some((k) => text.includes(k))) return 'suspected';
+  return 'reported';
+}
+const CONFIDENCE_RANK = { reported: 0, suspected: 1, confirmed: 2 };
+
 /* GET /api/admin/onehealth — disease risk alerts computed live from this
    farm network's health records. admin or super_admin only. */
 router.get('/onehealth', async (req, res) => {
   try {
     const db = getDb();
-    const since30 = isoDate(30);
     const since7 = isoDate(7);
     const since14 = isoDate(14);
 
-    const [records, criticalAnimals, userList, profiles] = await Promise.all([
-      db.collection('health_records').find({ check_date: { $gte: since30 } }).toArray(),
+    /* Watchlist matching looks at full history — a named disease case doesn't
+       stop being relevant just because it's older than 30 days. Only the
+       cluster/spike detectors below stay window-bound, since a "cluster" or
+       "spike" is inherently about what's happening *now*, not what happened
+       at any point in the farm's history. */
+    const [records, criticalAnimals, deceasedAnimals, userList, profiles] = await Promise.all([
+      db.collection('health_records').find({}).toArray(),
       db.collection('animals').find({ health_status: 'Critical' }).toArray(),
+      db.collection('animals').find({ health_status: 'Deceased' }).toArray(),
       clerkClient.users.getUserList({ limit: 500 }),
       db.collection('profiles').find({}).toArray()
     ]);
@@ -286,37 +345,65 @@ router.get('/onehealth', async (req, res) => {
       existing.recordIds = [...new Set([...existing.recordIds, ...alert.recordIds])];
       if (SEVERITY_RANK[alert.severity] > SEVERITY_RANK[existing.severity]) existing.severity = alert.severity;
       if (alert.detectedAt > existing.detectedAt) existing.detectedAt = alert.detectedAt;
+      if (alert.confidence && CONFIDENCE_RANK[alert.confidence] > CONFIDENCE_RANK[existing.confidence || 'reported']) existing.confidence = alert.confidence;
     };
 
-    /* 1) Watchlist keyword matches on disease/notes text */
+    /* 1) Watchlist matches — expanded synonyms + fuzzy matching, full history,
+       skipping mentions that are clearly just a routine preventive record. */
     records.forEach((r) => {
       const text = `${r.disease || ''} ${r.notes || ''}`.toLowerCase();
       if (!text.trim()) return;
+      if (isLikelyPreventiveOnly(text, r.status)) return;
+      const confidence = confidenceOf(text);
       ONE_HEALTH_WATCHLIST.forEach((entry) => {
-        if (!entry.keywords.some((k) => text.includes(k))) return;
+        if (!entry.keywords.some((k) => textMatchesKeyword(text, k))) return;
         upsert(`watchlist:${entry.disease}:${r.user_id}`, {
           type: 'watchlist',
           disease: entry.disease,
           zoonotic: entry.zoonotic,
           severity: entry.severity,
-          title: `${entry.disease} suspected — ${farmLabel(r.user_id)}`,
+          confidence,
+          title: `${entry.disease} ${confidence === 'confirmed' ? 'confirmed' : confidence === 'suspected' ? 'suspected' : 'reported'} — ${farmLabel(r.user_id)}`,
           description: `${entry.disease}${entry.zoonotic ? ' (zoonotic)' : ''} matched on a health record${r.district ? ` in ${r.district}` : ''}.`,
           farms: [farmLabel(r.user_id)],
           count: 1,
           district: r.district || null,
-          detectedAt: r.check_date || since30,
+          detectedAt: r.check_date || since14,
           recordIds: [r._id]
         });
       });
     });
 
-    /* 2) Critical-status clustering per farm — this schema has no death/mortality
-       field, so a burst of Critical statuses is the closest available severity signal */
+    /* 2) Mortality clustering — genuine deaths via the Deceased status. Lower
+       threshold and higher base severity than the critical-status cluster
+       below, since an actual death is a stronger signal than "still alive
+       but critical". */
+    const mortalityByFarm = new Map();
+    const pushMortality = (userId, item) => { if (!mortalityByFarm.has(userId)) mortalityByFarm.set(userId, []); mortalityByFarm.get(userId).push(item); };
+    deceasedAnimals.filter((a) => (a.last_check_date || '') >= since7).forEach((a) => pushMortality(a.user_id, a));
+    records.filter((r) => r.status === 'Deceased' && (r.check_date || '') >= since7).forEach((r) => pushMortality(r.user_id, r));
+    mortalityByFarm.forEach((items, userId) => {
+      if (items.length < 2) return;
+      upsert(`mortality:${userId}`, {
+        type: 'mortality_cluster',
+        disease: null,
+        zoonotic: false,
+        severity: bumpSeverity('high', items.length - 2),
+        confidence: 'confirmed',
+        title: `Mortality cluster — ${farmLabel(userId)}`,
+        description: `${items.length} deaths recorded at this farm in the last 7 days.`,
+        farms: [farmLabel(userId)],
+        count: items.length,
+        district: items.find((i) => i.district)?.district || null,
+        detectedAt: isoDate(0),
+        recordIds: items.map((i) => i._id)
+      });
+    });
+
+    /* 3) Critical-status clustering per farm — animals/records that are
+       seriously unwell but not (yet, or not confirmed) deceased. */
     const criticalByFarm = new Map();
-    const pushCritical = (userId, item) => {
-      if (!criticalByFarm.has(userId)) criticalByFarm.set(userId, []);
-      criticalByFarm.get(userId).push(item);
-    };
+    const pushCritical = (userId, item) => { if (!criticalByFarm.has(userId)) criticalByFarm.set(userId, []); criticalByFarm.get(userId).push(item); };
     criticalAnimals.filter((a) => (a.last_check_date || '') >= since7).forEach((a) => pushCritical(a.user_id, a));
     records.filter((r) => r.status === 'Critical' && (r.check_date || '') >= since7).forEach((r) => pushCritical(r.user_id, r));
     criticalByFarm.forEach((items, userId) => {
@@ -326,6 +413,7 @@ router.get('/onehealth', async (req, res) => {
         disease: null,
         zoonotic: false,
         severity: bumpSeverity('medium', items.length - 3),
+        confidence: 'confirmed',
         title: `Critical health cluster — ${farmLabel(userId)}`,
         description: `${items.length} animals/records marked Critical at this farm in the last 7 days.`,
         farms: [farmLabel(userId)],
@@ -336,7 +424,7 @@ router.get('/onehealth', async (req, res) => {
       });
     });
 
-    /* 3) Cross-farm disease clustering by district — the strongest early signal
+    /* 4) Cross-farm disease clustering by district — the strongest early signal
        of a possible outbreak, since it needs no diagnosis on the watchlist */
     const byDistrictDisease = new Map();
     records.filter((r) => (r.check_date || '') >= since14 && r.disease && r.disease.trim()).forEach((r) => {
@@ -356,6 +444,7 @@ router.get('/onehealth', async (req, res) => {
         disease: label,
         zoonotic: false,
         severity: bumpSeverity('medium', farmSet.size - 3),
+        confidence: 'reported',
         title: `Possible outbreak cluster — "${label}" in ${district}`,
         description: `"${label}" reported across ${farmSet.size} different farms in ${district} within the last 14 days.`,
         farms: [...farmSet].map(farmLabel),

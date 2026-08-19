@@ -7,8 +7,10 @@ import { fmtDate } from '../lib/badges.jsx';
 
 const SEVERITY_BADGE = { critical: 'badge-red', high: 'badge-orange', medium: 'badge-blue', low: 'badge-gray' };
 const SEVERITY_COLOR = { critical: '#D32F2F', high: '#F9A825', medium: '#1976D2', low: '#90A4AE' };
-const TYPE_LABEL = { watchlist: 'Watchlist disease', critical_cluster: 'Critical health cluster', outbreak_cluster: 'Outbreak cluster' };
-const TYPE_ICON = { watchlist: 'fa-skull-crossbones', critical_cluster: 'fa-heart-crack', outbreak_cluster: 'fa-diagram-project' };
+const TYPE_LABEL = { watchlist: 'Watchlist disease', mortality_cluster: 'Mortality cluster', critical_cluster: 'Critical health cluster', outbreak_cluster: 'Outbreak cluster' };
+const TYPE_ICON = { watchlist: 'fa-skull-crossbones', mortality_cluster: 'fa-cross', critical_cluster: 'fa-heart-crack', outbreak_cluster: 'fa-diagram-project' };
+const CONFIDENCE_BADGE = { confirmed: 'badge-red', suspected: 'badge-orange', reported: 'badge-gray' };
+const CONFIDENCE_LABEL = { confirmed: 'Confirmed', suspected: 'Suspected', reported: 'Reported' };
 
 function StatCard({ icon, color, label, value }) {
   return (
@@ -37,7 +39,7 @@ function SeverityChart({ bySeverity }) {
 }
 
 function TypeChart({ alerts }) {
-  const counts = { watchlist: 0, critical_cluster: 0, outbreak_cluster: 0 };
+  const counts = { watchlist: 0, mortality_cluster: 0, critical_cluster: 0, outbreak_cluster: 0 };
   alerts.forEach((a) => { if (counts[a.type] !== undefined) counts[a.type]++; });
   const entries = Object.entries(counts);
   const total = alerts.length;
@@ -45,7 +47,7 @@ function TypeChart({ alerts }) {
     if (total === 0) return null;
     return {
       type: 'bar',
-      data: { labels: entries.map(([k]) => TYPE_LABEL[k]), datasets: [{ data: entries.map(([, v]) => v), backgroundColor: ['#7B1FA2', '#D32F2F', '#F9A825'], borderRadius: 6 }] },
+      data: { labels: entries.map(([k]) => TYPE_LABEL[k]), datasets: [{ data: entries.map(([, v]) => v), backgroundColor: ['#7B1FA2', '#424242', '#D32F2F', '#F9A825'], borderRadius: 6 }] },
       options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: { color: '#F0F0F0' } }, y: { grid: { display: false }, ticks: { font: { size: 11 } } } }, plugins: { legend: { display: false } } }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -127,18 +129,20 @@ export default function OneHealth() {
                 <div>
                   <p className="fw-600" style={{ marginBottom: 8, color: 'var(--primary)' }}><i className="fas fa-check-circle"></i> It can detect</p>
                   <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, lineHeight: 1.8, color: 'var(--text-secondary, #555)' }}>
-                    <li>Health records naming a disease on a 15-entry zoonotic / major-transboundary watchlist (e.g. Anthrax, Rabies, Avian Influenza, Brucellosis, FMD, ASF).</li>
+                    <li>Health records naming a disease on an 18-entry zoonotic / major-transboundary watchlist (e.g. Anthrax, Rabies, Avian Influenza, Brucellosis, FMD, ASF, East Coast Fever) — matched against your full record history, not just recent ones.</li>
+                    <li>Local/colloquial names too, not just clinical terms — e.g. &quot;mad dog disease&quot; for rabies, &quot;Bang&apos;s disease&quot; for brucellosis — plus typo-tolerant fuzzy matching on single-word terms.</li>
+                    <li>Whether a match is <strong>confirmed</strong>, <strong>suspected</strong>, or just <strong>reported</strong>, based on the record&apos;s own wording — shown as a badge on each alert.</li>
+                    <li>Actual deaths directly: recording an animal or record as <strong>Deceased</strong> now feeds a dedicated mortality-cluster detector, separate from (and more urgent than) the Critical-status one.</li>
                     <li>The same unnamed symptom reported across 3+ different farms in one district within 14 days — an early outbreak signal that needs no diagnosis at all.</li>
-                    <li>A burst of 3+ Critical-status animals or records at one farm within 7 days.</li>
+                    <li>A burst of 3+ Critical-status animals or records, or 2+ deaths, at one farm within 7 days.</li>
                   </ul>
                 </div>
                 <div>
-                  <p className="fw-600" style={{ marginBottom: 8, color: 'var(--red)' }}><i className="fas fa-triangle-exclamation"></i> It cannot (yet) detect</p>
+                  <p className="fw-600" style={{ marginBottom: 8, color: 'var(--red)' }}><i className="fas fa-triangle-exclamation"></i> Where it can still be wrong</p>
                   <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, lineHeight: 1.8, color: 'var(--text-secondary, #555)' }}>
-                    <li>Diseases described in local/colloquial terms not on the watchlist — text matching only catches known phrasing.</li>
-                    <li>The difference between a preventive vaccination mention and an actual diagnosis — both currently match the same keywords.</li>
-                    <li>Mortality directly — this schema has no death field, so Critical status is used as the closest available proxy.</li>
-                    <li>Anything outside the last 30 days of records, or any unconfirmed/lab-pending case.</li>
+                    <li>A record now skips the watchlist match if it only mentions a preventive vaccination with no confirming or suspecting language — but it still trusts whatever wording is entered, so an ambiguous note can go either way.</li>
+                    <li>Fuzzy matching stays conservative (small edit-distance, single words only) to avoid false alarms — a genuinely novel term with no resemblance to any watchlist entry can still be missed.</li>
+                    <li>The cluster and mortality-spike detectors are intentionally window-bound (7&ndash;14 days), since a pattern from months ago isn&apos;t an active risk today — only the named-disease watchlist looks at full history.</li>
                   </ul>
                 </div>
               </div>
@@ -149,7 +153,7 @@ export default function OneHealth() {
             <StatCard icon="fa-shield-virus" color="red" label="Open alerts" value={summary?.total ?? 0} />
             <StatCard icon="fa-skull" color="purple" label="Zoonotic risk" value={summary?.zoonotic ?? 0} />
             <StatCard icon="fa-map-location-dot" color="blue" label="Farms affected" value={farmsAffected} />
-            <StatCard icon="fa-database" color="green" label="Records scanned (30d)" value={summary?.recordsScanned ?? 0} />
+            <StatCard icon="fa-database" color="green" label="Records scanned (all-time)" value={summary?.recordsScanned ?? 0} />
           </div>
 
           <div className="charts-grid mb-24">
@@ -210,7 +214,8 @@ export default function OneHealth() {
                           <td>
                             <div className="fw-600"><i className={`fas ${TYPE_ICON[a.type] || 'fa-triangle-exclamation'}`} style={{ marginRight: 6, color: 'var(--red)' }}></i>{a.title}</div>
                             <div className="text-muted" style={{ fontSize: 12, marginTop: 2 }}>{a.description}</div>
-                            {a.zoonotic && <span className="badge badge-purple" style={{ marginTop: 4, display: 'inline-block' }}>Zoonotic</span>}
+                            {a.zoonotic && <span className="badge badge-purple" style={{ marginTop: 4, marginRight: 4, display: 'inline-block' }}>Zoonotic</span>}
+                            {a.confidence && <span className={`badge ${CONFIDENCE_BADGE[a.confidence]}`} style={{ marginTop: 4, display: 'inline-block' }}>{CONFIDENCE_LABEL[a.confidence]}</span>}
                           </td>
                           <td>{TYPE_LABEL[a.type] || a.type}</td>
                           <td><span className={`badge ${SEVERITY_BADGE[a.severity]}`}>{a.severity}</span></td>

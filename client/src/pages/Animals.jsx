@@ -163,6 +163,7 @@ export default function Animals() {
           <option value="Healthy">Healthy</option>
           <option value="Under Treatment">Under Treatment</option>
           <option value="Critical">Critical</option>
+          <option value="Deceased">Deceased</option>
         </select>
       </div>
 
@@ -231,7 +232,7 @@ export default function Animals() {
         <div className="form-group">
           <label>Health Status</label>
           <select className="form-control" value={form.health_status} onChange={(e) => setForm({ ...form, health_status: e.target.value })}>
-            <option value="Healthy">Healthy</option><option value="Under Treatment">Under Treatment</option><option value="Critical">Critical</option>
+            <option value="Healthy">Healthy</option><option value="Under Treatment">Under Treatment</option><option value="Critical">Critical</option><option value="Deceased">Deceased</option>
           </select>
         </div>
         <div className="form-group"><label>Notes</label><textarea className="form-control" placeholder="Additional notes..." value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
