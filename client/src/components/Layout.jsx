@@ -196,6 +196,11 @@ function LayoutInner() {
               <i className="fas fa-user-shield"></i> Admin Panel
             </NavLink>
           )}
+          {isAdmin && (
+            <NavLink to="/onehealth" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')} onClick={() => setSidebarOpen(false)}>
+              <i className="fas fa-shield-virus" style={{ color: '#FFD54F' }}></i> One Health
+            </NavLink>
+          )}
           <a href="#" className="nav-item logout-item" onClick={handleLogout}>
             <i className="fas fa-right-from-bracket"></i> Logout
           </a>
