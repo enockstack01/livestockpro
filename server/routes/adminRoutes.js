@@ -30,6 +30,7 @@ router.get('/stats', async (req, res) => {
 
     async function groupCounts(collection, field) {
       const rows = await db.collection(collection).aggregate([
+        { $match: { deleted_at: null } },
         { $group: { _id: { $ifNull: [`$${field}`, 'Unspecified'] }, count: { $sum: 1 } } },
         { $sort: { count: -1 } }
       ]).toArray();
@@ -43,7 +44,7 @@ router.get('/stats', async (req, res) => {
       groupCounts('animals', 'health_status'),
       groupCounts('animals', 'species'),
       groupCounts('tasks', 'status'),
-      ...RESOURCE_COLLECTIONS.map((name) => db.collection(name).countDocuments({}))
+      ...RESOURCE_COLLECTIONS.map((name) => db.collection(name).countDocuments({ deleted_at: null }))
     ]);
 
     const byCollection = {};
@@ -96,11 +97,11 @@ router.get('/spatial', async (req, res) => {
     const [userList, ...collectionDocs] = await Promise.all([
       clerkClient.users.getUserList({ limit: 500 }),
       ...RESOURCE_COLLECTIONS.map((name) => db.collection(name).find({
-        latitude: { $exists: true, $ne: null }, longitude: { $exists: true, $ne: null }
+        latitude: { $exists: true, $ne: null }, longitude: { $exists: true, $ne: null }, deleted_at: null
       }).toArray())
     ]);
 
-    const profiles = await db.collection('profiles').find({}).toArray();
+    const profiles = await db.collection('profiles').find({ deleted_at: null }).toArray();
     const farmByUser = {};
     profiles.forEach((p) => { farmByUser[p.user_id] = p.farm_name || ''; });
     const emailByUser = {};
@@ -140,8 +141,8 @@ router.get('/users', async (req, res) => {
 
     const users = await Promise.all(sorted.map(async (u) => {
       const [profile, ...counts] = await Promise.all([
-        db.collection('profiles').findOne({ user_id: u.id }),
-        ...RESOURCE_COLLECTIONS.map((name) => db.collection(name).countDocuments({ user_id: u.id }))
+        db.collection('profiles').findOne({ user_id: u.id, deleted_at: null }),
+        ...RESOURCE_COLLECTIONS.map((name) => db.collection(name).countDocuments({ user_id: u.id, deleted_at: null }))
       ]);
       const byCollection = {};
       RESOURCE_COLLECTIONS.forEach((name, i) => { byCollection[name] = counts[i]; });
@@ -326,11 +327,11 @@ async function computeOneHealthAlerts(db) {
      "spike" is inherently about what's happening *now*, not what happened
      at any point in the farm's history. */
   const [records, criticalAnimals, deceasedAnimals, userList, profiles] = await Promise.all([
-    db.collection('health_records').find({}).toArray(),
-    db.collection('animals').find({ health_status: 'Critical' }).toArray(),
-    db.collection('animals').find({ health_status: 'Deceased' }).toArray(),
+    db.collection('health_records').find({ deleted_at: null }).toArray(),
+    db.collection('animals').find({ health_status: 'Critical', deleted_at: null }).toArray(),
+    db.collection('animals').find({ health_status: 'Deceased', deleted_at: null }).toArray(),
     clerkClient.users.getUserList({ limit: 500 }),
-    db.collection('profiles').find({}).toArray()
+    db.collection('profiles').find({ deleted_at: null }).toArray()
   ]);
 
   /* Every id an alert can reference (health record or animal), so the map
@@ -555,7 +556,7 @@ router.delete('/users/:id', requireRole('super_admin'), async (req, res) => {
       return res.status(400).json({ error: { message: 'Use Settings to delete your own account.' } });
     }
     const db = getDb();
-    await Promise.all(['profiles', ...RESOURCE_COLLECTIONS].map((name) => db.collection(name).deleteMany({ user_id: targetId })));
+    await Promise.all(['profiles', 'push_tokens', ...RESOURCE_COLLECTIONS].map((name) => db.collection(name).deleteMany({ user_id: targetId })));
     await clerkClient.users.deleteUser(targetId);
     res.json({ data: {}, error: null });
   } catch (err) {

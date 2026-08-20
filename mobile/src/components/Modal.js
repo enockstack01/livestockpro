@@ -1,0 +1,39 @@
+import { KeyboardAvoidingView, Modal as RNModal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+
+/* Native counterpart to client/src/components/Modal.jsx: same
+   open/onClose/title/children/footer contract, used for every add/edit form
+   and delete confirmation across all record screens. */
+export default function Modal({ open, onClose, title, children, footer }) {
+  return (
+    <RNModal visible={open} transparent animationType="fade" onRequestClose={onClose}>
+      <KeyboardAvoidingView
+        style={styles.overlay}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+        <View style={styles.sheet}>
+          <View style={styles.header}>
+            <Text style={styles.title} numberOfLines={1}>{title}</Text>
+            <Pressable onPress={onClose} hitSlop={12}>
+              <Ionicons name="close" size={22} color="#546E7A" />
+            </Pressable>
+          </View>
+          <ScrollView style={styles.body} contentContainerStyle={{ paddingBottom: 12 }} keyboardShouldPersistTaps="handled">
+            {children}
+          </ScrollView>
+          {footer ? <View style={styles.footer}>{footer}</View> : null}
+        </View>
+      </KeyboardAvoidingView>
+    </RNModal>
+  );
+}
+
+const styles = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
+  sheet: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '88%', paddingTop: 8 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#ECEFF1' },
+  title: { fontSize: 17, fontWeight: '700', color: '#1B5E20', flex: 1 },
+  body: { paddingHorizontal: 20, paddingTop: 12 },
+  footer: { flexDirection: 'row', gap: 10, padding: 16, borderTopWidth: 1, borderTopColor: '#ECEFF1' },
+});

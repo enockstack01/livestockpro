@@ -1,34 +1,24 @@
-const STATUS_MAP = {
-  Healthy: 'badge-green', 'Under Treatment': 'badge-orange', Critical: 'badge-red', Deceased: 'badge-gray',
-  Pregnant: 'badge-purple', Completed: 'badge-green', Pending: 'badge-orange',
-  'In Progress': 'badge-blue', Recovered: 'badge-green', 'Not Confirmed': 'badge-gray'
-};
+/* Status -> tone-name mapping lives in shared/statusMaps.js, imported by both
+   this file and mobile/src/components/Badges.js, so the two clients can never
+   quietly drift on "what color is a Critical animal". Each client still maps
+   tone-name -> its own rendering (this file: a CSS class; mobile: a hex pair)
+   since a React Native <View> and a <span className> aren't the same kind of
+   thing to share further than that. */
+import { STATUS_TONE, PRIORITY_TONE, PREGNANCY_TONE } from '../../../shared/statusMaps';
+
 export function StatusBadge({ status }) {
-  return <span className={`badge ${STATUS_MAP[status] || 'badge-gray'}`}>{status}</span>;
+  return <span className={`badge badge-${STATUS_TONE[status] || 'gray'}`}>{status}</span>;
 }
 
-const PRIORITY_MAP = { High: 'badge-red', Medium: 'badge-orange', Low: 'badge-blue' };
 export function PriorityBadge({ priority }) {
-  return <span className={`badge ${PRIORITY_MAP[priority] || 'badge-gray'}`}>{priority || 'Medium'}</span>;
+  return <span className={`badge badge-${PRIORITY_TONE[priority] || 'gray'}`}>{priority || 'Medium'}</span>;
 }
 
-const PREGNANCY_MAP = { Pregnant: 'badge-purple', 'Not Confirmed': 'badge-gray', 'Not Pregnant': 'badge-orange', Delivered: 'badge-green' };
 export function PregnancyBadge({ status }) {
-  return <span className={`badge ${PREGNANCY_MAP[status] || 'badge-gray'}`}>{status}</span>;
+  return <span className={`badge badge-${PREGNANCY_TONE[status] || 'gray'}`}>{status}</span>;
 }
 
-export function fmtDate(value) {
-  return value ? new Date(value).toLocaleDateString() : '—';
-}
-
-export function calcAge(dob) {
-  if (!dob) return '—';
-  const diff = Date.now() - new Date(dob).getTime();
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  if (days < 30) return days + ' days';
-  if (days < 365) return Math.floor(days / 30) + ' months';
-  return (days / 365).toFixed(1) + ' years';
-}
+export { fmtDate, calcAge } from '../../../shared/format';
 
 export function downloadCSV(csvContent, filename) {
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

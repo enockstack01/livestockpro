@@ -4,6 +4,8 @@ A full-stack (MERN) livestock farm management system: track animals, health
 records, feeding, breeding, production, finances, and tasks.
 
 - **Frontend:** React + Vite (`client/`)
+- **Mobile:** React Native + Expo, Android + iOS (`mobile/`) — offline-first,
+  shares this same backend/database, see [mobile/README.md](mobile/README.md)
 - **Backend:** Node.js + Express REST API (`server/`)
 - **Database:** MongoDB (Atlas)
 - **Auth:** [Clerk](https://clerk.com) — sign-in/sign-up UI, sessions, and password/email management
@@ -102,6 +104,19 @@ client/             React (Vite) frontend
                          Tasks, Reports, Settings, AdminDashboard
     style.css            shared stylesheet (design system, unchanged)
   dist/               production build output (git-ignored, created by `npm run build`)
+
+mobile/             React Native (Expo) app — Android + iOS, see mobile/README.md
+  app/                 Expo Router file-based routes (auth stack + tab layout)
+  src/
+    api/client.js        REST client mirroring client/src/lib/api.js's {data,error} contract
+    db/                   local SQLite schema + repository (offline-first reads/writes)
+    sync/                 push/pull sync engine against server/routes/dataRoutes.js
+    notifications/        local reminders + server push token registration
+    config/tables.js       per-record-type config driving the one shared CRUD screen
+
+shared/             small cross-client package imported by both client/ and mobile/ —
+                    status colors, date/age formatting, business rules, and a JS
+                    mirror of dataRoutes.js's SCHEMAS field whitelist
 ```
 
 ## Auth model

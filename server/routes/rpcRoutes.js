@@ -13,7 +13,8 @@ const COLLECTIONS = [
   'breeding_records',
   'production_records',
   'finance_records',
-  'tasks'
+  'tasks',
+  'push_tokens'
 ];
 
 /* POST /api/rpc/:fn — a tiny stand-in for Supabase's Postgres RPC functions */
