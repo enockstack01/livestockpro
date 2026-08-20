@@ -53,6 +53,24 @@ records, feeding, breeding, production, finances, and tasks.
 
 Then open **http://localhost:3001** (or **http://localhost:5173** in dev mode).
 
+## Deploying (e.g. Render)
+
+This is a single web service — Render (or similar) builds and runs it directly
+from the repo root, no separate static site needed:
+
+- **Build Command:** `npm run build`
+  (this now runs `npm install` for the root/server deps *and* the client's
+  install+build in one step, so it's safe as the entire Build Command)
+- **Start Command:** `npm start`
+- **Environment variables** (Render → your service → Environment): `MONGODB_URI`,
+  `MONGODB_DB`, `CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, and optionally
+  `SUPER_ADMIN_EMAILS`. `.env` is git-ignored and never deployed — these must
+  be set directly in the platform's dashboard, or the server exits immediately
+  on boot (`MONGODB_URI is not set`, from `server/db.js`).
+- If MongoDB Atlas is used, add the platform's outbound IPs (or `0.0.0.0/0`
+  for simplicity) to Atlas' Network Access list — otherwise the connection
+  attempt in `connect()` (`server/db.js`) hangs/times out on startup.
+
 ## Project layout
 
 ```

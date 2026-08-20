@@ -311,150 +311,166 @@ const CONFIDENCE_RANK = { reported: 0, suspected: 1, confirmed: 2 };
 
 /* GET /api/admin/onehealth — disease risk alerts computed live from this
    farm network's health records. admin or super_admin only. */
+/* Shared by /onehealth (summary) and /onehealth/map (spatial points) so the
+   detection logic itself lives in exactly one place. Returns the computed
+   alerts plus a lookup from every contributing record/animal id back to its
+   own document — the map endpoint needs each one's lat/lng, which an
+   aggregated alert doesn't carry on its own. */
+async function computeOneHealthAlerts(db) {
+  const since7 = isoDate(7);
+  const since14 = isoDate(14);
+
+  /* Watchlist matching looks at full history — a named disease case doesn't
+     stop being relevant just because it's older than 30 days. Only the
+     cluster/spike detectors below stay window-bound, since a "cluster" or
+     "spike" is inherently about what's happening *now*, not what happened
+     at any point in the farm's history. */
+  const [records, criticalAnimals, deceasedAnimals, userList, profiles] = await Promise.all([
+    db.collection('health_records').find({}).toArray(),
+    db.collection('animals').find({ health_status: 'Critical' }).toArray(),
+    db.collection('animals').find({ health_status: 'Deceased' }).toArray(),
+    clerkClient.users.getUserList({ limit: 500 }),
+    db.collection('profiles').find({}).toArray()
+  ]);
+
+  /* Every id an alert can reference (health record or animal), so the map
+     endpoint can resolve lat/lng back from an aggregated alert. */
+  const entityById = new Map();
+  [...records, ...criticalAnimals, ...deceasedAnimals].forEach((e) => entityById.set(e._id, e));
+
+  const farmByUser = {};
+  profiles.forEach((p) => { farmByUser[p.user_id] = p.farm_name || ''; });
+  const emailByUser = {};
+  userList.data.forEach((u) => { emailByUser[u.id] = primaryEmail(u); });
+  const farmLabel = (userId) => farmByUser[userId] || emailByUser[userId] || 'Unknown farm';
+
+  const alerts = new Map();
+  const upsert = (key, alert) => {
+    const existing = alerts.get(key);
+    if (!existing) { alerts.set(key, alert); return; }
+    existing.farms = [...new Set([...existing.farms, ...alert.farms])];
+    existing.count += alert.count;
+    existing.recordIds = [...new Set([...existing.recordIds, ...alert.recordIds])];
+    if (SEVERITY_RANK[alert.severity] > SEVERITY_RANK[existing.severity]) existing.severity = alert.severity;
+    if (alert.detectedAt > existing.detectedAt) existing.detectedAt = alert.detectedAt;
+    if (alert.confidence && CONFIDENCE_RANK[alert.confidence] > CONFIDENCE_RANK[existing.confidence || 'reported']) existing.confidence = alert.confidence;
+  };
+
+  /* 1) Watchlist matches — expanded synonyms + fuzzy matching, full history,
+     skipping mentions that are clearly just a routine preventive record. */
+  records.forEach((r) => {
+    const text = `${r.disease || ''} ${r.notes || ''}`.toLowerCase();
+    if (!text.trim()) return;
+    if (isLikelyPreventiveOnly(text, r.status)) return;
+    const confidence = confidenceOf(text);
+    ONE_HEALTH_WATCHLIST.forEach((entry) => {
+      if (!entry.keywords.some((k) => textMatchesKeyword(text, k))) return;
+      upsert(`watchlist:${entry.disease}:${r.user_id}`, {
+        type: 'watchlist',
+        disease: entry.disease,
+        zoonotic: entry.zoonotic,
+        severity: entry.severity,
+        confidence,
+        title: `${entry.disease} ${confidence === 'confirmed' ? 'confirmed' : confidence === 'suspected' ? 'suspected' : 'reported'} — ${farmLabel(r.user_id)}`,
+        description: `${entry.disease}${entry.zoonotic ? ' (zoonotic)' : ''} matched on a health record${r.district ? ` in ${r.district}` : ''}.`,
+        farms: [farmLabel(r.user_id)],
+        count: 1,
+        district: r.district || null,
+        detectedAt: r.check_date || since14,
+        recordIds: [r._id]
+      });
+    });
+  });
+
+  /* 2) Mortality clustering — genuine deaths via the Deceased status. Lower
+     threshold and higher base severity than the critical-status cluster
+     below, since an actual death is a stronger signal than "still alive
+     but critical". */
+  const mortalityByFarm = new Map();
+  const pushMortality = (userId, item) => { if (!mortalityByFarm.has(userId)) mortalityByFarm.set(userId, []); mortalityByFarm.get(userId).push(item); };
+  deceasedAnimals.filter((a) => (a.last_check_date || '') >= since7).forEach((a) => pushMortality(a.user_id, a));
+  records.filter((r) => r.status === 'Deceased' && (r.check_date || '') >= since7).forEach((r) => pushMortality(r.user_id, r));
+  mortalityByFarm.forEach((items, userId) => {
+    if (items.length < 2) return;
+    upsert(`mortality:${userId}`, {
+      type: 'mortality_cluster',
+      disease: null,
+      zoonotic: false,
+      severity: bumpSeverity('high', items.length - 2),
+      confidence: 'confirmed',
+      title: `Mortality cluster — ${farmLabel(userId)}`,
+      description: `${items.length} deaths recorded at this farm in the last 7 days.`,
+      farms: [farmLabel(userId)],
+      count: items.length,
+      district: items.find((i) => i.district)?.district || null,
+      detectedAt: isoDate(0),
+      recordIds: items.map((i) => i._id)
+    });
+  });
+
+  /* 3) Critical-status clustering per farm — animals/records that are
+     seriously unwell but not (yet, or not confirmed) deceased. */
+  const criticalByFarm = new Map();
+  const pushCritical = (userId, item) => { if (!criticalByFarm.has(userId)) criticalByFarm.set(userId, []); criticalByFarm.get(userId).push(item); };
+  criticalAnimals.filter((a) => (a.last_check_date || '') >= since7).forEach((a) => pushCritical(a.user_id, a));
+  records.filter((r) => r.status === 'Critical' && (r.check_date || '') >= since7).forEach((r) => pushCritical(r.user_id, r));
+  criticalByFarm.forEach((items, userId) => {
+    if (items.length < 3) return;
+    upsert(`critical:${userId}`, {
+      type: 'critical_cluster',
+      disease: null,
+      zoonotic: false,
+      severity: bumpSeverity('medium', items.length - 3),
+      confidence: 'confirmed',
+      title: `Critical health cluster — ${farmLabel(userId)}`,
+      description: `${items.length} animals/records marked Critical at this farm in the last 7 days.`,
+      farms: [farmLabel(userId)],
+      count: items.length,
+      district: items.find((i) => i.district)?.district || null,
+      detectedAt: isoDate(0),
+      recordIds: items.map((i) => i._id)
+    });
+  });
+
+  /* 4) Cross-farm disease clustering by district — the strongest early signal
+     of a possible outbreak, since it needs no diagnosis on the watchlist */
+  const byDistrictDisease = new Map();
+  records.filter((r) => (r.check_date || '') >= since14 && r.disease && r.disease.trim()).forEach((r) => {
+    const district = r.district || 'Unknown district';
+    const key = `${district}::${r.disease.trim().toLowerCase()}`;
+    if (!byDistrictDisease.has(key)) byDistrictDisease.set(key, []);
+    byDistrictDisease.get(key).push(r);
+  });
+  byDistrictDisease.forEach((items, key) => {
+    const farmSet = new Set(items.map((r) => r.user_id));
+    if (farmSet.size < 3) return;
+    const district = key.split('::')[0];
+    const label = items[0].disease.trim();
+    const latest = items.reduce((a, b) => ((b.check_date || '') > (a.check_date || '') ? b : a));
+    upsert(`cluster:${key}`, {
+      type: 'outbreak_cluster',
+      disease: label,
+      zoonotic: false,
+      severity: bumpSeverity('medium', farmSet.size - 3),
+      confidence: 'reported',
+      title: `Possible outbreak cluster — "${label}" in ${district}`,
+      description: `"${label}" reported across ${farmSet.size} different farms in ${district} within the last 14 days.`,
+      farms: [...farmSet].map(farmLabel),
+      count: items.length,
+      district,
+      detectedAt: latest.check_date || since14,
+      recordIds: items.map((i) => i._id)
+    });
+  });
+
+  return { alerts, records, entityById, farmLabel };
+}
+
+/* GET /api/admin/onehealth — disease risk alerts computed live from this
+   farm network's health records. admin or super_admin only. */
 router.get('/onehealth', async (req, res) => {
   try {
-    const db = getDb();
-    const since7 = isoDate(7);
-    const since14 = isoDate(14);
-
-    /* Watchlist matching looks at full history — a named disease case doesn't
-       stop being relevant just because it's older than 30 days. Only the
-       cluster/spike detectors below stay window-bound, since a "cluster" or
-       "spike" is inherently about what's happening *now*, not what happened
-       at any point in the farm's history. */
-    const [records, criticalAnimals, deceasedAnimals, userList, profiles] = await Promise.all([
-      db.collection('health_records').find({}).toArray(),
-      db.collection('animals').find({ health_status: 'Critical' }).toArray(),
-      db.collection('animals').find({ health_status: 'Deceased' }).toArray(),
-      clerkClient.users.getUserList({ limit: 500 }),
-      db.collection('profiles').find({}).toArray()
-    ]);
-
-    const farmByUser = {};
-    profiles.forEach((p) => { farmByUser[p.user_id] = p.farm_name || ''; });
-    const emailByUser = {};
-    userList.data.forEach((u) => { emailByUser[u.id] = primaryEmail(u); });
-    const farmLabel = (userId) => farmByUser[userId] || emailByUser[userId] || 'Unknown farm';
-
-    const alerts = new Map();
-    const upsert = (key, alert) => {
-      const existing = alerts.get(key);
-      if (!existing) { alerts.set(key, alert); return; }
-      existing.farms = [...new Set([...existing.farms, ...alert.farms])];
-      existing.count += alert.count;
-      existing.recordIds = [...new Set([...existing.recordIds, ...alert.recordIds])];
-      if (SEVERITY_RANK[alert.severity] > SEVERITY_RANK[existing.severity]) existing.severity = alert.severity;
-      if (alert.detectedAt > existing.detectedAt) existing.detectedAt = alert.detectedAt;
-      if (alert.confidence && CONFIDENCE_RANK[alert.confidence] > CONFIDENCE_RANK[existing.confidence || 'reported']) existing.confidence = alert.confidence;
-    };
-
-    /* 1) Watchlist matches — expanded synonyms + fuzzy matching, full history,
-       skipping mentions that are clearly just a routine preventive record. */
-    records.forEach((r) => {
-      const text = `${r.disease || ''} ${r.notes || ''}`.toLowerCase();
-      if (!text.trim()) return;
-      if (isLikelyPreventiveOnly(text, r.status)) return;
-      const confidence = confidenceOf(text);
-      ONE_HEALTH_WATCHLIST.forEach((entry) => {
-        if (!entry.keywords.some((k) => textMatchesKeyword(text, k))) return;
-        upsert(`watchlist:${entry.disease}:${r.user_id}`, {
-          type: 'watchlist',
-          disease: entry.disease,
-          zoonotic: entry.zoonotic,
-          severity: entry.severity,
-          confidence,
-          title: `${entry.disease} ${confidence === 'confirmed' ? 'confirmed' : confidence === 'suspected' ? 'suspected' : 'reported'} — ${farmLabel(r.user_id)}`,
-          description: `${entry.disease}${entry.zoonotic ? ' (zoonotic)' : ''} matched on a health record${r.district ? ` in ${r.district}` : ''}.`,
-          farms: [farmLabel(r.user_id)],
-          count: 1,
-          district: r.district || null,
-          detectedAt: r.check_date || since14,
-          recordIds: [r._id]
-        });
-      });
-    });
-
-    /* 2) Mortality clustering — genuine deaths via the Deceased status. Lower
-       threshold and higher base severity than the critical-status cluster
-       below, since an actual death is a stronger signal than "still alive
-       but critical". */
-    const mortalityByFarm = new Map();
-    const pushMortality = (userId, item) => { if (!mortalityByFarm.has(userId)) mortalityByFarm.set(userId, []); mortalityByFarm.get(userId).push(item); };
-    deceasedAnimals.filter((a) => (a.last_check_date || '') >= since7).forEach((a) => pushMortality(a.user_id, a));
-    records.filter((r) => r.status === 'Deceased' && (r.check_date || '') >= since7).forEach((r) => pushMortality(r.user_id, r));
-    mortalityByFarm.forEach((items, userId) => {
-      if (items.length < 2) return;
-      upsert(`mortality:${userId}`, {
-        type: 'mortality_cluster',
-        disease: null,
-        zoonotic: false,
-        severity: bumpSeverity('high', items.length - 2),
-        confidence: 'confirmed',
-        title: `Mortality cluster — ${farmLabel(userId)}`,
-        description: `${items.length} deaths recorded at this farm in the last 7 days.`,
-        farms: [farmLabel(userId)],
-        count: items.length,
-        district: items.find((i) => i.district)?.district || null,
-        detectedAt: isoDate(0),
-        recordIds: items.map((i) => i._id)
-      });
-    });
-
-    /* 3) Critical-status clustering per farm — animals/records that are
-       seriously unwell but not (yet, or not confirmed) deceased. */
-    const criticalByFarm = new Map();
-    const pushCritical = (userId, item) => { if (!criticalByFarm.has(userId)) criticalByFarm.set(userId, []); criticalByFarm.get(userId).push(item); };
-    criticalAnimals.filter((a) => (a.last_check_date || '') >= since7).forEach((a) => pushCritical(a.user_id, a));
-    records.filter((r) => r.status === 'Critical' && (r.check_date || '') >= since7).forEach((r) => pushCritical(r.user_id, r));
-    criticalByFarm.forEach((items, userId) => {
-      if (items.length < 3) return;
-      upsert(`critical:${userId}`, {
-        type: 'critical_cluster',
-        disease: null,
-        zoonotic: false,
-        severity: bumpSeverity('medium', items.length - 3),
-        confidence: 'confirmed',
-        title: `Critical health cluster — ${farmLabel(userId)}`,
-        description: `${items.length} animals/records marked Critical at this farm in the last 7 days.`,
-        farms: [farmLabel(userId)],
-        count: items.length,
-        district: items.find((i) => i.district)?.district || null,
-        detectedAt: isoDate(0),
-        recordIds: items.map((i) => i._id)
-      });
-    });
-
-    /* 4) Cross-farm disease clustering by district — the strongest early signal
-       of a possible outbreak, since it needs no diagnosis on the watchlist */
-    const byDistrictDisease = new Map();
-    records.filter((r) => (r.check_date || '') >= since14 && r.disease && r.disease.trim()).forEach((r) => {
-      const district = r.district || 'Unknown district';
-      const key = `${district}::${r.disease.trim().toLowerCase()}`;
-      if (!byDistrictDisease.has(key)) byDistrictDisease.set(key, []);
-      byDistrictDisease.get(key).push(r);
-    });
-    byDistrictDisease.forEach((items, key) => {
-      const farmSet = new Set(items.map((r) => r.user_id));
-      if (farmSet.size < 3) return;
-      const district = key.split('::')[0];
-      const label = items[0].disease.trim();
-      const latest = items.reduce((a, b) => ((b.check_date || '') > (a.check_date || '') ? b : a));
-      upsert(`cluster:${key}`, {
-        type: 'outbreak_cluster',
-        disease: label,
-        zoonotic: false,
-        severity: bumpSeverity('medium', farmSet.size - 3),
-        confidence: 'reported',
-        title: `Possible outbreak cluster — "${label}" in ${district}`,
-        description: `"${label}" reported across ${farmSet.size} different farms in ${district} within the last 14 days.`,
-        farms: [...farmSet].map(farmLabel),
-        count: items.length,
-        district,
-        detectedAt: latest.check_date || since14,
-        recordIds: items.map((i) => i._id)
-      });
-    });
-
+    const { alerts, records } = await computeOneHealthAlerts(getDb());
     const list = [...alerts.values()].sort((a, b) => (b.detectedAt || '').localeCompare(a.detectedAt || ''));
     res.json({
       data: {
@@ -473,6 +489,58 @@ router.get('/onehealth', async (req, res) => {
       },
       error: null
     });
+  } catch (err) {
+    res.status(500).json({ error: { message: err.message } });
+  }
+});
+
+/* GET /api/admin/onehealth/map — the same alerts, exploded back out to the
+   georeferenced record/animal that triggered each one. One point per
+   distinct location, carrying every alert that touched it, so the frontend
+   can symbolize by severity, disease, zoonotic status, confidence, or
+   detection method, and build a density layer from the same data. */
+router.get('/onehealth/map', async (req, res) => {
+  try {
+    const { alerts, entityById, farmLabel } = await computeOneHealthAlerts(getDb());
+
+    const pointsById = new Map();
+    for (const alert of alerts.values()) {
+      for (const id of alert.recordIds) {
+        const entity = entityById.get(id);
+        if (!entity || typeof entity.latitude !== 'number' || typeof entity.longitude !== 'number') continue;
+        if (!pointsById.has(id)) {
+          pointsById.set(id, {
+            id,
+            lat: entity.latitude,
+            lng: entity.longitude,
+            district: entity.district || 'Unknown district',
+            farmName: farmLabel(entity.user_id),
+            species: entity.species || null,
+            date: entity.check_date || entity.last_check_date || null,
+            alerts: []
+          });
+        }
+        pointsById.get(id).alerts.push({
+          type: alert.type,
+          disease: alert.disease,
+          severity: alert.severity,
+          zoonotic: alert.zoonotic,
+          confidence: alert.confidence,
+          title: alert.title
+        });
+      }
+    }
+
+    const points = [...pointsById.values()].map((p) => ({
+      ...p,
+      severity: p.alerts.reduce((max, a) => (SEVERITY_RANK[a.severity] > SEVERITY_RANK[max] ? a.severity : max), 'low'),
+      zoonotic: p.alerts.some((a) => a.zoonotic),
+      confidence: p.alerts.reduce((best, a) => (a.confidence && CONFIDENCE_RANK[a.confidence] > CONFIDENCE_RANK[best] ? a.confidence : best), 'reported'),
+      types: [...new Set(p.alerts.map((a) => a.type))],
+      diseases: [...new Set(p.alerts.map((a) => a.disease).filter(Boolean))]
+    }));
+
+    res.json({ data: points, error: null });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
   }

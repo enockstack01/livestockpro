@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
-    "build": "npm --prefix client install && npm --prefix client run build",
+    "build": "npm install && npm --prefix client install && npm --prefix client run build",
     "seed:onehealth": "node scripts/seedOneHealthDemo.js"
   },
   "engines": {
