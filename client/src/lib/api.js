@@ -77,6 +77,9 @@ export function useApi() {
     async adminOneHealth() {
       return request(getToken, '/admin/onehealth');
     },
+    async adminOneHealthMap() {
+      return request(getToken, '/admin/onehealth/map');
+    },
     async setUserStatus(userId, banned) {
       return request(getToken, `/admin/users/${encodeURIComponent(userId)}/status`, { method: 'PATCH', body: JSON.stringify({ banned }) });
     },

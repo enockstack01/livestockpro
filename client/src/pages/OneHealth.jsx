@@ -4,6 +4,7 @@ import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { useCanvasChart } from '../lib/useChart.js';
 import { fmtDate } from '../lib/badges.jsx';
+import OneHealthMap from '../components/OneHealthMap.jsx';
 
 const SEVERITY_BADGE = { critical: 'badge-red', high: 'badge-orange', medium: 'badge-blue', low: 'badge-gray' };
 const SEVERITY_COLOR = { critical: '#D32F2F', high: '#F9A825', medium: '#1976D2', low: '#90A4AE' };
@@ -165,6 +166,13 @@ export default function OneHealth() {
               <div className="card-header"><h3>Alerts by Detection Method</h3></div>
               <div className="card-body"><TypeChart alerts={alerts} /></div>
             </div>
+          </div>
+
+          <div className="card-header" style={{ padding: '0 0 12px', border: 0 }}>
+            <h3><i className="fas fa-map-location-dot" style={{ color: 'var(--red)', marginRight: 6 }}></i> Spatial Risk Distribution</h3>
+          </div>
+          <div className="mb-24">
+            <OneHealthMap />
           </div>
 
           <div className="filter-bar">
