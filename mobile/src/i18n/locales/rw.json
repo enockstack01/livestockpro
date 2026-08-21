@@ -1,0 +1,363 @@
+{
+  "common": {
+    "save": "Bika",
+    "cancel": "Hagarika",
+    "delete": "Siba",
+    "edit": "Hindura",
+    "add": "Ongeraho",
+    "search": "Shakisha",
+    "loading": "Biratunganywa...",
+    "retry": "Ongera ugerageze",
+    "confirm": "Emeza",
+    "done": "Byarangiye",
+    "close": "Funga",
+    "untitled": "Nta zina"
+  },
+  "nav": {
+    "dashboard": "Ahabanza",
+    "animals": "Amatungo",
+    "health": "Ubuzima",
+    "feeding": "Kugaburira",
+    "breeding": "Kworora",
+    "production": "Umusaruro",
+    "finance": "Imari",
+    "tasks": "Imirimo",
+    "reports": "Raporo",
+    "settings": "Igenamiterere",
+    "more": "Ibindi",
+    "signOut": "Sohoka"
+  },
+  "menu": {
+    "title": "Ibikubiyemo"
+  },
+  "auth": {
+    "brandName": "LivestockPro",
+    "welcomeBack": "Murakaza neza",
+    "createAccount": "Fungura konti yawe",
+    "emailAddress": "Imeyili",
+    "password": "Ijambo ry'ibanga",
+    "signIn": "Injira",
+    "signUp": "Iyandikishe",
+    "continueWithGoogle": "Komeza ukoresheje Google",
+    "or": "CYANGWA",
+    "dontHaveAccount": "Ntufite konti? ",
+    "alreadyHaveAccount": "Usanzwe ufite konti? ",
+    "verifyItsYou": "Emeza ko ari wowe",
+    "verifyCodeSentSignIn": "Injiza kode yo kwemeza twakoherereje kuri imeyili yawe.",
+    "checkYourEmail": "Reba imeyili yawe",
+    "verifyCodeSentSignUp": "Injiza kode yo kwemeza twoherereje kuri {{email}}.",
+    "verificationCode": "Kode yo kwemeza",
+    "verify": "Emeza",
+    "resendCode": "Ongera wohereze kode",
+    "couldNotSignIn": "Ntibyakunze kukwinjiza.",
+    "couldNotCreateAccount": "Ntibyakunze gufungura konti yawe.",
+    "somethingWentWrong": "Hari ikibazo cyabaye.",
+    "verificationIncomplete": "Kwemeza ntibyarangiye — reba kode hanyuma ugerageze.",
+    "invalidCode": "Kode ntabwo ari yo.",
+    "signInDidNotComplete": "Kwinjira ntibyarangiye. Ongera ugerageze.",
+    "mfaNotSupported": "Iyi konti isaba uburyo bwo kwemeza butakiri bushobora gukoreshwa muri iyi porogaramu. Injira ukoresheje urubuga.",
+    "googleSignInFailed": "Kwinjira ukoresheje Google ntibyakunze."
+  },
+  "settings": {
+    "farmProfile": "Amakuru y'Ubuhinzi",
+    "farmName": "Izina ry'Ubworozi",
+    "farmNamePlaceholder": "Izina ry'ubworozi bwawe",
+    "location": "Aho biherereye",
+    "locationPlaceholder": "Umujyi, Akarere, Igihugu",
+    "phoneNumber": "Nimero ya Telefoni",
+    "phonePlaceholder": "+250 700 000 000",
+    "saveProfile": "Bika Amakuru",
+    "profileSaved": "Amakuru yabitswe.",
+    "saveFailed": "Kubika byanze: {{message}}",
+    "account": "Konti",
+    "email": "Imeyili",
+    "userId": "Nimero y'Ukoresha",
+    "passwordNote": "Ijambo ry'ibanga n'igenamiterere ry'umutekano bishobora gucungwa hakoreshejwe urubuga rwa LivestockPro.",
+    "changePhoto": "Hindura Ifoto",
+    "remove": "Kuraho",
+    "photoUpdated": "Ifoto y'umwirondoro yavuguruwe.",
+    "photoRemoved": "Ifoto y'umwirondoro yakuweho.",
+    "photoPermissionNeeded": "Kwinjira mu mafoto birakenewe kugira ngo uhindure ifoto yawe.",
+    "uploadFailed": "Kohereza byanze.",
+    "removeFailed": "Gukuraho ifoto byanze.",
+    "dangerZone": "Agace k'Akaga",
+    "deleteWarning": "Gusiba konti yawe bizasiba burundu amakuru yawe yose. Iki gikorwa ntigishobora gusubizwa inyuma.",
+    "deleteAccount": "Siba Konti",
+    "deleteConfirmMessage": "Ibi bizasiba burundu konti yawe n'amakuru yose ajyanye nayo. Andika DELETE kugira ngo wemeze.",
+    "typeDeleteHere": "Andika \"DELETE\" hano",
+    "typeDeleteToConfirm": "Andika DELETE kugira ngo wemeze.",
+    "deleteForever": "Siba Burundu",
+    "accountDeleted": "Konti yasibwe.",
+    "partialDeleteWarning": "Ntibyakunze gusiba konti burundu; urimo gusohoka.",
+    "appearance": "Imigaragarire",
+    "themeLight": "Umucyo",
+    "themeDark": "Umwijima",
+    "themeSystem": "Nk'uko sisitemu ibiteganya",
+    "language": "Ururimi",
+    "rtlRestartNotice": "Ongera utangire porogaramu kugira ngo icyerekezo gishya cy'inyandiko gikoreshwe neza."
+  },
+  "sync": {
+    "synced": "Byahujwe",
+    "syncing": "Birahuzwa…",
+    "syncIssue": "Ikibazo cyo guhuza",
+    "lastSynced": "Byahujwe ubwa nyuma {{time}}",
+    "notSyncedYet": "Ntibirahurizwa — kanda kugira ngo bihuzwe",
+    "recordsFailed_one": "Icyanditswe {{count}} ntikyahuye",
+    "recordsFailed_other": "Ibyanditswe {{count}} ntibyahuye"
+  },
+  "geo": {
+    "capturing": "Gufata aho igikoresho kiri...",
+    "denied": "Uburenganzira bwo kumenya aho uri bwanzwe — iki cyanditswe kizabikwa kitarimo aho biherereye.",
+    "error": "Ntibyashobotse kumenya aho igikoresho kiri — iki cyanditswe kizabikwa kitarimo aho biherereye.",
+    "unsupported": "Iki gikoresho ntigishobora kumenya aho kiri.",
+    "captured": "Aho biherereye byabonetse ({{lat}}, {{lng}})",
+    "tapToRetry": " Kanda kugira ngo ugerageze."
+  },
+  "confirmDialogs": {
+    "signOutTitle": "Gusohoka?",
+    "signOutMessage": "Ushobora kwinjira ukundi igihe cyose — amakuru yawe agumana guhuzwa na konti yawe.",
+    "signOutConfirm": "Sohoka",
+    "deleteRecordTitle": "Siba iki {{item}}?",
+    "cannotBeUndone": "Iki gikorwa ntigishobora gusubizwa inyuma."
+  },
+  "dashboard": {
+    "totalAnimals": "Amatungo Yose",
+    "critical": "Ni ikigo",
+    "pregnant": "Zitwite",
+    "pendingTasks": "Imirimo Itegereje",
+    "overdueCount": "{{count}} yarengeje igihe",
+    "incomeMonth": "Inyungu (ukwezi)",
+    "expenseMonth": "Amafaranga yasohotse (ukwezi)",
+    "herdHealth": "Ubuzima bw'Amatungo",
+    "noAnimalsYet": "Nta matungo arahari.",
+    "recentAnimals": "Amatungo Mashya",
+    "upcomingTasks": "Imirimo Iri Kuza",
+    "nothingPending": "Nta kintu gitegereje.",
+    "recentHealthAlerts": "Ibimenyetso by'Ubuzima Bishya",
+    "noActiveAlerts": "Nta kimenyetso kiriho.",
+    "checkup": "Isuzuma"
+  },
+  "reports": {
+    "exportCsv": "Kohereza muri CSV",
+    "exportFailed": "Kohereza byanze: {{message}}",
+    "sharingUnavailable": "Gusangira ntibishoboka kuri iki gikoresho.",
+    "sectionAnimals": "Amatungo",
+    "total": "Igiteranyo",
+    "healthy": "Afite Ubuzima",
+    "underTreatment": "Ari Kuvurwa",
+    "criticalStatus": "Ni ikigo",
+    "deceased": "Zapfuye",
+    "sectionBreeding": "Kworora",
+    "delivered": "Zabyaye",
+    "newbornsAllTime": "Ivyavutse (byose)",
+    "sectionProduction": "Umusaruro (uku kwezi)",
+    "milkLiters": "Amata (litiro)",
+    "eggsUnits": "Amagi (umubare)",
+    "meatKg": "Inyama (kg)",
+    "sectionFinance": "Imari (uku kwezi)",
+    "income": "Inyungu",
+    "expense": "Amafaranga yasohotse",
+    "net": "Inyungu Nyayo",
+    "sectionHealth": "Ubuzima",
+    "records": "Ibyanditswe",
+    "activeAlerts": "Ibimenyetso Biriho"
+  },
+  "records": {
+    "searchPlaceholder": "Shakisha {{label}}...",
+    "emptyList": "Nta {{label}} arahari. Kanda + kugira ngo wongereho.",
+    "addTitle": "Ongeraho {{item}}",
+    "editTitle": "Hindura {{item}}",
+    "fieldRequired": "{{field}} irakenewe.",
+    "added": "{{item}} yongeweho.",
+    "updated": "{{item}} yavuguruwe.",
+    "deleted": "{{item}} yasibwe.",
+    "saveFailed": "Kubika byanze: {{message}}",
+    "all": "{{label}} Byose"
+  },
+  "tables": {
+    "animals": {
+      "label": "Amatungo",
+      "singular": "Itungo",
+      "fields": {
+        "tag_id": "Nimero y'Itungo",
+        "name": "Izina",
+        "species": "Ubwoko",
+        "breed": "Ubwoko Bwihariye",
+        "sex": "Igitsina",
+        "date_of_birth": "Itariki y'Amavuko",
+        "location": "Aho biherereye",
+        "health_status": "Uko Ubuzima Bumeze",
+        "notes": "Ibisobanuro"
+      }
+    },
+    "health_records": {
+      "label": "Ubuzima",
+      "singular": "Icyanditswe cy'Ubuzima",
+      "fields": {
+        "tag_id": "Nimero y'Itungo",
+        "disease": "Indwara / Uko Bimeze",
+        "treatment": "Ubuvuzi",
+        "medicine": "Umuti",
+        "vet_name": "Izina ry'Muganga w'Amatungo",
+        "check_date": "Itariki yo Gusuzuma",
+        "next_check_date": "Itariki y'Isuzuma Rikurikira",
+        "status": "Uko Bimeze",
+        "notes": "Ibisobanuro"
+      }
+    },
+    "feeding_records": {
+      "label": "Kugaburira",
+      "singular": "Icyanditswe cyo Kugaburira",
+      "fields": {
+        "feed_type": "Ubwoko bw'Ibiryo",
+        "quantity": "Ingano",
+        "unit": "Igipimo",
+        "cost": "Igiciro",
+        "feeding_date": "Itariki yo Kugaburira",
+        "animal_group": "Itsinda ry'Amatungo",
+        "notes": "Ibisobanuro"
+      }
+    },
+    "breeding_records": {
+      "label": "Kworora",
+      "singular": "Icyanditswe cyo Kworora",
+      "fields": {
+        "tag_id": "Nimero y'Itungo",
+        "breeding_date": "Itariki yo Kworora",
+        "pregnancy_status": "Uko Inda Imeze",
+        "expected_birth_date": "Itariki Iteganijwe yo Kubyara",
+        "birth_date": "Itariki yo Kubyara",
+        "newborn_count": "Umubare w'Ivyavutse",
+        "newborn_details": "Ibisobanuro ku Vyavutse",
+        "notes": "Ibisobanuro"
+      }
+    },
+    "production_records": {
+      "label": "Umusaruro",
+      "singular": "Icyanditswe cy'Umusaruro",
+      "fields": {
+        "production_type": "Ubwoko",
+        "tag_id": "Nimero y'Itungo",
+        "quantity": "Ingano",
+        "unit": "Igipimo",
+        "production_date": "Itariki y'Umusaruro",
+        "notes": "Ibisobanuro"
+      }
+    },
+    "finance_records": {
+      "label": "Imari",
+      "singular": "Icyanditswe cy'Imari",
+      "fields": {
+        "type": "Ubwoko",
+        "amount": "Umubare w'Amafaranga",
+        "category": "Icyiciro",
+        "date": "Itariki",
+        "description": "Ibisobanuro"
+      }
+    },
+    "tasks": {
+      "label": "Imirimo",
+      "singular": "Umurimo",
+      "fields": {
+        "title": "Umutwe",
+        "description": "Ibisobanuro",
+        "due_date": "Itariki ntarengwa",
+        "priority": "Ikirengagizwa",
+        "status": "Uko Bimeze"
+      }
+    }
+  },
+  "enums": {
+    "species": {
+      "Cattle": "Inka",
+      "Sheep": "Intama",
+      "Goat": "Ihene",
+      "Pig": "Ingurube",
+      "Poultry": "Inkoko",
+      "Horse": "Ifarashi",
+      "Donkey": "Indogobe",
+      "Rabbit": "Urukwavu",
+      "Other": "Ikindi"
+    },
+    "sex": {
+      "Male": "Igitsina Gabo",
+      "Female": "Igitsina Gore"
+    },
+    "animalHealthStatus": {
+      "Healthy": "Afite Ubuzima",
+      "Under Treatment": "Ari Kuvurwa",
+      "Critical": "Ni ikigo",
+      "Deceased": "Yapfuye"
+    },
+    "healthRecordStatus": {
+      "Under Treatment": "Ari Kuvurwa",
+      "Healthy": "Afite Ubuzima",
+      "Critical": "Ni ikigo",
+      "Recovered": "Yakize",
+      "Deceased": "Yapfuye"
+    },
+    "pregnancyStatus": {
+      "Not Confirmed": "Ntibyaremejwe",
+      "Pregnant": "Aratwite",
+      "Not Pregnant": "Ntatwite",
+      "Delivered": "Yabyaye"
+    },
+    "feedingUnit": {
+      "kg": "kg",
+      "lbs": "amatembabuzima",
+      "tons": "toni",
+      "bags": "amasaka"
+    },
+    "productionType": {
+      "Milk": "Amata",
+      "Eggs": "Amagi",
+      "Meat": "Inyama"
+    },
+    "productionUnit": {
+      "liters": "litiro",
+      "units": "umubare",
+      "kg": "kg"
+    },
+    "financeType": {
+      "Income": "Inyungu",
+      "Expense": "Amafaranga yasohotse"
+    },
+    "financeCategory": {
+      "Milk Sales": "Kugurisha Amata",
+      "Egg Sales": "Kugurisha Amagi",
+      "Meat Sales": "Kugurisha Inyama",
+      "Animal Sales": "Kugurisha Amatungo",
+      "Other Income": "Izindi Nyungu",
+      "Feed": "Ibiryo",
+      "Veterinary": "Ubuvuzi bw'Amatungo",
+      "Medicine": "Umuti",
+      "Labor": "Umurimo",
+      "Equipment": "Ibikoresho",
+      "Maintenance": "Kubungabunga",
+      "Transport": "Ubwikorezi",
+      "Other Expense": "Andi Mafaranga Yasohotse"
+    },
+    "taskPriority": {
+      "Low": "Bike",
+      "Medium": "Hagati",
+      "High": "Byinshi"
+    },
+    "taskStatus": {
+      "Pending": "Itegereje",
+      "In Progress": "Iri Gukorwa",
+      "Completed": "Yarangiye"
+    },
+    "statusBadge": {
+      "Healthy": "Afite Ubuzima",
+      "Under Treatment": "Ari Kuvurwa",
+      "Critical": "Ni ikigo",
+      "Deceased": "Yapfuye",
+      "Pregnant": "Aratwite",
+      "Completed": "Yarangiye",
+      "Pending": "Itegereje",
+      "In Progress": "Iri Gukorwa",
+      "Recovered": "Yakize",
+      "Not Confirmed": "Ntibyaremejwe"
+    }
+  }
+}

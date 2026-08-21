@@ -1,19 +1,26 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { Dimensions, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { PieChart } from 'react-native-chart-kit';
-import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useRepository } from '../../src/db/repository';
 import { useSync } from '../../src/sync/SyncProvider';
 import { fmtDate, isOverdueTask, isThisMonth } from '../../src/lib/shared';
 import { StatusBadge } from '../../src/components/Badges';
-
-const CHART_COLORS = { green: '#2E7D32', orange: '#E65100', red: '#D32F2F', gray: '#90A4AE', blue: '#1976D2' };
+import Icon from '../../src/components/Icon';
+import ResponsiveScreen from '../../src/components/ResponsiveScreen';
+import { useTheme } from '../../src/theme/ThemeProvider';
 
 export default function DashboardScreen() {
+  const { t } = useTranslation();
+  const { colors, radius, shadow } = useTheme();
+  const styles = useMemo(() => makeStyles(colors, radius, shadow), [colors, radius, shadow]);
+  const CHART_COLORS = useMemo(() => ({ green: colors.primary, orange: colors.orange, red: colors.red, gray: colors.textLight, blue: colors.blue }), [colors]);
+
   const repo = useRepository();
   const router = useRouter();
   const { syncing, lastSyncedAt, triggerSync } = useSync();
+  const { width: windowWidth } = useWindowDimensions();
   const [data, setData] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -39,82 +46,84 @@ export default function DashboardScreen() {
     setRefreshing(false);
   }, [triggerSync, load]);
 
-  const kpis = useMemo(() => computeKpis(data), [data]);
+  const kpis = useMemo(() => computeKpis(data, CHART_COLORS, colors), [data, CHART_COLORS, colors]);
 
   if (!data) {
     return <View style={styles.container} />;
   }
 
   return (
+    <ResponsiveScreen>
     <ScrollView
       style={styles.container}
       contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 40 }}
-      refreshControl={<RefreshControl refreshing={refreshing || syncing} onRefresh={onRefresh} colors={['#2E7D32']} />}
+      refreshControl={<RefreshControl refreshing={refreshing || syncing} onRefresh={onRefresh} colors={[colors.primary]} />}
     >
       <View style={styles.grid}>
-        <KpiCard label="Total Animals" value={kpis.totalAnimals} icon="paw" color={CHART_COLORS.green} onPress={() => router.push('/animals')} />
-        <KpiCard label="Critical" value={kpis.critical} icon="alert-circle" color={CHART_COLORS.red} onPress={() => router.push('/health')} />
-        <KpiCard label="Pregnant" value={kpis.pregnant} icon="heart" color={CHART_COLORS.blue} onPress={() => router.push('/breeding')} />
-        <KpiCard label="Pending Tasks" value={kpis.pendingTasks} sub={kpis.overdueTasks ? `${kpis.overdueTasks} overdue` : null} icon="checkbox" color={kpis.overdueTasks ? CHART_COLORS.red : CHART_COLORS.orange} onPress={() => router.push('/tasks')} />
-        <KpiCard label="Income (mo.)" value={`$${kpis.monthlyIncome.toFixed(0)}`} icon="trending-up" color={CHART_COLORS.green} onPress={() => router.push('/finance')} />
-        <KpiCard label="Expense (mo.)" value={`$${kpis.monthlyExpense.toFixed(0)}`} icon="trending-down" color={CHART_COLORS.red} onPress={() => router.push('/finance')} />
+        <KpiCard styles={styles} label={t('dashboard.totalAnimals')} value={kpis.totalAnimals} icon="cow" color={CHART_COLORS.green} onPress={() => router.push('/animals')} />
+        <KpiCard styles={styles} label={t('dashboard.critical')} value={kpis.critical} icon="triangle-exclamation" color={CHART_COLORS.red} onPress={() => router.push('/health')} />
+        <KpiCard styles={styles} label={t('dashboard.pregnant')} value={kpis.pregnant} icon="venus-mars" color={CHART_COLORS.blue} onPress={() => router.push('/breeding')} />
+        <KpiCard styles={styles} label={t('dashboard.pendingTasks')} value={kpis.pendingTasks} sub={kpis.overdueTasks ? t('dashboard.overdueCount', { count: kpis.overdueTasks }) : null} icon="list-check" color={kpis.overdueTasks ? CHART_COLORS.red : CHART_COLORS.orange} onPress={() => router.push('/tasks')} />
+        <KpiCard styles={styles} label={t('dashboard.incomeMonth')} value={`$${kpis.monthlyIncome.toFixed(0)}`} icon="arrow-trend-up" color={CHART_COLORS.green} onPress={() => router.push('/finance')} />
+        <KpiCard styles={styles} label={t('dashboard.expenseMonth')} value={`$${kpis.monthlyExpense.toFixed(0)}`} icon="arrow-trend-down" color={CHART_COLORS.red} onPress={() => router.push('/finance')} />
       </View>
 
       <View style={[styles.card, { alignItems: 'center' }]}>
-        <Text style={styles.cardTitle}>Herd Health</Text>
+        <Text style={styles.cardTitle}>{t('dashboard.herdHealth')}</Text>
         {kpis.totalAnimals > 0 ? (
           <PieChart
             data={kpis.healthChartData}
-            width={Dimensions.get('window').width - 64}
+            width={Math.min(windowWidth, 640) - 64}
             height={160}
             accessor="value"
             backgroundColor="transparent"
             paddingLeft="8"
-            chartConfig={{ color: () => '#263238' }}
+            chartConfig={{ color: () => colors.text }}
             hasLegend
           />
         ) : (
-          <Text style={styles.emptyText}>No animals yet.</Text>
+          <Text style={styles.emptyText}>{t('dashboard.noAnimalsYet')}</Text>
         )}
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Recent Animals</Text>
+        <Text style={styles.cardTitle}>{t('dashboard.recentAnimals')}</Text>
         {data.animals.slice(0, 5).map((a) => (
           <View key={a.id} style={styles.listRow}>
             <Text style={styles.listRowTitle}>{a.tag_id} {a.name ? `· ${a.name}` : ''}</Text>
             <StatusBadge status={a.health_status} />
           </View>
         ))}
-        {data.animals.length === 0 && <Text style={styles.emptyText}>No animals yet.</Text>}
+        {data.animals.length === 0 && <Text style={styles.emptyText}>{t('dashboard.noAnimalsYet')}</Text>}
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Upcoming Tasks</Text>
-        {kpis.upcomingTasks.map((t) => (
-          <View key={t.id} style={styles.listRow}>
-            <Text style={styles.listRowTitle} numberOfLines={1}>{t.title}</Text>
-            <Text style={styles.listRowMeta}>{fmtDate(t.due_date)}</Text>
+        <Text style={styles.cardTitle}>{t('dashboard.upcomingTasks')}</Text>
+        {kpis.upcomingTasks.map((task) => (
+          <View key={task.id} style={styles.listRow}>
+            <Text style={styles.listRowTitle} numberOfLines={1}>{task.title}</Text>
+            <Text style={styles.listRowMeta}>{fmtDate(task.due_date)}</Text>
           </View>
         ))}
-        {kpis.upcomingTasks.length === 0 && <Text style={styles.emptyText}>Nothing pending.</Text>}
+        {kpis.upcomingTasks.length === 0 && <Text style={styles.emptyText}>{t('dashboard.nothingPending')}</Text>}
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Recent Health Alerts</Text>
+        <Text style={styles.cardTitle}>{t('dashboard.recentHealthAlerts')}</Text>
         {kpis.healthAlerts.map((h) => (
           <View key={h.id} style={styles.listRow}>
-            <Text style={styles.listRowTitle} numberOfLines={1}>{h.tag_id} — {h.disease || 'Check-up'}</Text>
+            <Text style={styles.listRowTitle} numberOfLines={1}>{h.tag_id} — {h.disease || t('dashboard.checkup')}</Text>
             <StatusBadge status={h.status} />
           </View>
         ))}
-        {kpis.healthAlerts.length === 0 && <Text style={styles.emptyText}>No active alerts.</Text>}
+        {kpis.healthAlerts.length === 0 && <Text style={styles.emptyText}>{t('dashboard.noActiveAlerts')}</Text>}
       </View>
     </ScrollView>
+    </ResponsiveScreen>
   );
 }
 
-function computeKpis(data) {
+function computeKpis(data, CHART_COLORS, colors) {
   if (!data) return null;
   const { animals, health, breeding, finance, tasks } = data;
 
@@ -141,10 +150,10 @@ function computeKpis(data) {
     .slice(0, 5);
 
   const healthChartData = [
-    { name: 'Healthy', value: healthy, color: CHART_COLORS.green, legendFontColor: '#37474F', legendFontSize: 12 },
-    { name: 'Under Treatment', value: underTreatment, color: CHART_COLORS.orange, legendFontColor: '#37474F', legendFontSize: 12 },
-    { name: 'Critical', value: critical, color: CHART_COLORS.red, legendFontColor: '#37474F', legendFontSize: 12 },
-    { name: 'Deceased', value: deceased, color: CHART_COLORS.gray, legendFontColor: '#37474F', legendFontSize: 12 },
+    { name: 'Healthy', value: healthy, color: CHART_COLORS.green, legendFontColor: colors.textLight, legendFontSize: 12 },
+    { name: 'Under Treatment', value: underTreatment, color: CHART_COLORS.orange, legendFontColor: colors.textLight, legendFontSize: 12 },
+    { name: 'Critical', value: critical, color: CHART_COLORS.red, legendFontColor: colors.textLight, legendFontSize: 12 },
+    { name: 'Deceased', value: deceased, color: CHART_COLORS.gray, legendFontColor: colors.textLight, legendFontSize: 12 },
   ].filter((d) => d.value > 0);
 
   return {
@@ -161,11 +170,11 @@ function computeKpis(data) {
   };
 }
 
-function KpiCard({ label, value, sub, icon, color, onPress }) {
+function KpiCard({ styles, label, value, sub, icon, color, onPress }) {
   return (
     <Pressable style={styles.kpiCard} onPress={onPress}>
       <View style={[styles.kpiIcon, { backgroundColor: color + '1A' }]}>
-        <Ionicons name={icon} size={18} color={color} />
+        <Icon name={icon} size={16} color={color} />
       </View>
       <Text style={styles.kpiValue}>{value}</Text>
       <Text style={styles.kpiLabel}>{label}</Text>
@@ -174,18 +183,26 @@ function KpiCard({ label, value, sub, icon, color, onPress }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F7F5' },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  kpiCard: { width: '31%', backgroundColor: '#fff', borderRadius: 14, padding: 12, borderWidth: 1, borderColor: '#ECEFF1', gap: 4 },
-  kpiIcon: { width: 30, height: 30, borderRadius: 8, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
-  kpiValue: { fontSize: 18, fontWeight: '800', color: '#1B5E20' },
-  kpiLabel: { fontSize: 11, color: '#607D8B' },
-  kpiSub: { fontSize: 10, fontWeight: '700' },
-  card: { backgroundColor: '#fff', borderRadius: 14, padding: 16, borderWidth: 1, borderColor: '#ECEFF1', gap: 10 },
-  cardTitle: { fontSize: 15, fontWeight: '700', color: '#1B5E20' },
-  listRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: '#F5F7F5' },
-  listRowTitle: { flex: 1, fontSize: 13, color: '#263238', marginRight: 8 },
-  listRowMeta: { fontSize: 12, color: '#90A4AE' },
-  emptyText: { color: '#90A4AE', fontSize: 13 },
-});
+function makeStyles(colors, radius, shadow) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.bg },
+    grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+    kpiCard: {
+      width: '31%', backgroundColor: colors.card, borderRadius: radius.card, padding: 12, gap: 4,
+      shadowColor: shadow.color, shadowOpacity: shadow.opacity, shadowRadius: shadow.radius, shadowOffset: shadow.offset, elevation: shadow.elevation,
+    },
+    kpiIcon: { width: 30, height: 30, borderRadius: radius.button, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
+    kpiValue: { fontSize: 18, fontWeight: '800', color: colors.primaryDark },
+    kpiLabel: { fontSize: 11, color: colors.textLight },
+    kpiSub: { fontSize: 10, fontWeight: '700' },
+    card: {
+      backgroundColor: colors.card, borderRadius: radius.card, padding: 16, gap: 10,
+      shadowColor: shadow.color, shadowOpacity: shadow.opacity, shadowRadius: shadow.radius, shadowOffset: shadow.offset, elevation: shadow.elevation,
+    },
+    cardTitle: { fontSize: 15, fontWeight: '700', color: colors.primaryDark },
+    listRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: colors.bg },
+    listRowTitle: { flex: 1, fontSize: 13, color: colors.text, marginRight: 8 },
+    listRowMeta: { fontSize: 12, color: colors.textLight },
+    emptyText: { color: colors.textLight, fontSize: 13 },
+  });
+}

@@ -1,17 +1,27 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth, useUser } from '@clerk/expo';
 import { useSQLiteContext } from 'expo-sqlite';
+import { useTranslation } from 'react-i18next';
 import { useRepository } from '../../src/db/repository';
 import { useApi } from '../../src/api/client';
 import { useToast } from '../../src/lib/toast';
 import { wipeLocalData } from '../../src/db/schema';
 import Modal from '../../src/components/Modal';
+import Icon from '../../src/components/Icon';
+import SelectField from '../../src/components/SelectField';
+import ResponsiveScreen from '../../src/components/ResponsiveScreen';
+import { useTheme } from '../../src/theme/ThemeProvider';
+import { useLanguage } from '../../src/i18n/LanguageProvider';
 
 export default function SettingsScreen() {
+  const { t } = useTranslation();
+  const { colors, radius, shadow, preference, setThemePreference } = useTheme();
+  const styles = useMemo(() => makeStyles(colors, radius, shadow), [colors, radius, shadow]);
+  const { language, setLanguage, languages, rtlRestartNeeded } = useLanguage();
+
   const { user } = useUser();
   const { signOut } = useAuth();
   const repo = useRepository();
@@ -52,9 +62,9 @@ export default function SettingsScreen() {
       if (profile) await repo.update('profiles', profile.id, payload);
       else await repo.insert('profiles', payload);
       await load();
-      showToast('Profile saved.', 'success');
+      showToast(t('settings.profileSaved'), 'success');
     } catch (err) {
-      showToast(`Save failed: ${err.message}`, 'error');
+      showToast(t('settings.saveFailed', { message: err.message }), 'error');
     } finally {
       setSaving(false);
     }
@@ -63,7 +73,7 @@ export default function SettingsScreen() {
   async function changeAvatar() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      showToast('Photo library access is needed to change your picture.', 'error');
+      showToast(t('settings.photoPermissionNeeded'), 'error');
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8, allowsEditing: true, aspect: [1, 1] });
@@ -76,9 +86,9 @@ export default function SettingsScreen() {
       const blob = await response.blob();
       await user.setProfileImage({ file: blob });
       await user.reload();
-      showToast('Profile photo updated.', 'success');
+      showToast(t('settings.photoUpdated'), 'success');
     } catch (err) {
-      showToast('Upload failed.', 'error');
+      showToast(t('settings.uploadFailed'), 'error');
     } finally {
       setUploading(false);
     }
@@ -89,9 +99,9 @@ export default function SettingsScreen() {
     try {
       await user.setProfileImage({ file: null });
       await user.reload();
-      showToast('Profile photo removed.', 'success');
+      showToast(t('settings.photoRemoved'), 'success');
     } catch (err) {
-      showToast('Failed to remove photo.', 'error');
+      showToast(t('settings.removeFailed'), 'error');
     } finally {
       setUploading(false);
     }
@@ -99,15 +109,15 @@ export default function SettingsScreen() {
 
   async function deleteAccount() {
     if (confirmText !== 'DELETE') {
-      showToast('Type DELETE to confirm.', 'error');
+      showToast(t('settings.typeDeleteToConfirm'), 'error');
       return;
     }
     setDeleting(true);
     try {
       if (profile) await repo.remove('profiles', profile.id);
       const result = await api.rpc('delete_user', {});
-      if (result.error) showToast('Could not fully delete account; signing out.', 'warning');
-      else showToast('Account deleted.', 'success');
+      if (result.error) showToast(t('settings.partialDeleteWarning'), 'warning');
+      else showToast(t('settings.accountDeleted'), 'success');
     } catch (err) {
       /* fall through to sign-out regardless */
     } finally {
@@ -118,7 +128,15 @@ export default function SettingsScreen() {
     }
   }
 
+  const themeOptions = [
+    { value: 'light', label: t('settings.themeLight') },
+    { value: 'dark', label: t('settings.themeDark') },
+    { value: 'system', label: t('settings.themeSystem') },
+  ];
+  const languageOptions = languages.map((l) => ({ value: l.code, label: l.nativeLabel }));
+
   return (
+    <ResponsiveScreen>
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 16, gap: 16 }}>
       <View style={styles.headerCard}>
         <Pressable onPress={changeAvatar} disabled={uploading}>
@@ -127,77 +145,89 @@ export default function SettingsScreen() {
           ) : (
             <View style={[styles.avatar, styles.avatarPlaceholder]}><Text style={styles.avatarInitials}>{initials}</Text></View>
           )}
-          <View style={styles.avatarEdit}><Ionicons name="camera" size={14} color="#fff" /></View>
+          <View style={styles.avatarEdit}><Icon name="camera" size={12} color={colors.white} /></View>
         </Pressable>
         <Text style={styles.headerName}>{displayName}</Text>
         <Text style={styles.headerEmail}>{email}</Text>
         <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
           <Pressable style={styles.smallBtn} onPress={changeAvatar} disabled={uploading}>
-            {uploading ? <ActivityIndicator size="small" color="#37474F" /> : <Text style={styles.smallBtnText}>Change Photo</Text>}
+            {uploading ? <ActivityIndicator size="small" color={colors.text} /> : <Text style={styles.smallBtnText}>{t('settings.changePhoto')}</Text>}
           </Pressable>
           {user?.imageUrl ? (
             <Pressable style={styles.smallBtn} onPress={removeAvatar} disabled={uploading}>
-              <Text style={styles.smallBtnText}>Remove</Text>
+              <Text style={styles.smallBtnText}>{t('settings.remove')}</Text>
             </Pressable>
           ) : null}
         </View>
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Farm Profile</Text>
-        <Field label="Farm Name" value={farmName} onChangeText={setFarmName} placeholder="Your farm name" />
-        <Field label="Location" value={location} onChangeText={setLocation} placeholder="City, District, Country" />
-        <Field label="Phone Number" value={phone} onChangeText={setPhone} placeholder="+250 700 000 000" keyboardType="phone-pad" />
+        <Text style={styles.cardTitle}>{t('settings.appearance')}</Text>
+        <SelectField value={preference} options={themeOptions} onChange={setThemePreference} />
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>{t('settings.language')}</Text>
+        <SelectField value={language} options={languageOptions} onChange={setLanguage} />
+        {rtlRestartNeeded ? <Text style={styles.hint}>{t('settings.rtlRestartNotice')}</Text> : null}
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>{t('settings.farmProfile')}</Text>
+        <Field styles={styles} colors={colors} label={t('settings.farmName')} value={farmName} onChangeText={setFarmName} placeholder={t('settings.farmNamePlaceholder')} />
+        <Field styles={styles} colors={colors} label={t('settings.location')} value={location} onChangeText={setLocation} placeholder={t('settings.locationPlaceholder')} />
+        <Field styles={styles} colors={colors} label={t('settings.phoneNumber')} value={phone} onChangeText={setPhone} placeholder={t('settings.phonePlaceholder')} keyboardType="phone-pad" />
         <Pressable style={styles.saveBtn} onPress={saveProfile} disabled={saving}>
-          {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveBtnText}>Save Profile</Text>}
+          {saving ? <ActivityIndicator color={colors.white} /> : <Text style={styles.saveBtnText}>{t('settings.saveProfile')}</Text>}
         </Pressable>
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Account</Text>
-        <Row label="Email" value={email} />
-        <Row label="User ID" value={user?.id || ''} mono />
-        <Text style={styles.hint}>Password and security settings can be managed from the LivestockPro web app.</Text>
+        <Text style={styles.cardTitle}>{t('settings.account')}</Text>
+        <Row styles={styles} label={t('settings.email')} value={email} />
+        <Row styles={styles} label={t('settings.userId')} value={user?.id || ''} mono />
+        <Text style={styles.hint}>{t('settings.passwordNote')}</Text>
       </View>
 
       <View style={[styles.card, styles.dangerCard]}>
-        <Text style={[styles.cardTitle, { color: '#D32F2F' }]}>Danger Zone</Text>
-        <Text style={styles.hint}>Deleting your account permanently removes all your data. This cannot be undone.</Text>
+        <Text style={[styles.cardTitle, { color: colors.red }]}>{t('settings.dangerZone')}</Text>
+        <Text style={styles.hint}>{t('settings.deleteWarning')}</Text>
         <Pressable style={styles.deleteBtn} onPress={() => setDeleteOpen(true)}>
-          <Text style={styles.deleteBtnText}>Delete Account</Text>
+          <Text style={styles.deleteBtnText}>{t('settings.deleteAccount')}</Text>
         </Pressable>
       </View>
 
       <Modal
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}
-        title="Delete Account"
+        title={t('settings.deleteAccount')}
         footer={
           <>
-            <Pressable style={styles.smallBtn} onPress={() => setDeleteOpen(false)}><Text style={styles.smallBtnText}>Cancel</Text></Pressable>
+            <Pressable style={styles.smallBtn} onPress={() => setDeleteOpen(false)}><Text style={styles.smallBtnText}>{t('common.cancel')}</Text></Pressable>
             <Pressable style={styles.deleteBtn} onPress={deleteAccount} disabled={deleting}>
-              {deleting ? <ActivityIndicator color="#fff" /> : <Text style={styles.deleteBtnText}>Delete Forever</Text>}
+              {deleting ? <ActivityIndicator color={colors.white} /> : <Text style={styles.deleteBtnText}>{t('settings.deleteForever')}</Text>}
             </Pressable>
           </>
         }
       >
-        <Text style={styles.hint}>This permanently deletes your account and all associated data. Type DELETE to confirm.</Text>
-        <TextInput style={styles.confirmInput} value={confirmText} onChangeText={setConfirmText} placeholder='Type "DELETE" here' autoCapitalize="characters" />
+        <Text style={styles.hint}>{t('settings.deleteConfirmMessage')}</Text>
+        <TextInput style={styles.confirmInput} value={confirmText} onChangeText={setConfirmText} placeholder={t('settings.typeDeleteHere')} autoCapitalize="characters" />
       </Modal>
     </ScrollView>
+    </ResponsiveScreen>
   );
 }
 
-function Field({ label, ...props }) {
+function Field({ styles, colors, label, ...props }) {
   return (
     <View style={{ marginBottom: 12 }}>
       <Text style={styles.fieldLabel}>{label}</Text>
-      <TextInput style={styles.input} placeholderTextColor="#90A4AE" {...props} />
+      <TextInput style={styles.input} placeholderTextColor={colors.placeholder} {...props} />
     </View>
   );
 }
 
-function Row({ label, value, mono }) {
+function Row({ styles, label, value, mono }) {
   return (
     <View style={styles.row}>
       <Text style={styles.rowLabel}>{label}</Text>
@@ -206,29 +236,37 @@ function Row({ label, value, mono }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F7F5' },
-  headerCard: { backgroundColor: '#fff', borderRadius: 14, padding: 20, alignItems: 'center', borderWidth: 1, borderColor: '#ECEFF1' },
-  avatar: { width: 72, height: 72, borderRadius: 36 },
-  avatarPlaceholder: { backgroundColor: '#E8F5E9', alignItems: 'center', justifyContent: 'center' },
-  avatarInitials: { fontSize: 24, fontWeight: '800', color: '#2E7D32' },
-  avatarEdit: { position: 'absolute', right: -2, bottom: -2, backgroundColor: '#2E7D32', borderRadius: 10, padding: 5, borderWidth: 2, borderColor: '#fff' },
-  headerName: { fontSize: 17, fontWeight: '700', color: '#1B5E20', marginTop: 12 },
-  headerEmail: { fontSize: 13, color: '#607D8B', marginTop: 2 },
-  smallBtn: { backgroundColor: '#ECEFF1', paddingVertical: 9, paddingHorizontal: 14, borderRadius: 8 },
-  smallBtnText: { color: '#37474F', fontWeight: '700', fontSize: 13 },
-  card: { backgroundColor: '#fff', borderRadius: 14, padding: 16, borderWidth: 1, borderColor: '#ECEFF1' },
-  cardTitle: { fontSize: 15, fontWeight: '700', color: '#1B5E20', marginBottom: 12 },
-  fieldLabel: { fontSize: 12, fontWeight: '600', color: '#607D8B', marginBottom: 6 },
-  input: { borderWidth: 1, borderColor: '#CFD8DC', borderRadius: 10, paddingVertical: 11, paddingHorizontal: 12, fontSize: 14, color: '#263238' },
-  saveBtn: { backgroundColor: '#2E7D32', paddingVertical: 13, borderRadius: 10, alignItems: 'center', marginTop: 4 },
-  saveBtnText: { color: '#fff', fontWeight: '700' },
-  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#F5F7F5' },
-  rowLabel: { color: '#607D8B', fontSize: 13 },
-  rowValue: { color: '#263238', fontSize: 13, flexShrink: 1, marginLeft: 12 },
-  hint: { color: '#90A4AE', fontSize: 12, marginTop: 8 },
-  dangerCard: { borderColor: '#FFCDD2' },
-  deleteBtn: { backgroundColor: '#D32F2F', paddingVertical: 12, borderRadius: 10, alignItems: 'center', marginTop: 12, paddingHorizontal: 16 },
-  deleteBtnText: { color: '#fff', fontWeight: '700' },
-  confirmInput: { borderWidth: 1, borderColor: '#CFD8DC', borderRadius: 10, paddingVertical: 11, paddingHorizontal: 12, marginTop: 12, fontSize: 14 },
-});
+function makeStyles(colors, radius, shadow) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.bg },
+    headerCard: {
+      backgroundColor: colors.card, borderRadius: radius.card, padding: 20, alignItems: 'center',
+      shadowColor: shadow.color, shadowOpacity: shadow.opacity, shadowRadius: shadow.radius, shadowOffset: shadow.offset, elevation: shadow.elevation,
+    },
+    avatar: { width: 72, height: 72, borderRadius: 36 },
+    avatarPlaceholder: { backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center' },
+    avatarInitials: { fontSize: 24, fontWeight: '800', color: colors.primary },
+    avatarEdit: { position: 'absolute', right: -2, bottom: -2, backgroundColor: colors.primary, borderRadius: 10, padding: 5, borderWidth: 2, borderColor: colors.card },
+    headerName: { fontSize: 17, fontWeight: '700', color: colors.primaryDark, marginTop: 12 },
+    headerEmail: { fontSize: 13, color: colors.textLight, marginTop: 2 },
+    smallBtn: { backgroundColor: colors.bg, borderWidth: 1.5, borderColor: colors.border, paddingVertical: 9, paddingHorizontal: 14, borderRadius: radius.button },
+    smallBtnText: { color: colors.text, fontWeight: '700', fontSize: 13 },
+    card: {
+      backgroundColor: colors.card, borderRadius: radius.card, padding: 16,
+      shadowColor: shadow.color, shadowOpacity: shadow.opacity, shadowRadius: shadow.radius, shadowOffset: shadow.offset, elevation: shadow.elevation,
+    },
+    cardTitle: { fontSize: 15, fontWeight: '700', color: colors.primaryDark, marginBottom: 12 },
+    fieldLabel: { fontSize: 12, fontWeight: '600', color: colors.textLight, marginBottom: 6 },
+    input: { borderWidth: 1, borderColor: colors.border, borderRadius: radius.card, paddingVertical: 11, paddingHorizontal: 12, fontSize: 14, color: colors.text },
+    saveBtn: { backgroundColor: colors.primary, paddingVertical: 13, borderRadius: radius.button, alignItems: 'center', marginTop: 4 },
+    saveBtnText: { color: colors.white, fontWeight: '700' },
+    row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.bg },
+    rowLabel: { color: colors.textLight, fontSize: 13 },
+    rowValue: { color: colors.text, fontSize: 13, flexShrink: 1, marginLeft: 12 },
+    hint: { color: colors.textLight, fontSize: 12, marginTop: 8 },
+    dangerCard: { borderWidth: 1, borderColor: '#FFCDD2' },
+    deleteBtn: { backgroundColor: colors.red, paddingVertical: 12, borderRadius: radius.button, alignItems: 'center', marginTop: 12, paddingHorizontal: 16 },
+    deleteBtnText: { color: colors.white, fontWeight: '700' },
+    confirmInput: { borderWidth: 1, borderColor: colors.border, borderRadius: radius.card, paddingVertical: 11, paddingHorizontal: 12, marginTop: 12, fontSize: 14 },
+  });
+}

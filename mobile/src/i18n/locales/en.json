@@ -1,0 +1,363 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "loading": "Loading...",
+    "retry": "Retry",
+    "confirm": "Confirm",
+    "done": "Done",
+    "close": "Close",
+    "untitled": "Untitled"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "animals": "Animals",
+    "health": "Health",
+    "feeding": "Feeding",
+    "breeding": "Breeding",
+    "production": "Production",
+    "finance": "Finance",
+    "tasks": "Tasks",
+    "reports": "Reports",
+    "settings": "Settings",
+    "more": "More",
+    "signOut": "Sign out"
+  },
+  "menu": {
+    "title": "Menu"
+  },
+  "auth": {
+    "brandName": "LivestockPro",
+    "welcomeBack": "Welcome back",
+    "createAccount": "Create your account",
+    "emailAddress": "Email address",
+    "password": "Password",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "continueWithGoogle": "Continue with Google",
+    "or": "OR",
+    "dontHaveAccount": "Don't have an account? ",
+    "alreadyHaveAccount": "Already have an account? ",
+    "verifyItsYou": "Verify it's you",
+    "verifyCodeSentSignIn": "Enter the verification code we emailed you.",
+    "checkYourEmail": "Check your email",
+    "verifyCodeSentSignUp": "Enter the verification code we sent to {{email}}.",
+    "verificationCode": "Verification code",
+    "verify": "Verify",
+    "resendCode": "Resend code",
+    "couldNotSignIn": "Could not sign you in.",
+    "couldNotCreateAccount": "Could not create your account.",
+    "somethingWentWrong": "Something went wrong.",
+    "verificationIncomplete": "Verification incomplete — check the code and try again.",
+    "invalidCode": "Invalid code.",
+    "signInDidNotComplete": "Sign-in did not complete. Please try again.",
+    "mfaNotSupported": "This account requires a verification method not yet supported in the app. Please sign in on the web instead.",
+    "googleSignInFailed": "Google sign-in failed."
+  },
+  "settings": {
+    "farmProfile": "Farm Profile",
+    "farmName": "Farm Name",
+    "farmNamePlaceholder": "Your farm name",
+    "location": "Location",
+    "locationPlaceholder": "City, District, Country",
+    "phoneNumber": "Phone Number",
+    "phonePlaceholder": "+250 700 000 000",
+    "saveProfile": "Save Profile",
+    "profileSaved": "Profile saved.",
+    "saveFailed": "Save failed: {{message}}",
+    "account": "Account",
+    "email": "Email",
+    "userId": "User ID",
+    "passwordNote": "Password and security settings can be managed from the LivestockPro web app.",
+    "changePhoto": "Change Photo",
+    "remove": "Remove",
+    "photoUpdated": "Profile photo updated.",
+    "photoRemoved": "Profile photo removed.",
+    "photoPermissionNeeded": "Photo library access is needed to change your picture.",
+    "uploadFailed": "Upload failed.",
+    "removeFailed": "Failed to remove photo.",
+    "dangerZone": "Danger Zone",
+    "deleteWarning": "Deleting your account permanently removes all your data. This cannot be undone.",
+    "deleteAccount": "Delete Account",
+    "deleteConfirmMessage": "This permanently deletes your account and all associated data. Type DELETE to confirm.",
+    "typeDeleteHere": "Type \"DELETE\" here",
+    "typeDeleteToConfirm": "Type DELETE to confirm.",
+    "deleteForever": "Delete Forever",
+    "accountDeleted": "Account deleted.",
+    "partialDeleteWarning": "Could not fully delete account; signing out.",
+    "appearance": "Appearance",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "language": "Language",
+    "rtlRestartNotice": "Restart the app for the new text direction to fully apply."
+  },
+  "sync": {
+    "synced": "Synced",
+    "syncing": "Syncing…",
+    "syncIssue": "Sync issue",
+    "lastSynced": "Last synced {{time}}",
+    "notSyncedYet": "Not synced yet — tap to sync",
+    "recordsFailed_one": "{{count}} record failed to sync",
+    "recordsFailed_other": "{{count}} records failed to sync"
+  },
+  "geo": {
+    "capturing": "Capturing device location...",
+    "denied": "Location permission denied — this record will save without coordinates.",
+    "error": "Couldn't get device location — this record will save without coordinates.",
+    "unsupported": "This device does not support location capture.",
+    "captured": "Location captured ({{lat}}, {{lng}})",
+    "tapToRetry": " Tap to retry."
+  },
+  "confirmDialogs": {
+    "signOutTitle": "Sign out?",
+    "signOutMessage": "You can sign back in any time — your data stays synced to your account.",
+    "signOutConfirm": "Sign out",
+    "deleteRecordTitle": "Delete this {{item}}?",
+    "cannotBeUndone": "This cannot be undone."
+  },
+  "dashboard": {
+    "totalAnimals": "Total Animals",
+    "critical": "Critical",
+    "pregnant": "Pregnant",
+    "pendingTasks": "Pending Tasks",
+    "overdueCount": "{{count}} overdue",
+    "incomeMonth": "Income (mo.)",
+    "expenseMonth": "Expense (mo.)",
+    "herdHealth": "Herd Health",
+    "noAnimalsYet": "No animals yet.",
+    "recentAnimals": "Recent Animals",
+    "upcomingTasks": "Upcoming Tasks",
+    "nothingPending": "Nothing pending.",
+    "recentHealthAlerts": "Recent Health Alerts",
+    "noActiveAlerts": "No active alerts.",
+    "checkup": "Check-up"
+  },
+  "reports": {
+    "exportCsv": "Export CSV",
+    "exportFailed": "Export failed: {{message}}",
+    "sharingUnavailable": "Sharing is not available on this device.",
+    "sectionAnimals": "Animals",
+    "total": "Total",
+    "healthy": "Healthy",
+    "underTreatment": "Under Treatment",
+    "criticalStatus": "Critical",
+    "deceased": "Deceased",
+    "sectionBreeding": "Breeding",
+    "delivered": "Delivered",
+    "newbornsAllTime": "Newborns (all time)",
+    "sectionProduction": "Production (this month)",
+    "milkLiters": "Milk (liters)",
+    "eggsUnits": "Eggs (units)",
+    "meatKg": "Meat (kg)",
+    "sectionFinance": "Finance (this month)",
+    "income": "Income",
+    "expense": "Expense",
+    "net": "Net",
+    "sectionHealth": "Health",
+    "records": "Records",
+    "activeAlerts": "Active alerts"
+  },
+  "records": {
+    "searchPlaceholder": "Search {{label}}...",
+    "emptyList": "No {{label}} yet. Tap + to add one.",
+    "addTitle": "Add {{item}}",
+    "editTitle": "Edit {{item}}",
+    "fieldRequired": "{{field}} is required.",
+    "added": "{{item}} added.",
+    "updated": "{{item}} updated.",
+    "deleted": "{{item}} deleted.",
+    "saveFailed": "Save failed: {{message}}",
+    "all": "All {{label}}"
+  },
+  "tables": {
+    "animals": {
+      "label": "Animals",
+      "singular": "Animal",
+      "fields": {
+        "tag_id": "Tag ID",
+        "name": "Name",
+        "species": "Species",
+        "breed": "Breed",
+        "sex": "Sex",
+        "date_of_birth": "Date of Birth",
+        "location": "Location",
+        "health_status": "Health Status",
+        "notes": "Notes"
+      }
+    },
+    "health_records": {
+      "label": "Health",
+      "singular": "Health Record",
+      "fields": {
+        "tag_id": "Animal Tag ID",
+        "disease": "Disease / Condition",
+        "treatment": "Treatment",
+        "medicine": "Medicine",
+        "vet_name": "Vet Name",
+        "check_date": "Check Date",
+        "next_check_date": "Next Check Date",
+        "status": "Status",
+        "notes": "Notes"
+      }
+    },
+    "feeding_records": {
+      "label": "Feeding",
+      "singular": "Feeding Record",
+      "fields": {
+        "feed_type": "Feed Type",
+        "quantity": "Quantity",
+        "unit": "Unit",
+        "cost": "Cost",
+        "feeding_date": "Feeding Date",
+        "animal_group": "Animal Group",
+        "notes": "Notes"
+      }
+    },
+    "breeding_records": {
+      "label": "Breeding",
+      "singular": "Breeding Record",
+      "fields": {
+        "tag_id": "Animal Tag ID",
+        "breeding_date": "Breeding Date",
+        "pregnancy_status": "Pregnancy Status",
+        "expected_birth_date": "Expected Birth Date",
+        "birth_date": "Birth Date",
+        "newborn_count": "Newborn Count",
+        "newborn_details": "Newborn Details",
+        "notes": "Notes"
+      }
+    },
+    "production_records": {
+      "label": "Production",
+      "singular": "Production Record",
+      "fields": {
+        "production_type": "Type",
+        "tag_id": "Animal Tag ID",
+        "quantity": "Quantity",
+        "unit": "Unit",
+        "production_date": "Production Date",
+        "notes": "Notes"
+      }
+    },
+    "finance_records": {
+      "label": "Finance",
+      "singular": "Finance Record",
+      "fields": {
+        "type": "Type",
+        "amount": "Amount",
+        "category": "Category",
+        "date": "Date",
+        "description": "Description"
+      }
+    },
+    "tasks": {
+      "label": "Tasks",
+      "singular": "Task",
+      "fields": {
+        "title": "Title",
+        "description": "Description",
+        "due_date": "Due Date",
+        "priority": "Priority",
+        "status": "Status"
+      }
+    }
+  },
+  "enums": {
+    "species": {
+      "Cattle": "Cattle",
+      "Sheep": "Sheep",
+      "Goat": "Goat",
+      "Pig": "Pig",
+      "Poultry": "Poultry",
+      "Horse": "Horse",
+      "Donkey": "Donkey",
+      "Rabbit": "Rabbit",
+      "Other": "Other"
+    },
+    "sex": {
+      "Male": "Male",
+      "Female": "Female"
+    },
+    "animalHealthStatus": {
+      "Healthy": "Healthy",
+      "Under Treatment": "Under Treatment",
+      "Critical": "Critical",
+      "Deceased": "Deceased"
+    },
+    "healthRecordStatus": {
+      "Under Treatment": "Under Treatment",
+      "Healthy": "Healthy",
+      "Critical": "Critical",
+      "Recovered": "Recovered",
+      "Deceased": "Deceased"
+    },
+    "pregnancyStatus": {
+      "Not Confirmed": "Not Confirmed",
+      "Pregnant": "Pregnant",
+      "Not Pregnant": "Not Pregnant",
+      "Delivered": "Delivered"
+    },
+    "feedingUnit": {
+      "kg": "kg",
+      "lbs": "lbs",
+      "tons": "tons",
+      "bags": "bags"
+    },
+    "productionType": {
+      "Milk": "Milk",
+      "Eggs": "Eggs",
+      "Meat": "Meat"
+    },
+    "productionUnit": {
+      "liters": "liters",
+      "units": "units",
+      "kg": "kg"
+    },
+    "financeType": {
+      "Income": "Income",
+      "Expense": "Expense"
+    },
+    "financeCategory": {
+      "Milk Sales": "Milk Sales",
+      "Egg Sales": "Egg Sales",
+      "Meat Sales": "Meat Sales",
+      "Animal Sales": "Animal Sales",
+      "Other Income": "Other Income",
+      "Feed": "Feed",
+      "Veterinary": "Veterinary",
+      "Medicine": "Medicine",
+      "Labor": "Labor",
+      "Equipment": "Equipment",
+      "Maintenance": "Maintenance",
+      "Transport": "Transport",
+      "Other Expense": "Other Expense"
+    },
+    "taskPriority": {
+      "Low": "Low",
+      "Medium": "Medium",
+      "High": "High"
+    },
+    "taskStatus": {
+      "Pending": "Pending",
+      "In Progress": "In Progress",
+      "Completed": "Completed"
+    },
+    "statusBadge": {
+      "Healthy": "Healthy",
+      "Under Treatment": "Under Treatment",
+      "Critical": "Critical",
+      "Deceased": "Deceased",
+      "Pregnant": "Pregnant",
+      "Completed": "Completed",
+      "Pending": "Pending",
+      "In Progress": "In Progress",
+      "Recovered": "Recovered",
+      "Not Confirmed": "Not Confirmed"
+    }
+  }
+}

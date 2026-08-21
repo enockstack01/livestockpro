@@ -3,6 +3,7 @@
    here (short, stable relative paths) instead of each file computing its own
    '../../../shared/...' depth. */
 export { fmtDate, calcAge } from '../../../shared/format';
-export { TONES, statusTone, priorityTone, pregnancyTone } from '../../../shared/statusMaps';
+export { TONES, DARK_TONES, statusTone, priorityTone, pregnancyTone } from '../../../shared/statusMaps';
 export { isOverdueTask, isThisMonth, todayIso } from '../../../shared/businessRules';
 export { SCHEMAS, SYNCED_TABLES } from '../../../shared/schemas';
+export { COLORS, LIGHT_COLORS, DARK_COLORS, RADIUS, SHADOW, SHADOW_LG } from '../../../shared/theme';

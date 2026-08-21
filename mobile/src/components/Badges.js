@@ -1,5 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { statusTone, priorityTone, pregnancyTone } from '../lib/shared';
+import { useTheme } from '../theme/ThemeProvider';
 
 function Badge({ label, tone }) {
   if (!label) return null;
@@ -11,15 +13,24 @@ function Badge({ label, tone }) {
 }
 
 export function StatusBadge({ status }) {
-  return <Badge label={status} tone={statusTone(status)} />;
+  const { t } = useTranslation();
+  const { scheme } = useTheme();
+  if (!status) return null;
+  return <Badge label={t(`enums.statusBadge.${status}`, status)} tone={statusTone(status, scheme === 'dark')} />;
 }
 
 export function PriorityBadge({ priority }) {
-  return <Badge label={priority || 'Medium'} tone={priorityTone(priority)} />;
+  const { t } = useTranslation();
+  const { scheme } = useTheme();
+  const value = priority || 'Medium';
+  return <Badge label={t(`enums.taskPriority.${value}`, value)} tone={priorityTone(value, scheme === 'dark')} />;
 }
 
 export function PregnancyBadge({ status }) {
-  return <Badge label={status} tone={pregnancyTone(status)} />;
+  const { t } = useTranslation();
+  const { scheme } = useTheme();
+  if (!status) return null;
+  return <Badge label={t(`enums.pregnancyStatus.${status}`, status)} tone={pregnancyTone(status, scheme === 'dark')} />;
 }
 
 const styles = StyleSheet.create({

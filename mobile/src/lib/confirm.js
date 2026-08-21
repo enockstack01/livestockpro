@@ -1,6 +1,8 @@
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Modal from '../components/Modal';
+import { useTheme } from '../theme/ThemeProvider';
 
 /* Imperative confirm() dialog, same pattern as useToast(). Built on our own
    Modal instead of React Native's Alert.alert() — react-native-web's Alert
@@ -10,6 +12,9 @@ import Modal from '../components/Modal';
 const ConfirmContext = createContext(null);
 
 export function ConfirmProvider({ children }) {
+  const { t } = useTranslation();
+  const { colors, radius } = useTheme();
+  const styles = useMemo(() => makeStyles(colors, radius), [colors, radius]);
   const [state, setState] = useState(null); // { title, message, confirmLabel, destructive, resolve }
 
   const confirm = useCallback((opts) => new Promise((resolve) => setState({ ...opts, resolve })), []);
@@ -25,14 +30,14 @@ export function ConfirmProvider({ children }) {
       <Modal
         open={!!state}
         onClose={() => close(false)}
-        title={state?.title || 'Are you sure?'}
+        title={state?.title || t('common.confirm')}
         footer={
           <>
             <Pressable style={[styles.btn, styles.btnSecondary]} onPress={() => close(false)}>
-              <Text style={styles.btnSecondaryText}>Cancel</Text>
+              <Text style={styles.btnSecondaryText}>{t('common.cancel')}</Text>
             </Pressable>
             <Pressable style={[styles.btn, state?.destructive ? styles.btnDanger : styles.btnPrimary]} onPress={() => close(true)}>
-              <Text style={styles.btnPrimaryText}>{state?.confirmLabel || 'Confirm'}</Text>
+              <Text style={styles.btnPrimaryText}>{state?.confirmLabel || t('common.confirm')}</Text>
             </Pressable>
           </>
         }
@@ -50,12 +55,14 @@ export function useConfirm() {
   return ctx;
 }
 
-const styles = StyleSheet.create({
-  message: { fontSize: 14, color: '#37474F', lineHeight: 20 },
-  btn: { flex: 1, paddingVertical: 13, borderRadius: 10, alignItems: 'center' },
-  btnPrimary: { backgroundColor: '#2E7D32' },
-  btnPrimaryText: { color: '#fff', fontWeight: '700' },
-  btnSecondary: { backgroundColor: '#ECEFF1' },
-  btnSecondaryText: { color: '#37474F', fontWeight: '700' },
-  btnDanger: { backgroundColor: '#D32F2F' },
-});
+function makeStyles(colors, radius) {
+  return StyleSheet.create({
+    message: { fontSize: 14, color: colors.textLight, lineHeight: 20 },
+    btn: { flex: 1, paddingVertical: 13, borderRadius: radius.button, alignItems: 'center' },
+    btnPrimary: { backgroundColor: colors.primary },
+    btnPrimaryText: { color: colors.white, fontWeight: '700' },
+    btnSecondary: { backgroundColor: colors.bg, borderWidth: 1.5, borderColor: colors.border },
+    btnSecondaryText: { color: colors.text, fontWeight: '700' },
+    btnDanger: { backgroundColor: colors.red },
+  });
+}

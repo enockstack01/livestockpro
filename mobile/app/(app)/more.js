@@ -1,22 +1,31 @@
+import { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@clerk/expo';
 import { useSQLiteContext } from 'expo-sqlite';
+import { useTranslation } from 'react-i18next';
 import { useSync } from '../../src/sync/SyncProvider';
 import { useConfirm } from '../../src/lib/confirm';
 import { wipeLocalData } from '../../src/db/schema';
+import Icon from '../../src/components/Icon';
+import ResponsiveScreen from '../../src/components/ResponsiveScreen';
+import { useTheme } from '../../src/theme/ThemeProvider';
 
+/* Icon names match client/src/components/Layout.jsx's sidebar exactly
+   (fa-wheat-awn, fa-venus-mars, fa-gauge, fa-coins, fa-chart-bar, fa-gear). */
 const LINKS = [
-  { href: '/feeding', label: 'Feeding', icon: 'nutrition' },
-  { href: '/breeding', label: 'Breeding', icon: 'heart' },
-  { href: '/production', label: 'Production', icon: 'stats-chart' },
-  { href: '/finance', label: 'Finance', icon: 'cash' },
-  { href: '/reports', label: 'Reports', icon: 'document-text' },
-  { href: '/settings', label: 'Settings', icon: 'settings' },
+  { href: '/feeding', key: 'feeding', icon: 'wheat-awn' },
+  { href: '/breeding', key: 'breeding', icon: 'venus-mars' },
+  { href: '/production', key: 'production', icon: 'gauge' },
+  { href: '/finance', key: 'finance', icon: 'coins' },
+  { href: '/reports', key: 'reports', icon: 'chart-bar' },
+  { href: '/settings', key: 'settings', icon: 'gear' },
 ];
 
 export default function MoreScreen() {
+  const { t } = useTranslation();
+  const { colors, radius, shadow } = useTheme();
+  const styles = useMemo(() => makeStyles(colors, radius, shadow), [colors, radius, shadow]);
   const router = useRouter();
   const { signOut } = useAuth();
   const db = useSQLiteContext();
@@ -25,9 +34,9 @@ export default function MoreScreen() {
 
   async function confirmSignOut() {
     const ok = await confirm({
-      title: 'Sign out?',
-      message: 'You can sign back in any time — your data stays synced to your account.',
-      confirmLabel: 'Sign out',
+      title: t('confirmDialogs.signOutTitle'),
+      message: t('confirmDialogs.signOutMessage'),
+      confirmLabel: t('confirmDialogs.signOutConfirm'),
       destructive: true,
     });
     if (!ok) return;
@@ -36,48 +45,59 @@ export default function MoreScreen() {
   }
 
   return (
+    <ResponsiveScreen>
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 16, gap: 10 }}>
-      <SyncStatusCard syncing={syncing} lastSyncedAt={lastSyncedAt} lastError={lastError} failedCount={failedCount} onRefresh={triggerSync} />
+      <SyncStatusCard styles={styles} colors={colors} syncing={syncing} lastSyncedAt={lastSyncedAt} lastError={lastError} failedCount={failedCount} onRefresh={triggerSync} />
 
       {LINKS.map((item) => (
         <Pressable key={item.href} style={styles.row} onPress={() => router.push(item.href)}>
-          <Ionicons name={item.icon} size={20} color="#2E7D32" style={{ width: 28 }} />
-          <Text style={styles.rowLabel}>{item.label}</Text>
-          <Ionicons name="chevron-forward" size={18} color="#B0BEC5" />
+          <Icon name={item.icon} size={18} color={colors.primary} style={{ width: 28 }} />
+          <Text style={styles.rowLabel}>{t(`nav.${item.key}`)}</Text>
+          <Icon name="chevron-right" size={14} color={colors.textLight} />
         </Pressable>
       ))}
 
       <Pressable style={[styles.row, styles.signOutRow]} onPress={confirmSignOut}>
-        <Ionicons name="log-out-outline" size={20} color="#D32F2F" style={{ width: 28 }} />
-        <Text style={[styles.rowLabel, { color: '#D32F2F' }]}>Sign out</Text>
+        <Icon name="right-from-bracket" size={18} color={colors.red} style={{ width: 28 }} />
+        <Text style={[styles.rowLabel, { color: colors.red }]}>{t('nav.signOut')}</Text>
       </Pressable>
     </ScrollView>
+    </ResponsiveScreen>
   );
 }
 
-function SyncStatusCard({ syncing, lastSyncedAt, lastError, failedCount, onRefresh }) {
+function SyncStatusCard({ styles, colors, syncing, lastSyncedAt, lastError, failedCount, onRefresh }) {
+  const { t } = useTranslation();
   return (
     <Pressable style={styles.syncCard} onPress={onRefresh}>
-      <Ionicons name={syncing ? 'sync' : lastError ? 'warning' : 'checkmark-circle'} size={20} color={lastError ? '#E65100' : '#2E7D32'} />
+      <Icon name={syncing ? 'arrows-rotate' : lastError ? 'triangle-exclamation' : 'circle-check'} size={18} color={lastError ? colors.orange : colors.primary} />
       <View style={{ flex: 1 }}>
         <Text style={styles.syncTitle}>
-          {syncing ? 'Syncing…' : lastError ? 'Sync issue' : 'Synced'}
+          {syncing ? t('sync.syncing') : lastError ? t('sync.syncIssue') : t('sync.synced')}
         </Text>
         <Text style={styles.syncSubtitle}>
-          {lastError ? lastError : lastSyncedAt ? `Last synced ${new Date(lastSyncedAt).toLocaleTimeString()}` : 'Not synced yet — tap to sync'}
-          {failedCount > 0 ? ` · ${failedCount} record${failedCount === 1 ? '' : 's'} failed to sync` : ''}
+          {lastError ? lastError : lastSyncedAt ? t('sync.lastSynced', { time: new Date(lastSyncedAt).toLocaleTimeString() }) : t('sync.notSyncedYet')}
+          {failedCount > 0 ? ` · ${t('sync.recordsFailed', { count: failedCount })}` : ''}
         </Text>
       </View>
     </Pressable>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F7F5' },
-  syncCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#fff', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#ECEFF1', marginBottom: 6 },
-  syncTitle: { fontWeight: '700', color: '#263238', fontSize: 14 },
-  syncSubtitle: { color: '#607D8B', fontSize: 12, marginTop: 2 },
-  row: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#ECEFF1' },
-  rowLabel: { flex: 1, fontSize: 15, color: '#263238', fontWeight: '600' },
-  signOutRow: { marginTop: 10 },
-});
+function makeStyles(colors, radius, shadow) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.bg },
+    syncCard: {
+      flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.card, borderRadius: radius.card, padding: 14, marginBottom: 6,
+      shadowColor: shadow.color, shadowOpacity: shadow.opacity, shadowRadius: shadow.radius, shadowOffset: shadow.offset, elevation: shadow.elevation,
+    },
+    syncTitle: { fontWeight: '700', color: colors.text, fontSize: 14 },
+    syncSubtitle: { color: colors.textLight, fontSize: 12, marginTop: 2 },
+    row: {
+      flexDirection: 'row', alignItems: 'center', backgroundColor: colors.card, borderRadius: radius.card, padding: 16,
+      shadowColor: shadow.color, shadowOpacity: shadow.opacity, shadowRadius: shadow.radius, shadowOffset: shadow.offset, elevation: shadow.elevation,
+    },
+    rowLabel: { flex: 1, fontSize: 15, color: colors.text, fontWeight: '600' },
+    signOutRow: { marginTop: 10 },
+  });
+}

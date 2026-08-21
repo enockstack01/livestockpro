@@ -1,0 +1,363 @@
+{
+  "common": {
+    "save": "Hifadhi",
+    "cancel": "Ghairi",
+    "delete": "Futa",
+    "edit": "Hariri",
+    "add": "Ongeza",
+    "search": "Tafuta",
+    "loading": "Inapakia...",
+    "retry": "Jaribu tena",
+    "confirm": "Thibitisha",
+    "done": "Imekamilika",
+    "close": "Funga",
+    "untitled": "Bila jina"
+  },
+  "nav": {
+    "dashboard": "Dashibodi",
+    "animals": "Wanyama",
+    "health": "Afya",
+    "feeding": "Ulishaji",
+    "breeding": "Uzalishaji",
+    "production": "Mazao",
+    "finance": "Fedha",
+    "tasks": "Kazi",
+    "reports": "Ripoti",
+    "settings": "Mipangilio",
+    "more": "Zaidi",
+    "signOut": "Toka"
+  },
+  "menu": {
+    "title": "Menyu"
+  },
+  "auth": {
+    "brandName": "LivestockPro",
+    "welcomeBack": "Karibu tena",
+    "createAccount": "Fungua akaunti yako",
+    "emailAddress": "Barua pepe",
+    "password": "Nenosiri",
+    "signIn": "Ingia",
+    "signUp": "Jisajili",
+    "continueWithGoogle": "Endelea na Google",
+    "or": "AU",
+    "dontHaveAccount": "Huna akaunti? ",
+    "alreadyHaveAccount": "Una akaunti tayari? ",
+    "verifyItsYou": "Thibitisha ni wewe",
+    "verifyCodeSentSignIn": "Ingiza msimbo wa uthibitisho tuliokutumia kwa barua pepe.",
+    "checkYourEmail": "Angalia barua pepe yako",
+    "verifyCodeSentSignUp": "Ingiza msimbo wa uthibitisho tuliotuma kwa {{email}}.",
+    "verificationCode": "Msimbo wa uthibitisho",
+    "verify": "Thibitisha",
+    "resendCode": "Tuma tena msimbo",
+    "couldNotSignIn": "Imeshindikana kukuingiza.",
+    "couldNotCreateAccount": "Imeshindikana kuunda akaunti yako.",
+    "somethingWentWrong": "Hitilafu imetokea.",
+    "verificationIncomplete": "Uthibitisho haujakamilika — angalia msimbo na ujaribu tena.",
+    "invalidCode": "Msimbo si sahihi.",
+    "signInDidNotComplete": "Kuingia hakukukamilika. Tafadhali jaribu tena.",
+    "mfaNotSupported": "Akaunti hii inahitaji njia ya uthibitisho ambayo bado haijaungwa mkono kwenye programu. Tafadhali ingia kwenye tovuti.",
+    "googleSignInFailed": "Kuingia kwa Google kumeshindikana."
+  },
+  "settings": {
+    "farmProfile": "Wasifu wa Shamba",
+    "farmName": "Jina la Shamba",
+    "farmNamePlaceholder": "Jina la shamba lako",
+    "location": "Mahali",
+    "locationPlaceholder": "Mji, Wilaya, Nchi",
+    "phoneNumber": "Nambari ya Simu",
+    "phonePlaceholder": "+250 700 000 000",
+    "saveProfile": "Hifadhi Wasifu",
+    "profileSaved": "Wasifu umehifadhiwa.",
+    "saveFailed": "Kuhifadhi kumeshindikana: {{message}}",
+    "account": "Akaunti",
+    "email": "Barua pepe",
+    "userId": "Kitambulisho cha Mtumiaji",
+    "passwordNote": "Nenosiri na mipangilio ya usalama vinaweza kusimamiwa kutoka kwenye tovuti ya LivestockPro.",
+    "changePhoto": "Badilisha Picha",
+    "remove": "Ondoa",
+    "photoUpdated": "Picha ya wasifu imesasishwa.",
+    "photoRemoved": "Picha ya wasifu imeondolewa.",
+    "photoPermissionNeeded": "Ufikiaji wa maktaba ya picha unahitajika kubadilisha picha yako.",
+    "uploadFailed": "Kupakia kumeshindikana.",
+    "removeFailed": "Imeshindikana kuondoa picha.",
+    "dangerZone": "Eneo la Hatari",
+    "deleteWarning": "Kufuta akaunti yako kutaondoa kabisa data yako yote. Kitendo hiki hakiwezi kutenduliwa.",
+    "deleteAccount": "Futa Akaunti",
+    "deleteConfirmMessage": "Hii itafuta kabisa akaunti yako na data yote inayohusiana. Andika DELETE kuthibitisha.",
+    "typeDeleteHere": "Andika \"DELETE\" hapa",
+    "typeDeleteToConfirm": "Andika DELETE kuthibitisha.",
+    "deleteForever": "Futa Kabisa",
+    "accountDeleted": "Akaunti imefutwa.",
+    "partialDeleteWarning": "Imeshindikana kufuta akaunti kikamilifu; inakutoa sasa.",
+    "appearance": "Muonekano",
+    "themeLight": "Mwangaza",
+    "themeDark": "Giza",
+    "themeSystem": "Mfumo",
+    "language": "Lugha",
+    "rtlRestartNotice": "Anzisha upya programu ili mwelekeo mpya wa maandishi utumike kikamilifu."
+  },
+  "sync": {
+    "synced": "Imesawazishwa",
+    "syncing": "Inasawazisha…",
+    "syncIssue": "Tatizo la usawazishaji",
+    "lastSynced": "Ilisawazishwa mara ya mwisho {{time}}",
+    "notSyncedYet": "Bado haijasawazishwa — gusa kusawazisha",
+    "recordsFailed_one": "Rekodi {{count}} haikusawazishwa",
+    "recordsFailed_other": "Rekodi {{count}} hazikusawazishwa"
+  },
+  "geo": {
+    "capturing": "Inapata mahali pa kifaa...",
+    "denied": "Ruhusa ya mahali imekataliwa — rekodi hii itahifadhiwa bila kuratibu.",
+    "error": "Imeshindwa kupata mahali pa kifaa — rekodi hii itahifadhiwa bila kuratibu.",
+    "unsupported": "Kifaa hiki hakiwezi kupata mahali.",
+    "captured": "Mahali pamepatikana ({{lat}}, {{lng}})",
+    "tapToRetry": " Gusa kujaribu tena."
+  },
+  "confirmDialogs": {
+    "signOutTitle": "Toka?",
+    "signOutMessage": "Unaweza kuingia tena wakati wowote — data yako inabaki kusawazishwa na akaunti yako.",
+    "signOutConfirm": "Toka",
+    "deleteRecordTitle": "Futa {{item}} hii?",
+    "cannotBeUndone": "Kitendo hiki hakiwezi kutenduliwa."
+  },
+  "dashboard": {
+    "totalAnimals": "Jumla ya Wanyama",
+    "critical": "Hatari",
+    "pregnant": "Wenye Mimba",
+    "pendingTasks": "Kazi Zinazosubiri",
+    "overdueCount": "{{count}} zimechelewa",
+    "incomeMonth": "Mapato (mwezi)",
+    "expenseMonth": "Matumizi (mwezi)",
+    "herdHealth": "Afya ya Kundi",
+    "noAnimalsYet": "Hakuna wanyama bado.",
+    "recentAnimals": "Wanyama wa Hivi Karibuni",
+    "upcomingTasks": "Kazi Zinazokuja",
+    "nothingPending": "Hakuna kinachosubiri.",
+    "recentHealthAlerts": "Tahadhari za Afya za Hivi Karibuni",
+    "noActiveAlerts": "Hakuna tahadhari zinazoendelea.",
+    "checkup": "Uchunguzi"
+  },
+  "reports": {
+    "exportCsv": "Hamisha kwa CSV",
+    "exportFailed": "Kuhamisha kumeshindikana: {{message}}",
+    "sharingUnavailable": "Kushiriki hakupatikani kwenye kifaa hiki.",
+    "sectionAnimals": "Wanyama",
+    "total": "Jumla",
+    "healthy": "Wenye Afya",
+    "underTreatment": "Wanaotibiwa",
+    "criticalStatus": "Hatari",
+    "deceased": "Waliokufa",
+    "sectionBreeding": "Uzalishaji",
+    "delivered": "Waliozaa",
+    "newbornsAllTime": "Waliozaliwa (jumla)",
+    "sectionProduction": "Mazao (mwezi huu)",
+    "milkLiters": "Maziwa (lita)",
+    "eggsUnits": "Mayai (idadi)",
+    "meatKg": "Nyama (kg)",
+    "sectionFinance": "Fedha (mwezi huu)",
+    "income": "Mapato",
+    "expense": "Matumizi",
+    "net": "Faida Halisi",
+    "sectionHealth": "Afya",
+    "records": "Rekodi",
+    "activeAlerts": "Tahadhari Zinazoendelea"
+  },
+  "records": {
+    "searchPlaceholder": "Tafuta {{label}}...",
+    "emptyList": "Hakuna {{label}} bado. Gusa + kuongeza moja.",
+    "addTitle": "Ongeza {{item}}",
+    "editTitle": "Hariri {{item}}",
+    "fieldRequired": "{{field}} inahitajika.",
+    "added": "{{item}} imeongezwa.",
+    "updated": "{{item}} imesasishwa.",
+    "deleted": "{{item}} imefutwa.",
+    "saveFailed": "Kuhifadhi kumeshindikana: {{message}}",
+    "all": "{{label}} Zote"
+  },
+  "tables": {
+    "animals": {
+      "label": "Wanyama",
+      "singular": "Mnyama",
+      "fields": {
+        "tag_id": "Nambari ya Utambulisho",
+        "name": "Jina",
+        "species": "Aina",
+        "breed": "Aina ya Kizazi",
+        "sex": "Jinsia",
+        "date_of_birth": "Tarehe ya Kuzaliwa",
+        "location": "Mahali",
+        "health_status": "Hali ya Afya",
+        "notes": "Maelezo"
+      }
+    },
+    "health_records": {
+      "label": "Afya",
+      "singular": "Rekodi ya Afya",
+      "fields": {
+        "tag_id": "Nambari ya Mnyama",
+        "disease": "Ugonjwa / Hali",
+        "treatment": "Matibabu",
+        "medicine": "Dawa",
+        "vet_name": "Jina la Daktari wa Mifugo",
+        "check_date": "Tarehe ya Uchunguzi",
+        "next_check_date": "Tarehe ya Uchunguzi Ujao",
+        "status": "Hali",
+        "notes": "Maelezo"
+      }
+    },
+    "feeding_records": {
+      "label": "Ulishaji",
+      "singular": "Rekodi ya Ulishaji",
+      "fields": {
+        "feed_type": "Aina ya Chakula",
+        "quantity": "Kiasi",
+        "unit": "Kipimo",
+        "cost": "Gharama",
+        "feeding_date": "Tarehe ya Ulishaji",
+        "animal_group": "Kikundi cha Wanyama",
+        "notes": "Maelezo"
+      }
+    },
+    "breeding_records": {
+      "label": "Uzalishaji",
+      "singular": "Rekodi ya Uzalishaji",
+      "fields": {
+        "tag_id": "Nambari ya Mnyama",
+        "breeding_date": "Tarehe ya Kupandisha",
+        "pregnancy_status": "Hali ya Mimba",
+        "expected_birth_date": "Tarehe Inayotarajiwa ya Kuzaa",
+        "birth_date": "Tarehe ya Kuzaa",
+        "newborn_count": "Idadi ya Waliozaliwa",
+        "newborn_details": "Maelezo ya Waliozaliwa",
+        "notes": "Maelezo"
+      }
+    },
+    "production_records": {
+      "label": "Mazao",
+      "singular": "Rekodi ya Mazao",
+      "fields": {
+        "production_type": "Aina",
+        "tag_id": "Nambari ya Mnyama",
+        "quantity": "Kiasi",
+        "unit": "Kipimo",
+        "production_date": "Tarehe ya Uzalishaji",
+        "notes": "Maelezo"
+      }
+    },
+    "finance_records": {
+      "label": "Fedha",
+      "singular": "Rekodi ya Fedha",
+      "fields": {
+        "type": "Aina",
+        "amount": "Kiasi",
+        "category": "Jamii",
+        "date": "Tarehe",
+        "description": "Maelezo"
+      }
+    },
+    "tasks": {
+      "label": "Kazi",
+      "singular": "Kazi",
+      "fields": {
+        "title": "Kichwa",
+        "description": "Maelezo",
+        "due_date": "Tarehe ya Mwisho",
+        "priority": "Kipaumbele",
+        "status": "Hali"
+      }
+    }
+  },
+  "enums": {
+    "species": {
+      "Cattle": "Ng'ombe",
+      "Sheep": "Kondoo",
+      "Goat": "Mbuzi",
+      "Pig": "Nguruwe",
+      "Poultry": "Kuku",
+      "Horse": "Farasi",
+      "Donkey": "Punda",
+      "Rabbit": "Sungura",
+      "Other": "Nyingine"
+    },
+    "sex": {
+      "Male": "Dume",
+      "Female": "Jike"
+    },
+    "animalHealthStatus": {
+      "Healthy": "Mwenye Afya",
+      "Under Treatment": "Anatibiwa",
+      "Critical": "Hatari",
+      "Deceased": "Amekufa"
+    },
+    "healthRecordStatus": {
+      "Under Treatment": "Anatibiwa",
+      "Healthy": "Mwenye Afya",
+      "Critical": "Hatari",
+      "Recovered": "Amepona",
+      "Deceased": "Amekufa"
+    },
+    "pregnancyStatus": {
+      "Not Confirmed": "Haijathibitishwa",
+      "Pregnant": "Mwenye Mimba",
+      "Not Pregnant": "Hana Mimba",
+      "Delivered": "Amezaa"
+    },
+    "feedingUnit": {
+      "kg": "kg",
+      "lbs": "ratili",
+      "tons": "tani",
+      "bags": "magunia"
+    },
+    "productionType": {
+      "Milk": "Maziwa",
+      "Eggs": "Mayai",
+      "Meat": "Nyama"
+    },
+    "productionUnit": {
+      "liters": "lita",
+      "units": "idadi",
+      "kg": "kg"
+    },
+    "financeType": {
+      "Income": "Mapato",
+      "Expense": "Matumizi"
+    },
+    "financeCategory": {
+      "Milk Sales": "Mauzo ya Maziwa",
+      "Egg Sales": "Mauzo ya Mayai",
+      "Meat Sales": "Mauzo ya Nyama",
+      "Animal Sales": "Mauzo ya Wanyama",
+      "Other Income": "Mapato Mengine",
+      "Feed": "Chakula",
+      "Veterinary": "Huduma za Mifugo",
+      "Medicine": "Dawa",
+      "Labor": "Ajira",
+      "Equipment": "Vifaa",
+      "Maintenance": "Matengenezo",
+      "Transport": "Usafiri",
+      "Other Expense": "Matumizi Mengine"
+    },
+    "taskPriority": {
+      "Low": "Chini",
+      "Medium": "Wastani",
+      "High": "Juu"
+    },
+    "taskStatus": {
+      "Pending": "Inasubiri",
+      "In Progress": "Inaendelea",
+      "Completed": "Imekamilika"
+    },
+    "statusBadge": {
+      "Healthy": "Mwenye Afya",
+      "Under Treatment": "Anatibiwa",
+      "Critical": "Hatari",
+      "Deceased": "Amekufa",
+      "Pregnant": "Mwenye Mimba",
+      "Completed": "Imekamilika",
+      "Pending": "Inasubiri",
+      "In Progress": "Inaendelea",
+      "Recovered": "Amepona",
+      "Not Confirmed": "Haijathibitishwa"
+    }
+  }
+}

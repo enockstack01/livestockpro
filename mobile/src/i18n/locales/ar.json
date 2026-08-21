@@ -1,0 +1,363 @@
+{
+  "common": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "search": "بحث",
+    "loading": "جارٍ التحميل...",
+    "retry": "إعادة المحاولة",
+    "confirm": "تأكيد",
+    "done": "تم",
+    "close": "إغلاق",
+    "untitled": "بدون عنوان"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "animals": "الحيوانات",
+    "health": "الصحة",
+    "feeding": "التغذية",
+    "breeding": "التكاثر",
+    "production": "الإنتاج",
+    "finance": "المالية",
+    "tasks": "المهام",
+    "reports": "التقارير",
+    "settings": "الإعدادات",
+    "more": "المزيد",
+    "signOut": "تسجيل الخروج"
+  },
+  "menu": {
+    "title": "القائمة"
+  },
+  "auth": {
+    "brandName": "LivestockPro",
+    "welcomeBack": "مرحبًا بعودتك",
+    "createAccount": "أنشئ حسابك",
+    "emailAddress": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "continueWithGoogle": "المتابعة باستخدام Google",
+    "or": "أو",
+    "dontHaveAccount": "ليس لديك حساب؟ ",
+    "alreadyHaveAccount": "لديك حساب بالفعل؟ ",
+    "verifyItsYou": "تأكد من أنك أنت",
+    "verifyCodeSentSignIn": "أدخل رمز التحقق الذي أرسلناه إلى بريدك الإلكتروني.",
+    "checkYourEmail": "تحقق من بريدك الإلكتروني",
+    "verifyCodeSentSignUp": "أدخل رمز التحقق المُرسل إلى {{email}}.",
+    "verificationCode": "رمز التحقق",
+    "verify": "تحقق",
+    "resendCode": "إعادة إرسال الرمز",
+    "couldNotSignIn": "تعذّر تسجيل الدخول.",
+    "couldNotCreateAccount": "تعذّر إنشاء حسابك.",
+    "somethingWentWrong": "حدث خطأ ما.",
+    "verificationIncomplete": "التحقق غير مكتمل — راجع الرمز وحاول مرة أخرى.",
+    "invalidCode": "رمز غير صحيح.",
+    "signInDidNotComplete": "لم يكتمل تسجيل الدخول. حاول مرة أخرى.",
+    "mfaNotSupported": "يتطلب هذا الحساب طريقة تحقق غير مدعومة بعد في التطبيق. يرجى تسجيل الدخول عبر الموقع الإلكتروني.",
+    "googleSignInFailed": "فشل تسجيل الدخول عبر Google."
+  },
+  "settings": {
+    "farmProfile": "ملف المزرعة",
+    "farmName": "اسم المزرعة",
+    "farmNamePlaceholder": "اسم مزرعتك",
+    "location": "الموقع",
+    "locationPlaceholder": "المدينة، المقاطعة، البلد",
+    "phoneNumber": "رقم الهاتف",
+    "phonePlaceholder": "+250 700 000 000",
+    "saveProfile": "حفظ الملف الشخصي",
+    "profileSaved": "تم حفظ الملف الشخصي.",
+    "saveFailed": "فشل الحفظ: {{message}}",
+    "account": "الحساب",
+    "email": "البريد الإلكتروني",
+    "userId": "معرّف المستخدم",
+    "passwordNote": "يمكن إدارة كلمة المرور وإعدادات الأمان من موقع LivestockPro الإلكتروني.",
+    "changePhoto": "تغيير الصورة",
+    "remove": "إزالة",
+    "photoUpdated": "تم تحديث صورة الملف الشخصي.",
+    "photoRemoved": "تمت إزالة صورة الملف الشخصي.",
+    "photoPermissionNeeded": "يلزم الوصول إلى مكتبة الصور لتغيير صورتك.",
+    "uploadFailed": "فشل الرفع.",
+    "removeFailed": "فشلت إزالة الصورة.",
+    "dangerZone": "منطقة الخطر",
+    "deleteWarning": "سيؤدي حذف حسابك إلى إزالة جميع بياناتك نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+    "deleteAccount": "حذف الحساب",
+    "deleteConfirmMessage": "سيؤدي هذا إلى حذف حسابك وجميع البيانات المرتبطة به نهائيًا. اكتب DELETE للتأكيد.",
+    "typeDeleteHere": "اكتب \"DELETE\" هنا",
+    "typeDeleteToConfirm": "اكتب DELETE للتأكيد.",
+    "deleteForever": "حذف نهائي",
+    "accountDeleted": "تم حذف الحساب.",
+    "partialDeleteWarning": "تعذّر حذف الحساب بالكامل؛ جارٍ تسجيل الخروج.",
+    "appearance": "المظهر",
+    "themeLight": "فاتح",
+    "themeDark": "داكن",
+    "themeSystem": "حسب النظام",
+    "language": "اللغة",
+    "rtlRestartNotice": "أعد تشغيل التطبيق لتطبيق اتجاه النص الجديد بالكامل."
+  },
+  "sync": {
+    "synced": "تمت المزامنة",
+    "syncing": "جارٍ المزامنة…",
+    "syncIssue": "مشكلة في المزامنة",
+    "lastSynced": "آخر مزامنة {{time}}",
+    "notSyncedYet": "لم تتم المزامنة بعد — اضغط للمزامنة",
+    "recordsFailed_one": "فشلت مزامنة سجل واحد ({{count}})",
+    "recordsFailed_other": "فشلت مزامنة {{count}} سجلات"
+  },
+  "geo": {
+    "capturing": "جارٍ تحديد موقع الجهاز...",
+    "denied": "تم رفض إذن الموقع — سيتم حفظ هذا السجل دون إحداثيات.",
+    "error": "تعذّر تحديد موقع الجهاز — سيتم حفظ هذا السجل دون إحداثيات.",
+    "unsupported": "هذا الجهاز لا يدعم تحديد الموقع.",
+    "captured": "تم تحديد الموقع ({{lat}}, {{lng}})",
+    "tapToRetry": " اضغط لإعادة المحاولة."
+  },
+  "confirmDialogs": {
+    "signOutTitle": "تسجيل الخروج؟",
+    "signOutMessage": "يمكنك تسجيل الدخول مرة أخرى في أي وقت — تبقى بياناتك متزامنة مع حسابك.",
+    "signOutConfirm": "تسجيل الخروج",
+    "deleteRecordTitle": "حذف هذا العنصر: {{item}}؟",
+    "cannotBeUndone": "لا يمكن التراجع عن هذا الإجراء."
+  },
+  "dashboard": {
+    "totalAnimals": "إجمالي الحيوانات",
+    "critical": "حرجة",
+    "pregnant": "حوامل",
+    "pendingTasks": "المهام المعلّقة",
+    "overdueCount": "{{count}} متأخرة",
+    "incomeMonth": "الدخل (الشهر)",
+    "expenseMonth": "المصروفات (الشهر)",
+    "herdHealth": "صحة القطيع",
+    "noAnimalsYet": "لا توجد حيوانات بعد.",
+    "recentAnimals": "الحيوانات الأخيرة",
+    "upcomingTasks": "المهام القادمة",
+    "nothingPending": "لا شيء معلّق.",
+    "recentHealthAlerts": "تنبيهات الصحة الأخيرة",
+    "noActiveAlerts": "لا توجد تنبيهات نشطة.",
+    "checkup": "فحص"
+  },
+  "reports": {
+    "exportCsv": "تصدير كـ CSV",
+    "exportFailed": "فشل التصدير: {{message}}",
+    "sharingUnavailable": "المشاركة غير متاحة على هذا الجهاز.",
+    "sectionAnimals": "الحيوانات",
+    "total": "الإجمالي",
+    "healthy": "سليمة",
+    "underTreatment": "تحت العلاج",
+    "criticalStatus": "حرجة",
+    "deceased": "نافقة",
+    "sectionBreeding": "التكاثر",
+    "delivered": "ولدت",
+    "newbornsAllTime": "المواليد (الإجمالي)",
+    "sectionProduction": "الإنتاج (هذا الشهر)",
+    "milkLiters": "الحليب (لتر)",
+    "eggsUnits": "البيض (وحدة)",
+    "meatKg": "اللحم (كجم)",
+    "sectionFinance": "المالية (هذا الشهر)",
+    "income": "الدخل",
+    "expense": "المصروفات",
+    "net": "صافي الربح",
+    "sectionHealth": "الصحة",
+    "records": "السجلات",
+    "activeAlerts": "التنبيهات النشطة"
+  },
+  "records": {
+    "searchPlaceholder": "بحث في {{label}}...",
+    "emptyList": "لا توجد {{label}} بعد. اضغط + للإضافة.",
+    "addTitle": "إضافة {{item}}",
+    "editTitle": "تعديل {{item}}",
+    "fieldRequired": "{{field}} مطلوب.",
+    "added": "تمت إضافة {{item}}.",
+    "updated": "تم تحديث {{item}}.",
+    "deleted": "تم حذف {{item}}.",
+    "saveFailed": "فشل الحفظ: {{message}}",
+    "all": "كل {{label}}"
+  },
+  "tables": {
+    "animals": {
+      "label": "الحيوانات",
+      "singular": "حيوان",
+      "fields": {
+        "tag_id": "رقم العلامة",
+        "name": "الاسم",
+        "species": "النوع",
+        "breed": "السلالة",
+        "sex": "الجنس",
+        "date_of_birth": "تاريخ الميلاد",
+        "location": "الموقع",
+        "health_status": "الحالة الصحية",
+        "notes": "ملاحظات"
+      }
+    },
+    "health_records": {
+      "label": "الصحة",
+      "singular": "سجل صحي",
+      "fields": {
+        "tag_id": "رقم علامة الحيوان",
+        "disease": "المرض / الحالة",
+        "treatment": "العلاج",
+        "medicine": "الدواء",
+        "vet_name": "اسم الطبيب البيطري",
+        "check_date": "تاريخ الفحص",
+        "next_check_date": "تاريخ الفحص القادم",
+        "status": "الحالة",
+        "notes": "ملاحظات"
+      }
+    },
+    "feeding_records": {
+      "label": "التغذية",
+      "singular": "سجل تغذية",
+      "fields": {
+        "feed_type": "نوع العلف",
+        "quantity": "الكمية",
+        "unit": "الوحدة",
+        "cost": "التكلفة",
+        "feeding_date": "تاريخ التغذية",
+        "animal_group": "مجموعة الحيوانات",
+        "notes": "ملاحظات"
+      }
+    },
+    "breeding_records": {
+      "label": "التكاثر",
+      "singular": "سجل تكاثر",
+      "fields": {
+        "tag_id": "رقم علامة الحيوان",
+        "breeding_date": "تاريخ التلقيح",
+        "pregnancy_status": "حالة الحمل",
+        "expected_birth_date": "تاريخ الولادة المتوقع",
+        "birth_date": "تاريخ الولادة",
+        "newborn_count": "عدد المواليد",
+        "newborn_details": "تفاصيل المواليد",
+        "notes": "ملاحظات"
+      }
+    },
+    "production_records": {
+      "label": "الإنتاج",
+      "singular": "سجل إنتاج",
+      "fields": {
+        "production_type": "النوع",
+        "tag_id": "رقم علامة الحيوان",
+        "quantity": "الكمية",
+        "unit": "الوحدة",
+        "production_date": "تاريخ الإنتاج",
+        "notes": "ملاحظات"
+      }
+    },
+    "finance_records": {
+      "label": "المالية",
+      "singular": "سجل مالي",
+      "fields": {
+        "type": "النوع",
+        "amount": "المبلغ",
+        "category": "الفئة",
+        "date": "التاريخ",
+        "description": "الوصف"
+      }
+    },
+    "tasks": {
+      "label": "المهام",
+      "singular": "مهمة",
+      "fields": {
+        "title": "العنوان",
+        "description": "الوصف",
+        "due_date": "تاريخ الاستحقاق",
+        "priority": "الأولوية",
+        "status": "الحالة"
+      }
+    }
+  },
+  "enums": {
+    "species": {
+      "Cattle": "أبقار",
+      "Sheep": "أغنام",
+      "Goat": "ماعز",
+      "Pig": "خنازير",
+      "Poultry": "دواجن",
+      "Horse": "حصان",
+      "Donkey": "حمار",
+      "Rabbit": "أرنب",
+      "Other": "أخرى"
+    },
+    "sex": {
+      "Male": "ذكر",
+      "Female": "أنثى"
+    },
+    "animalHealthStatus": {
+      "Healthy": "سليم",
+      "Under Treatment": "تحت العلاج",
+      "Critical": "حرجة",
+      "Deceased": "نافق"
+    },
+    "healthRecordStatus": {
+      "Under Treatment": "تحت العلاج",
+      "Healthy": "سليم",
+      "Critical": "حرجة",
+      "Recovered": "تعافى",
+      "Deceased": "نافق"
+    },
+    "pregnancyStatus": {
+      "Not Confirmed": "غير مؤكد",
+      "Pregnant": "حامل",
+      "Not Pregnant": "غير حامل",
+      "Delivered": "ولدت"
+    },
+    "feedingUnit": {
+      "kg": "كجم",
+      "lbs": "رطل",
+      "tons": "طن",
+      "bags": "كيس"
+    },
+    "productionType": {
+      "Milk": "حليب",
+      "Eggs": "بيض",
+      "Meat": "لحم"
+    },
+    "productionUnit": {
+      "liters": "لتر",
+      "units": "وحدة",
+      "kg": "كجم"
+    },
+    "financeType": {
+      "Income": "دخل",
+      "Expense": "مصروف"
+    },
+    "financeCategory": {
+      "Milk Sales": "مبيعات الحليب",
+      "Egg Sales": "مبيعات البيض",
+      "Meat Sales": "مبيعات اللحوم",
+      "Animal Sales": "مبيعات الحيوانات",
+      "Other Income": "دخل آخر",
+      "Feed": "علف",
+      "Veterinary": "بيطري",
+      "Medicine": "دواء",
+      "Labor": "عمالة",
+      "Equipment": "معدات",
+      "Maintenance": "صيانة",
+      "Transport": "نقل",
+      "Other Expense": "مصروف آخر"
+    },
+    "taskPriority": {
+      "Low": "منخفضة",
+      "Medium": "متوسطة",
+      "High": "عالية"
+    },
+    "taskStatus": {
+      "Pending": "معلّقة",
+      "In Progress": "قيد التنفيذ",
+      "Completed": "مكتملة"
+    },
+    "statusBadge": {
+      "Healthy": "سليم",
+      "Under Treatment": "تحت العلاج",
+      "Critical": "حرجة",
+      "Deceased": "نافق",
+      "Pregnant": "حامل",
+      "Completed": "مكتملة",
+      "Pending": "معلّقة",
+      "In Progress": "قيد التنفيذ",
+      "Recovered": "تعافى",
+      "Not Confirmed": "غير مؤكد"
+    }
+  }
+}

@@ -1,0 +1,362 @@
+{
+  "common": {
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "add": "添加",
+    "search": "搜索",
+    "loading": "加载中...",
+    "retry": "重试",
+    "confirm": "确认",
+    "done": "完成",
+    "close": "关闭",
+    "untitled": "无标题"
+  },
+  "nav": {
+    "dashboard": "仪表盘",
+    "animals": "动物",
+    "health": "健康",
+    "feeding": "饲喂",
+    "breeding": "繁殖",
+    "production": "产量",
+    "finance": "财务",
+    "tasks": "任务",
+    "reports": "报告",
+    "settings": "设置",
+    "more": "更多",
+    "signOut": "退出登录"
+  },
+  "menu": {
+    "title": "菜单"
+  },
+  "auth": {
+    "brandName": "LivestockPro",
+    "welcomeBack": "欢迎回来",
+    "createAccount": "创建您的账户",
+    "emailAddress": "电子邮箱",
+    "password": "密码",
+    "signIn": "登录",
+    "signUp": "注册",
+    "continueWithGoogle": "使用 Google 继续",
+    "or": "或",
+    "dontHaveAccount": "还没有账户？",
+    "alreadyHaveAccount": "已有账户？",
+    "verifyItsYou": "验证您的身份",
+    "verifyCodeSentSignIn": "请输入我们通过电子邮件发送的验证码。",
+    "checkYourEmail": "请查看您的邮箱",
+    "verifyCodeSentSignUp": "请输入发送至 {{email}} 的验证码。",
+    "verificationCode": "验证码",
+    "verify": "验证",
+    "resendCode": "重新发送验证码",
+    "couldNotSignIn": "无法登录。",
+    "couldNotCreateAccount": "无法创建您的账户。",
+    "somethingWentWrong": "出现了一些问题。",
+    "verificationIncomplete": "验证未完成 — 请检查验证码后重试。",
+    "invalidCode": "验证码无效。",
+    "signInDidNotComplete": "登录未完成，请重试。",
+    "mfaNotSupported": "此账户需要应用程序尚不支持的验证方式，请改用网页版登录。",
+    "googleSignInFailed": "使用 Google 登录失败。"
+  },
+  "settings": {
+    "farmProfile": "农场资料",
+    "farmName": "农场名称",
+    "farmNamePlaceholder": "您的农场名称",
+    "location": "位置",
+    "locationPlaceholder": "城市、地区、国家",
+    "phoneNumber": "电话号码",
+    "phonePlaceholder": "+250 700 000 000",
+    "saveProfile": "保存资料",
+    "profileSaved": "资料已保存。",
+    "saveFailed": "保存失败：{{message}}",
+    "account": "账户",
+    "email": "电子邮箱",
+    "userId": "用户 ID",
+    "passwordNote": "密码和安全设置可通过 LivestockPro 网页版进行管理。",
+    "changePhoto": "更换照片",
+    "remove": "移除",
+    "photoUpdated": "头像已更新。",
+    "photoRemoved": "头像已移除。",
+    "photoPermissionNeeded": "需要访问相册权限才能更换照片。",
+    "uploadFailed": "上传失败。",
+    "removeFailed": "移除照片失败。",
+    "dangerZone": "危险区域",
+    "deleteWarning": "删除账户将永久移除您的所有数据，此操作无法撤销。",
+    "deleteAccount": "删除账户",
+    "deleteConfirmMessage": "此操作将永久删除您的账户及所有相关数据。请输入 DELETE 以确认。",
+    "typeDeleteHere": "在此输入「DELETE」",
+    "typeDeleteToConfirm": "请输入 DELETE 以确认。",
+    "deleteForever": "永久删除",
+    "accountDeleted": "账户已删除。",
+    "partialDeleteWarning": "无法完全删除账户；正在退出登录。",
+    "appearance": "外观",
+    "themeLight": "浅色",
+    "themeDark": "深色",
+    "themeSystem": "跟随系统",
+    "language": "语言",
+    "rtlRestartNotice": "请重启应用以完全应用新的文字方向。"
+  },
+  "sync": {
+    "synced": "已同步",
+    "syncing": "同步中…",
+    "syncIssue": "同步出现问题",
+    "lastSynced": "上次同步：{{time}}",
+    "notSyncedYet": "尚未同步 — 点击进行同步",
+    "recordsFailed_other": "{{count}} 条记录同步失败"
+  },
+  "geo": {
+    "capturing": "正在获取设备位置...",
+    "denied": "位置权限被拒绝 — 该记录将不含坐标保存。",
+    "error": "无法获取设备位置 — 该记录将不含坐标保存。",
+    "unsupported": "此设备不支持位置采集。",
+    "captured": "已获取位置（{{lat}}, {{lng}}）",
+    "tapToRetry": " 点击重试。"
+  },
+  "confirmDialogs": {
+    "signOutTitle": "退出登录？",
+    "signOutMessage": "您可以随时重新登录 — 您的数据会一直与账户保持同步。",
+    "signOutConfirm": "退出登录",
+    "deleteRecordTitle": "删除此{{item}}？",
+    "cannotBeUndone": "此操作无法撤销。"
+  },
+  "dashboard": {
+    "totalAnimals": "动物总数",
+    "critical": "危急",
+    "pregnant": "怀孕",
+    "pendingTasks": "待办任务",
+    "overdueCount": "{{count}} 项已逾期",
+    "incomeMonth": "本月收入",
+    "expenseMonth": "本月支出",
+    "herdHealth": "畜群健康状况",
+    "noAnimalsYet": "暂无动物。",
+    "recentAnimals": "最近的动物",
+    "upcomingTasks": "即将到来的任务",
+    "nothingPending": "暂无待办事项。",
+    "recentHealthAlerts": "最近的健康警报",
+    "noActiveAlerts": "没有活跃的警报。",
+    "checkup": "检查"
+  },
+  "reports": {
+    "exportCsv": "导出为 CSV",
+    "exportFailed": "导出失败：{{message}}",
+    "sharingUnavailable": "此设备不支持共享。",
+    "sectionAnimals": "动物",
+    "total": "总计",
+    "healthy": "健康",
+    "underTreatment": "治疗中",
+    "criticalStatus": "危急",
+    "deceased": "已死亡",
+    "sectionBreeding": "繁殖",
+    "delivered": "已分娩",
+    "newbornsAllTime": "新生数量（累计）",
+    "sectionProduction": "产量（本月）",
+    "milkLiters": "牛奶（升）",
+    "eggsUnits": "鸡蛋（个）",
+    "meatKg": "肉类（公斤）",
+    "sectionFinance": "财务（本月）",
+    "income": "收入",
+    "expense": "支出",
+    "net": "净利润",
+    "sectionHealth": "健康",
+    "records": "记录",
+    "activeAlerts": "活跃警报"
+  },
+  "records": {
+    "searchPlaceholder": "搜索{{label}}...",
+    "emptyList": "暂无{{label}}。点击 + 添加一条。",
+    "addTitle": "添加{{item}}",
+    "editTitle": "编辑{{item}}",
+    "fieldRequired": "{{field}}为必填项。",
+    "added": "已添加{{item}}。",
+    "updated": "已更新{{item}}。",
+    "deleted": "已删除{{item}}。",
+    "saveFailed": "保存失败：{{message}}",
+    "all": "全部{{label}}"
+  },
+  "tables": {
+    "animals": {
+      "label": "动物",
+      "singular": "动物",
+      "fields": {
+        "tag_id": "耳标编号",
+        "name": "名称",
+        "species": "品种类别",
+        "breed": "品种",
+        "sex": "性别",
+        "date_of_birth": "出生日期",
+        "location": "位置",
+        "health_status": "健康状况",
+        "notes": "备注"
+      }
+    },
+    "health_records": {
+      "label": "健康",
+      "singular": "健康记录",
+      "fields": {
+        "tag_id": "动物耳标编号",
+        "disease": "疾病/状况",
+        "treatment": "治疗方法",
+        "medicine": "药物",
+        "vet_name": "兽医姓名",
+        "check_date": "检查日期",
+        "next_check_date": "下次检查日期",
+        "status": "状态",
+        "notes": "备注"
+      }
+    },
+    "feeding_records": {
+      "label": "饲喂",
+      "singular": "饲喂记录",
+      "fields": {
+        "feed_type": "饲料类型",
+        "quantity": "数量",
+        "unit": "单位",
+        "cost": "成本",
+        "feeding_date": "饲喂日期",
+        "animal_group": "动物群组",
+        "notes": "备注"
+      }
+    },
+    "breeding_records": {
+      "label": "繁殖",
+      "singular": "繁殖记录",
+      "fields": {
+        "tag_id": "动物耳标编号",
+        "breeding_date": "配种日期",
+        "pregnancy_status": "怀孕状态",
+        "expected_birth_date": "预产期",
+        "birth_date": "出生日期",
+        "newborn_count": "新生数量",
+        "newborn_details": "新生详情",
+        "notes": "备注"
+      }
+    },
+    "production_records": {
+      "label": "产量",
+      "singular": "产量记录",
+      "fields": {
+        "production_type": "类型",
+        "tag_id": "动物耳标编号",
+        "quantity": "数量",
+        "unit": "单位",
+        "production_date": "生产日期",
+        "notes": "备注"
+      }
+    },
+    "finance_records": {
+      "label": "财务",
+      "singular": "财务记录",
+      "fields": {
+        "type": "类型",
+        "amount": "金额",
+        "category": "类别",
+        "date": "日期",
+        "description": "描述"
+      }
+    },
+    "tasks": {
+      "label": "任务",
+      "singular": "任务",
+      "fields": {
+        "title": "标题",
+        "description": "描述",
+        "due_date": "截止日期",
+        "priority": "优先级",
+        "status": "状态"
+      }
+    }
+  },
+  "enums": {
+    "species": {
+      "Cattle": "牛",
+      "Sheep": "绵羊",
+      "Goat": "山羊",
+      "Pig": "猪",
+      "Poultry": "家禽",
+      "Horse": "马",
+      "Donkey": "驴",
+      "Rabbit": "兔",
+      "Other": "其他"
+    },
+    "sex": {
+      "Male": "雄性",
+      "Female": "雌性"
+    },
+    "animalHealthStatus": {
+      "Healthy": "健康",
+      "Under Treatment": "治疗中",
+      "Critical": "危急",
+      "Deceased": "已死亡"
+    },
+    "healthRecordStatus": {
+      "Under Treatment": "治疗中",
+      "Healthy": "健康",
+      "Critical": "危急",
+      "Recovered": "已康复",
+      "Deceased": "已死亡"
+    },
+    "pregnancyStatus": {
+      "Not Confirmed": "未确认",
+      "Pregnant": "怀孕",
+      "Not Pregnant": "未怀孕",
+      "Delivered": "已分娩"
+    },
+    "feedingUnit": {
+      "kg": "公斤",
+      "lbs": "磅",
+      "tons": "吨",
+      "bags": "袋"
+    },
+    "productionType": {
+      "Milk": "牛奶",
+      "Eggs": "鸡蛋",
+      "Meat": "肉类"
+    },
+    "productionUnit": {
+      "liters": "升",
+      "units": "个",
+      "kg": "公斤"
+    },
+    "financeType": {
+      "Income": "收入",
+      "Expense": "支出"
+    },
+    "financeCategory": {
+      "Milk Sales": "牛奶销售",
+      "Egg Sales": "鸡蛋销售",
+      "Meat Sales": "肉类销售",
+      "Animal Sales": "动物销售",
+      "Other Income": "其他收入",
+      "Feed": "饲料",
+      "Veterinary": "兽医",
+      "Medicine": "药物",
+      "Labor": "人工",
+      "Equipment": "设备",
+      "Maintenance": "维护",
+      "Transport": "运输",
+      "Other Expense": "其他支出"
+    },
+    "taskPriority": {
+      "Low": "低",
+      "Medium": "中",
+      "High": "高"
+    },
+    "taskStatus": {
+      "Pending": "待处理",
+      "In Progress": "进行中",
+      "Completed": "已完成"
+    },
+    "statusBadge": {
+      "Healthy": "健康",
+      "Under Treatment": "治疗中",
+      "Critical": "危急",
+      "Deceased": "已死亡",
+      "Pregnant": "怀孕",
+      "Completed": "已完成",
+      "Pending": "待处理",
+      "In Progress": "进行中",
+      "Recovered": "已康复",
+      "Not Confirmed": "未确认"
+    }
+  }
+}

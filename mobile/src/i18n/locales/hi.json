@@ -1,0 +1,363 @@
+{
+  "common": {
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "add": "जोड़ें",
+    "search": "खोजें",
+    "loading": "लोड हो रहा है...",
+    "retry": "पुनः प्रयास करें",
+    "confirm": "पुष्टि करें",
+    "done": "पूर्ण",
+    "close": "बंद करें",
+    "untitled": "शीर्षक रहित"
+  },
+  "nav": {
+    "dashboard": "डैशबोर्ड",
+    "animals": "पशु",
+    "health": "स्वास्थ्य",
+    "feeding": "आहार",
+    "breeding": "प्रजनन",
+    "production": "उत्पादन",
+    "finance": "वित्त",
+    "tasks": "कार्य",
+    "reports": "रिपोर्ट",
+    "settings": "सेटिंग्स",
+    "more": "अधिक",
+    "signOut": "साइन आउट करें"
+  },
+  "menu": {
+    "title": "मेनू"
+  },
+  "auth": {
+    "brandName": "LivestockPro",
+    "welcomeBack": "वापसी पर स्वागत है",
+    "createAccount": "अपना खाता बनाएं",
+    "emailAddress": "ईमेल पता",
+    "password": "पासवर्ड",
+    "signIn": "साइन इन करें",
+    "signUp": "साइन अप करें",
+    "continueWithGoogle": "Google से जारी रखें",
+    "or": "या",
+    "dontHaveAccount": "खाता नहीं है? ",
+    "alreadyHaveAccount": "पहले से खाता है? ",
+    "verifyItsYou": "पुष्टि करें कि यह आप हैं",
+    "verifyCodeSentSignIn": "हमने आपको ईमेल किया गया सत्यापन कोड दर्ज करें।",
+    "checkYourEmail": "अपना ईमेल जांचें",
+    "verifyCodeSentSignUp": "{{email}} पर भेजा गया सत्यापन कोड दर्ज करें।",
+    "verificationCode": "सत्यापन कोड",
+    "verify": "सत्यापित करें",
+    "resendCode": "कोड फिर से भेजें",
+    "couldNotSignIn": "साइन इन नहीं हो सका।",
+    "couldNotCreateAccount": "आपका खाता नहीं बनाया जा सका।",
+    "somethingWentWrong": "कुछ गड़बड़ हो गई।",
+    "verificationIncomplete": "सत्यापन अधूरा है — कोड जांचें और फिर से प्रयास करें।",
+    "invalidCode": "अमान्य कोड।",
+    "signInDidNotComplete": "साइन इन पूरा नहीं हुआ। कृपया फिर से प्रयास करें।",
+    "mfaNotSupported": "इस खाते के लिए एक सत्यापन विधि आवश्यक है जो अभी ऐप में समर्थित नहीं है। कृपया वेबसाइट पर साइन इन करें।",
+    "googleSignInFailed": "Google से साइन इन विफल रहा।"
+  },
+  "settings": {
+    "farmProfile": "फार्म प्रोफ़ाइल",
+    "farmName": "फार्म का नाम",
+    "farmNamePlaceholder": "आपके फार्म का नाम",
+    "location": "स्थान",
+    "locationPlaceholder": "शहर, ज़िला, देश",
+    "phoneNumber": "फ़ोन नंबर",
+    "phonePlaceholder": "+250 700 000 000",
+    "saveProfile": "प्रोफ़ाइल सहेजें",
+    "profileSaved": "प्रोफ़ाइल सहेजी गई।",
+    "saveFailed": "सहेजने में विफल: {{message}}",
+    "account": "खाता",
+    "email": "ईमेल",
+    "userId": "उपयोगकर्ता आईडी",
+    "passwordNote": "पासवर्ड और सुरक्षा सेटिंग्स LivestockPro वेब ऐप से प्रबंधित की जा सकती हैं।",
+    "changePhoto": "फ़ोटो बदलें",
+    "remove": "हटाएं",
+    "photoUpdated": "प्रोफ़ाइल फ़ोटो अपडेट हो गई।",
+    "photoRemoved": "प्रोफ़ाइल फ़ोटो हटा दी गई।",
+    "photoPermissionNeeded": "अपनी फ़ोटो बदलने के लिए फ़ोटो लाइब्रेरी की अनुमति आवश्यक है।",
+    "uploadFailed": "अपलोड विफल रहा।",
+    "removeFailed": "फ़ोटो हटाने में विफल रहा।",
+    "dangerZone": "खतरे का क्षेत्र",
+    "deleteWarning": "अपना खाता हटाने से आपका सारा डेटा स्थायी रूप से हट जाएगा। यह क्रिया पूर्ववत नहीं की जा सकती।",
+    "deleteAccount": "खाता हटाएं",
+    "deleteConfirmMessage": "इससे आपका खाता और सभी संबंधित डेटा स्थायी रूप से हट जाएगा। पुष्टि के लिए DELETE लिखें।",
+    "typeDeleteHere": "यहां \"DELETE\" लिखें",
+    "typeDeleteToConfirm": "पुष्टि के लिए DELETE लिखें।",
+    "deleteForever": "स्थायी रूप से हटाएं",
+    "accountDeleted": "खाता हटा दिया गया।",
+    "partialDeleteWarning": "खाता पूरी तरह से नहीं हटाया जा सका; साइन आउट किया जा रहा है।",
+    "appearance": "रूप",
+    "themeLight": "हल्का",
+    "themeDark": "गहरा",
+    "themeSystem": "सिस्टम",
+    "language": "भाषा",
+    "rtlRestartNotice": "नई टेक्स्ट दिशा को पूरी तरह लागू करने के लिए ऐप को पुनः आरंभ करें।"
+  },
+  "sync": {
+    "synced": "समन्वयित",
+    "syncing": "समन्वयित हो रहा है…",
+    "syncIssue": "समन्वयन समस्या",
+    "lastSynced": "अंतिम समन्वयन {{time}}",
+    "notSyncedYet": "अभी तक समन्वयित नहीं — समन्वयन के लिए टैप करें",
+    "recordsFailed_one": "{{count}} रिकॉर्ड समन्वयित नहीं हो सका",
+    "recordsFailed_other": "{{count}} रिकॉर्ड समन्वयित नहीं हो सके"
+  },
+  "geo": {
+    "capturing": "डिवाइस का स्थान प्राप्त किया जा रहा है...",
+    "denied": "स्थान की अनुमति अस्वीकृत — यह रिकॉर्ड निर्देशांक के बिना सहेजा जाएगा।",
+    "error": "डिवाइस का स्थान प्राप्त नहीं हो सका — यह रिकॉर्ड निर्देशांक के बिना सहेजा जाएगा।",
+    "unsupported": "यह डिवाइस स्थान कैप्चर का समर्थन नहीं करता।",
+    "captured": "स्थान प्राप्त हुआ ({{lat}}, {{lng}})",
+    "tapToRetry": " फिर से प्रयास करने के लिए टैप करें।"
+  },
+  "confirmDialogs": {
+    "signOutTitle": "साइन आउट करें?",
+    "signOutMessage": "आप किसी भी समय फिर से साइन इन कर सकते हैं — आपका डेटा आपके खाते के साथ समन्वयित रहता है।",
+    "signOutConfirm": "साइन आउट करें",
+    "deleteRecordTitle": "क्या इस {{item}} को हटाएं?",
+    "cannotBeUndone": "यह क्रिया पूर्ववत नहीं की जा सकती।"
+  },
+  "dashboard": {
+    "totalAnimals": "कुल पशु",
+    "critical": "गंभीर",
+    "pregnant": "गर्भवती",
+    "pendingTasks": "लंबित कार्य",
+    "overdueCount": "{{count}} अतिदेय",
+    "incomeMonth": "आय (माह)",
+    "expenseMonth": "व्यय (माह)",
+    "herdHealth": "झुंड का स्वास्थ्य",
+    "noAnimalsYet": "अभी तक कोई पशु नहीं है।",
+    "recentAnimals": "हाल के पशु",
+    "upcomingTasks": "आगामी कार्य",
+    "nothingPending": "कुछ भी लंबित नहीं है।",
+    "recentHealthAlerts": "हाल की स्वास्थ्य चेतावनियां",
+    "noActiveAlerts": "कोई सक्रिय चेतावनी नहीं है।",
+    "checkup": "जांच"
+  },
+  "reports": {
+    "exportCsv": "CSV में निर्यात करें",
+    "exportFailed": "निर्यात विफल: {{message}}",
+    "sharingUnavailable": "इस डिवाइस पर साझा करना उपलब्ध नहीं है।",
+    "sectionAnimals": "पशु",
+    "total": "कुल",
+    "healthy": "स्वस्थ",
+    "underTreatment": "उपचाराधीन",
+    "criticalStatus": "गंभीर",
+    "deceased": "मृत",
+    "sectionBreeding": "प्रजनन",
+    "delivered": "प्रसव हुआ",
+    "newbornsAllTime": "नवजात (कुल)",
+    "sectionProduction": "उत्पादन (इस माह)",
+    "milkLiters": "दूध (लीटर)",
+    "eggsUnits": "अंडे (संख्या)",
+    "meatKg": "मांस (किग्रा)",
+    "sectionFinance": "वित्त (इस माह)",
+    "income": "आय",
+    "expense": "व्यय",
+    "net": "शुद्ध लाभ",
+    "sectionHealth": "स्वास्थ्य",
+    "records": "रिकॉर्ड",
+    "activeAlerts": "सक्रिय चेतावनियां"
+  },
+  "records": {
+    "searchPlaceholder": "{{label}} खोजें...",
+    "emptyList": "अभी तक कोई {{label}} नहीं है। जोड़ने के लिए + टैप करें।",
+    "addTitle": "{{item}} जोड़ें",
+    "editTitle": "{{item}} संपादित करें",
+    "fieldRequired": "{{field}} आवश्यक है।",
+    "added": "{{item}} जोड़ा गया।",
+    "updated": "{{item}} अपडेट किया गया।",
+    "deleted": "{{item}} हटाया गया।",
+    "saveFailed": "सहेजने में विफल: {{message}}",
+    "all": "सभी {{label}}"
+  },
+  "tables": {
+    "animals": {
+      "label": "पशु",
+      "singular": "पशु",
+      "fields": {
+        "tag_id": "टैग आईडी",
+        "name": "नाम",
+        "species": "प्रजाति",
+        "breed": "नस्ल",
+        "sex": "लिंग",
+        "date_of_birth": "जन्म तिथि",
+        "location": "स्थान",
+        "health_status": "स्वास्थ्य स्थिति",
+        "notes": "टिप्पणियां"
+      }
+    },
+    "health_records": {
+      "label": "स्वास्थ्य",
+      "singular": "स्वास्थ्य रिकॉर्ड",
+      "fields": {
+        "tag_id": "पशु टैग आईडी",
+        "disease": "रोग / स्थिति",
+        "treatment": "उपचार",
+        "medicine": "दवा",
+        "vet_name": "पशु चिकित्सक का नाम",
+        "check_date": "जांच तिथि",
+        "next_check_date": "अगली जांच तिथि",
+        "status": "स्थिति",
+        "notes": "टिप्पणियां"
+      }
+    },
+    "feeding_records": {
+      "label": "आहार",
+      "singular": "आहार रिकॉर्ड",
+      "fields": {
+        "feed_type": "चारे का प्रकार",
+        "quantity": "मात्रा",
+        "unit": "इकाई",
+        "cost": "लागत",
+        "feeding_date": "आहार तिथि",
+        "animal_group": "पशु समूह",
+        "notes": "टिप्पणियां"
+      }
+    },
+    "breeding_records": {
+      "label": "प्रजनन",
+      "singular": "प्रजनन रिकॉर्ड",
+      "fields": {
+        "tag_id": "पशु टैग आईडी",
+        "breeding_date": "प्रजनन तिथि",
+        "pregnancy_status": "गर्भावस्था स्थिति",
+        "expected_birth_date": "अपेक्षित जन्म तिथि",
+        "birth_date": "जन्म तिथि",
+        "newborn_count": "नवजात संख्या",
+        "newborn_details": "नवजात विवरण",
+        "notes": "टिप्पणियां"
+      }
+    },
+    "production_records": {
+      "label": "उत्पादन",
+      "singular": "उत्पादन रिकॉर्ड",
+      "fields": {
+        "production_type": "प्रकार",
+        "tag_id": "पशु टैग आईडी",
+        "quantity": "मात्रा",
+        "unit": "इकाई",
+        "production_date": "उत्पादन तिथि",
+        "notes": "टिप्पणियां"
+      }
+    },
+    "finance_records": {
+      "label": "वित्त",
+      "singular": "वित्तीय रिकॉर्ड",
+      "fields": {
+        "type": "प्रकार",
+        "amount": "राशि",
+        "category": "श्रेणी",
+        "date": "तिथि",
+        "description": "विवरण"
+      }
+    },
+    "tasks": {
+      "label": "कार्य",
+      "singular": "कार्य",
+      "fields": {
+        "title": "शीर्षक",
+        "description": "विवरण",
+        "due_date": "नियत तिथि",
+        "priority": "प्राथमिकता",
+        "status": "स्थिति"
+      }
+    }
+  },
+  "enums": {
+    "species": {
+      "Cattle": "गाय-बैल",
+      "Sheep": "भेड़",
+      "Goat": "बकरी",
+      "Pig": "सुअर",
+      "Poultry": "मुर्गी पालन",
+      "Horse": "घोड़ा",
+      "Donkey": "गधा",
+      "Rabbit": "खरगोश",
+      "Other": "अन्य"
+    },
+    "sex": {
+      "Male": "नर",
+      "Female": "मादा"
+    },
+    "animalHealthStatus": {
+      "Healthy": "स्वस्थ",
+      "Under Treatment": "उपचाराधीन",
+      "Critical": "गंभीर",
+      "Deceased": "मृत"
+    },
+    "healthRecordStatus": {
+      "Under Treatment": "उपचाराधीन",
+      "Healthy": "स्वस्थ",
+      "Critical": "गंभीर",
+      "Recovered": "स्वस्थ हुआ",
+      "Deceased": "मृत"
+    },
+    "pregnancyStatus": {
+      "Not Confirmed": "अपुष्ट",
+      "Pregnant": "गर्भवती",
+      "Not Pregnant": "गर्भवती नहीं",
+      "Delivered": "प्रसव हो चुका"
+    },
+    "feedingUnit": {
+      "kg": "किग्रा",
+      "lbs": "पाउंड",
+      "tons": "टन",
+      "bags": "बोरी"
+    },
+    "productionType": {
+      "Milk": "दूध",
+      "Eggs": "अंडे",
+      "Meat": "मांस"
+    },
+    "productionUnit": {
+      "liters": "लीटर",
+      "units": "इकाई",
+      "kg": "किग्रा"
+    },
+    "financeType": {
+      "Income": "आय",
+      "Expense": "व्यय"
+    },
+    "financeCategory": {
+      "Milk Sales": "दूध की बिक्री",
+      "Egg Sales": "अंडों की बिक्री",
+      "Meat Sales": "मांस की बिक्री",
+      "Animal Sales": "पशुओं की बिक्री",
+      "Other Income": "अन्य आय",
+      "Feed": "चारा",
+      "Veterinary": "पशु चिकित्सा",
+      "Medicine": "दवा",
+      "Labor": "श्रम",
+      "Equipment": "उपकरण",
+      "Maintenance": "रखरखाव",
+      "Transport": "परिवहन",
+      "Other Expense": "अन्य व्यय"
+    },
+    "taskPriority": {
+      "Low": "कम",
+      "Medium": "मध्यम",
+      "High": "उच्च"
+    },
+    "taskStatus": {
+      "Pending": "लंबित",
+      "In Progress": "प्रगति पर",
+      "Completed": "पूर्ण"
+    },
+    "statusBadge": {
+      "Healthy": "स्वस्थ",
+      "Under Treatment": "उपचाराधीन",
+      "Critical": "गंभीर",
+      "Deceased": "मृत",
+      "Pregnant": "गर्भवती",
+      "Completed": "पूर्ण",
+      "Pending": "लंबित",
+      "In Progress": "प्रगति पर",
+      "Recovered": "स्वस्थ हुआ",
+      "Not Confirmed": "अपुष्ट"
+    }
+  }
+}

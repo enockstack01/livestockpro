@@ -1,0 +1,363 @@
+{
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "add": "Hinzufügen",
+    "search": "Suchen",
+    "loading": "Wird geladen...",
+    "retry": "Erneut versuchen",
+    "confirm": "Bestätigen",
+    "done": "Fertig",
+    "close": "Schließen",
+    "untitled": "Unbenannt"
+  },
+  "nav": {
+    "dashboard": "Übersicht",
+    "animals": "Tiere",
+    "health": "Gesundheit",
+    "feeding": "Fütterung",
+    "breeding": "Zucht",
+    "production": "Produktion",
+    "finance": "Finanzen",
+    "tasks": "Aufgaben",
+    "reports": "Berichte",
+    "settings": "Einstellungen",
+    "more": "Mehr",
+    "signOut": "Abmelden"
+  },
+  "menu": {
+    "title": "Menü"
+  },
+  "auth": {
+    "brandName": "LivestockPro",
+    "welcomeBack": "Willkommen zurück",
+    "createAccount": "Konto erstellen",
+    "emailAddress": "E-Mail-Adresse",
+    "password": "Passwort",
+    "signIn": "Anmelden",
+    "signUp": "Registrieren",
+    "continueWithGoogle": "Mit Google fortfahren",
+    "or": "ODER",
+    "dontHaveAccount": "Noch kein Konto? ",
+    "alreadyHaveAccount": "Bereits ein Konto? ",
+    "verifyItsYou": "Bestätige, dass du es bist",
+    "verifyCodeSentSignIn": "Gib den per E-Mail gesendeten Bestätigungscode ein.",
+    "checkYourEmail": "Überprüfe deine E-Mails",
+    "verifyCodeSentSignUp": "Gib den an {{email}} gesendeten Bestätigungscode ein.",
+    "verificationCode": "Bestätigungscode",
+    "verify": "Bestätigen",
+    "resendCode": "Code erneut senden",
+    "couldNotSignIn": "Anmeldung fehlgeschlagen.",
+    "couldNotCreateAccount": "Konto konnte nicht erstellt werden.",
+    "somethingWentWrong": "Etwas ist schiefgelaufen.",
+    "verificationIncomplete": "Bestätigung unvollständig — Code prüfen und erneut versuchen.",
+    "invalidCode": "Ungültiger Code.",
+    "signInDidNotComplete": "Anmeldung nicht abgeschlossen. Bitte erneut versuchen.",
+    "mfaNotSupported": "Dieses Konto erfordert eine Verifizierungsmethode, die in der App noch nicht unterstützt wird. Bitte über die Website anmelden.",
+    "googleSignInFailed": "Google-Anmeldung fehlgeschlagen."
+  },
+  "settings": {
+    "farmProfile": "Hofprofil",
+    "farmName": "Hofname",
+    "farmNamePlaceholder": "Name deines Hofs",
+    "location": "Standort",
+    "locationPlaceholder": "Stadt, Bezirk, Land",
+    "phoneNumber": "Telefonnummer",
+    "phonePlaceholder": "+250 700 000 000",
+    "saveProfile": "Profil Speichern",
+    "profileSaved": "Profil gespeichert.",
+    "saveFailed": "Speichern fehlgeschlagen: {{message}}",
+    "account": "Konto",
+    "email": "E-Mail",
+    "userId": "Benutzer-ID",
+    "passwordNote": "Passwort und Sicherheitseinstellungen können über die LivestockPro-Website verwaltet werden.",
+    "changePhoto": "Foto Ändern",
+    "remove": "Entfernen",
+    "photoUpdated": "Profilfoto aktualisiert.",
+    "photoRemoved": "Profilfoto entfernt.",
+    "photoPermissionNeeded": "Zugriff auf die Fotobibliothek ist erforderlich, um dein Foto zu ändern.",
+    "uploadFailed": "Hochladen fehlgeschlagen.",
+    "removeFailed": "Foto konnte nicht entfernt werden.",
+    "dangerZone": "Gefahrenzone",
+    "deleteWarning": "Das Löschen deines Kontos entfernt alle deine Daten dauerhaft. Dies kann nicht rückgängig gemacht werden.",
+    "deleteAccount": "Konto Löschen",
+    "deleteConfirmMessage": "Dies löscht dein Konto und alle zugehörigen Daten dauerhaft. Gib DELETE ein, um zu bestätigen.",
+    "typeDeleteHere": "Hier \"DELETE\" eingeben",
+    "typeDeleteToConfirm": "Gib DELETE ein, um zu bestätigen.",
+    "deleteForever": "Endgültig Löschen",
+    "accountDeleted": "Konto gelöscht.",
+    "partialDeleteWarning": "Konto konnte nicht vollständig gelöscht werden; du wirst abgemeldet.",
+    "appearance": "Erscheinungsbild",
+    "themeLight": "Hell",
+    "themeDark": "Dunkel",
+    "themeSystem": "System",
+    "language": "Sprache",
+    "rtlRestartNotice": "Starte die App neu, damit die neue Textrichtung vollständig angewendet wird."
+  },
+  "sync": {
+    "synced": "Synchronisiert",
+    "syncing": "Wird synchronisiert…",
+    "syncIssue": "Synchronisierungsproblem",
+    "lastSynced": "Zuletzt synchronisiert {{time}}",
+    "notSyncedYet": "Noch nicht synchronisiert — zum Synchronisieren tippen",
+    "recordsFailed_one": "{{count}} Eintrag konnte nicht synchronisiert werden",
+    "recordsFailed_other": "{{count}} Einträge konnten nicht synchronisiert werden"
+  },
+  "geo": {
+    "capturing": "Gerätestandort wird ermittelt...",
+    "denied": "Standortberechtigung verweigert — dieser Eintrag wird ohne Koordinaten gespeichert.",
+    "error": "Gerätestandort konnte nicht ermittelt werden — dieser Eintrag wird ohne Koordinaten gespeichert.",
+    "unsupported": "Dieses Gerät unterstützt keine Standorterfassung.",
+    "captured": "Standort erfasst ({{lat}}, {{lng}})",
+    "tapToRetry": " Zum Wiederholen tippen."
+  },
+  "confirmDialogs": {
+    "signOutTitle": "Abmelden?",
+    "signOutMessage": "Du kannst dich jederzeit wieder anmelden — deine Daten bleiben mit deinem Konto synchronisiert.",
+    "signOutConfirm": "Abmelden",
+    "deleteRecordTitle": "Diese(n/s) {{item}} löschen?",
+    "cannotBeUndone": "Dies kann nicht rückgängig gemacht werden."
+  },
+  "dashboard": {
+    "totalAnimals": "Tiere Gesamt",
+    "critical": "Kritisch",
+    "pregnant": "Trächtig",
+    "pendingTasks": "Offene Aufgaben",
+    "overdueCount": "{{count}} überfällig",
+    "incomeMonth": "Einnahmen (Monat)",
+    "expenseMonth": "Ausgaben (Monat)",
+    "herdHealth": "Herdengesundheit",
+    "noAnimalsYet": "Noch keine Tiere.",
+    "recentAnimals": "Kürzlich Hinzugefügte Tiere",
+    "upcomingTasks": "Anstehende Aufgaben",
+    "nothingPending": "Nichts anstehend.",
+    "recentHealthAlerts": "Aktuelle Gesundheitswarnungen",
+    "noActiveAlerts": "Keine aktiven Warnungen.",
+    "checkup": "Untersuchung"
+  },
+  "reports": {
+    "exportCsv": "Als CSV Exportieren",
+    "exportFailed": "Export fehlgeschlagen: {{message}}",
+    "sharingUnavailable": "Teilen ist auf diesem Gerät nicht verfügbar.",
+    "sectionAnimals": "Tiere",
+    "total": "Gesamt",
+    "healthy": "Gesund",
+    "underTreatment": "In Behandlung",
+    "criticalStatus": "Kritisch",
+    "deceased": "Verstorben",
+    "sectionBreeding": "Zucht",
+    "delivered": "Geworfen",
+    "newbornsAllTime": "Nachwuchs (gesamt)",
+    "sectionProduction": "Produktion (dieser Monat)",
+    "milkLiters": "Milch (Liter)",
+    "eggsUnits": "Eier (Stück)",
+    "meatKg": "Fleisch (kg)",
+    "sectionFinance": "Finanzen (dieser Monat)",
+    "income": "Einnahmen",
+    "expense": "Ausgaben",
+    "net": "Nettoertrag",
+    "sectionHealth": "Gesundheit",
+    "records": "Einträge",
+    "activeAlerts": "Aktive Warnungen"
+  },
+  "records": {
+    "searchPlaceholder": "{{label}} suchen...",
+    "emptyList": "Noch keine {{label}}. Zum Hinzufügen + tippen.",
+    "addTitle": "{{item}} Hinzufügen",
+    "editTitle": "{{item}} Bearbeiten",
+    "fieldRequired": "{{field}} ist erforderlich.",
+    "added": "{{item}} hinzugefügt.",
+    "updated": "{{item}} aktualisiert.",
+    "deleted": "{{item}} gelöscht.",
+    "saveFailed": "Speichern fehlgeschlagen: {{message}}",
+    "all": "Alle {{label}}"
+  },
+  "tables": {
+    "animals": {
+      "label": "Tiere",
+      "singular": "Tier",
+      "fields": {
+        "tag_id": "Ohrmarken-Nr.",
+        "name": "Name",
+        "species": "Tierart",
+        "breed": "Rasse",
+        "sex": "Geschlecht",
+        "date_of_birth": "Geburtsdatum",
+        "location": "Standort",
+        "health_status": "Gesundheitsstatus",
+        "notes": "Notizen"
+      }
+    },
+    "health_records": {
+      "label": "Gesundheit",
+      "singular": "Gesundheitseintrag",
+      "fields": {
+        "tag_id": "Ohrmarken-Nr. des Tieres",
+        "disease": "Krankheit / Zustand",
+        "treatment": "Behandlung",
+        "medicine": "Medikament",
+        "vet_name": "Name des Tierarztes",
+        "check_date": "Untersuchungsdatum",
+        "next_check_date": "Nächstes Untersuchungsdatum",
+        "status": "Status",
+        "notes": "Notizen"
+      }
+    },
+    "feeding_records": {
+      "label": "Fütterung",
+      "singular": "Fütterungseintrag",
+      "fields": {
+        "feed_type": "Futterart",
+        "quantity": "Menge",
+        "unit": "Einheit",
+        "cost": "Kosten",
+        "feeding_date": "Fütterungsdatum",
+        "animal_group": "Tiergruppe",
+        "notes": "Notizen"
+      }
+    },
+    "breeding_records": {
+      "label": "Zucht",
+      "singular": "Zuchteintrag",
+      "fields": {
+        "tag_id": "Ohrmarken-Nr. des Tieres",
+        "breeding_date": "Deckdatum",
+        "pregnancy_status": "Trächtigkeitsstatus",
+        "expected_birth_date": "Voraussichtliches Geburtsdatum",
+        "birth_date": "Geburtsdatum",
+        "newborn_count": "Anzahl Nachwuchs",
+        "newborn_details": "Details zum Nachwuchs",
+        "notes": "Notizen"
+      }
+    },
+    "production_records": {
+      "label": "Produktion",
+      "singular": "Produktionseintrag",
+      "fields": {
+        "production_type": "Typ",
+        "tag_id": "Ohrmarken-Nr. des Tieres",
+        "quantity": "Menge",
+        "unit": "Einheit",
+        "production_date": "Produktionsdatum",
+        "notes": "Notizen"
+      }
+    },
+    "finance_records": {
+      "label": "Finanzen",
+      "singular": "Finanzeintrag",
+      "fields": {
+        "type": "Typ",
+        "amount": "Betrag",
+        "category": "Kategorie",
+        "date": "Datum",
+        "description": "Beschreibung"
+      }
+    },
+    "tasks": {
+      "label": "Aufgaben",
+      "singular": "Aufgabe",
+      "fields": {
+        "title": "Titel",
+        "description": "Beschreibung",
+        "due_date": "Fälligkeitsdatum",
+        "priority": "Priorität",
+        "status": "Status"
+      }
+    }
+  },
+  "enums": {
+    "species": {
+      "Cattle": "Rind",
+      "Sheep": "Schaf",
+      "Goat": "Ziege",
+      "Pig": "Schwein",
+      "Poultry": "Geflügel",
+      "Horse": "Pferd",
+      "Donkey": "Esel",
+      "Rabbit": "Kaninchen",
+      "Other": "Andere"
+    },
+    "sex": {
+      "Male": "Männlich",
+      "Female": "Weiblich"
+    },
+    "animalHealthStatus": {
+      "Healthy": "Gesund",
+      "Under Treatment": "In Behandlung",
+      "Critical": "Kritisch",
+      "Deceased": "Verstorben"
+    },
+    "healthRecordStatus": {
+      "Under Treatment": "In Behandlung",
+      "Healthy": "Gesund",
+      "Critical": "Kritisch",
+      "Recovered": "Genesen",
+      "Deceased": "Verstorben"
+    },
+    "pregnancyStatus": {
+      "Not Confirmed": "Nicht Bestätigt",
+      "Pregnant": "Trächtig",
+      "Not Pregnant": "Nicht Trächtig",
+      "Delivered": "Geworfen"
+    },
+    "feedingUnit": {
+      "kg": "kg",
+      "lbs": "lb",
+      "tons": "Tonnen",
+      "bags": "Säcke"
+    },
+    "productionType": {
+      "Milk": "Milch",
+      "Eggs": "Eier",
+      "Meat": "Fleisch"
+    },
+    "productionUnit": {
+      "liters": "Liter",
+      "units": "Stück",
+      "kg": "kg"
+    },
+    "financeType": {
+      "Income": "Einnahme",
+      "Expense": "Ausgabe"
+    },
+    "financeCategory": {
+      "Milk Sales": "Milchverkauf",
+      "Egg Sales": "Eierverkauf",
+      "Meat Sales": "Fleischverkauf",
+      "Animal Sales": "Tierverkauf",
+      "Other Income": "Sonstige Einnahmen",
+      "Feed": "Futter",
+      "Veterinary": "Tierarzt",
+      "Medicine": "Medikamente",
+      "Labor": "Arbeitskosten",
+      "Equipment": "Ausrüstung",
+      "Maintenance": "Instandhaltung",
+      "Transport": "Transport",
+      "Other Expense": "Sonstige Ausgaben"
+    },
+    "taskPriority": {
+      "Low": "Niedrig",
+      "Medium": "Mittel",
+      "High": "Hoch"
+    },
+    "taskStatus": {
+      "Pending": "Ausstehend",
+      "In Progress": "In Bearbeitung",
+      "Completed": "Abgeschlossen"
+    },
+    "statusBadge": {
+      "Healthy": "Gesund",
+      "Under Treatment": "In Behandlung",
+      "Critical": "Kritisch",
+      "Deceased": "Verstorben",
+      "Pregnant": "Trächtig",
+      "Completed": "Abgeschlossen",
+      "Pending": "Ausstehend",
+      "In Progress": "In Bearbeitung",
+      "Recovered": "Genesen",
+      "Not Confirmed": "Nicht Bestätigt"
+    }
+  }
+}

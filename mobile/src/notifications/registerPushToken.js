@@ -3,6 +3,7 @@ import * as Crypto from 'expo-crypto';
 import * as Notifications from 'expo-notifications';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
+import { COLORS } from '../lib/shared';
 
 async function getDeviceId() {
   let id = await SecureStore.getItemAsync('lp_device_id');
@@ -25,7 +26,7 @@ export async function registerForPushNotifications(api) {
       name: 'Default',
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#2E7D32',
+      lightColor: COLORS.primary,
     });
   }
 
