@@ -117,6 +117,7 @@
     "signOutTitle": "Toka?",
     "signOutMessage": "Unaweza kuingia tena wakati wowote — data yako inabaki kusawazishwa na akaunti yako.",
     "signOutConfirm": "Toka",
+    "signOutSyncPending": "Baadhi ya mabadiliko bado hayajasawazishwa. Unganisha kwenye intaneti na ujaribu tena — kutoka sasa kunaweza kuyapoteza.",
     "deleteRecordTitle": "Futa {{item}} hii?",
     "cannotBeUndone": "Kitendo hiki hakiwezi kutenduliwa."
   },
@@ -359,5 +360,16 @@
       "Recovered": "Amepona",
       "Not Confirmed": "Haijathibitishwa"
     }
+  },
+  "reminders": {
+    "taskDueTitle": "Kazi inayostahili leo",
+    "taskDueBodyFallback": "Kuna kazi inayostahili leo.",
+    "healthCheckTitle": "Ukaguzi wa afya unahitajika",
+    "healthCheckBody": "Ukaguzi unaofuata wa {{tag}} ni leo.",
+    "birthTomorrowTitle": "Kuzaliwa kunatarajiwa kesho",
+    "birthTomorrowBody": "{{tag}} anatarajiwa kuzaa kesho.",
+    "birthTodayTitle": "Kuzaliwa kunatarajiwa leo",
+    "birthTodayBody": "{{tag}} anatarajiwa kuzaa leo.",
+    "animalFallback": "Mnyama"
   }
 }

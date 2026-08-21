@@ -117,6 +117,7 @@
     "signOutTitle": "Se déconnecter ?",
     "signOutMessage": "Vous pouvez vous reconnecter à tout moment — vos données restent synchronisées avec votre compte.",
     "signOutConfirm": "Déconnexion",
+    "signOutSyncPending": "Certaines modifications ne sont pas encore synchronisées. Connectez-vous à Internet et réessayez — se déconnecter maintenant pourrait les faire perdre.",
     "deleteRecordTitle": "Supprimer cet(te) {{item}} ?",
     "cannotBeUndone": "Cette action est irréversible."
   },
@@ -359,5 +360,16 @@
       "Recovered": "Rétabli",
       "Not Confirmed": "Non confirmée"
     }
+  },
+  "reminders": {
+    "taskDueTitle": "Tâche à échéance aujourd'hui",
+    "taskDueBodyFallback": "Une tâche est à échéance aujourd'hui.",
+    "healthCheckTitle": "Contrôle de santé à effectuer",
+    "healthCheckBody": "Le prochain contrôle de {{tag}} est aujourd'hui.",
+    "birthTomorrowTitle": "Naissance prévue demain",
+    "birthTomorrowBody": "{{tag}} devrait mettre bas demain.",
+    "birthTodayTitle": "Naissance prévue aujourd'hui",
+    "birthTodayBody": "{{tag}} devrait mettre bas aujourd'hui.",
+    "animalFallback": "Un animal"
   }
 }

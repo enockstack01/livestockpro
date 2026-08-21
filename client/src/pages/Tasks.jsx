@@ -5,6 +5,7 @@ import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import { StatusBadge, PriorityBadge, fmtDate } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
+import { isOverdueTask } from '../../../shared/businessRules';
 
 const EMPTY_FORM = { title: '', description: '', due_date: '', priority: 'Medium', status: 'Pending' };
 const FILTER_TABS = ['all', 'Pending', 'In Progress', 'Completed'];
@@ -36,7 +37,7 @@ export default function Tasks() {
     const pending = tasks.filter((t) => t.status === 'Pending').length;
     const inProgress = tasks.filter((t) => t.status === 'In Progress').length;
     const completed = tasks.filter((t) => t.status === 'Completed').length;
-    const overdue = tasks.filter((t) => t.due_date && t.status !== 'Completed' && new Date(t.due_date) < new Date()).length;
+    const overdue = tasks.filter(isOverdueTask).length;
     return { total: tasks.length, pending, inProgress, completed, overdue };
   }, [tasks]);
 
@@ -113,7 +114,7 @@ export default function Tasks() {
                 {filtered.length === 0 ? (
                   <tr><td colSpan={6}><div className="empty-state"><i className="fas fa-clipboard-check"></i><h3>No tasks found</h3><p>{filter !== 'all' ? `No ${filter.toLowerCase()} tasks.` : 'Add your first task to get started.'}</p></div></td></tr>
                 ) : filtered.map((t) => {
-                  const isOverdue = t.due_date && t.status !== 'Completed' && new Date(t.due_date) < new Date();
+                  const isOverdue = isOverdueTask(t);
                   const desc = t.description || '';
                   const completedStyle = t.status === 'Completed' ? { textDecoration: 'line-through', opacity: 0.6 } : undefined;
                   const completedDescStyle = t.status === 'Completed' ? { textDecoration: 'line-through', opacity: 0.5 } : undefined;

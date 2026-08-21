@@ -117,6 +117,7 @@
     "signOutTitle": "Abmelden?",
     "signOutMessage": "Du kannst dich jederzeit wieder anmelden — deine Daten bleiben mit deinem Konto synchronisiert.",
     "signOutConfirm": "Abmelden",
+    "signOutSyncPending": "Einige Änderungen wurden noch nicht synchronisiert. Verbinde dich mit dem Internet und versuche es erneut — jetzt abzumelden könnte sie verlieren.",
     "deleteRecordTitle": "Diese(n/s) {{item}} löschen?",
     "cannotBeUndone": "Dies kann nicht rückgängig gemacht werden."
   },
@@ -359,5 +360,16 @@
       "Recovered": "Genesen",
       "Not Confirmed": "Nicht Bestätigt"
     }
+  },
+  "reminders": {
+    "taskDueTitle": "Aufgabe heute fällig",
+    "taskDueBodyFallback": "Eine Aufgabe ist heute fällig.",
+    "healthCheckTitle": "Gesundheitscheck fällig",
+    "healthCheckBody": "Die nächste Untersuchung von {{tag}} ist heute.",
+    "birthTomorrowTitle": "Geburt morgen erwartet",
+    "birthTomorrowBody": "{{tag}} wird voraussichtlich morgen gebären.",
+    "birthTodayTitle": "Geburt heute erwartet",
+    "birthTodayBody": "{{tag}} wird voraussichtlich heute gebären.",
+    "animalFallback": "Ein Tier"
   }
 }

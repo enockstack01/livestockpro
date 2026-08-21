@@ -117,6 +117,7 @@
     "signOutTitle": "साइन आउट करें?",
     "signOutMessage": "आप किसी भी समय फिर से साइन इन कर सकते हैं — आपका डेटा आपके खाते के साथ समन्वयित रहता है।",
     "signOutConfirm": "साइन आउट करें",
+    "signOutSyncPending": "कुछ बदलाव अभी तक सिंक नहीं हुए हैं। इंटरनेट से जुड़ें और फिर से प्रयास करें — अभी साइन आउट करने से वे खो सकते हैं।",
     "deleteRecordTitle": "क्या इस {{item}} को हटाएं?",
     "cannotBeUndone": "यह क्रिया पूर्ववत नहीं की जा सकती।"
   },
@@ -359,5 +360,16 @@
       "Recovered": "स्वस्थ हुआ",
       "Not Confirmed": "अपुष्ट"
     }
+  },
+  "reminders": {
+    "taskDueTitle": "कार्य आज देय है",
+    "taskDueBodyFallback": "एक कार्य आज देय है।",
+    "healthCheckTitle": "स्वास्थ्य जांच बाकी है",
+    "healthCheckBody": "{{tag}} की अगली जांच आज है।",
+    "birthTomorrowTitle": "कल जन्म की उम्मीद",
+    "birthTomorrowBody": "{{tag}} के कल बच्चा देने की उम्मीद है।",
+    "birthTodayTitle": "आज जन्म की उम्मीद",
+    "birthTodayBody": "{{tag}} के आज बच्चा देने की उम्मीद है।",
+    "animalFallback": "एक जानवर"
   }
 }

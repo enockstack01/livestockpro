@@ -104,14 +104,40 @@ export default function Animals() {
     showToast('Animals exported to CSV.', 'success');
   }
 
+  /* Splits one CSV line respecting double-quoted fields (so a quoted value
+     containing a comma, e.g. exportCSV's own `"Pasture A, north side"`,
+     round-trips correctly instead of being split mid-field). */
+  function parseCsvLine(line) {
+    const values = [];
+    let cur = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (inQuotes) {
+        if (c === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+        else if (c === '"') inQuotes = false;
+        else cur += c;
+      } else if (c === '"') {
+        inQuotes = true;
+      } else if (c === ',') {
+        values.push(cur);
+        cur = '';
+      } else {
+        cur += c;
+      }
+    }
+    values.push(cur);
+    return values;
+  }
+
   function parseCSV(text) {
-    const lines = text.split('\n').map((l) => l.trim()).filter((l) => l);
+    const lines = text.split(/\r?\n/).map((l) => l.trim()).filter((l) => l);
     if (lines.length < 2) return [];
-    const headers = lines[0].split(',').map((h) => h.trim().replace(/^"|"$/g, ''));
+    const headers = parseCsvLine(lines[0]).map((h) => h.trim());
     return lines.slice(1).map((line) => {
-      const values = line.split(',').map((v) => v.trim().replace(/^"|"$/g, ''));
+      const values = parseCsvLine(line);
       const obj = {};
-      headers.forEach((h, i) => { obj[h] = values[i] || ''; });
+      headers.forEach((h, i) => { obj[h] = (values[i] || '').trim(); });
       return obj;
     });
   }
@@ -124,14 +150,18 @@ export default function Animals() {
       try {
         const rows = parseCSV(ev.target.result);
         if (rows.length === 0) { showToast('CSV file is empty or has invalid format.', 'error'); return; }
-        const records = rows.map((row) => ({
-          tag_id: row.tag_id || '', name: row.name || '', species: row.species || '', breed: row.breed || '',
+        // Same required fields the manual "Add Animal" form enforces (see save() above).
+        const validRows = rows.filter((row) => row.tag_id && row.species);
+        const skipped = rows.length - validRows.length;
+        if (validRows.length === 0) { showToast('No valid rows found — every animal needs a Tag ID and Species.', 'error'); return; }
+        const records = validRows.map((row) => ({
+          tag_id: row.tag_id, name: row.name || '', species: row.species, breed: row.breed || '',
           sex: row.sex || '', date_of_birth: row.date_of_birth || null, location: row.location || '',
           health_status: row.health_status || 'Healthy', notes: row.notes || ''
         }));
         const { error } = await api.insert('animals', records);
         if (error) { showToast('Import failed: ' + error.message, 'error'); return; }
-        showToast(`Successfully imported ${records.length} animals.`, 'success');
+        showToast(`Successfully imported ${records.length} animals.${skipped ? ` Skipped ${skipped} row(s) missing Tag ID/Species.` : ''}`, 'success');
         setCsvModalOpen(false);
         await load();
       } catch (err) {

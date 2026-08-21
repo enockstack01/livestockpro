@@ -116,6 +116,7 @@
     "signOutTitle": "退出登录？",
     "signOutMessage": "您可以随时重新登录 — 您的数据会一直与账户保持同步。",
     "signOutConfirm": "退出登录",
+    "signOutSyncPending": "部分更改尚未同步完成。请连接网络后重试——现在退出登录可能会丢失这些更改。",
     "deleteRecordTitle": "删除此{{item}}？",
     "cannotBeUndone": "此操作无法撤销。"
   },
@@ -358,5 +359,16 @@
       "Recovered": "已康复",
       "Not Confirmed": "未确认"
     }
+  },
+  "reminders": {
+    "taskDueTitle": "任务今日到期",
+    "taskDueBodyFallback": "有一项任务今日到期。",
+    "healthCheckTitle": "需要进行健康检查",
+    "healthCheckBody": "{{tag}}的下一次检查是今天。",
+    "birthTomorrowTitle": "预计明天分娩",
+    "birthTomorrowBody": "预计{{tag}}将于明天分娩。",
+    "birthTodayTitle": "预计今天分娩",
+    "birthTodayBody": "预计{{tag}}将于今天分娩。",
+    "animalFallback": "一只动物"
   }
 }

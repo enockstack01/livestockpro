@@ -5,6 +5,7 @@ import { useToast } from '../lib/toast.jsx';
 import { StatusBadge, PriorityBadge, fmtDate } from '../lib/badges.jsx';
 import { useCanvasChart } from '../lib/useChart.js';
 import Modal from '../components/Modal.jsx';
+import { isOverdueTask } from '../../../shared/businessRules';
 
 export default function Dashboard() {
   const api = useApi();
@@ -63,7 +64,7 @@ export default function Dashboard() {
   const pregnantCount = b.filter((x) => x.pregnancy_status === 'Pregnant').length;
   const newbornCount = b.filter((x) => x.birth_date).reduce((s, x) => s + (x.newborn_count || 0), 0);
   const pendingTasks = t.filter((x) => x.status === 'Pending').length;
-  const overdueTasks = t.filter((x) => x.due_date && x.status !== 'Completed' && new Date(x.due_date) < new Date()).length;
+  const overdueTasks = t.filter(isOverdueTask).length;
 
   const now = new Date();
   const monthFinance = f.filter((x) => { const d = new Date(x.date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); });
@@ -158,7 +159,7 @@ export default function Dashboard() {
               <div className="table-wrapper"><table className="data-table">
                 <thead><tr><th>Task</th><th>Due Date</th><th>Priority</th><th>Status</th></tr></thead>
                 <tbody>{pendingTasksList.map((tk) => {
-                  const isOverdue = tk.due_date && tk.status !== 'Completed' && new Date(tk.due_date) < new Date();
+                  const isOverdue = isOverdueTask(tk);
                   return (
                     <tr key={tk.id} style={{ cursor: 'pointer' }} onClick={() => (window.location.href = '/tasks')}>
                       <td className="fw-600">{tk.title}</td>

@@ -6,7 +6,8 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { useTranslation } from 'react-i18next';
 import { useSync } from '../../src/sync/SyncProvider';
 import { useConfirm } from '../../src/lib/confirm';
-import { wipeLocalData } from '../../src/db/schema';
+import { useToast } from '../../src/lib/toast';
+import { wipeLocalData, getPendingSyncCount } from '../../src/db/schema';
 import Icon from '../../src/components/Icon';
 import ResponsiveScreen from '../../src/components/ResponsiveScreen';
 import { useTheme } from '../../src/theme/ThemeProvider';
@@ -31,6 +32,7 @@ export default function MoreScreen() {
   const db = useSQLiteContext();
   const { syncing, lastSyncedAt, lastError, failedCount, triggerSync } = useSync();
   const confirm = useConfirm();
+  const showToast = useToast();
 
   async function confirmSignOut() {
     const ok = await confirm({
@@ -40,6 +42,13 @@ export default function MoreScreen() {
       destructive: true,
     });
     if (!ok) return;
+    // Give queued offline edits one last chance to reach the server before
+    // wiping the local cache — the prompt above promises data stays synced.
+    await triggerSync();
+    if ((await getPendingSyncCount(db)) > 0) {
+      showToast(t('confirmDialogs.signOutSyncPending'), 'error');
+      return;
+    }
     await wipeLocalData(db); // don't leak this account's cached data to whoever signs in next
     await signOut();
   }

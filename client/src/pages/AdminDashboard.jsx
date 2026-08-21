@@ -113,9 +113,10 @@ export default function AdminDashboard() {
     if (isRefresh) setRefreshing(true);
     const [statsRes, usersRes] = await Promise.all([api.adminStats(), api.adminUsers()]);
     if (statsRes.error) showToast('Failed to load stats: ' + statsRes.error.message, 'error');
+    else if (!statsRes.data) showToast('Failed to load stats: empty response.', 'error');
     else setStats(statsRes.data);
     if (usersRes.error) showToast('Failed to load users: ' + usersRes.error.message, 'error');
-    else setUsers(usersRes.data);
+    else setUsers(usersRes.data || []);
     setLoading(false);
     setRefreshing(false);
   }
@@ -266,7 +267,7 @@ export default function AdminDashboard() {
               <div className="charts-grid">
                 <div className="card">
                   <div className="card-header"><h3>Resource Breakdown</h3></div>
-                  <div className="card-body"><ResourceChart byCollection={stats.byCollection} /></div>
+                  <div className="card-body"><ResourceChart byCollection={stats?.byCollection} /></div>
                 </div>
                 <div className="card">
                   <div className="card-header"><h3>Users by Role</h3></div>
@@ -277,15 +278,15 @@ export default function AdminDashboard() {
               <div className="charts-grid">
                 <div className="card">
                   <div className="card-header"><h3><i className="fas fa-heart-pulse" style={{ color: 'var(--primary)', marginRight: 6 }}></i> Platform Animal Health</h3></div>
-                  <div className="card-body"><HealthBreakdownChart breakdown={stats.healthBreakdown} /></div>
+                  <div className="card-body"><HealthBreakdownChart breakdown={stats?.healthBreakdown} /></div>
                 </div>
                 <div className="card">
                   <div className="card-header"><h3><i className="fas fa-paw" style={{ color: 'var(--orange)', marginRight: 6 }}></i> Popular Species</h3></div>
-                  <div className="card-body"><SpeciesChart breakdown={stats.speciesBreakdown} /></div>
+                  <div className="card-body"><SpeciesChart breakdown={stats?.speciesBreakdown} /></div>
                 </div>
                 <div className="card">
                   <div className="card-header"><h3><i className="fas fa-list-check" style={{ color: 'var(--blue)', marginRight: 6 }}></i> Task Completion</h3></div>
-                  <div className="card-body"><TaskBreakdownChart breakdown={stats.taskBreakdown} /></div>
+                  <div className="card-body"><TaskBreakdownChart breakdown={stats?.taskBreakdown} /></div>
                 </div>
               </div>
 

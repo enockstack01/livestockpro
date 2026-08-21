@@ -14,6 +14,19 @@ const adminRoutes = require('./routes/adminRoutes');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+/* Render sits in front of this app as a single reverse-proxy hop; without
+   this, express-rate-limit (and req.ip generally) ignores X-Forwarded-For
+   and keys every request off the same upstream address, collapsing the
+   per-client rate limit budget below into one shared budget for all users. */
+app.set('trust proxy', 1);
+
+/* Express's default 'qs' parser turns bracket notation (?id[$ne]=x) into a
+   nested object, which would let a client smuggle a raw Mongo operator into
+   buildFilter()'s query-param loop (server/routes/dataRoutes.js). The
+   'simple' parser (Node's querystring) never produces nested objects, so
+   every query value buildFilter() sees is guaranteed to be a plain string. */
+app.set('query parser', 'simple');
+
 /* Requests with no Origin header (native apps — the mobile client, curl,
    server-to-server) always pass; this only gates browser-based cross-origin
    calls. Auth is Bearer-token-based (no cookies), so an open policy here
@@ -44,7 +57,12 @@ app.use(helmet({
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com'],
       fontSrc: ["'self'", 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com'],
-      imgSrc: ["'self'", 'data:'],
+      imgSrc: [
+        "'self'", 'data:',
+        'https://*.tile.openstreetmap.org',
+        'https://server.arcgisonline.com',
+        'https://*.basemaps.cartocdn.com',
+      ],
       connectSrc: ["'self'"]
     }
   }

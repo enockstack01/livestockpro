@@ -67,6 +67,14 @@ export async function migrateDbIfNeeded(db) {
   await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION};`);
 }
 
+/* Lets a sign-out flow check whether anything is still waiting to reach the
+   server before it wipes local data — without this, an offline edit made
+   just before signing out is silently destroyed with no way to recover it. */
+export async function getPendingSyncCount(db) {
+  const row = await db.getFirstAsync('SELECT COUNT(*) as c FROM sync_queue');
+  return row ? row.c : 0;
+}
+
 /* Sign-out safety: wipes every row (not the tables themselves) so a second
    account signing in on the same device never sees the previous account's
    cached data. Leaves schema/version intact, so no re-migration is needed. */

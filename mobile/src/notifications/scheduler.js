@@ -1,4 +1,5 @@
 import * as Notifications from 'expo-notifications';
+import i18n from '../i18n';
 import { todayIso } from '../lib/shared';
 
 Notifications.setNotificationHandler({
@@ -64,7 +65,7 @@ export async function rescheduleReminders(db) {
   for (const t of tasks) {
     const key = `tasks:${t.id}:due_date`;
     taskKeys.add(key);
-    await upsertReminder(db, key, 'Task due today', t.title || 'A task is due today.', atLocal8am(t.due_date));
+    await upsertReminder(db, key, i18n.t('reminders.taskDueTitle'), t.title || i18n.t('reminders.taskDueBodyFallback'), atLocal8am(t.due_date));
   }
   await pruneStale(db, 'tasks:', taskKeys);
 
@@ -75,7 +76,7 @@ export async function rescheduleReminders(db) {
   for (const h of health) {
     const key = `health_records:${h.id}:next_check_date`;
     healthKeys.add(key);
-    await upsertReminder(db, key, 'Health check-up due', `${h.tag_id || 'An animal'}'s next check-up is today.`, atLocal8am(h.next_check_date));
+    await upsertReminder(db, key, i18n.t('reminders.healthCheckTitle'), i18n.t('reminders.healthCheckBody', { tag: h.tag_id || i18n.t('reminders.animalFallback') }), atLocal8am(h.next_check_date));
   }
   await pruneStale(db, 'health_records:', healthKeys);
 
@@ -88,8 +89,9 @@ export async function rescheduleReminders(db) {
     const ofKey = `breeding_records:${b.id}:expected_birth_date:of`;
     breedingKeys.add(beforeKey);
     breedingKeys.add(ofKey);
-    await upsertReminder(db, beforeKey, 'Birth expected tomorrow', `${b.tag_id || 'An animal'} is expected to give birth tomorrow.`, atLocal8am(b.expected_birth_date, -1));
-    await upsertReminder(db, ofKey, 'Birth expected today', `${b.tag_id || 'An animal'} is expected to give birth today.`, atLocal8am(b.expected_birth_date, 0));
+    const tag = b.tag_id || i18n.t('reminders.animalFallback');
+    await upsertReminder(db, beforeKey, i18n.t('reminders.birthTomorrowTitle'), i18n.t('reminders.birthTomorrowBody', { tag }), atLocal8am(b.expected_birth_date, -1));
+    await upsertReminder(db, ofKey, i18n.t('reminders.birthTodayTitle'), i18n.t('reminders.birthTodayBody', { tag }), atLocal8am(b.expected_birth_date, 0));
   }
   await pruneStale(db, 'breeding_records:', breedingKeys);
 }

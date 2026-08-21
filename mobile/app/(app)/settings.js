@@ -116,15 +116,21 @@ export default function SettingsScreen() {
     try {
       if (profile) await repo.remove('profiles', profile.id);
       const result = await api.rpc('delete_user', {});
-      if (result.error) showToast(t('settings.partialDeleteWarning'), 'warning');
-      else showToast(t('settings.accountDeleted'), 'success');
-    } catch (err) {
-      /* fall through to sign-out regardless */
-    } finally {
+      if (result.error) {
+        // Account was NOT actually deleted server-side (e.g. no connection) —
+        // stay signed in with local data intact rather than wiping it and
+        // signing the user out of an account that still fully exists.
+        showToast(t('settings.partialDeleteWarning'), 'warning');
+        return;
+      }
+      showToast(t('settings.accountDeleted'), 'success');
       await wipeLocalData(db);
       await signOut();
-      setDeleting(false);
       router.replace('/sign-in');
+    } catch (err) {
+      showToast(t('settings.partialDeleteWarning'), 'warning');
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -264,7 +270,7 @@ function makeStyles(colors, radius, shadow) {
     rowLabel: { color: colors.textLight, fontSize: 13 },
     rowValue: { color: colors.text, fontSize: 13, flexShrink: 1, marginLeft: 12 },
     hint: { color: colors.textLight, fontSize: 12, marginTop: 8 },
-    dangerCard: { borderWidth: 1, borderColor: '#FFCDD2' },
+    dangerCard: { borderWidth: 1, borderColor: colors.red },
     deleteBtn: { backgroundColor: colors.red, paddingVertical: 12, borderRadius: radius.button, alignItems: 'center', marginTop: 12, paddingHorizontal: 16 },
     deleteBtnText: { color: colors.white, fontWeight: '700' },
     confirmInput: { borderWidth: 1, borderColor: colors.border, borderRadius: radius.card, paddingVertical: 11, paddingHorizontal: 12, marginTop: 12, fontSize: 14 },

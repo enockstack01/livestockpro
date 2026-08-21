@@ -80,7 +80,8 @@ export default function OneHealth() {
     if (isRefresh) setRefreshing(true);
     const { data, error } = await api.adminOneHealth();
     if (error) showToast('Failed to load One Health data: ' + error.message, 'error');
-    else { setAlerts(data.alerts); setSummary(data.summary); }
+    else if (!data) showToast('Failed to load One Health data: empty response.', 'error');
+    else { setAlerts(data.alerts || []); setSummary(data.summary); }
     setLoading(false);
     setRefreshing(false);
   }

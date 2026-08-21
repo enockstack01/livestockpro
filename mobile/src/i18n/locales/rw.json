@@ -117,6 +117,7 @@
     "signOutTitle": "Gusohoka?",
     "signOutMessage": "Ushobora kwinjira ukundi igihe cyose — amakuru yawe agumana guhuzwa na konti yawe.",
     "signOutConfirm": "Sohoka",
+    "signOutSyncPending": "Amahinduka amwe ntiraboneka guhuzwa. Huza kuri interineti hanyuma ugerageze nanone — gusohoka nonaha byashobora kuyatakaza.",
     "deleteRecordTitle": "Siba iki {{item}}?",
     "cannotBeUndone": "Iki gikorwa ntigishobora gusubizwa inyuma."
   },
@@ -359,5 +360,16 @@
       "Recovered": "Yakize",
       "Not Confirmed": "Ntibyaremejwe"
     }
+  },
+  "reminders": {
+    "taskDueTitle": "Umurimo ugomba gukorwa uyu munsi",
+    "taskDueBodyFallback": "Hari umurimo ugomba gukorwa uyu munsi.",
+    "healthCheckTitle": "Isuzuma ry'ubuzima rirakenewe",
+    "healthCheckBody": "Isuzuma rikurikira rya {{tag}} ni uyu munsi.",
+    "birthTomorrowTitle": "Kubyara biteganyijwe ejo",
+    "birthTomorrowBody": "{{tag}} ategerejwe kubyara ejo.",
+    "birthTodayTitle": "Kubyara biteganyijwe uyu munsi",
+    "birthTodayBody": "{{tag}} ategerejwe kubyara uyu munsi.",
+    "animalFallback": "Itungo"
   }
 }

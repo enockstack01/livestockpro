@@ -117,6 +117,7 @@
     "signOutTitle": "تسجيل الخروج؟",
     "signOutMessage": "يمكنك تسجيل الدخول مرة أخرى في أي وقت — تبقى بياناتك متزامنة مع حسابك.",
     "signOutConfirm": "تسجيل الخروج",
+    "signOutSyncPending": "بعض التغييرات لم تتم مزامنتها بعد. اتصل بالإنترنت وحاول مرة أخرى — قد يؤدي تسجيل الخروج الآن إلى فقدانها.",
     "deleteRecordTitle": "حذف هذا العنصر: {{item}}؟",
     "cannotBeUndone": "لا يمكن التراجع عن هذا الإجراء."
   },
@@ -359,5 +360,16 @@
       "Recovered": "تعافى",
       "Not Confirmed": "غير مؤكد"
     }
+  },
+  "reminders": {
+    "taskDueTitle": "مهمة مستحقة اليوم",
+    "taskDueBodyFallback": "هناك مهمة مستحقة اليوم.",
+    "healthCheckTitle": "فحص صحي مستحق",
+    "healthCheckBody": "الفحص القادم لـ {{tag}} هو اليوم.",
+    "birthTomorrowTitle": "الولادة متوقعة غدًا",
+    "birthTomorrowBody": "من المتوقع أن تلد {{tag}} غدًا.",
+    "birthTodayTitle": "الولادة متوقعة اليوم",
+    "birthTodayBody": "من المتوقع أن تلد {{tag}} اليوم.",
+    "animalFallback": "حيوان"
   }
 }

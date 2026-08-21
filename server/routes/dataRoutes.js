@@ -35,6 +35,11 @@ function isUuid(value) {
   return typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 }
 
+/* Fields stored as JS numbers (inserted straight from JSON bodies) — a
+   query-string equality filter arrives as a string and needs coercing back,
+   or it can never match ("5" !== 5 to Mongo). */
+const NUMERIC_FIELDS = new Set(['latitude', 'longitude', 'quantity', 'cost', 'amount', 'newborn_count']);
+
 /* Fire-and-forget: never let a push failure affect the write it's reporting on. */
 function notifyCriticalChange(table, doc, userId) {
   const label = table === 'animals' ? (doc.tag_id || doc.name || 'An animal') : (doc.tag_id || 'A health record');
@@ -83,10 +88,22 @@ function buildFilter(req) {
   }
   for (const [key, value] of Object.entries(req.query)) {
     if (reservedKey(key)) continue;
+    /* With the default 'qs' query parser, bracket notation (?id[$ne]=x)
+       parses to a nested object, letting a client smuggle a raw Mongo
+       operator into an intended equality filter. server/index.js switches
+       to the 'simple' parser (no nested objects), so every value reaching
+       here is guaranteed to be a string or array of strings — reject
+       anything else defensively rather than trust that config silently. */
+    if (typeof value !== 'string') continue;
     if (key === 'id') {
       filter._id = value;
     } else if (req.fields.includes(key)) {
-      filter[key] = value;
+      if (NUMERIC_FIELDS.has(key)) {
+        const n = Number(value);
+        if (!Number.isNaN(n)) filter[key] = n;
+      } else {
+        filter[key] = value;
+      }
     }
   }
   return filter;
@@ -182,9 +199,15 @@ router.patch('/:table', async (req, res) => {
 
     const filter = buildFilter(req);
     const trigger = PUSH_TRIGGERS[req.params.table];
-    const wasCritical = trigger && trigger.values.includes(set[trigger.field])
-      ? await col.find({ ...filter, [trigger.field]: { $ne: set[trigger.field] } }).toArray()
-      : [];
+    /* Snapshot each matched row's prior trigger-field value up front (one
+       read, before the write) rather than re-querying for "not already this
+       value" afterward — the previous approach re-ran that check against
+       live data after the update, so a second write landing in between could
+       make it fire for a transition that no longer reflects what actually
+       changed. */
+    const priorValues = trigger && trigger.values.includes(set[trigger.field])
+      ? new Map((await col.find(filter, { projection: { [trigger.field]: 1 } }).toArray()).map((d) => [String(d._id), d[trigger.field]]))
+      : null;
 
     if (Object.keys(set).length > 0) {
       set.updated_at = new Date().toISOString();
@@ -193,7 +216,14 @@ router.patch('/:table', async (req, res) => {
     const docs = await col.find(filter).toArray();
     res.json({ data: docs.map(toClient), error: null });
 
-    wasCritical.forEach((doc) => notifyCriticalChange(req.params.table, { ...doc, [trigger.field]: set[trigger.field] }, req.user.id));
+    if (priorValues) {
+      docs.forEach((doc) => {
+        const prior = priorValues.get(String(doc._id));
+        if (prior !== undefined && prior !== set[trigger.field]) {
+          notifyCriticalChange(req.params.table, doc, req.user.id);
+        }
+      });
+    }
   } catch (err) {
     res.status(400).json({ error: { message: err.message } });
   }

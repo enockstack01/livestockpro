@@ -46,7 +46,7 @@ export default function DashboardScreen() {
     setRefreshing(false);
   }, [triggerSync, load]);
 
-  const kpis = useMemo(() => computeKpis(data, CHART_COLORS, colors), [data, CHART_COLORS, colors]);
+  const kpis = useMemo(() => computeKpis(data, CHART_COLORS, colors, t), [data, CHART_COLORS, colors, t]);
 
   if (!data) {
     return <View style={styles.container} />;
@@ -123,7 +123,7 @@ export default function DashboardScreen() {
   );
 }
 
-function computeKpis(data, CHART_COLORS, colors) {
+function computeKpis(data, CHART_COLORS, colors, t) {
   if (!data) return null;
   const { animals, health, breeding, finance, tasks } = data;
 
@@ -150,10 +150,10 @@ function computeKpis(data, CHART_COLORS, colors) {
     .slice(0, 5);
 
   const healthChartData = [
-    { name: 'Healthy', value: healthy, color: CHART_COLORS.green, legendFontColor: colors.textLight, legendFontSize: 12 },
-    { name: 'Under Treatment', value: underTreatment, color: CHART_COLORS.orange, legendFontColor: colors.textLight, legendFontSize: 12 },
-    { name: 'Critical', value: critical, color: CHART_COLORS.red, legendFontColor: colors.textLight, legendFontSize: 12 },
-    { name: 'Deceased', value: deceased, color: CHART_COLORS.gray, legendFontColor: colors.textLight, legendFontSize: 12 },
+    { name: t('enums.statusBadge.Healthy'), value: healthy, color: CHART_COLORS.green, legendFontColor: colors.textLight, legendFontSize: 12 },
+    { name: t('enums.statusBadge.Under Treatment'), value: underTreatment, color: CHART_COLORS.orange, legendFontColor: colors.textLight, legendFontSize: 12 },
+    { name: t('enums.statusBadge.Critical'), value: critical, color: CHART_COLORS.red, legendFontColor: colors.textLight, legendFontSize: 12 },
+    { name: t('enums.statusBadge.Deceased'), value: deceased, color: CHART_COLORS.gray, legendFontColor: colors.textLight, legendFontSize: 12 },
   ].filter((d) => d.value > 0);
 
   return {

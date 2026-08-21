@@ -3,6 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useClerk, useUser } from '@clerk/clerk-react';
 import { useApi } from '../lib/api.js';
 import { TopbarSearchProvider, useTopbarSearchBox } from '../lib/topbarSearch.jsx';
+import { isOverdueTask } from '../../../shared/businessRules';
 
 const NAV_ITEMS = [
   { to: '/dashboard', icon: 'fa-gauge-high', label: 'Dashboard' },
@@ -58,7 +59,7 @@ function useNotifications() {
       const now = new Date();
 
       tasks.forEach((t) => {
-        if (t.due_date && t.status !== 'Completed' && new Date(t.due_date) < now) {
+        if (isOverdueTask(t)) {
           notifItems.push({ id: 'task-overdue-' + t.id, icon: 'fa-clock', color: 'red', title: 'Overdue: ' + t.title, sub: 'Was due ' + new Date(t.due_date).toLocaleDateString(), link: '/tasks' });
         }
       });

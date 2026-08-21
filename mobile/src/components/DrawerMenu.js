@@ -7,7 +7,9 @@ import { useSQLiteContext } from 'expo-sqlite';
 import Icon from './Icon';
 import { useTheme } from '../theme/ThemeProvider';
 import { useConfirm } from '../lib/confirm';
-import { wipeLocalData } from '../db/schema';
+import { useToast } from '../lib/toast';
+import { useSync } from '../sync/SyncProvider';
+import { wipeLocalData, getPendingSyncCount } from '../db/schema';
 
 const WIDTH = Math.min(320, Dimensions.get('window').width * 0.82);
 
@@ -34,6 +36,8 @@ export default function DrawerMenu({ open, onClose }) {
   const { signOut } = useAuth();
   const db = useSQLiteContext();
   const confirm = useConfirm();
+  const showToast = useToast();
+  const { triggerSync } = useSync();
   const translateX = useRef(new Animated.Value(-WIDTH)).current;
 
   useEffect(() => {
@@ -54,6 +58,15 @@ export default function DrawerMenu({ open, onClose }) {
     });
     if (!ok) return;
     onClose();
+    // Give queued offline edits one last chance to reach the server — the
+    // sign-out prompt promises "your data stays synced", so don't wipe the
+    // local cache (and the account's only copy of anything still queued)
+    // while changes are still pending.
+    await triggerSync();
+    if ((await getPendingSyncCount(db)) > 0) {
+      showToast(t('confirmDialogs.signOutSyncPending'), 'error');
+      return;
+    }
     await wipeLocalData(db);
     await signOut();
   }

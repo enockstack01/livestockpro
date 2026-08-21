@@ -117,6 +117,7 @@
     "signOutTitle": "Sign out?",
     "signOutMessage": "You can sign back in any time — your data stays synced to your account.",
     "signOutConfirm": "Sign out",
+    "signOutSyncPending": "Some changes haven't finished syncing yet. Connect to the internet and try again — signing out now could lose them.",
     "deleteRecordTitle": "Delete this {{item}}?",
     "cannotBeUndone": "This cannot be undone."
   },
@@ -359,5 +360,16 @@
       "Recovered": "Recovered",
       "Not Confirmed": "Not Confirmed"
     }
+  },
+  "reminders": {
+    "taskDueTitle": "Task due today",
+    "taskDueBodyFallback": "A task is due today.",
+    "healthCheckTitle": "Health check-up due",
+    "healthCheckBody": "{{tag}}'s next check-up is today.",
+    "birthTomorrowTitle": "Birth expected tomorrow",
+    "birthTomorrowBody": "{{tag}} is expected to give birth tomorrow.",
+    "birthTodayTitle": "Birth expected today",
+    "birthTodayBody": "{{tag}} is expected to give birth today.",
+    "animalFallback": "An animal"
   }
 }

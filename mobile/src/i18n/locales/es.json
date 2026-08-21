@@ -117,6 +117,7 @@
     "signOutTitle": "¿Cerrar sesión?",
     "signOutMessage": "Puedes volver a iniciar sesión en cualquier momento — tus datos permanecen sincronizados con tu cuenta.",
     "signOutConfirm": "Cerrar sesión",
+    "signOutSyncPending": "Algunos cambios aún no se han sincronizado. Conéctate a internet e inténtalo de nuevo — cerrar sesión ahora podría perderlos.",
     "deleteRecordTitle": "¿Eliminar este/a {{item}}?",
     "cannotBeUndone": "Esta acción no se puede deshacer."
   },
@@ -359,5 +360,16 @@
       "Recovered": "Recuperado",
       "Not Confirmed": "No Confirmada"
     }
+  },
+  "reminders": {
+    "taskDueTitle": "Tarea vence hoy",
+    "taskDueBodyFallback": "Una tarea vence hoy.",
+    "healthCheckTitle": "Revisión de salud pendiente",
+    "healthCheckBody": "El próximo chequeo de {{tag}} es hoy.",
+    "birthTomorrowTitle": "Nacimiento esperado mañana",
+    "birthTomorrowBody": "Se espera que {{tag}} dé a luz mañana.",
+    "birthTodayTitle": "Nacimiento esperado hoy",
+    "birthTodayBody": "Se espera que {{tag}} dé a luz hoy.",
+    "animalFallback": "Un animal"
   }
 }

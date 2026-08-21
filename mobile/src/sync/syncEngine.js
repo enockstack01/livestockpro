@@ -87,6 +87,10 @@ async function pullChanges(db, api) {
     for (const doc of result.data || []) {
       if (doc.deleted_at) {
         await db.runAsync(`DELETE FROM ${table} WHERE id = ?`, doc.id);
+        // The record is gone server-side (another device deleted it); a
+        // locally-queued mutation for it — e.g. an update that raced that
+        // delete — can never succeed and would otherwise retry forever.
+        await db.runAsync('DELETE FROM sync_queue WHERE table_name = ? AND record_id = ?', table, doc.id);
       } else {
         // A record with a still-queued local edit shouldn't be clobbered by a
         // stale pull (can happen after a partial push failure above).
