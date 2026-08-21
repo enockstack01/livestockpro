@@ -43,27 +43,53 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
   : DEFAULT_ORIGINS;
 
+/* Clerk's browser SDK talks directly to its own Frontend API host (encoded,
+   base64, inside the publishable key — e.g. pk_test_<base64>) for every
+   sign-in/sign-up/session call, and loads Cloudflare Turnstile + its own
+   bot-protection scripts from fixed Clerk domains. A CSP that doesn't allow
+   those hosts doesn't break the UI cosmetically like a missing font would —
+   it silently fails every one of those network calls, which looks exactly
+   like "authentication is disabled" from the user's side. Resolved from
+   CLERK_PUBLISHABLE_KEY so this stays correct if the app ever switches Clerk
+   instances (dev -> prod) without a code change. See
+   https://clerk.com/docs/security/clerk-csp for the required host list. */
+function clerkFrontendApiHost() {
+  const key = process.env.CLERK_PUBLISHABLE_KEY || '';
+  const match = key.match(/^pk_(?:test|live)_([A-Za-z0-9+/=]+)$/);
+  if (!match) return null;
+  try {
+    return Buffer.from(match[1], 'base64').toString('utf8').replace(/\$+$/, '');
+  } catch {
+    return null;
+  }
+}
+const CLERK_FAPI_HOST = clerkFrontendApiHost();
+const CLERK_FAPI_ORIGIN = CLERK_FAPI_HOST ? [`https://${CLERK_FAPI_HOST}`] : [];
+
 /* Explicit CSP allowlist instead of helmet's restrictive self-only default —
    client/index.html pulls Google Fonts + the cdnjs Font Awesome stylesheet,
    and the React app renders plenty of inline `style={{...}}` attributes
    (CSP's style-src governs those too, not just <style>/<link> tags), so both
    need naming here or the whole UI loses its icons/fonts/styling. Verified
-   against the actual built client/dist/index.html: no inline <script> tags,
-   so script-src can stay 'self'-only. */
+   against the actual built client/dist/index.html: no inline <script> tags
+   of our own, so script-src only needs Clerk's hosts added, not 'unsafe-inline'. */
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
+      scriptSrc: ["'self'", ...CLERK_FAPI_ORIGIN, 'https://challenges.cloudflare.com', 'https://*.protect.clerk.com'],
       styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com'],
       fontSrc: ["'self'", 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com'],
       imgSrc: [
         "'self'", 'data:',
+        'https://img.clerk.com',
         'https://*.tile.openstreetmap.org',
         'https://server.arcgisonline.com',
         'https://*.basemaps.cartocdn.com',
       ],
-      connectSrc: ["'self'"]
+      connectSrc: ["'self'", ...CLERK_FAPI_ORIGIN, 'https://*.protect.clerk.com'],
+      workerSrc: ["'self'", 'blob:'],
+      frameSrc: ['https://challenges.cloudflare.com', 'https://*.protect.clerk.com']
     }
   }
 }));
