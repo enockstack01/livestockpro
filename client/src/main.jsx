@@ -6,7 +6,7 @@ import App from './App.jsx';
 import { ToastProvider } from './lib/toast.jsx';
 import './style.css';
 
-const PUBLISHABLE_KEY = 'pk_test_YWJvdmUteWV0aS03MC5jbGVyay5hY2NvdW50cy5kZXYk';
+const PUBLISHABLE_KEY = 'pk_live_Y2xlcmsubGl2ZXN0b2NrcHJvLmFncmljb2RlcnMuY29tJA';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <ClerkProvider publishableKey={PUBLISHABLE_KEY}>

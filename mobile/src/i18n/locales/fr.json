@@ -56,7 +56,17 @@
     "invalidCode": "Code invalide.",
     "signInDidNotComplete": "La connexion n'a pas abouti. Veuillez réessayer.",
     "mfaNotSupported": "Ce compte nécessite une méthode de vérification pas encore prise en charge dans l'application. Veuillez vous connecter sur le site web.",
-    "googleSignInFailed": "Échec de la connexion avec Google."
+    "googleSignInFailed": "Échec de la connexion avec Google.",
+    "forgotPassword": "Mot de passe oublié ?",
+    "resetPasswordTitle": "Réinitialiser votre mot de passe",
+    "resetPasswordSubtitle": "Entrez votre e-mail et nous vous enverrons un code pour le réinitialiser.",
+    "sendResetCode": "Envoyer le code",
+    "resetCodeSentTo": "Entrez le code envoyé à {{email}}, puis choisissez un nouveau mot de passe.",
+    "newPassword": "Nouveau mot de passe",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "backToSignIn": "Retour à la connexion",
+    "couldNotSendResetCode": "Impossible d'envoyer le code.",
+    "couldNotResetPassword": "Impossible de réinitialiser le mot de passe."
   },
   "settings": {
     "farmProfile": "Profil de la ferme",

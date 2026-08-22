@@ -56,7 +56,17 @@
     "invalidCode": "رمز غير صحيح.",
     "signInDidNotComplete": "لم يكتمل تسجيل الدخول. حاول مرة أخرى.",
     "mfaNotSupported": "يتطلب هذا الحساب طريقة تحقق غير مدعومة بعد في التطبيق. يرجى تسجيل الدخول عبر الموقع الإلكتروني.",
-    "googleSignInFailed": "فشل تسجيل الدخول عبر Google."
+    "googleSignInFailed": "فشل تسجيل الدخول عبر Google.",
+    "forgotPassword": "هل نسيت كلمة المرور؟",
+    "resetPasswordTitle": "إعادة تعيين كلمة المرور",
+    "resetPasswordSubtitle": "أدخل بريدك الإلكتروني وسنرسل لك رمزًا لإعادة تعيينها.",
+    "sendResetCode": "إرسال رمز إعادة التعيين",
+    "resetCodeSentTo": "أدخل الرمز الذي أرسلناه إلى {{email}}، ثم اختر كلمة مرور جديدة.",
+    "newPassword": "كلمة المرور الجديدة",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "backToSignIn": "العودة إلى تسجيل الدخول",
+    "couldNotSendResetCode": "تعذّر إرسال رمز إعادة التعيين.",
+    "couldNotResetPassword": "تعذّر إعادة تعيين كلمة المرور."
   },
   "settings": {
     "farmProfile": "ملف المزرعة",

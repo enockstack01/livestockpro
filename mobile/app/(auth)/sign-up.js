@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSignUp } from '@clerk/expo';
 import { Link, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -62,68 +62,72 @@ export default function SignUpScreen() {
   if (needsVerification) {
     return (
       <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <Text style={styles.title}>{t('auth.checkYourEmail')}</Text>
-        <Text style={styles.subtitle}>{t('auth.verifyCodeSentSignUp', { email })}</Text>
-        <TextInput style={styles.input} value={code} onChangeText={setCode} placeholder={t('auth.verificationCode')} keyboardType="number-pad" placeholderTextColor={colors.placeholder} />
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-        <Pressable style={styles.button} onPress={handleVerify} disabled={busy}>
-          {busy ? <ActivityIndicator color={colors.white} /> : <Text style={styles.buttonText}>{t('auth.verify')}</Text>}
-        </Pressable>
-        <Pressable onPress={() => signUp.verifications.sendEmailCode()}>
-          <Text style={styles.link}>{t('auth.resendCode')}</Text>
-        </Pressable>
+        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+          <Text style={styles.title}>{t('auth.checkYourEmail')}</Text>
+          <Text style={styles.subtitle}>{t('auth.verifyCodeSentSignUp', { email })}</Text>
+          <TextInput style={styles.input} value={code} onChangeText={setCode} placeholder={t('auth.verificationCode')} keyboardType="number-pad" placeholderTextColor={colors.placeholder} />
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+          <Pressable style={styles.button} onPress={handleVerify} disabled={busy}>
+            {busy ? <ActivityIndicator color={colors.white} /> : <Text style={styles.buttonText}>{t('auth.verify')}</Text>}
+          </Pressable>
+          <Pressable onPress={() => signUp.verifications.sendEmailCode()}>
+            <Text style={styles.link}>{t('auth.resendCode')}</Text>
+          </Pressable>
+        </ScrollView>
       </KeyboardAvoidingView>
     );
   }
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={styles.brand}>
-        <Icon name="cow" size={36} color={colors.primary} />
-        <Text style={styles.brandName}>{t('auth.brandName')}</Text>
-      </View>
-      <Text style={styles.title}>{t('auth.createAccount')}</Text>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <View style={styles.brand}>
+          <Icon name="cow" size={36} color={colors.primary} />
+          <Text style={styles.brandName}>{t('auth.brandName')}</Text>
+        </View>
+        <Text style={styles.title}>{t('auth.createAccount')}</Text>
 
-      <GoogleSignInButton onError={setError} />
-      <View style={styles.dividerRow}>
-        <View style={styles.dividerLine} />
-        <Text style={styles.dividerText}>{t('auth.or')}</Text>
-        <View style={styles.dividerLine} />
-      </View>
+        <GoogleSignInButton onError={setError} />
+        <View style={styles.dividerRow}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>{t('auth.or')}</Text>
+          <View style={styles.dividerLine} />
+        </View>
 
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        placeholder={t('auth.emailAddress')}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        placeholderTextColor={colors.placeholder}
-      />
-      <TextInput
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        placeholder={t('auth.password')}
-        secureTextEntry
-        placeholderTextColor={colors.placeholder}
-      />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Pressable
-        style={[styles.button, (!email || !password) && styles.buttonDisabled]}
-        onPress={handleSignUp}
-        disabled={!email || !password || busy}
-      >
-        {busy ? <ActivityIndicator color={colors.white} /> : <Text style={styles.buttonText}>{t('auth.signUp')}</Text>}
-      </Pressable>
-      <View style={styles.footerRow}>
-        <Text style={styles.footerText}>{t('auth.alreadyHaveAccount')}</Text>
-        <Link href="/sign-in"><Text style={styles.link}>{t('auth.signIn')}</Text></Link>
-      </View>
-      {/* Clerk's bot-protection widget renders into this node on web; native
-          builds ignore it. Without it Clerk falls back to a slower invisible
-          CAPTCHA and logs a warning on every sign-up. */}
-      <View nativeID="clerk-captcha" />
+        <TextInput
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+          placeholder={t('auth.emailAddress')}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          placeholderTextColor={colors.placeholder}
+        />
+        <TextInput
+          style={styles.input}
+          value={password}
+          onChangeText={setPassword}
+          placeholder={t('auth.password')}
+          secureTextEntry
+          placeholderTextColor={colors.placeholder}
+        />
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <Pressable
+          style={[styles.button, (!email || !password) && styles.buttonDisabled]}
+          onPress={handleSignUp}
+          disabled={!email || !password || busy}
+        >
+          {busy ? <ActivityIndicator color={colors.white} /> : <Text style={styles.buttonText}>{t('auth.signUp')}</Text>}
+        </Pressable>
+        <View style={styles.footerRow}>
+          <Text style={styles.footerText}>{t('auth.alreadyHaveAccount')}</Text>
+          <Link href="/sign-in"><Text style={styles.link}>{t('auth.signIn')}</Text></Link>
+        </View>
+        {/* Clerk's bot-protection widget renders into this node on web; native
+            builds ignore it. Without it Clerk falls back to a slower invisible
+            CAPTCHA and logs a warning on every sign-up. */}
+        <View nativeID="clerk-captcha" />
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

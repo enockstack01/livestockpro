@@ -56,7 +56,17 @@
     "invalidCode": "Código inválido.",
     "signInDidNotComplete": "O login não foi concluído. Tente novamente.",
     "mfaNotSupported": "Esta conta requer um método de verificação ainda não suportado no app. Faça login pelo site.",
-    "googleSignInFailed": "Falha ao entrar com o Google."
+    "googleSignInFailed": "Falha ao entrar com o Google.",
+    "forgotPassword": "Esqueceu a senha?",
+    "resetPasswordTitle": "Redefina sua senha",
+    "resetPasswordSubtitle": "Digite seu e-mail e enviaremos um código para redefini-la.",
+    "sendResetCode": "Enviar código",
+    "resetCodeSentTo": "Digite o código enviado para {{email}} e escolha uma nova senha.",
+    "newPassword": "Nova senha",
+    "resetPassword": "Redefinir senha",
+    "backToSignIn": "Voltar para o login",
+    "couldNotSendResetCode": "Não foi possível enviar o código.",
+    "couldNotResetPassword": "Não foi possível redefinir sua senha."
   },
   "settings": {
     "farmProfile": "Perfil da Fazenda",

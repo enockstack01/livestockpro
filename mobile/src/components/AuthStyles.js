@@ -1,11 +1,18 @@
 import { StyleSheet } from 'react-native';
 
-/* Shared visual style for app/(auth)/sign-in.js and sign-up.js — kept in one
-   place since both screens are near-identical layouts. Themed: call with
-   the current theme's colors/radius (see useTheme()) inside a useMemo. */
+/* Shared visual style for app/(auth)/sign-in.js, sign-up.js, and
+   forgot-password.js — kept in one place since all three screens are
+   near-identical layouts. Themed: call with the current theme's
+   colors/radius (see useTheme()) inside a useMemo.
+   `container` is the flex:1 wrapper passed to the screen's outer
+   KeyboardAvoidingView; `content` is the centered/padded column passed as
+   a ScrollView's contentContainerStyle, so a small screen or a long
+   MFA/reset form can scroll instead of clipping its button off-screen. */
 export function makeAuthStyles(colors, radius) {
   return StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.bg, padding: 24, justifyContent: 'center', gap: 12, width: '100%', maxWidth: 480, alignSelf: 'center' },
+    container: { flex: 1, backgroundColor: colors.bg },
+    content: { flexGrow: 1, justifyContent: 'center', gap: 12, padding: 24, width: '100%', maxWidth: 480, alignSelf: 'center' },
+    forgotRow: { alignItems: 'flex-end', marginTop: -4 },
     brand: { alignItems: 'center', marginBottom: 24, gap: 8 },
     brandName: { fontSize: 22, fontWeight: '800', color: colors.primaryDark },
     title: { fontSize: 20, fontWeight: '700', color: colors.primaryDark, marginBottom: 4 },

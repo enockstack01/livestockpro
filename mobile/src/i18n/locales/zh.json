@@ -56,7 +56,17 @@
     "invalidCode": "验证码无效。",
     "signInDidNotComplete": "登录未完成，请重试。",
     "mfaNotSupported": "此账户需要应用程序尚不支持的验证方式，请改用网页版登录。",
-    "googleSignInFailed": "使用 Google 登录失败。"
+    "googleSignInFailed": "使用 Google 登录失败。",
+    "forgotPassword": "忘记密码？",
+    "resetPasswordTitle": "重置密码",
+    "resetPasswordSubtitle": "请输入您的邮箱，我们将向您发送重置验证码。",
+    "sendResetCode": "发送验证码",
+    "resetCodeSentTo": "请输入发送至 {{email}} 的验证码，然后设置新密码。",
+    "newPassword": "新密码",
+    "resetPassword": "重置密码",
+    "backToSignIn": "返回登录",
+    "couldNotSendResetCode": "无法发送验证码。",
+    "couldNotResetPassword": "无法重置密码。"
   },
   "settings": {
     "farmProfile": "农场资料",

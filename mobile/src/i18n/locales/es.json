@@ -56,7 +56,17 @@
     "invalidCode": "Código inválido.",
     "signInDidNotComplete": "El inicio de sesión no se completó. Inténtalo de nuevo.",
     "mfaNotSupported": "Esta cuenta requiere un método de verificación que aún no es compatible con la app. Inicia sesión en la web.",
-    "googleSignInFailed": "Error al iniciar sesión con Google."
+    "googleSignInFailed": "Error al iniciar sesión con Google.",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "resetPasswordTitle": "Restablece tu contraseña",
+    "resetPasswordSubtitle": "Introduce tu correo y te enviaremos un código para restablecerla.",
+    "sendResetCode": "Enviar código",
+    "resetCodeSentTo": "Introduce el código enviado a {{email}} y elige una nueva contraseña.",
+    "newPassword": "Nueva contraseña",
+    "resetPassword": "Restablecer contraseña",
+    "backToSignIn": "Volver a iniciar sesión",
+    "couldNotSendResetCode": "No se pudo enviar el código.",
+    "couldNotResetPassword": "No se pudo restablecer tu contraseña."
   },
   "settings": {
     "farmProfile": "Perfil de la Granja",

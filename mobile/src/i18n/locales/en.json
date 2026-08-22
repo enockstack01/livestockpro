@@ -56,7 +56,17 @@
     "invalidCode": "Invalid code.",
     "signInDidNotComplete": "Sign-in did not complete. Please try again.",
     "mfaNotSupported": "This account requires a verification method not yet supported in the app. Please sign in on the web instead.",
-    "googleSignInFailed": "Google sign-in failed."
+    "googleSignInFailed": "Google sign-in failed.",
+    "forgotPassword": "Forgot password?",
+    "resetPasswordTitle": "Reset your password",
+    "resetPasswordSubtitle": "Enter your account email and we'll send you a code to reset it.",
+    "sendResetCode": "Send reset code",
+    "resetCodeSentTo": "Enter the code we sent to {{email}}, then choose a new password.",
+    "newPassword": "New password",
+    "resetPassword": "Reset password",
+    "backToSignIn": "Back to sign in",
+    "couldNotSendResetCode": "Could not send the reset code.",
+    "couldNotResetPassword": "Could not reset your password."
   },
   "settings": {
     "farmProfile": "Farm Profile",

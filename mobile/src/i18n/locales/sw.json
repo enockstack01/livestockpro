@@ -56,7 +56,17 @@
     "invalidCode": "Msimbo si sahihi.",
     "signInDidNotComplete": "Kuingia hakukukamilika. Tafadhali jaribu tena.",
     "mfaNotSupported": "Akaunti hii inahitaji njia ya uthibitisho ambayo bado haijaungwa mkono kwenye programu. Tafadhali ingia kwenye tovuti.",
-    "googleSignInFailed": "Kuingia kwa Google kumeshindikana."
+    "googleSignInFailed": "Kuingia kwa Google kumeshindikana.",
+    "forgotPassword": "Umesahau nenosiri?",
+    "resetPasswordTitle": "Weka upya nenosiri lako",
+    "resetPasswordSubtitle": "Ingiza barua pepe yako nasi tutakutumia msimbo wa kuliweka upya.",
+    "sendResetCode": "Tuma msimbo",
+    "resetCodeSentTo": "Ingiza msimbo tuliotuma kwa {{email}}, kisha chagua nenosiri jipya.",
+    "newPassword": "Nenosiri jipya",
+    "resetPassword": "Weka upya nenosiri",
+    "backToSignIn": "Rudi kuingia",
+    "couldNotSendResetCode": "Imeshindikana kutuma msimbo.",
+    "couldNotResetPassword": "Imeshindikana kuweka upya nenosiri."
   },
   "settings": {
     "farmProfile": "Wasifu wa Shamba",

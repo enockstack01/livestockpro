@@ -8,7 +8,7 @@ import { useTheme } from '../theme/ThemeProvider';
 export default function DateField({ value, onChange, placeholder = '' }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const { colors, radius } = useTheme();
+  const { colors, radius, scheme } = useTheme();
   const styles = useMemo(() => makeStyles(colors, radius), [colors, radius]);
   const dateValue = value ? new Date(value + 'T00:00:00') : new Date();
 
@@ -16,6 +16,23 @@ export default function DateField({ value, onChange, placeholder = '' }) {
     if (Platform.OS === 'android') setOpen(false); // Android's dialog closes itself either way
     if (event.type === 'dismissed') return;
     if (selected) onChange(selected.toISOString().slice(0, 10));
+  }
+
+  // @react-native-community/datetimepicker has no web implementation, so the
+  // native picker below never renders on web — without this branch, tapping
+  // the field silently did nothing on every date field in the app. The
+  // browser's own <input type="date"> already gives a full picker UI here.
+  if (Platform.OS === 'web') {
+    return (
+      <View style={styles.input}>
+        <input
+          type="date"
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value)}
+          style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: 15, color: colors.text, fontFamily: 'inherit', colorScheme: scheme }}
+        />
+      </View>
+    );
   }
 
   return (

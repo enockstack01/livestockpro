@@ -56,7 +56,17 @@
     "invalidCode": "Kode ntabwo ari yo.",
     "signInDidNotComplete": "Kwinjira ntibyarangiye. Ongera ugerageze.",
     "mfaNotSupported": "Iyi konti isaba uburyo bwo kwemeza butakiri bushobora gukoreshwa muri iyi porogaramu. Injira ukoresheje urubuga.",
-    "googleSignInFailed": "Kwinjira ukoresheje Google ntibyakunze."
+    "googleSignInFailed": "Kwinjira ukoresheje Google ntibyakunze.",
+    "forgotPassword": "Wibagiwe ijambo ry'ibanga?",
+    "resetPasswordTitle": "Hindura ijambo ry'ibanga",
+    "resetPasswordSubtitle": "Injiza imeyili yawe tuguherereze kode yo kuryihindura.",
+    "sendResetCode": "Ohereza kode",
+    "resetCodeSentTo": "Injiza kode twoherereje kuri {{email}}, hanyuma uhitemo ijambo ry'ibanga rishya.",
+    "newPassword": "Ijambo ry'ibanga rishya",
+    "resetPassword": "Hindura ijambo ry'ibanga",
+    "backToSignIn": "Subira ku kwinjira",
+    "couldNotSendResetCode": "Ntibyakunze kohereza kode.",
+    "couldNotResetPassword": "Ntibyakunze guhindura ijambo ry'ibanga."
   },
   "settings": {
     "farmProfile": "Amakuru y'Ubuhinzi",
