@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { useLanguage } from '../i18n/LanguageProvider.jsx';
+import { useTheme } from '../theme/ThemeProvider.jsx';
 import Modal from '../components/Modal.jsx';
 
 export default function Settings() {
@@ -16,6 +17,7 @@ export default function Settings() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const { language, setLanguage, languages } = useLanguage();
+  const { preference, setThemePreference } = useTheme();
 
   const [profile, setProfile] = useState(null);
   const [farmName, setFarmName] = useState('');
@@ -161,6 +163,14 @@ export default function Settings() {
         <div className="card">
           <div className="card-header"><h3><i className="fas fa-globe" style={{ color: 'var(--primary)', marginRight: 6 }}></i> {t('settings.preferences')}</h3></div>
           <div className="card-body">
+            <div className="form-group">
+              <label>{t('settings.appearance')}</label>
+              <select className="form-control" value={preference} onChange={(e) => setThemePreference(e.target.value)}>
+                <option value="light">{t('settings.themeLight')}</option>
+                <option value="dark">{t('settings.themeDark')}</option>
+                <option value="system">{t('settings.themeSystem')}</option>
+              </select>
+            </div>
             <div className="form-group">
               <label>{t('settings.language')}</label>
               <select className="form-control" value={language} onChange={(e) => setLanguage(e.target.value)}>

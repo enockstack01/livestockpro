@@ -4,6 +4,7 @@ import { useClerk, useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { TopbarSearchProvider, useTopbarSearchBox } from '../lib/topbarSearch.jsx';
+import { useTheme } from '../theme/ThemeProvider.jsx';
 import { isOverdueTask } from '../../../shared/businessRules';
 
 const NAV_ITEMS = [
@@ -159,6 +160,7 @@ function TopbarSearchInput() {
 
 function LayoutInner() {
   const { t } = useTranslation();
+  const { scheme, setThemePreference } = useTheme();
   const { user } = useUser();
   const { signOut } = useClerk();
   const navigate = useNavigate();
@@ -217,6 +219,14 @@ function LayoutInner() {
           <TopbarSearchInput />
         </div>
         <div className="topbar-right">
+          <button
+            className="topbar-btn"
+            title={t('layout.toggleTheme')}
+            aria-label={t('layout.toggleTheme')}
+            onClick={() => setThemePreference(scheme === 'dark' ? 'light' : 'dark')}
+          >
+            <i className={`fas ${scheme === 'dark' ? 'fa-sun' : 'fa-moon'}`}></i>
+          </button>
           <div className="notif-wrapper">
             <button className="topbar-btn" style={{ position: 'relative' }} onClick={(e) => { e.stopPropagation(); setNotifOpen((v) => !v); }}>
               <i className="fas fa-bell"></i>

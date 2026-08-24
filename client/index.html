@@ -8,6 +8,21 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script>
+    // Applied before first paint so switching to/from dark mode never flashes
+    // the wrong theme — src/theme/ThemeProvider.jsx takes over from here once
+    // React mounts (same storage key, same resolution logic).
+    (function () {
+      try {
+        var saved = localStorage.getItem('lp_theme_preference');
+        var pref = saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'system';
+        var scheme = pref === 'system'
+          ? (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : pref;
+        document.documentElement.setAttribute('data-theme', scheme);
+      } catch (e) { /* storage/matchMedia unavailable — default light styles apply */ }
+    })();
+  </script>
 </head>
 <body>
   <div id="root"></div>
