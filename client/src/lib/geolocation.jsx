@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 /* Captures the device's GPS coordinates on demand (call .capture() when a
    page opens its "add new record" modal). Never blocks saving — every
@@ -32,33 +33,34 @@ export function useGeoCapture() {
   return { status, coords, capture, reset };
 }
 
-const MESSAGES = {
-  loading: { icon: 'fa-spinner fa-spin', cls: 'loading', text: 'Capturing device location...' },
-  denied: { icon: 'fa-triangle-exclamation', cls: 'warn', text: "Location permission denied — this record will save without coordinates." },
-  error: { icon: 'fa-triangle-exclamation', cls: 'warn', text: "Couldn't get device location — this record will save without coordinates." },
-  unsupported: { icon: 'fa-triangle-exclamation', cls: 'warn', text: 'This device/browser does not support location capture.' }
+const MESSAGE_KEYS = {
+  loading: { icon: 'fa-spinner fa-spin', cls: 'loading', key: 'geo.capturing' },
+  denied: { icon: 'fa-triangle-exclamation', cls: 'warn', key: 'geo.denied' },
+  error: { icon: 'fa-triangle-exclamation', cls: 'warn', key: 'geo.error' },
+  unsupported: { icon: 'fa-triangle-exclamation', cls: 'warn', key: 'geo.unsupported' }
 };
 
 /* Small status line for inside an "add record" modal, showing capture
    progress and the captured coordinates once available. */
 export function LocationCaptureBadge({ geo }) {
+  const { t } = useTranslation();
   if (geo.status === 'idle') return null;
 
   if (geo.status === 'success') {
     return (
       <p className="location-badge success">
-        <i className="fas fa-location-dot"></i> Location captured ({geo.coords.latitude.toFixed(4)}, {geo.coords.longitude.toFixed(4)})
-        <a href="#" onClick={(e) => { e.preventDefault(); geo.capture(); }}>Recapture</a>
+        <i className="fas fa-location-dot"></i> {t('geo.captured', { lat: geo.coords.latitude.toFixed(4), lng: geo.coords.longitude.toFixed(4) })}
+        <a href="#" onClick={(e) => { e.preventDefault(); geo.capture(); }}>{t('common.retry')}</a>
       </p>
     );
   }
 
-  const m = MESSAGES[geo.status];
+  const m = MESSAGE_KEYS[geo.status];
   if (!m) return null;
   return (
     <p className={`location-badge ${m.cls}`}>
-      <i className={`fas ${m.icon}`}></i> {m.text}
-      {m.cls === 'warn' && <a href="#" onClick={(e) => { e.preventDefault(); geo.capture(); }}>Try again</a>}
+      <i className={`fas ${m.icon}`}></i> {t(m.key)}
+      {m.cls === 'warn' && <a href="#" onClick={(e) => { e.preventDefault(); geo.capture(); }}>{t('common.retry')}</a>}
     </p>
   );
 }

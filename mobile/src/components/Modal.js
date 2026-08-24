@@ -26,8 +26,8 @@ export default function Modal({ open, onClose, title, children, footer }) {
           </View>
           <ScrollView style={styles.body} contentContainerStyle={{ paddingBottom: 12 }} keyboardShouldPersistTaps="handled">
             {children}
+            {footer ? <View style={styles.footer}>{footer}</View> : null}
           </ScrollView>
-          {footer ? <View style={styles.footer}>{footer}</View> : null}
         </View>
       </KeyboardAvoidingView>
     </RNModal>
@@ -41,6 +41,6 @@ function makeStyles(colors, radius) {
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border },
     title: { fontSize: 17, fontWeight: '700', color: colors.primaryDark, flex: 1 },
     body: { paddingHorizontal: 20, paddingTop: 12 },
-    footer: { flexDirection: 'row', gap: 10, padding: 16, borderTopWidth: 1, borderTopColor: colors.border },
+    footer: { flexDirection: 'row', gap: 10, marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: colors.border },
   });
 }

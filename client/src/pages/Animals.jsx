@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { useTopbarSearch } from '../lib/topbarSearch.jsx';
@@ -10,10 +11,13 @@ const EMPTY_FORM = { tag_id: '', name: '', species: '', breed: '', sex: '', date
 const SPECIES_OPTIONS = ['Cattle', 'Sheep', 'Goat', 'Pig', 'Poultry', 'Horse', 'Donkey', 'Rabbit', 'Other'];
 
 export default function Animals() {
+  const { t } = useTranslation();
   const api = useApi();
   const showToast = useToast();
   const fileInputRef = useRef(null);
   const geo = useGeoCapture();
+  const label = t('tables.animals.label');
+  const singular = t('tables.animals.singular');
 
   const [animals, setAnimals] = useState([]);
   const [search, setSearch] = useState('');
@@ -30,11 +34,11 @@ export default function Animals() {
 
   const [csvModalOpen, setCsvModalOpen] = useState(false);
 
-  useTopbarSearch('Search animals...', setSearch);
+  useTopbarSearch(t('records.searchPlaceholder', { label: label.toLowerCase() }), setSearch);
 
   async function load() {
     const { data, error } = await api.list('animals', { eq: {}, order: 'created_at.desc' });
-    if (error) { showToast('Failed to load animals: ' + error.message, 'error'); return; }
+    if (error) { showToast(t('records.loadFailed', { label: label.toLowerCase(), message: error.message }), 'error'); return; }
     setAnimals(data || []);
   }
 
@@ -65,16 +69,16 @@ export default function Animals() {
   }
 
   async function save() {
-    if (!form.tag_id || !form.species) { showToast('Tag ID and Species are required.', 'error'); return; }
+    if (!form.tag_id || !form.species) { showToast(t('animalsPage.tagAndSpeciesRequired'), 'error'); return; }
     if (editingId) {
       const { error } = await api.update('animals', editingId, form);
-      if (error) { showToast('Update failed: ' + error.message, 'error'); return; }
-      showToast('Animal updated successfully.', 'success');
+      if (error) { showToast(t('records.saveFailed', { message: error.message }), 'error'); return; }
+      showToast(t('records.updated', { item: singular }), 'success');
     } else {
       const payload = geo.status === 'success' ? { ...form, latitude: geo.coords.latitude, longitude: geo.coords.longitude } : form;
       const { error } = await api.insert('animals', [payload]);
-      if (error) { showToast('Insert failed: ' + error.message, 'error'); return; }
-      showToast('Animal added successfully.', 'success');
+      if (error) { showToast(t('records.saveFailed', { message: error.message }), 'error'); return; }
+      showToast(t('records.added', { item: singular }), 'success');
     }
     setModalOpen(false);
     await load();
@@ -89,19 +93,19 @@ export default function Animals() {
   async function doDelete() {
     if (!deletingId) return;
     const { error } = await api.remove('animals', deletingId);
-    if (error) { showToast('Delete failed: ' + error.message, 'error'); return; }
-    showToast('Animal deleted.', 'success');
+    if (error) { showToast(t('records.deleteFailed', { item: singular }), 'error'); return; }
+    showToast(t('records.deleted', { item: singular }), 'success');
     setDeleteOpen(false);
     setDeletingId(null);
     await load();
   }
 
   function exportCSV() {
-    if (animals.length === 0) { showToast('No animals to export.', 'warning'); return; }
+    if (animals.length === 0) { showToast(t('records.noRecordsToExport', { label: label.toLowerCase() }), 'warning'); return; }
     const headers = ['tag_id', 'name', 'species', 'breed', 'sex', 'date_of_birth', 'location', 'health_status', 'last_check_date', 'notes'];
     const csv = [headers.join(',')].concat(animals.map((a) => headers.map((h) => csvCell(a[h])).join(','))).join('\n');
     downloadCSV(csv, 'animals_export.csv');
-    showToast('Animals exported to CSV.', 'success');
+    showToast(t('records.exported', { label }), 'success');
   }
 
   /* Splits one CSV line respecting double-quoted fields (so a quoted value
@@ -149,23 +153,23 @@ export default function Animals() {
     reader.onload = async (ev) => {
       try {
         const rows = parseCSV(ev.target.result);
-        if (rows.length === 0) { showToast('CSV file is empty or has invalid format.', 'error'); return; }
+        if (rows.length === 0) { showToast(t('animalsPage.csvEmpty'), 'error'); return; }
         // Same required fields the manual "Add Animal" form enforces (see save() above).
         const validRows = rows.filter((row) => row.tag_id && row.species);
         const skipped = rows.length - validRows.length;
-        if (validRows.length === 0) { showToast('No valid rows found — every animal needs a Tag ID and Species.', 'error'); return; }
+        if (validRows.length === 0) { showToast(t('animalsPage.noValidRows'), 'error'); return; }
         const records = validRows.map((row) => ({
           tag_id: row.tag_id, name: row.name || '', species: row.species, breed: row.breed || '',
           sex: row.sex || '', date_of_birth: row.date_of_birth || null, location: row.location || '',
           health_status: row.health_status || 'Healthy', notes: row.notes || ''
         }));
         const { error } = await api.insert('animals', records);
-        if (error) { showToast('Import failed: ' + error.message, 'error'); return; }
-        showToast(`Successfully imported ${records.length} animals.${skipped ? ` Skipped ${skipped} row(s) missing Tag ID/Species.` : ''}`, 'success');
+        if (error) { showToast(t('records.saveFailed', { message: error.message }), 'error'); return; }
+        showToast(t('animalsPage.importedSuccess', { count: records.length }) + (skipped ? t('animalsPage.skippedRows', { count: skipped }) : ''), 'success');
         setCsvModalOpen(false);
         await load();
       } catch (err) {
-        showToast('Error parsing CSV: ' + err.message, 'error');
+        showToast(t('animalsPage.csvParseError', { message: err.message }), 'error');
       }
     };
     reader.readAsText(file);
@@ -175,25 +179,25 @@ export default function Animals() {
   return (
     <>
       <div className="page-header">
-        <div><h1>Animals</h1><p>Manage your livestock inventory</p></div>
+        <div><h1>{t('animalsPage.title')}</h1><p>{t('animalsPage.subtitle')}</p></div>
         <div className="d-flex gap-16 flex-wrap">
-          <button className="btn btn-secondary" onClick={() => setCsvModalOpen(true)}><i className="fas fa-file-import"></i> Import CSV</button>
-          <button className="btn btn-secondary" onClick={exportCSV}><i className="fas fa-file-export"></i> Export CSV</button>
-          <button className="btn btn-primary" onClick={openAdd}><i className="fas fa-plus"></i> Add Animal</button>
+          <button className="btn btn-secondary" onClick={() => setCsvModalOpen(true)}><i className="fas fa-file-import"></i> {t('animalsPage.importCsv')}</button>
+          <button className="btn btn-secondary" onClick={exportCSV}><i className="fas fa-file-export"></i> {t('reports.exportCsv')}</button>
+          <button className="btn btn-primary" onClick={openAdd}><i className="fas fa-plus"></i> {t('animalsPage.addAnimal')}</button>
         </div>
       </div>
 
       <div className="filter-bar">
         <select className="form-control" value={speciesFilter} onChange={(e) => setSpeciesFilter(e.target.value)}>
-          <option value="">All Species</option>
-          {speciesOptions.map((s) => <option key={s} value={s}>{s}</option>)}
+          <option value="">{t('animalsPage.allSpecies')}</option>
+          {speciesOptions.map((s) => <option key={s} value={s}>{t(`enums.species.${s}`, s)}</option>)}
         </select>
         <select className="form-control" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-          <option value="">All Statuses</option>
-          <option value="Healthy">Healthy</option>
-          <option value="Under Treatment">Under Treatment</option>
-          <option value="Critical">Critical</option>
-          <option value="Deceased">Deceased</option>
+          <option value="">{t('animalsPage.allStatuses')}</option>
+          <option value="Healthy">{t('enums.animalHealthStatus.Healthy')}</option>
+          <option value="Under Treatment">{t('enums.animalHealthStatus.Under Treatment')}</option>
+          <option value="Critical">{t('enums.animalHealthStatus.Critical')}</option>
+          <option value="Deceased">{t('enums.animalHealthStatus.Deceased')}</option>
         </select>
       </div>
 
@@ -201,25 +205,25 @@ export default function Animals() {
         <div className="card-body" style={{ padding: 0 }}>
           <div className="table-wrapper">
             <table className="data-table">
-              <thead><tr><th>Tag ID</th><th>Name</th><th>Species</th><th>Breed</th><th>Sex</th><th>Age</th><th>Location</th><th>Health Status</th><th>Last Check</th><th>Actions</th></tr></thead>
+              <thead><tr><th>{t('tables.animals.fields.tag_id')}</th><th>{t('tables.animals.fields.name')}</th><th>{t('tables.animals.fields.species')}</th><th>{t('tables.animals.fields.breed')}</th><th>{t('tables.animals.fields.sex')}</th><th>{t('common.age')}</th><th>{t('tables.animals.fields.location')}</th><th>{t('tables.animals.fields.health_status')}</th><th>{t('common.lastCheck')}</th><th>{t('adminDashboard.colActions')}</th></tr></thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan={10}><div className="empty-state"><i className="fas fa-cow"></i><h3>No animals found</h3><p>Add a new animal or adjust your filters.</p></div></td></tr>
+                  <tr><td colSpan={10}><div className="empty-state"><i className="fas fa-cow"></i><h3>{t('common.noneFound', { label })}</h3><p>{t('animalsPage.addOrAdjustFilters')}</p></div></td></tr>
                 ) : filtered.map((a) => (
                   <tr key={a.id}>
                     <td className="fw-600">{a.tag_id}</td>
                     <td>{a.name || '—'}</td>
-                    <td>{a.species}</td>
+                    <td>{t(`enums.species.${a.species}`, a.species)}</td>
                     <td>{a.breed || '—'}</td>
-                    <td>{a.sex || '—'}</td>
+                    <td>{a.sex ? t(`enums.sex.${a.sex}`, a.sex) : '—'}</td>
                     <td>{calcAge(a.date_of_birth)}</td>
                     <td>{a.location || '—'}</td>
                     <td><StatusBadge status={a.health_status} /></td>
                     <td>{fmtDate(a.last_check_date)}</td>
                     <td>
                       <div className="table-actions">
-                        <button className="btn-icon" title="Edit" onClick={() => openEdit(a)}><i className="fas fa-pen-to-square"></i></button>
-                        <button className="btn-icon danger" title="Delete" onClick={() => confirmDelete(a)}><i className="fas fa-trash"></i></button>
+                        <button className="btn-icon" title={t('common.edit')} onClick={() => openEdit(a)}><i className="fas fa-pen-to-square"></i></button>
+                        <button className="btn-icon danger" title={t('common.delete')} onClick={() => confirmDelete(a)}><i className="fas fa-trash"></i></button>
                       </div>
                     </td>
                   </tr>
@@ -231,58 +235,58 @@ export default function Animals() {
       </div>
 
       <Modal
-        open={modalOpen} onClose={() => setModalOpen(false)} title={editingId ? 'Edit Animal' : 'Add New Animal'}
-        footer={<><button className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button><button className="btn btn-primary" onClick={save}><i className="fas fa-check"></i> Save</button></>}
+        open={modalOpen} onClose={() => setModalOpen(false)} title={editingId ? t('animalsPage.editAnimal') : t('animalsPage.addNewAnimal')}
+        footer={<><button className="btn btn-secondary" onClick={() => setModalOpen(false)}>{t('common.cancel')}</button><button className="btn btn-primary" onClick={save}><i className="fas fa-check"></i> {t('common.save')}</button></>}
       >
         {!editingId && <LocationCaptureBadge geo={geo} />}
-        <div className="form-group"><label>Tag ID *</label><input type="text" className="form-control" placeholder="e.g. COW-001" value={form.tag_id} onChange={(e) => setForm({ ...form, tag_id: e.target.value })} /></div>
+        <div className="form-group"><label>{t('tables.animals.fields.tag_id')} *</label><input type="text" className="form-control" placeholder={t('animalsPage.tagIdPlaceholder')} value={form.tag_id} onChange={(e) => setForm({ ...form, tag_id: e.target.value })} /></div>
         <div className="form-row">
-          <div className="form-group"><label>Name</label><input type="text" className="form-control" placeholder="Optional name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+          <div className="form-group"><label>{t('tables.animals.fields.name')}</label><input type="text" className="form-control" placeholder={t('animalsPage.namePlaceholder')} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
           <div className="form-group">
-            <label>Species *</label>
+            <label>{t('tables.animals.fields.species')} *</label>
             <select className="form-control" value={form.species} onChange={(e) => setForm({ ...form, species: e.target.value })}>
-              <option value="">Select species</option>
-              {SPECIES_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
+              <option value="">{t('animalsPage.selectSpecies')}</option>
+              {SPECIES_OPTIONS.map((s) => <option key={s} value={s}>{t(`enums.species.${s}`, s)}</option>)}
             </select>
           </div>
         </div>
         <div className="form-row">
-          <div className="form-group"><label>Breed</label><input type="text" className="form-control" placeholder="e.g. Holstein" value={form.breed} onChange={(e) => setForm({ ...form, breed: e.target.value })} /></div>
+          <div className="form-group"><label>{t('tables.animals.fields.breed')}</label><input type="text" className="form-control" placeholder={t('animalsPage.breedPlaceholder')} value={form.breed} onChange={(e) => setForm({ ...form, breed: e.target.value })} /></div>
           <div className="form-group">
-            <label>Sex</label>
+            <label>{t('tables.animals.fields.sex')}</label>
             <select className="form-control" value={form.sex} onChange={(e) => setForm({ ...form, sex: e.target.value })}>
-              <option value="">Select</option><option value="Male">Male</option><option value="Female">Female</option>
+              <option value="">{t('animalsPage.selectSex')}</option><option value="Male">{t('enums.sex.Male')}</option><option value="Female">{t('enums.sex.Female')}</option>
             </select>
           </div>
         </div>
         <div className="form-row">
-          <div className="form-group"><label>Date of Birth</label><input type="date" className="form-control" value={form.date_of_birth} onChange={(e) => setForm({ ...form, date_of_birth: e.target.value })} /></div>
-          <div className="form-group"><label>Location</label><input type="text" className="form-control" placeholder="e.g. Pasture A" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} /></div>
+          <div className="form-group"><label>{t('tables.animals.fields.date_of_birth')}</label><input type="date" className="form-control" value={form.date_of_birth} onChange={(e) => setForm({ ...form, date_of_birth: e.target.value })} /></div>
+          <div className="form-group"><label>{t('tables.animals.fields.location')}</label><input type="text" className="form-control" placeholder={t('animalsPage.locationPlaceholder')} value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} /></div>
         </div>
         <div className="form-group">
-          <label>Health Status</label>
+          <label>{t('tables.animals.fields.health_status')}</label>
           <select className="form-control" value={form.health_status} onChange={(e) => setForm({ ...form, health_status: e.target.value })}>
-            <option value="Healthy">Healthy</option><option value="Under Treatment">Under Treatment</option><option value="Critical">Critical</option><option value="Deceased">Deceased</option>
+            <option value="Healthy">{t('enums.animalHealthStatus.Healthy')}</option><option value="Under Treatment">{t('enums.animalHealthStatus.Under Treatment')}</option><option value="Critical">{t('enums.animalHealthStatus.Critical')}</option><option value="Deceased">{t('enums.animalHealthStatus.Deceased')}</option>
           </select>
         </div>
-        <div className="form-group"><label>Notes</label><textarea className="form-control" placeholder="Additional notes..." value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
+        <div className="form-group"><label>{t('tables.animals.fields.notes')}</label><textarea className="form-control" placeholder={t('common.notesPlaceholder')} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
       </Modal>
 
       <Modal
-        open={deleteOpen} onClose={() => setDeleteOpen(false)} title="Confirm Delete" maxWidth={420}
-        footer={<><button className="btn btn-secondary" onClick={() => setDeleteOpen(false)}>Cancel</button><button className="btn btn-danger" onClick={doDelete}><i className="fas fa-trash"></i> Delete</button></>}
+        open={deleteOpen} onClose={() => setDeleteOpen(false)} title={t('common.confirmDelete')} maxWidth={420}
+        footer={<><button className="btn btn-secondary" onClick={() => setDeleteOpen(false)}>{t('common.cancel')}</button><button className="btn btn-danger" onClick={doDelete}><i className="fas fa-trash"></i> {t('common.delete')}</button></>}
       >
-        <p className="text-muted">Are you sure you want to delete animal "{deletingTag}"? This action cannot be undone.</p>
+        <p className="text-muted">{t('animalsPage.confirmDeleteAnimal', { tag: deletingTag })}</p>
       </Modal>
 
-      <Modal open={csvModalOpen} onClose={() => setCsvModalOpen(false)} title="Import Animals from CSV">
+      <Modal open={csvModalOpen} onClose={() => setCsvModalOpen(false)} title={t('animalsPage.importAnimalsCsv')}>
         <p className="text-muted mb-16" style={{ fontSize: 13 }}>
-          Upload a CSV file with columns: <strong>tag_id, name, species, breed, sex, date_of_birth, location, health_status, notes</strong>
+          {t('animalsPage.importInstructions')}
         </p>
         <div className="csv-drop-zone" onClick={() => fileInputRef.current?.click()}>
           <i className="fas fa-cloud-arrow-up"></i>
-          <p><span className="browse-link">Click to browse</span> or drag and drop</p>
-          <p style={{ fontSize: 12, marginTop: 4 }}>.csv files only</p>
+          <p><span className="browse-link">{t('animalsPage.clickToBrowse')}</span> {t('animalsPage.orDragDrop')}</p>
+          <p style={{ fontSize: 12, marginTop: 4 }}>{t('animalsPage.csvOnly')}</p>
         </div>
         <input ref={fileInputRef} type="file" accept=".csv" style={{ display: 'none' }} onChange={handleFileChange} />
       </Modal>

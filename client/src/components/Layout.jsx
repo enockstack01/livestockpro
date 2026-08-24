@@ -1,21 +1,22 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useClerk, useUser } from '@clerk/clerk-react';
+import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { TopbarSearchProvider, useTopbarSearchBox } from '../lib/topbarSearch.jsx';
 import { isOverdueTask } from '../../../shared/businessRules';
 
 const NAV_ITEMS = [
-  { to: '/dashboard', icon: 'fa-gauge-high', label: 'Dashboard' },
-  { to: '/animals', icon: 'fa-cow', label: 'Animals' },
-  { to: '/health', icon: 'fa-stethoscope', label: 'Health Records' },
-  { to: '/feeding', icon: 'fa-wheat-awn', label: 'Feeding' },
-  { to: '/breeding', icon: 'fa-venus-mars', label: 'Breeding' },
-  { to: '/production', icon: 'fa-gauge', label: 'Production' },
-  { to: '/finance', icon: 'fa-coins', label: 'Finance' },
-  { to: '/tasks', icon: 'fa-list-check', label: 'Tasks' },
-  { to: '/reports', icon: 'fa-chart-bar', label: 'Reports' },
-  { to: '/settings', icon: 'fa-gear', label: 'Settings' }
+  { to: '/dashboard', icon: 'fa-gauge-high', labelKey: 'nav.dashboard' },
+  { to: '/animals', icon: 'fa-cow', labelKey: 'nav.animals' },
+  { to: '/health', icon: 'fa-stethoscope', labelKey: 'nav.health' },
+  { to: '/feeding', icon: 'fa-wheat-awn', labelKey: 'nav.feeding' },
+  { to: '/breeding', icon: 'fa-venus-mars', labelKey: 'nav.breeding' },
+  { to: '/production', icon: 'fa-gauge', labelKey: 'nav.production' },
+  { to: '/finance', icon: 'fa-coins', labelKey: 'nav.finance' },
+  { to: '/tasks', icon: 'fa-list-check', labelKey: 'nav.tasks' },
+  { to: '/reports', icon: 'fa-chart-bar', labelKey: 'nav.reports' },
+  { to: '/settings', icon: 'fa-gear', labelKey: 'nav.settings' }
 ];
 
 const NOTIF_ORDER = { red: 0, orange: 1, blue: 2, purple: 3, green: 4 };
@@ -37,7 +38,7 @@ function useRole() {
   return role;
 }
 
-function useNotifications() {
+function useNotifications(t) {
   const api = useApi();
   const [items, setItems] = useState([]);
 
@@ -58,29 +59,29 @@ function useNotifications() {
       const notifItems = [];
       const now = new Date();
 
-      tasks.forEach((t) => {
-        if (isOverdueTask(t)) {
-          notifItems.push({ id: 'task-overdue-' + t.id, icon: 'fa-clock', color: 'red', title: 'Overdue: ' + t.title, sub: 'Was due ' + new Date(t.due_date).toLocaleDateString(), link: '/tasks' });
+      tasks.forEach((tk) => {
+        if (isOverdueTask(tk)) {
+          notifItems.push({ id: 'task-overdue-' + tk.id, icon: 'fa-clock', color: 'red', title: t('layout.notifOverdueTitle', { title: tk.title }), sub: t('layout.notifOverdueSub', { date: new Date(tk.due_date).toLocaleDateString() }), link: '/tasks' });
         }
       });
       animals.forEach((a) => {
         if (a.health_status === 'Critical') {
-          notifItems.push({ id: 'animal-critical-' + a.id, icon: 'fa-triangle-exclamation', color: 'red', title: 'Critical: ' + a.tag_id, sub: 'Animal needs immediate attention', link: '/health' });
+          notifItems.push({ id: 'animal-critical-' + a.id, icon: 'fa-triangle-exclamation', color: 'red', title: t('layout.notifCriticalTitle', { tag: a.tag_id }), sub: t('layout.notifCriticalSub'), link: '/health' });
         }
       });
       animals.forEach((a) => {
         if (a.health_status === 'Under Treatment') {
-          notifItems.push({ id: 'animal-treatment-' + a.id, icon: 'fa-stethoscope', color: 'orange', title: 'Treatment: ' + a.tag_id, sub: 'Currently under treatment', link: '/health' });
+          notifItems.push({ id: 'animal-treatment-' + a.id, icon: 'fa-stethoscope', color: 'orange', title: t('layout.notifTreatmentTitle', { tag: a.tag_id }), sub: t('layout.notifTreatmentSub'), link: '/health' });
         }
       });
       health.forEach((h) => {
         if (h.next_check_date) {
           const daysUntil = Math.ceil((new Date(h.next_check_date) - now) / (1000 * 60 * 60 * 24));
           if (daysUntil <= 3 && daysUntil >= 0 && h.status !== 'Recovered') {
-            notifItems.push({ id: 'health-due-' + h.id, icon: 'fa-calendar-check', color: 'blue', title: 'Check-up due: ' + (h.tag_id || '—'), sub: daysUntil === 0 ? 'Today!' : 'In ' + daysUntil + ' day' + (daysUntil > 1 ? 's' : '') + ' — ' + (h.disease || ''), link: '/health' });
+            notifItems.push({ id: 'health-due-' + h.id, icon: 'fa-calendar-check', color: 'blue', title: t('layout.notifCheckupDueTitle', { tag: h.tag_id || '—' }), sub: daysUntil === 0 ? t('layout.notifToday') : t('layout.notifInDaysWithNote', { count: daysUntil, note: h.disease || '' }), link: '/health' });
           }
           if (daysUntil < 0 && h.status !== 'Recovered') {
-            notifItems.push({ id: 'health-missed-' + h.id, icon: 'fa-calendar-xmark', color: 'red', title: 'Missed check-up: ' + (h.tag_id || '—'), sub: 'Was due ' + Math.abs(daysUntil) + ' day' + (Math.abs(daysUntil) > 1 ? 's' : '') + ' ago', link: '/health' });
+            notifItems.push({ id: 'health-missed-' + h.id, icon: 'fa-calendar-xmark', color: 'red', title: t('layout.notifMissedTitle', { tag: h.tag_id || '—' }), sub: t('layout.notifMissedSub', { count: Math.abs(daysUntil) }), link: '/health' });
           }
         }
       });
@@ -88,7 +89,7 @@ function useNotifications() {
         if (b.expected_birth_date && b.pregnancy_status === 'Pregnant') {
           const daysUntil = Math.ceil((new Date(b.expected_birth_date) - now) / (1000 * 60 * 60 * 24));
           if (daysUntil <= 7 && daysUntil >= 0) {
-            notifItems.push({ id: 'breeding-birth-' + b.id, icon: 'fa-paw', color: 'purple', title: 'Expected birth: ' + (b.tag_id || '—'), sub: daysUntil === 0 ? 'Today!' : 'In ' + daysUntil + ' day' + (daysUntil > 1 ? 's' : ''), link: '/breeding' });
+            notifItems.push({ id: 'breeding-birth-' + b.id, icon: 'fa-paw', color: 'purple', title: t('layout.notifBirthTitle', { tag: b.tag_id || '—' }), sub: daysUntil === 0 ? t('layout.notifToday') : t('layout.notifBirthInDays', { count: daysUntil }), link: '/breeding' });
           }
         }
       });
@@ -98,7 +99,7 @@ function useNotifications() {
     })();
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [t]);
 
   return items;
 }
@@ -157,10 +158,11 @@ function TopbarSearchInput() {
 }
 
 function LayoutInner() {
+  const { t } = useTranslation();
   const { user } = useUser();
   const { signOut } = useClerk();
   const navigate = useNavigate();
-  const notifItems = useNotifications();
+  const notifItems = useNotifications(t);
   const { readIds, markRead, markAllRead } = useReadNotifications(user?.id);
   const unreadCount = notifItems.filter((n) => !readIds.has(n.id)).length;
   const role = useRole();
@@ -189,21 +191,21 @@ function LayoutInner() {
         <nav className="sidebar-nav">
           {NAV_ITEMS.map((item) => (
             <NavLink key={item.to} to={item.to} className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')} onClick={() => setSidebarOpen(false)}>
-              <i className={`fas ${item.icon}`}></i> {item.label}
+              <i className={`fas ${item.icon}`}></i> {t(item.labelKey)}
             </NavLink>
           ))}
           {isAdmin && (
             <NavLink to="/admin" className={({ isActive }) => 'nav-item nav-item-admin' + (isActive ? ' active' : '')} onClick={() => setSidebarOpen(false)}>
-              <i className="fas fa-user-shield"></i> Admin Panel
+              <i className="fas fa-user-shield"></i> {t('layout.adminPanel')}
             </NavLink>
           )}
           {isAdmin && (
             <NavLink to="/onehealth" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')} onClick={() => setSidebarOpen(false)}>
-              <i className="fas fa-shield-virus" style={{ color: '#FFD54F' }}></i> One Health
+              <i className="fas fa-shield-virus" style={{ color: '#FFD54F' }}></i> {t('layout.oneHealth')}
             </NavLink>
           )}
           <a href="#" className="nav-item logout-item" onClick={handleLogout}>
-            <i className="fas fa-right-from-bracket"></i> Logout
+            <i className="fas fa-right-from-bracket"></i> {t('layout.logout')}
           </a>
         </nav>
       </aside>
@@ -227,12 +229,12 @@ function LayoutInner() {
             </button>
             <div className={`notif-dropdown${notifOpen ? ' show' : ''}`}>
               <div className="notif-header">
-                <h4><i className="fas fa-bell" style={{ marginRight: 6, color: 'var(--primary)' }}></i> Notifications</h4>
-                <span onClick={() => markAllRead(notifItems.map((n) => n.id))}>Mark all read</span>
+                <h4><i className="fas fa-bell" style={{ marginRight: 6, color: 'var(--primary)' }}></i> {t('layout.notifications')}</h4>
+                <span onClick={() => markAllRead(notifItems.map((n) => n.id))}>{t('layout.markAllRead')}</span>
               </div>
               <div className="notif-list">
                 {notifItems.length === 0 ? (
-                  <div className="notif-empty"><i className="fas fa-bell-slash"></i><p>No notifications</p></div>
+                  <div className="notif-empty"><i className="fas fa-bell-slash"></i><p>{t('layout.noNotifications')}</p></div>
                 ) : notifItems.map((n) => (
                   <NavLink key={n.id} to={n.link} className={`notif-item${readIds.has(n.id) ? ' read' : ''}`} onClick={() => { markRead(n.id); setNotifOpen(false); }}>
                     <div className={`notif-icon ${n.color}`}><i className={`fas ${n.icon}`}></i></div>
@@ -240,7 +242,7 @@ function LayoutInner() {
                   </NavLink>
                 ))}
               </div>
-              <div className="notif-footer"><NavLink to="/tasks" onClick={() => setNotifOpen(false)}>View all tasks</NavLink></div>
+              <div className="notif-footer"><NavLink to="/tasks" onClick={() => setNotifOpen(false)}>{t('layout.viewAllTasks')}</NavLink></div>
             </div>
           </div>
           <div className="user-menu">

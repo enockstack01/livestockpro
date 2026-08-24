@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
 
 export default function Reports() {
+  const { t } = useTranslation();
   const api = useApi();
   const showToast = useToast();
 
@@ -27,7 +29,7 @@ export default function Reports() {
     setRefreshing(true);
     await loadAll();
     setRefreshing(false);
-    showToast('Report refreshed.', 'success');
+    showToast(t('reportsPage.reportRefreshed'), 'success');
   }
 
   function exportFullReportCSV() {
@@ -62,7 +64,7 @@ export default function Reports() {
     data.finance.forEach((r) => lines.push([csvCell(r.type), csvCell(r.category), csvCell(r.amount), csvCell(r.date), csvCell(r.description)].join(',')));
 
     downloadCSV(lines.join('\n'), 'full_farm_report_' + new Date().toISOString().split('T')[0] + '.csv');
-    showToast('Full report exported to CSV.', 'success');
+    showToast(t('reportsPage.fullReportExported'), 'success');
   }
 
   if (!data) return null;
@@ -106,13 +108,13 @@ export default function Reports() {
   return (
     <>
       <div className="page-header">
-        <div><h1>Full Farm Report</h1><p>Complete overview of all your farm data</p></div>
+        <div><h1>{t('reportsPage.title')}</h1><p>{t('reportsPage.subtitle')}</p></div>
         <div className="d-flex gap-16 flex-wrap no-print">
           <button className="btn btn-secondary" onClick={handleRefresh} disabled={refreshing}>
-            {refreshing ? <><i className="fas fa-spinner fa-spin"></i> Loading...</> : <><i className="fas fa-rotate"></i> Refresh</>}
+            {refreshing ? <><i className="fas fa-spinner fa-spin"></i> {t('common.loading')}</> : <><i className="fas fa-rotate"></i> {t('common.refresh')}</>}
           </button>
-          <button className="btn btn-secondary" onClick={() => window.print()}><i className="fas fa-print"></i> Print</button>
-          <button className="btn btn-primary" onClick={exportFullReportCSV}><i className="fas fa-file-export"></i> Export CSV</button>
+          <button className="btn btn-secondary" onClick={() => window.print()}><i className="fas fa-print"></i> {t('reportsPage.print')}</button>
+          <button className="btn btn-primary" onClick={exportFullReportCSV}><i className="fas fa-file-export"></i> {t('reports.exportCsv')}</button>
         </div>
       </div>
 
@@ -120,19 +122,19 @@ export default function Reports() {
         <div className="card-body">
           <div className="filter-bar" style={{ marginBottom: 0 }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label style={{ marginBottom: 4 }}>From Date</label>
+              <label style={{ marginBottom: 4 }}>{t('reportsPage.fromDate')}</label>
               <input type="date" className="form-control" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label style={{ marginBottom: 4 }}>To Date</label>
+              <label style={{ marginBottom: 4 }}>{t('reportsPage.toDate')}</label>
               <input type="date" className="form-control" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
             </div>
             <div className="form-group" style={{ marginBottom: 0, minWidth: 160 }}>
-              <label style={{ marginBottom: 4 }}>Animal Tag</label>
-              <input type="text" className="form-control" placeholder="Filter by tag ID" value={animalTag} onChange={(e) => setAnimalTag(e.target.value)} />
+              <label style={{ marginBottom: 4 }}>{t('reportsPage.animalTag')}</label>
+              <input type="text" className="form-control" placeholder={t('reportsPage.animalTagPlaceholder')} value={animalTag} onChange={(e) => setAnimalTag(e.target.value)} />
             </div>
-            <button className="btn btn-primary" style={{ alignSelf: 'flex-end', marginTop: 'auto' }} onClick={() => showToast('Filters applied.', 'info')}>
-              <i className="fas fa-filter"></i> Apply Filter
+            <button className="btn btn-primary" style={{ alignSelf: 'flex-end', marginTop: 'auto' }} onClick={() => showToast(t('reportsPage.filtersApplied'), 'info')}>
+              <i className="fas fa-filter"></i> {t('reportsPage.applyFilter')}
             </button>
           </div>
         </div>
@@ -140,48 +142,48 @@ export default function Reports() {
 
       <div id="reportOutput">
         <div className="mb-24" style={{ borderBottom: '2px solid var(--primary)', paddingBottom: 16 }}>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: 'var(--primary-dark)', marginBottom: 4 }}>LivestockPro Farm Report</h2>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: 'var(--primary-dark)', marginBottom: 4 }}>{t('auth.brandName')} {t('reportsPage.title')}</h2>
           <p className="text-muted" style={{ fontSize: 13 }}>
-            Generated on {timestamp}
-            {(dateFrom || dateTo || animalTag) && <> &middot; Filtered: {dateFrom && `From ${dateFrom} `}{dateTo && `To ${dateTo} `}{animalTag && `Tag: ${animalTag}`}</>}
+            {t('reportsPage.generatedOn', { time: timestamp })}
+            {(dateFrom || dateTo || animalTag) && <> &middot; {t('reportsPage.filteredLabel')}{dateFrom && t('reportsPage.filteredFrom', { date: dateFrom })}{dateTo && t('reportsPage.filteredTo', { date: dateTo })}{animalTag && t('reportsPage.filteredTag', { tag: animalTag })}</>}
           </p>
         </div>
 
         <div className="finance-summary mb-24">
-          <div className="finance-card"><h4>Total Animals</h4><div className="amount" style={{ color: 'var(--text)' }}>{totalAnimals}</div></div>
-          <div className="finance-card"><h4>Healthy</h4><div className="amount income">{healthyCount}</div></div>
-          <div className="finance-card"><h4>Under Treatment</h4><div className="amount expense">{treatmentCount}</div></div>
-          <div className="finance-card"><h4>Critical</h4><div className="amount loss">{criticalCount}</div></div>
-          <div className="finance-card"><h4>Pregnant</h4><div className="amount" style={{ color: 'var(--purple)' }}>{pregnantCount}</div></div>
-          <div className="finance-card"><h4>Total Income</h4><div className="amount income">${totalIncome.toLocaleString()}</div></div>
-          <div className="finance-card"><h4>Total Expenses</h4><div className="amount expense">${totalExpense.toLocaleString()}</div></div>
-          <div className="finance-card"><h4>Net Profit</h4><div className={`amount ${netProfit >= 0 ? 'profit' : 'loss'}`}>${netProfit.toLocaleString()}</div></div>
+          <div className="finance-card"><h4>{t('reportsPage.totalAnimals')}</h4><div className="amount" style={{ color: 'var(--text)' }}>{totalAnimals}</div></div>
+          <div className="finance-card"><h4>{t('reports.healthy')}</h4><div className="amount income">{healthyCount}</div></div>
+          <div className="finance-card"><h4>{t('reports.underTreatment')}</h4><div className="amount expense">{treatmentCount}</div></div>
+          <div className="finance-card"><h4>{t('reports.criticalStatus')}</h4><div className="amount loss">{criticalCount}</div></div>
+          <div className="finance-card"><h4>{t('dashboardPage.pregnant')}</h4><div className="amount" style={{ color: 'var(--purple)' }}>{pregnantCount}</div></div>
+          <div className="finance-card"><h4>{t('reportsPage.totalIncome')}</h4><div className="amount income">${totalIncome.toLocaleString()}</div></div>
+          <div className="finance-card"><h4>{t('reportsPage.totalExpenses')}</h4><div className="amount expense">${totalExpense.toLocaleString()}</div></div>
+          <div className="finance-card"><h4>{t('reportsPage.netProfit')}</h4><div className={`amount ${netProfit >= 0 ? 'profit' : 'loss'}`}>${netProfit.toLocaleString()}</div></div>
         </div>
 
         <div className="finance-summary mb-24">
-          <div className="finance-card"><h4>Milk Produced</h4><div className="amount income">{milkTotal.toFixed(1)} L</div></div>
-          <div className="finance-card"><h4>Eggs Collected</h4><div className="amount" style={{ color: 'var(--orange)' }}>{eggsTotal} units</div></div>
-          <div className="finance-card"><h4>Meat Produced</h4><div className="amount" style={{ color: 'var(--primary)' }}>{meatTotal.toFixed(1)} kg</div></div>
+          <div className="finance-card"><h4>{t('reportsPage.milkProduced')}</h4><div className="amount income">{milkTotal.toFixed(1)} L</div></div>
+          <div className="finance-card"><h4>{t('reportsPage.eggsCollected')}</h4><div className="amount" style={{ color: 'var(--orange)' }}>{eggsTotal} units</div></div>
+          <div className="finance-card"><h4>{t('reportsPage.meatProduced')}</h4><div className="amount" style={{ color: 'var(--primary)' }}>{meatTotal.toFixed(1)} kg</div></div>
         </div>
 
-        <ReportSection title="Animals" icon="fa-cow" count={filteredAnimals.length}
-          headers={['Tag ID', 'Name', 'Species', 'Breed', 'Sex', 'Date of Birth', 'Location', 'Health Status']}
+        <ReportSection title={t('tables.animals.label')} icon="fa-cow" count={filteredAnimals.length}
+          headers={[t('tables.animals.fields.tag_id'), t('tables.animals.fields.name'), t('tables.animals.fields.species'), t('tables.animals.fields.breed'), t('tables.animals.fields.sex'), t('tables.animals.fields.date_of_birth'), t('tables.animals.fields.location'), t('tables.animals.fields.health_status')]}
           rows={filteredAnimals.map((a) => [a.tag_id, a.name || '—', a.species, a.breed || '—', a.sex || '—', fmtDate(a.date_of_birth), a.location || '—', a.health_status])} />
 
-        <ReportSection title="Health Records" icon="fa-stethoscope" count={filteredHealth.length}
-          headers={['Tag ID', 'Disease', 'Treatment', 'Medicine', 'Vet', 'Check Date', 'Next Check', 'Status']}
+        <ReportSection title={t('healthPage.title')} icon="fa-stethoscope" count={filteredHealth.length}
+          headers={[t('tables.animals.fields.tag_id'), t('tables.health_records.fields.disease'), t('tables.health_records.fields.treatment'), t('tables.health_records.fields.medicine'), t('tables.health_records.fields.vet_name'), t('tables.health_records.fields.check_date'), t('tables.health_records.fields.next_check_date'), t('tables.health_records.fields.status')]}
           rows={filteredHealth.map((h) => [h.tag_id || '—', h.disease || '—', h.treatment || '—', h.medicine || '—', h.vet_name || '—', fmtDate(h.check_date), fmtDate(h.next_check_date), h.status || '—'])} />
 
-        <ReportSection title="Breeding Records" icon="fa-venus-mars" count={filteredBreeding.length}
-          headers={['Tag ID', 'Breeding Date', 'Pregnancy Status', 'Expected Birth', 'Birth Date', 'Newborns', 'Details']}
+        <ReportSection title={t('tables.breeding_records.singular')} icon="fa-venus-mars" count={filteredBreeding.length}
+          headers={[t('tables.animals.fields.tag_id'), t('tables.breeding_records.fields.breeding_date'), t('tables.breeding_records.fields.pregnancy_status'), t('tables.breeding_records.fields.expected_birth_date'), t('tables.breeding_records.fields.birth_date'), t('tables.breeding_records.fields.newborn_count'), t('tables.breeding_records.fields.newborn_details')]}
           rows={filteredBreeding.map((b) => [b.tag_id || '—', fmtDate(b.breeding_date), b.pregnancy_status || '—', fmtDate(b.expected_birth_date), fmtDate(b.birth_date), b.newborn_count || '—', (b.newborn_details || '—').substring(0, 50)])} />
 
-        <ReportSection title="Production Records" icon="fa-gauge" count={filteredProduction.length}
-          headers={['Type', 'Tag ID', 'Quantity', 'Unit', 'Date', 'Notes']}
+        <ReportSection title={t('tables.production_records.singular')} icon="fa-gauge" count={filteredProduction.length}
+          headers={[t('tables.production_records.fields.production_type'), t('tables.animals.fields.tag_id'), t('tables.production_records.fields.quantity'), t('tables.production_records.fields.unit'), t('tables.production_records.fields.production_date'), t('tables.production_records.fields.notes')]}
           rows={filteredProduction.map((p) => [p.production_type || '—', p.tag_id || '—', p.quantity || 0, p.unit || '—', fmtDate(p.production_date), (p.notes || '—').substring(0, 50)])} />
 
-        <ReportSection title="Finance Records" icon="fa-coins" count={filteredFinance.length}
-          headers={['Type', 'Category', 'Amount', 'Date', 'Description']}
+        <ReportSection title={t('tables.finance_records.singular')} icon="fa-coins" count={filteredFinance.length}
+          headers={[t('tables.finance_records.fields.type'), t('tables.finance_records.fields.category'), t('tables.finance_records.fields.amount'), t('tables.finance_records.fields.date'), t('tables.finance_records.fields.description')]}
           rows={filteredFinance.map((r) => [r.type || '—', r.category || '—', '$' + (r.amount || 0).toLocaleString(), fmtDate(r.date), (r.description || '—').substring(0, 50)])} />
       </div>
     </>
@@ -189,18 +191,19 @@ export default function Reports() {
 }
 
 function ReportSection({ title, icon, count, headers, rows }) {
+  const { t } = useTranslation();
   return (
     <div className="card mb-24">
       <div className="card-header">
         <h3><i className={`fas ${icon}`} style={{ marginRight: 8, color: 'var(--primary)' }}></i>{title}</h3>
-        <span className="badge badge-green">{count} records</span>
+        <span className="badge badge-green">{t('reportsPage.recordsCount', { count })}</span>
       </div>
       <div className="card-body" style={{ padding: 0 }}>
         {count === 0 ? (
           <div className="empty-state" style={{ padding: '30px 20px' }}>
             <i className="fas fa-inbox"></i>
-            <h3>No {title.toLowerCase()} found</h3>
-            <p>No records match your current filters.</p>
+            <h3>{t('reportsPage.noRecordsFound', { section: title.toLowerCase() })}</h3>
+            <p>{t('reportsPage.noRecordsMatchFilters')}</p>
           </div>
         ) : (
           <div className="table-wrapper">

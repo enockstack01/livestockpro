@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SignIn, SignUp, useAuth } from '@clerk/clerk-react';
+import { useTranslation } from 'react-i18next';
 
 const hideFooterAction = { elements: { footerAction: { display: 'none' } } };
 
 export default function Login() {
+  const { t } = useTranslation();
   const { isLoaded, isSignedIn } = useAuth();
   const [showSignUp, setShowSignUp] = useState(false);
   const navigate = useNavigate();
@@ -17,14 +19,14 @@ export default function Login() {
     <div className="auth-page">
       <div className="auth-brand">
         <div className="auth-brand-icon"><i className="fas fa-cow"></i></div>
-        <h1>LivestockPro</h1>
-        <p>Streamline your farm operations. Track animals, health, breeding, feeding, production, and finances — all in one place.</p>
+        <h1>{t('auth.brandName')}</h1>
+        <p>{t('login.tagline')}</p>
       </div>
 
       <div className="auth-form-section">
         <div className="auth-form-wrapper">
-          <h2>Welcome</h2>
-          <p className="subtitle">Sign in to your farm management dashboard</p>
+          <h2>{t('login.welcomeTitle')}</h2>
+          <p className="subtitle">{t('login.welcomeSubtitle')}</p>
 
           {!isLoaded ? null : (
             <>
@@ -35,9 +37,9 @@ export default function Login() {
                 <SignUp routing="virtual" appearance={hideFooterAction} />
               </div>
               <p className="subtitle" style={{ marginTop: 16, textAlign: 'center' }}>
-                {showSignUp ? 'Already have an account? ' : "Don't have an account? "}
+                {showSignUp ? t('auth.alreadyHaveAccount') : t('auth.dontHaveAccount')}
                 <a href="#" onClick={(e) => { e.preventDefault(); setShowSignUp((v) => !v); }}>
-                  {showSignUp ? 'Sign in' : 'Sign up'}
+                  {showSignUp ? t('auth.signIn') : t('auth.signUp')}
                 </a>
               </p>
             </>

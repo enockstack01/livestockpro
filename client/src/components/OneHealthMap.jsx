@@ -5,6 +5,7 @@ import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import 'leaflet.heat';
+import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 
@@ -13,7 +14,7 @@ import { useToast } from '../lib/toast.jsx';
    at once — shape for category, color for the chosen attribute — is more
    informative than tying them together. */
 const TYPE_ICON = { watchlist: 'fa-skull-crossbones', mortality_cluster: 'fa-cross', critical_cluster: 'fa-heart-crack', outbreak_cluster: 'fa-diagram-project' };
-const TYPE_LABEL = { watchlist: 'Watchlist disease', mortality_cluster: 'Mortality cluster', critical_cluster: 'Critical health cluster', outbreak_cluster: 'Outbreak cluster' };
+const TYPE_LABEL_KEY = { watchlist: 'oneHealth.watchlistDisease', mortality_cluster: 'oneHealth.mortalityCluster', critical_cluster: 'oneHealth.criticalCluster', outbreak_cluster: 'oneHealth.outbreakCluster' };
 /* When a point carries more than one alert type, this priority decides which
    icon wins — most acute signal first. */
 const TYPE_PRIORITY = ['mortality_cluster', 'watchlist', 'critical_cluster', 'outbreak_cluster'];
@@ -23,12 +24,14 @@ const CONFIDENCE_COLOR = { confirmed: '#D32F2F', suspected: '#F9A825', reported:
 const TYPE_COLOR = { watchlist: '#7B1FA2', mortality_cluster: '#212121', critical_cluster: '#D32F2F', outbreak_cluster: '#F9A825' };
 const ZOONOTIC_COLOR = { yes: '#C2185B', no: '#1976D2' };
 
-const COLOR_MODES = {
-  severity: { label: 'Severity', heatColor: SEVERITY_COLOR.critical, legend: [['Critical', SEVERITY_COLOR.critical], ['High', SEVERITY_COLOR.high], ['Medium', SEVERITY_COLOR.medium], ['Low', SEVERITY_COLOR.low]], colorOf: (p) => SEVERITY_COLOR[p.severity] || '#90A4AE', weightOf: (p) => ({ critical: 1, high: 0.75, medium: 0.5, low: 0.25 }[p.severity] || 0.25) },
-  type: { label: 'Detection Method', heatColor: TYPE_COLOR.critical_cluster, legend: Object.entries(TYPE_COLOR).map(([k, c]) => [TYPE_LABEL[k], c]), colorOf: (p) => TYPE_COLOR[primaryType(p)] || '#546E7A', weightOf: () => 0.6 },
-  zoonotic: { label: 'Zoonotic Risk', heatColor: ZOONOTIC_COLOR.yes, legend: [['Zoonotic', ZOONOTIC_COLOR.yes], ['Not zoonotic', ZOONOTIC_COLOR.no]], colorOf: (p) => (p.zoonotic ? ZOONOTIC_COLOR.yes : ZOONOTIC_COLOR.no), weightOf: (p) => (p.zoonotic ? 1 : 0.35) },
-  confidence: { label: 'Confidence', heatColor: CONFIDENCE_COLOR.confirmed, legend: [['Confirmed', CONFIDENCE_COLOR.confirmed], ['Suspected', CONFIDENCE_COLOR.suspected], ['Reported', CONFIDENCE_COLOR.reported]], colorOf: (p) => CONFIDENCE_COLOR[p.confidence] || '#90A4AE', weightOf: (p) => ({ confirmed: 1, suspected: 0.6, reported: 0.3 }[p.confidence] || 0.3) }
-};
+function buildColorModes(t) {
+  return {
+    severity: { label: t('oneHealthMap.severityLabel'), heatColor: SEVERITY_COLOR.critical, legend: [[t('enums.animalHealthStatus.Critical'), SEVERITY_COLOR.critical], [t('enums.taskPriority.High'), SEVERITY_COLOR.high], [t('enums.taskPriority.Medium'), SEVERITY_COLOR.medium], [t('enums.taskPriority.Low'), SEVERITY_COLOR.low]], colorOf: (p) => SEVERITY_COLOR[p.severity] || '#90A4AE', weightOf: (p) => ({ critical: 1, high: 0.75, medium: 0.5, low: 0.25 }[p.severity] || 0.25) },
+    type: { label: t('oneHealthMap.detectionMethod'), heatColor: TYPE_COLOR.critical_cluster, legend: Object.entries(TYPE_COLOR).map(([k, c]) => [t(TYPE_LABEL_KEY[k]), c]), colorOf: (p) => TYPE_COLOR[primaryType(p)] || '#546E7A', weightOf: () => 0.6 },
+    zoonotic: { label: t('oneHealthMap.zoonoticRisk'), heatColor: ZOONOTIC_COLOR.yes, legend: [[t('oneHealth.zoonoticBadge'), ZOONOTIC_COLOR.yes], [t('oneHealthMap.notZoonotic'), ZOONOTIC_COLOR.no]], colorOf: (p) => (p.zoonotic ? ZOONOTIC_COLOR.yes : ZOONOTIC_COLOR.no), weightOf: (p) => (p.zoonotic ? 1 : 0.35) },
+    confidence: { label: t('oneHealthMap.confidence'), heatColor: CONFIDENCE_COLOR.confirmed, legend: [[t('oneHealth.confirmed'), CONFIDENCE_COLOR.confirmed], [t('oneHealth.suspected'), CONFIDENCE_COLOR.suspected], [t('oneHealth.reported'), CONFIDENCE_COLOR.reported]], colorOf: (p) => CONFIDENCE_COLOR[p.confidence] || '#90A4AE', weightOf: (p) => ({ confirmed: 1, suspected: 0.6, reported: 0.3 }[p.confidence] || 0.3) }
+  };
+}
 
 function primaryType(p) {
   return TYPE_PRIORITY.find((t) => p.types.includes(t)) || p.types[0];
@@ -60,11 +63,11 @@ function markerIcon(color, type) {
   });
 }
 
-function popupHtml(p) {
+function popupHtml(p, t) {
   const rows = p.alerts.map((a) => `
     <div class="spatial-popup-row" style="margin-bottom:4px;">
       <span class="badge" style="background:${SEVERITY_COLOR[a.severity]}22;color:${SEVERITY_COLOR[a.severity]};">${esc(a.severity)}</span>
-      ${a.zoonotic ? '<span class="badge badge-purple" style="margin-left:4px;">Zoonotic</span>' : ''}
+      ${a.zoonotic ? `<span class="badge badge-purple" style="margin-left:4px;">${esc(t('oneHealth.zoonoticBadge'))}</span>` : ''}
       <div style="margin-top:2px;">${esc(a.title)}</div>
     </div>`).join('');
   return `
@@ -72,12 +75,13 @@ function popupHtml(p) {
       <div class="spatial-popup-type" style="color:${TYPE_COLOR[primaryType(p)]}"><i class="fas ${TYPE_ICON[primaryType(p)]}"></i> ${esc(p.district)}</div>
       <div class="spatial-popup-farm" style="margin-bottom:6px;"><i class="fas fa-user"></i> ${esc(p.farmName)}</div>
       ${rows}
-      <div class="spatial-popup-row" style="margin-top:6px;"><strong>Date:</strong> ${p.date ? esc(new Date(p.date).toLocaleDateString()) : '—'}</div>
+      <div class="spatial-popup-row" style="margin-top:6px;"><strong>${esc(t('tables.finance_records.fields.date'))}:</strong> ${p.date ? esc(new Date(p.date).toLocaleDateString()) : '—'}</div>
     </div>
   `;
 }
 
 export default function OneHealthMap() {
+  const { t } = useTranslation();
   const api = useApi();
   const showToast = useToast();
 
@@ -97,7 +101,7 @@ export default function OneHealthMap() {
   useEffect(() => {
     (async () => {
       const { data, error } = await api.adminOneHealthMap();
-      if (error) { showToast('Failed to load One Health map data: ' + error.message, 'error'); setPoints([]); return; }
+      if (error) { showToast(t('oneHealthMap.failedLoadData', { message: error.message }), 'error'); setPoints([]); return; }
       setPoints(data || []);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,6 +111,7 @@ export default function OneHealthMap() {
     (!severityFilter || p.severity === severityFilter) && (!zoonoticOnly || p.zoonotic)
   ), [points, severityFilter, zoonoticOnly]);
 
+  const COLOR_MODES = useMemo(() => buildColorModes(t), [t]);
   const mode = COLOR_MODES[colorBy];
 
   /* Map + basemaps: initialize once. */
@@ -158,7 +163,7 @@ export default function OneHealthMap() {
         if (showBoundaries.districts) districts.addTo(map);
         if (showBoundaries.country) country.addTo(map);
       } catch (err) {
-        showToast('Failed to load administrative boundaries.', 'warning');
+        showToast(t('oneHealthMap.failedLoadBoundaries'), 'warning');
       }
     })();
 
@@ -212,7 +217,7 @@ export default function OneHealthMap() {
     withCoords.forEach((p) => {
       const color = mode.colorOf(p);
       const marker = L.marker([p.lat, p.lng], { icon: markerIcon(color, primaryType(p)), riskColor: color, riskWeight: mode.weightOf(p) });
-      marker.bindPopup(popupHtml(p));
+      marker.bindPopup(popupHtml(p, t));
       group.addLayer(marker);
     });
 
@@ -253,13 +258,13 @@ export default function OneHealthMap() {
   return (
     <div className="spatial-layout">
       <div className="card spatial-legend-card">
-        <div className="card-header"><h3><i className="fas fa-layer-group" style={{ color: 'var(--primary)', marginRight: 6 }}></i> Risk Map Layers</h3></div>
+        <div className="card-header"><h3><i className="fas fa-layer-group" style={{ color: 'var(--primary)', marginRight: 6 }}></i> {t('oneHealthMap.riskMapLayers')}</h3></div>
         <div className="card-body">
           <p className="text-muted" style={{ fontSize: 12, marginBottom: 12 }}>
-            {points === null ? 'Loading…' : `Showing ${shown} of ${total} georeferenced signals.`} Marker shape always shows detection method; color shows whichever factor you pick below.
+            {t('oneHealthMap.caption', { status: points === null ? t('spatialMap.loadingEllipsis') : t('oneHealthMap.showingOfTotal', { shown, total }) })}
           </p>
 
-          <div className="spatial-legend-section-title">Color by</div>
+          <div className="spatial-legend-section-title">{t('oneHealthMap.colorBy')}</div>
           <select className="form-control" style={{ marginBottom: 14 }} value={colorBy} onChange={(e) => setColorBy(e.target.value)}>
             {Object.entries(COLOR_MODES).map(([key, m]) => <option key={key} value={key}>{m.label}</option>)}
           </select>
@@ -272,51 +277,51 @@ export default function OneHealthMap() {
             </div>
           ))}
 
-          <div className="spatial-legend-section-title" style={{ marginTop: 16 }}>View mode</div>
-          <div className="spatial-mode-toggle" role="group" aria-label="View mode" style={{ width: '100%' }}>
+          <div className="spatial-legend-section-title" style={{ marginTop: 16 }}>{t('oneHealthMap.viewMode')}</div>
+          <div className="spatial-mode-toggle" role="group" aria-label={t('oneHealthMap.viewMode')} style={{ width: '100%' }}>
             <button type="button" className={`spatial-mode-btn${viewMode === 'markers' ? ' active' : ''}`} style={{ flex: 1 }} onClick={() => setViewMode('markers')}>
-              <i className="fas fa-location-dot"></i> Markers
+              <i className="fas fa-location-dot"></i> {t('oneHealthMap.markers')}
             </button>
             <button type="button" className={`spatial-mode-btn${viewMode === 'density' ? ' active' : ''}`} style={{ flex: 1 }} onClick={() => setViewMode('density')}>
-              <i className="fas fa-fire"></i> Density
+              <i className="fas fa-fire"></i> {t('oneHealthMap.density')}
             </button>
           </div>
           {viewMode === 'density' && (
             <p className="text-muted" style={{ fontSize: 11.5, marginTop: 8 }}>
-              Density is weighted by the selected factor — e.g. Critical points contribute more heat than Low ones — so hot spots reflect concentrated risk, not just record count.
+              {t('oneHealthMap.densityCaption')}
             </p>
           )}
 
-          <div className="spatial-legend-section-title" style={{ marginTop: 16 }}>Filters</div>
+          <div className="spatial-legend-section-title" style={{ marginTop: 16 }}>{t('oneHealthMap.filters')}</div>
           <select className="form-control" style={{ marginBottom: 8 }} value={severityFilter} onChange={(e) => setSeverityFilter(e.target.value)}>
-            <option value="">All Severities</option>
-            <option value="critical">Critical</option>
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
+            <option value="">{t('oneHealthMap.allSeverities')}</option>
+            <option value="critical">{t('enums.animalHealthStatus.Critical')}</option>
+            <option value="high">{t('enums.taskPriority.High')}</option>
+            <option value="medium">{t('enums.taskPriority.Medium')}</option>
+            <option value="low">{t('enums.taskPriority.Low')}</option>
           </select>
           <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, cursor: 'pointer' }}>
             <input type="checkbox" checked={zoonoticOnly} onChange={(e) => setZoonoticOnly(e.target.checked)} />
-            Zoonotic only
+            {t('oneHealth.zoonoticOnly')}
           </label>
 
-          <div className="spatial-legend-section-title" style={{ marginTop: 16 }}>Administrative boundaries</div>
+          <div className="spatial-legend-section-title" style={{ marginTop: 16 }}>{t('spatialMap.adminBoundaries')}</div>
           <label className="spatial-legend-row">
             <input type="checkbox" checked={showBoundaries.country} onChange={() => setShowBoundaries((s) => ({ ...s, country: !s.country }))} />
             <span className="spatial-legend-swatch" style={{ background: '#1B5E20' }}><i className="fas fa-flag"></i></span>
-            <span className="spatial-legend-label">Country border</span>
+            <span className="spatial-legend-label">{t('spatialMap.countryBorder')}</span>
           </label>
           <label className="spatial-legend-row">
             <input type="checkbox" checked={showBoundaries.districts} onChange={() => setShowBoundaries((s) => ({ ...s, districts: !s.districts }))} />
             <span className="spatial-legend-swatch" style={{ background: '#546E7A' }}><i className="fas fa-draw-polygon"></i></span>
-            <span className="spatial-legend-label">District borders</span>
+            <span className="spatial-legend-label">{t('spatialMap.districtBorders')}</span>
           </label>
         </div>
       </div>
 
       <div className="card spatial-map-card" style={{ position: 'relative' }}>
-        {points === null && <div className="spatial-loading-overlay"><i className="fas fa-spinner fa-spin"></i> Loading spatial data...</div>}
-        {points !== null && total === 0 && <div className="spatial-loading-overlay"><i className="fas fa-shield-heart"></i>&nbsp;No georeferenced risk signals yet</div>}
+        {points === null && <div className="spatial-loading-overlay"><i className="fas fa-spinner fa-spin"></i> {t('oneHealthMap.loadingSpatial')}</div>}
+        {points !== null && total === 0 && <div className="spatial-loading-overlay"><i className="fas fa-shield-heart"></i>&nbsp;{t('oneHealthMap.noSignalsYet')}</div>}
         <div ref={containerRef} className="spatial-map-container"></div>
       </div>
     </div>

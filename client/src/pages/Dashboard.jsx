@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { StatusBadge, PriorityBadge, fmtDate } from '../lib/badges.jsx';
@@ -8,6 +9,7 @@ import Modal from '../components/Modal.jsx';
 import { isOverdueTask } from '../../../shared/businessRules';
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const api = useApi();
   const showToast = useToast();
 
@@ -40,7 +42,7 @@ export default function Dashboard() {
 
   async function saveQuickTask() {
     const title = taskForm.title.trim();
-    if (!title) { showToast('Task title is required.', 'error'); return; }
+    if (!title) { showToast(t('tasksPage.taskTitleRequired'), 'error'); return; }
     const result = await api.insert('tasks', [{
       title,
       description: taskForm.description.trim(),
@@ -48,8 +50,8 @@ export default function Dashboard() {
       priority: taskForm.priority,
       status: 'Pending'
     }]);
-    if (result.error) { showToast('Failed to add task: ' + result.error.message, 'error'); return; }
-    showToast('Task added!', 'success');
+    if (result.error) { showToast(t('records.saveFailed', { message: result.error.message }), 'error'); return; }
+    showToast(t('records.added', { item: t('tables.tasks.singular') }), 'success');
     setTaskModalOpen(false);
     const taskResult = await api.list('tasks', { order: 'due_date.asc' });
     setData((d) => ({ ...d, tasks: taskResult.data || [] }));
@@ -57,14 +59,14 @@ export default function Dashboard() {
 
   if (loading) return null;
 
-  const a = data.animals, h = data.health, t = data.tasks, b = data.breeding, f = data.finance;
+  const a = data.animals, h = data.health, tasksArr = data.tasks, b = data.breeding, f = data.finance;
   const healthyCount = a.filter((x) => x.health_status === 'Healthy').length;
   const treatmentCount = a.filter((x) => x.health_status === 'Under Treatment').length;
   const criticalCount = a.filter((x) => x.health_status === 'Critical').length;
   const pregnantCount = b.filter((x) => x.pregnancy_status === 'Pregnant').length;
   const newbornCount = b.filter((x) => x.birth_date).reduce((s, x) => s + (x.newborn_count || 0), 0);
-  const pendingTasks = t.filter((x) => x.status === 'Pending').length;
-  const overdueTasks = t.filter(isOverdueTask).length;
+  const pendingTasks = tasksArr.filter((x) => x.status === 'Pending').length;
+  const overdueTasks = tasksArr.filter(isOverdueTask).length;
 
   const now = new Date();
   const monthFinance = f.filter((x) => { const d = new Date(x.date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); });
@@ -73,27 +75,27 @@ export default function Dashboard() {
   const profitLoss = monthIncome - monthExpense;
 
   const summaryItems = [
-    { icon: 'fa-cow', color: 'green', label: 'Total Animals', value: a.length, link: '/animals' },
-    { icon: 'fa-heart-pulse', color: 'green', label: 'Healthy', value: healthyCount, link: '/animals' },
-    { icon: 'fa-stethoscope', color: 'orange', label: 'Under Treatment', value: treatmentCount, link: '/health' },
-    { icon: 'fa-triangle-exclamation', color: 'red', label: 'Critical Cases', value: criticalCount, link: '/health' },
-    { icon: 'fa-paw', color: 'purple', label: 'Pregnant', value: pregnantCount, link: '/breeding' },
-    { icon: 'fa-egg', color: 'blue', label: 'Newborns', value: newbornCount, link: '/breeding' },
-    { icon: 'fa-list-check', color: overdueTasks > 0 ? 'red' : 'orange', label: 'Pending Tasks', value: pendingTasks, link: '/tasks' },
-    { icon: 'fa-arrow-trend-up', color: 'green', label: 'Monthly Income', value: '$' + monthIncome.toLocaleString(), link: '/finance' },
-    { icon: 'fa-arrow-trend-down', color: 'red', label: 'Monthly Expenses', value: '$' + monthExpense.toLocaleString(), link: '/finance' },
-    { icon: 'fa-chart-line', color: profitLoss >= 0 ? 'blue' : 'red', label: 'Profit/Loss', value: '$' + profitLoss.toLocaleString(), link: '/finance' }
+    { icon: 'fa-cow', color: 'green', label: t('dashboardPage.totalAnimals'), value: a.length, link: '/animals' },
+    { icon: 'fa-heart-pulse', color: 'green', label: t('dashboardPage.healthy'), value: healthyCount, link: '/animals' },
+    { icon: 'fa-stethoscope', color: 'orange', label: t('dashboardPage.underTreatment'), value: treatmentCount, link: '/health' },
+    { icon: 'fa-triangle-exclamation', color: 'red', label: t('dashboardPage.criticalCases'), value: criticalCount, link: '/health' },
+    { icon: 'fa-paw', color: 'purple', label: t('dashboardPage.pregnant'), value: pregnantCount, link: '/breeding' },
+    { icon: 'fa-egg', color: 'blue', label: t('dashboardPage.newborns'), value: newbornCount, link: '/breeding' },
+    { icon: 'fa-list-check', color: overdueTasks > 0 ? 'red' : 'orange', label: t('dashboardPage.pendingTasks'), value: pendingTasks, link: '/tasks' },
+    { icon: 'fa-arrow-trend-up', color: 'green', label: t('dashboardPage.monthlyIncome'), value: '$' + monthIncome.toLocaleString(), link: '/finance' },
+    { icon: 'fa-arrow-trend-down', color: 'red', label: t('dashboardPage.monthlyExpenses'), value: '$' + monthExpense.toLocaleString(), link: '/finance' },
+    { icon: 'fa-chart-line', color: profitLoss >= 0 ? 'blue' : 'red', label: t('dashboardPage.profitLoss'), value: '$' + profitLoss.toLocaleString(), link: '/finance' }
   ];
 
   const recentAnimals = a.slice().sort((x, y) => new Date(y.created_at) - new Date(x.created_at)).slice(0, 5);
-  const pendingTasksList = t.filter((x) => x.status !== 'Completed').slice(0, 5);
+  const pendingTasksList = tasksArr.filter((x) => x.status !== 'Completed').slice(0, 5);
   const alerts = h.filter((x) => x.status === 'Under Treatment' || x.status === 'Critical')
     .sort((x, y) => new Date(y.check_date) - new Date(x.check_date)).slice(0, 5);
 
   return (
     <>
       <div className="page-header">
-        <div><h1>Dashboard</h1><p>Overview of your farm operations</p></div>
+        <div><h1>{t('dashboardPage.title')}</h1><p>{t('dashboardPage.subtitle')}</p></div>
       </div>
 
       <div className="summary-grid">
@@ -107,32 +109,32 @@ export default function Dashboard() {
 
       <div className="charts-grid">
         <div className="card">
-          <div className="card-header"><h3>Animal Health Status</h3></div>
+          <div className="card-header"><h3>{t('dashboardPage.chartAnimalHealth')}</h3></div>
           <div className="card-body"><HealthChart healthy={healthyCount} treatment={treatmentCount} critical={criticalCount} /></div>
         </div>
         <div className="card">
-          <div className="card-header"><h3>Income vs Expenses (6 Months)</h3></div>
+          <div className="card-header"><h3>{t('dashboardPage.chartIncomeExpenses')}</h3></div>
           <div className="card-body"><FinanceChart finance={f} /></div>
         </div>
         <div className="card">
-          <div className="card-header"><h3>Production Trend</h3></div>
+          <div className="card-header"><h3>{t('dashboardPage.chartProductionTrend')}</h3></div>
           <div className="card-body"><ProductionChart production={data.production} /></div>
         </div>
         <div className="card">
-          <div className="card-header"><h3>Task Status</h3></div>
-          <div className="card-body"><TaskChart tasks={t} /></div>
+          <div className="card-header"><h3>{t('dashboardPage.chartTaskStatus')}</h3></div>
+          <div className="card-body"><TaskChart tasks={tasksArr} /></div>
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
         <div className="card">
-          <div className="card-header"><h3>Recent Animals</h3><Link to="/animals" className="btn btn-sm btn-secondary">View All</Link></div>
+          <div className="card-header"><h3>{t('dashboardPage.recentAnimals')}</h3><Link to="/animals" className="btn btn-sm btn-secondary">{t('common.viewAll')}</Link></div>
           <div className="card-body" style={{ padding: 0 }}>
             {recentAnimals.length === 0 ? (
-              <div className="empty-state"><i className="fas fa-cow"></i><h3>No animals yet</h3><p><Link to="/animals" style={{ color: 'var(--primary)', fontWeight: 600 }}>Add your first animal</Link> to get started.</p></div>
+              <div className="empty-state"><i className="fas fa-cow"></i><h3>{t('dashboardPage.noAnimalsYet')}</h3><p><Link to="/animals" style={{ color: 'var(--primary)', fontWeight: 600 }}>{t('dashboardPage.addFirstAnimal')}</Link></p></div>
             ) : (
               <div className="table-wrapper"><table className="data-table">
-                <thead><tr><th>Tag ID</th><th>Name</th><th>Species</th><th>Breed</th><th>Status</th></tr></thead>
+                <thead><tr><th>{t('tables.animals.fields.tag_id')}</th><th>{t('tables.animals.fields.name')}</th><th>{t('tables.animals.fields.species')}</th><th>{t('tables.animals.fields.breed')}</th><th>{t('tables.animals.fields.health_status')}</th></tr></thead>
                 <tbody>{recentAnimals.map((an) => (
                   <tr key={an.id} style={{ cursor: 'pointer' }} onClick={() => (window.location.href = '/animals')}>
                     <td className="fw-600">{an.tag_id}</td><td>{an.name || '—'}</td><td>{an.species}</td><td>{an.breed || '—'}</td>
@@ -146,18 +148,18 @@ export default function Dashboard() {
 
         <div className="card">
           <div className="card-header">
-            <h3>Upcoming Tasks</h3>
+            <h3>{t('dashboardPage.upcomingTasks')}</h3>
             <div className="d-flex gap-16">
-              <button className="btn btn-sm btn-primary" onClick={() => { setTaskForm({ title: '', description: '', due_date: '', priority: 'Medium' }); setTaskModalOpen(true); }}><i className="fas fa-plus"></i> Add</button>
-              <Link to="/tasks" className="btn btn-sm btn-secondary">View All</Link>
+              <button className="btn btn-sm btn-primary" onClick={() => { setTaskForm({ title: '', description: '', due_date: '', priority: 'Medium' }); setTaskModalOpen(true); }}><i className="fas fa-plus"></i> {t('dashboardPage.add')}</button>
+              <Link to="/tasks" className="btn btn-sm btn-secondary">{t('common.viewAll')}</Link>
             </div>
           </div>
           <div className="card-body" style={{ padding: 0 }}>
             {pendingTasksList.length === 0 ? (
-              <div className="empty-state"><i className="fas fa-clipboard-check"></i><h3>No pending tasks</h3><p>All caught up! <Link to="/tasks" style={{ color: 'var(--primary)', fontWeight: 600 }}>View all tasks</Link></p></div>
+              <div className="empty-state"><i className="fas fa-clipboard-check"></i><h3>{t('dashboardPage.noPendingTasks')}</h3><p>{t('dashboardPage.allCaughtUp')} <Link to="/tasks" style={{ color: 'var(--primary)', fontWeight: 600 }}>{t('layout.viewAllTasks')}</Link></p></div>
             ) : (
               <div className="table-wrapper"><table className="data-table">
-                <thead><tr><th>Task</th><th>Due Date</th><th>Priority</th><th>Status</th></tr></thead>
+                <thead><tr><th>{t('tables.tasks.fields.title')}</th><th>{t('tables.tasks.fields.due_date')}</th><th>{t('tables.tasks.fields.priority')}</th><th>{t('tables.tasks.fields.status')}</th></tr></thead>
                 <tbody>{pendingTasksList.map((tk) => {
                   const isOverdue = isOverdueTask(tk);
                   return (
@@ -176,13 +178,13 @@ export default function Dashboard() {
       </div>
 
       <div className="card mt-24">
-        <div className="card-header"><h3><i className="fas fa-triangle-exclamation text-orange"></i> Recent Health Alerts</h3><Link to="/health" className="btn btn-sm btn-secondary">View All</Link></div>
+        <div className="card-header"><h3><i className="fas fa-triangle-exclamation text-orange"></i> {t('dashboardPage.recentHealthAlerts')}</h3><Link to="/health" className="btn btn-sm btn-secondary">{t('common.viewAll')}</Link></div>
         <div className="card-body" style={{ padding: 0 }}>
           {alerts.length === 0 ? (
-            <div className="empty-state"><i className="fas fa-shield-heart"></i><h3>No health alerts</h3><p>All animals are healthy.</p></div>
+            <div className="empty-state"><i className="fas fa-shield-heart"></i><h3>{t('dashboardPage.noHealthAlerts')}</h3><p>{t('dashboardPage.allAnimalsHealthy')}</p></div>
           ) : (
             <div className="table-wrapper"><table className="data-table">
-              <thead><tr><th>Tag ID</th><th>Disease</th><th>Treatment</th><th>Status</th></tr></thead>
+              <thead><tr><th>{t('tables.animals.fields.tag_id')}</th><th>{t('tables.health_records.fields.disease')}</th><th>{t('tables.health_records.fields.treatment')}</th><th>{t('tables.health_records.fields.status')}</th></tr></thead>
               <tbody>{alerts.map((al) => (
                 <tr key={al.id} style={{ cursor: 'pointer' }} onClick={() => (window.location.href = '/health')}>
                   <td className="fw-600">{al.tag_id || '—'}</td><td>{al.disease || '—'}</td><td>{al.treatment || '—'}</td>
@@ -197,29 +199,29 @@ export default function Dashboard() {
       <Modal
         open={taskModalOpen}
         onClose={() => setTaskModalOpen(false)}
-        title="Quick Add Task"
+        title={t('dashboardPage.quickAddTask')}
         footer={<>
-          <button className="btn btn-secondary" onClick={() => setTaskModalOpen(false)}>Cancel</button>
-          <button className="btn btn-primary" onClick={saveQuickTask}><i className="fas fa-check"></i> Save Task</button>
+          <button className="btn btn-secondary" onClick={() => setTaskModalOpen(false)}>{t('common.cancel')}</button>
+          <button className="btn btn-primary" onClick={saveQuickTask}><i className="fas fa-check"></i> {t('dashboardPage.saveTask')}</button>
         </>}
       >
         <div className="form-group">
-          <label>Task Title *</label>
-          <input type="text" className="form-control" placeholder="e.g. Vaccinate cattle in Pen B" value={taskForm.title} onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })} />
+          <label>{t('tables.tasks.fields.title')} *</label>
+          <input type="text" className="form-control" placeholder={t('dashboardPage.taskTitlePlaceholder')} value={taskForm.title} onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })} />
         </div>
         <div className="form-group">
-          <label>Description</label>
-          <textarea className="form-control" placeholder="Optional details..." value={taskForm.description} onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })} />
+          <label>{t('tables.tasks.fields.description')}</label>
+          <textarea className="form-control" placeholder={t('dashboardPage.taskDescPlaceholder')} value={taskForm.description} onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })} />
         </div>
         <div className="form-row">
           <div className="form-group">
-            <label>Due Date</label>
+            <label>{t('tables.tasks.fields.due_date')}</label>
             <input type="date" className="form-control" value={taskForm.due_date} onChange={(e) => setTaskForm({ ...taskForm, due_date: e.target.value })} />
           </div>
           <div className="form-group">
-            <label>Priority</label>
+            <label>{t('tables.tasks.fields.priority')}</label>
             <select className="form-control" value={taskForm.priority} onChange={(e) => setTaskForm({ ...taskForm, priority: e.target.value })}>
-              <option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option>
+              <option value="Low">{t('enums.taskPriority.Low')}</option><option value="Medium">{t('enums.taskPriority.Medium')}</option><option value="High">{t('enums.taskPriority.High')}</option>
             </select>
           </div>
         </div>
@@ -229,21 +231,24 @@ export default function Dashboard() {
 }
 
 function HealthChart({ healthy, treatment, critical }) {
+  const { t } = useTranslation();
   const total = healthy + treatment + critical;
   const canvasRef = useCanvasChart(() => {
     if (total === 0) return null;
     return {
       type: 'doughnut',
-      data: { labels: ['Healthy', 'Under Treatment', 'Critical'], datasets: [{ data: [healthy, treatment, critical], backgroundColor: ['#2E7D32', '#F9A825', '#D32F2F'], borderWidth: 0, spacing: 2 }] },
+      data: { labels: [t('enums.animalHealthStatus.Healthy'), t('enums.animalHealthStatus.Under Treatment'), t('enums.animalHealthStatus.Critical')], datasets: [{ data: [healthy, treatment, critical], backgroundColor: ['#2E7D32', '#F9A825', '#D32F2F'], borderWidth: 0, spacing: 2 }] },
       options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true, pointStyleWidth: 10, font: { size: 12 } } } } }
     };
-  }, [healthy, treatment, critical]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [healthy, treatment, critical, t]);
 
-  if (total === 0) return <div className="empty-state" style={{ padding: '30px 10px' }}><i className="fas fa-chart-pie"></i><h3>No animal data yet</h3><p>Add animals to see health distribution.</p></div>;
+  if (total === 0) return <div className="empty-state" style={{ padding: '30px 10px' }}><i className="fas fa-chart-pie"></i><h3>{t('dashboardPage.chartNoAnimalData')}</h3><p>{t('dashboardPage.chartAddAnimals')}</p></div>;
   return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
 }
 
 function FinanceChart({ finance }) {
+  const { t } = useTranslation();
   const now = new Date();
   const months = [], incomeData = [], expenseData = [];
   for (let i = 5; i >= 0; i--) {
@@ -258,17 +263,18 @@ function FinanceChart({ finance }) {
     if (!hasData) return null;
     return {
       type: 'bar',
-      data: { labels: months, datasets: [{ label: 'Income', data: incomeData, backgroundColor: '#2E7D32', borderRadius: 6 }, { label: 'Expenses', data: expenseData, backgroundColor: '#D32F2F', borderRadius: 6 }] },
+      data: { labels: months, datasets: [{ label: t('enums.financeType.Income'), data: incomeData, backgroundColor: '#2E7D32', borderRadius: 6 }, { label: t('dashboardPage.monthlyExpenses'), data: expenseData, backgroundColor: '#D32F2F', borderRadius: 6 }] },
       options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#F0F0F0' }, ticks: { font: { size: 11 } } }, x: { grid: { display: false }, ticks: { font: { size: 11 } } } }, plugins: { legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true, font: { size: 12 } } } } }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(incomeData), JSON.stringify(expenseData)]);
+  }, [JSON.stringify(incomeData), JSON.stringify(expenseData), t]);
 
-  if (!hasData) return <div className="empty-state" style={{ padding: '30px 10px' }}><i className="fas fa-chart-column"></i><h3>No finance data yet</h3><p>Add income or expense records to see trends.</p></div>;
+  if (!hasData) return <div className="empty-state" style={{ padding: '30px 10px' }}><i className="fas fa-chart-column"></i><h3>{t('dashboardPage.chartNoFinanceData')}</h3><p>{t('dashboardPage.chartAddFinance')}</p></div>;
   return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
 }
 
 function ProductionChart({ production }) {
+  const { t } = useTranslation();
   const now = new Date();
   const months = [], prodData = [];
   for (let i = 5; i >= 0; i--) {
@@ -282,31 +288,33 @@ function ProductionChart({ production }) {
     if (!hasData) return null;
     return {
       type: 'line',
-      data: { labels: months, datasets: [{ label: 'Total Production', data: prodData, borderColor: '#1976D2', backgroundColor: 'rgba(25,118,210,0.1)', fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#1976D2' }] },
+      data: { labels: months, datasets: [{ label: t('dashboardPage.chartProductionTrend'), data: prodData, borderColor: '#1976D2', backgroundColor: 'rgba(25,118,210,0.1)', fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#1976D2' }] },
       options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#F0F0F0' }, ticks: { font: { size: 11 } } }, x: { grid: { display: false }, ticks: { font: { size: 11 } } } }, plugins: { legend: { display: false } } }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(prodData)]);
+  }, [JSON.stringify(prodData), t]);
 
-  if (!hasData) return <div className="empty-state" style={{ padding: '30px 10px' }}><i className="fas fa-chart-line"></i><h3>No production data yet</h3><p>Add milk, egg, or meat records to see trends.</p></div>;
+  if (!hasData) return <div className="empty-state" style={{ padding: '30px 10px' }}><i className="fas fa-chart-line"></i><h3>{t('dashboardPage.chartNoProductionData')}</h3><p>{t('dashboardPage.chartAddProduction')}</p></div>;
   return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
 }
 
 function TaskChart({ tasks }) {
-  const pending = tasks.filter((t) => t.status === 'Pending').length;
-  const inProgress = tasks.filter((t) => t.status === 'In Progress').length;
-  const completed = tasks.filter((t) => t.status === 'Completed').length;
+  const { t } = useTranslation();
+  const pending = tasks.filter((tk) => tk.status === 'Pending').length;
+  const inProgress = tasks.filter((tk) => tk.status === 'In Progress').length;
+  const completed = tasks.filter((tk) => tk.status === 'Completed').length;
   const total = pending + inProgress + completed;
 
   const canvasRef = useCanvasChart(() => {
     if (total === 0) return null;
     return {
       type: 'doughnut',
-      data: { labels: ['Pending', 'In Progress', 'Completed'], datasets: [{ data: [pending, inProgress, completed], backgroundColor: ['#F9A825', '#1976D2', '#2E7D32'], borderWidth: 0, spacing: 2 }] },
+      data: { labels: [t('enums.taskStatus.Pending'), t('enums.taskStatus.In Progress'), t('enums.taskStatus.Completed')], datasets: [{ data: [pending, inProgress, completed], backgroundColor: ['#F9A825', '#1976D2', '#2E7D32'], borderWidth: 0, spacing: 2 }] },
       options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true, pointStyleWidth: 10, font: { size: 12 } } } } }
     };
-  }, [pending, inProgress, completed]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pending, inProgress, completed, t]);
 
-  if (total === 0) return <div className="empty-state" style={{ padding: '30px 10px' }}><i className="fas fa-clipboard-list"></i><h3>No tasks yet</h3><p>Add a task to see status breakdown.</p></div>;
+  if (total === 0) return <div className="empty-state" style={{ padding: '30px 10px' }}><i className="fas fa-clipboard-list"></i><h3>{t('dashboardPage.chartNoTasksYet')}</h3><p>{t('dashboardPage.chartAddTasks')}</p></div>;
   return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
 }

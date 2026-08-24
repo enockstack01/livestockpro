@@ -1,17 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useClerk, useUser } from '@clerk/clerk-react';
+import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
+import { useLanguage } from '../i18n/LanguageProvider.jsx';
 import Modal from '../components/Modal.jsx';
 
 export default function Settings() {
+  const { t } = useTranslation();
   const { user } = useUser();
   const { signOut, openUserProfile } = useClerk();
   const api = useApi();
   const showToast = useToast();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const { language, setLanguage, languages } = useLanguage();
 
   const [profile, setProfile] = useState(null);
   const [farmName, setFarmName] = useState('');
@@ -45,16 +49,16 @@ export default function Settings() {
     e.target.value = '';
     if (!file) return;
     const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    if (!allowed.includes(file.type)) { showToast('Only JPG, PNG, WebP, or GIF images are allowed.', 'error'); return; }
-    if (file.size > 2 * 1024 * 1024) { showToast('Image must be under 2MB.', 'error'); return; }
+    if (!allowed.includes(file.type)) { showToast(t('settings.onlyImageTypes'), 'error'); return; }
+    if (file.size > 2 * 1024 * 1024) { showToast(t('settings.imageSizeLimit'), 'error'); return; }
 
     setUploading(true);
     try {
       await user.setProfileImage({ file });
       await user.reload();
-      showToast('Profile photo updated!', 'success');
+      showToast(t('settings.photoUpdated'), 'success');
     } catch (err) {
-      showToast('Upload failed: ' + (err?.errors?.[0]?.message || err.message), 'error');
+      showToast(t('settings.uploadFailed', { message: err?.errors?.[0]?.message || err.message }), 'error');
     } finally {
       setUploading(false);
     }
@@ -65,9 +69,9 @@ export default function Settings() {
     try {
       await user.setProfileImage({ file: null });
       await user.reload();
-      showToast('Profile photo removed.', 'success');
+      showToast(t('settings.photoRemoved'), 'success');
     } catch (err) {
-      showToast('Failed to remove photo.', 'error');
+      showToast(t('settings.removeFailed'), 'error');
     } finally {
       setUploading(false);
     }
@@ -80,19 +84,19 @@ export default function Settings() {
     if (profile) result = await api.update('profiles', profile.id, payload);
     else result = await api.insert('profiles', [payload]);
     setSaving(false);
-    if (result.error) { showToast('Save failed: ' + result.error.message, 'error'); return; }
+    if (result.error) { showToast(t('settings.saveFailed', { message: result.error.message }), 'error'); return; }
     if (!profile && result.data) setProfile(result.data[0]);
-    showToast('Profile saved successfully.', 'success');
+    showToast(t('settings.profileSaved'), 'success');
   }
 
   async function deleteAccount() {
-    if (deleteConfirmText !== 'DELETE') { showToast('Type DELETE to confirm.', 'error'); return; }
+    if (deleteConfirmText !== 'DELETE') { showToast(t('settings.typeDeleteToConfirm'), 'error'); return; }
     setDeleting(true);
     try {
       if (profile) await api.remove('profiles', profile.id);
       const result = await api.rpc('delete_user', {});
-      if (result.error) showToast('Could not fully delete account; signing out.', 'warning');
-      else showToast('Account deleted.', 'success');
+      if (result.error) showToast(t('settings.partialDeleteWarning'), 'warning');
+      else showToast(t('settings.accountDeleted'), 'success');
       await signOut();
       navigate('/');
     } catch (err) {
@@ -106,11 +110,11 @@ export default function Settings() {
   return (
     <>
       <div className="page-header">
-        <div><h1>Settings</h1><p>Manage your profile and preferences</p></div>
+        <div><h1>{t('settings.title')}</h1><p>{t('settings.subtitle')}</p></div>
       </div>
 
       <div className="card settings-header-card">
-        <div className={`settings-avatar${uploading ? ' uploading' : ''}`} onClick={() => !uploading && fileInputRef.current?.click()} title="Change photo">
+        <div className={`settings-avatar${uploading ? ' uploading' : ''}`} onClick={() => !uploading && fileInputRef.current?.click()} title={t('settings.changePhotoTooltip')}>
           {imageUrl ? <img src={imageUrl} alt="Profile" /> : <span className="initials">{initials}</span>}
           <div className="settings-avatar-edit"><i className="fas fa-camera"></i></div>
         </div>
@@ -123,11 +127,11 @@ export default function Settings() {
 
         <div className="settings-header-actions">
           <button className="btn btn-secondary btn-sm" disabled={uploading} onClick={() => fileInputRef.current?.click()}>
-            <i className="fas fa-upload"></i> {uploading ? 'Working...' : 'Change Photo'}
+            <i className="fas fa-upload"></i> {uploading ? t('settings.workingEllipsis') : t('settings.changePhoto')}
           </button>
           {imageUrl && (
             <button className="btn btn-secondary btn-sm" disabled={uploading} onClick={removeAvatar}>
-              <i className="fas fa-trash"></i> Remove
+              <i className="fas fa-trash"></i> {t('settings.remove')}
             </button>
           )}
         </div>
@@ -135,40 +139,53 @@ export default function Settings() {
 
       <div className="settings-grid">
         <div className="card">
-          <div className="card-header"><h3><i className="fas fa-tractor" style={{ color: 'var(--primary)', marginRight: 6 }}></i> Farm Profile</h3></div>
+          <div className="card-header"><h3><i className="fas fa-tractor" style={{ color: 'var(--primary)', marginRight: 6 }}></i> {t('settings.farmProfile')}</h3></div>
           <div className="card-body">
-            <div className="form-group"><label>Farm Name</label><input type="text" className="form-control" placeholder="Your farm name" value={farmName} onChange={(e) => setFarmName(e.target.value)} /></div>
-            <div className="form-group"><label>Location</label><input type="text" className="form-control" placeholder="City, State, Country" value={location} onChange={(e) => setLocation(e.target.value)} /></div>
-            <div className="form-group"><label>Phone Number</label><input type="tel" className="form-control" placeholder="+1 234 567 890" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
-            <button className="btn btn-primary" disabled={saving} onClick={saveProfile}><i className="fas fa-check"></i> {saving ? 'Saving...' : 'Save Profile'}</button>
+            <div className="form-group"><label>{t('settings.farmName')}</label><input type="text" className="form-control" placeholder={t('settings.farmNamePlaceholder')} value={farmName} onChange={(e) => setFarmName(e.target.value)} /></div>
+            <div className="form-group"><label>{t('settings.location')}</label><input type="text" className="form-control" placeholder={t('settings.locationPlaceholder')} value={location} onChange={(e) => setLocation(e.target.value)} /></div>
+            <div className="form-group"><label>{t('settings.phoneNumber')}</label><input type="tel" className="form-control" placeholder={t('settings.phonePlaceholder')} value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
+            <button className="btn btn-primary" disabled={saving} onClick={saveProfile}><i className="fas fa-check"></i> {saving ? t('settings.saving') : t('settings.saveProfile')}</button>
           </div>
         </div>
 
         <div className="card">
-          <div className="card-header"><h3><i className="fas fa-user-shield" style={{ color: 'var(--blue)', marginRight: 6 }}></i> Account & Security</h3></div>
+          <div className="card-header"><h3><i className="fas fa-user-shield" style={{ color: 'var(--blue)', marginRight: 6 }}></i> {t('settings.accountSecurity')}</h3></div>
           <div className="card-body">
-            <div className="settings-readonly-row"><span className="label">Email</span><span className="value">{email}</span></div>
-            <div className="settings-readonly-row"><span className="label">User ID</span><span className="value mono">{user?.id || ''}</span></div>
-            <p className="text-muted" style={{ fontSize: 13, margin: '16px 0' }}>Password, email, and security settings are managed by Clerk.</p>
-            <button className="btn btn-primary" onClick={() => openUserProfile()}><i className="fas fa-key"></i> Manage Account Security</button>
+            <div className="settings-readonly-row"><span className="label">{t('settings.email')}</span><span className="value">{email}</span></div>
+            <div className="settings-readonly-row"><span className="label">{t('settings.userId')}</span><span className="value mono">{user?.id || ''}</span></div>
+            <p className="text-muted" style={{ fontSize: 13, margin: '16px 0' }}>{t('settings.passwordManagedNote')}</p>
+            <button className="btn btn-primary" onClick={() => openUserProfile()}><i className="fas fa-key"></i> {t('settings.manageAccountSecurity')}</button>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-header"><h3><i className="fas fa-globe" style={{ color: 'var(--primary)', marginRight: 6 }}></i> {t('settings.preferences')}</h3></div>
+          <div className="card-body">
+            <div className="form-group">
+              <label>{t('settings.language')}</label>
+              <select className="form-control" value={language} onChange={(e) => setLanguage(e.target.value)}>
+                {languages.map((l) => <option key={l.code} value={l.code}>{l.nativeLabel}</option>)}
+              </select>
+            </div>
+            <p className="text-muted" style={{ fontSize: 13 }}>{t('settings.languageHelp')}</p>
           </div>
         </div>
       </div>
 
       <div className="card mt-24" style={{ border: '1.5px solid var(--red)' }}>
-        <div className="card-header"><h3 style={{ color: 'var(--red)' }}><i className="fas fa-triangle-exclamation"></i> Danger Zone</h3></div>
+        <div className="card-header"><h3 style={{ color: 'var(--red)' }}><i className="fas fa-triangle-exclamation"></i> {t('settings.dangerZone')}</h3></div>
         <div className="card-body">
-          <p className="text-muted" style={{ marginBottom: 16, fontSize: 13 }}>Once you delete your account, there is no going back. All your data will be permanently removed.</p>
-          <button className="btn btn-danger" onClick={() => setDeleteModalOpen(true)}><i className="fas fa-user-xmark"></i> Delete Account</button>
+          <p className="text-muted" style={{ marginBottom: 16, fontSize: 13 }}>{t('settings.dangerZoneWarning')}</p>
+          <button className="btn btn-danger" onClick={() => setDeleteModalOpen(true)}><i className="fas fa-user-xmark"></i> {t('settings.deleteAccount')}</button>
         </div>
       </div>
 
       <Modal
-        open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} title="Delete Account" maxWidth={420}
-        footer={<><button className="btn btn-secondary" onClick={() => setDeleteModalOpen(false)}>Cancel</button><button className="btn btn-danger" disabled={deleting} onClick={deleteAccount}><i className="fas fa-trash"></i> Delete Forever</button></>}
+        open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} title={t('settings.deleteAccount')} maxWidth={420}
+        footer={<><button className="btn btn-secondary" onClick={() => setDeleteModalOpen(false)}>{t('common.cancel')}</button><button className="btn btn-danger" disabled={deleting} onClick={deleteAccount}><i className="fas fa-trash"></i> {t('settings.deleteForever')}</button></>}
       >
-        <p className="text-muted">This will permanently delete your account and all associated data. Type <strong style={{ color: 'var(--red)' }}>DELETE</strong> to confirm.</p>
-        <input type="text" className="form-control mt-16" placeholder='Type "DELETE" here' value={deleteConfirmText} onChange={(e) => setDeleteConfirmText(e.target.value)} />
+        <p className="text-muted">{t('settings.deleteAccountConfirmText')}</p>
+        <input type="text" className="form-control mt-16" placeholder={t('settings.typeDeleteHere')} value={deleteConfirmText} onChange={(e) => setDeleteConfirmText(e.target.value)} />
       </Modal>
     </>
   );

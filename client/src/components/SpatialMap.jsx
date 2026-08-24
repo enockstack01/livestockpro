@@ -5,17 +5,18 @@ import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import 'leaflet.heat';
+import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 
 const TYPE_META = {
-  animals: { label: 'Animals', color: '#2E7D32', icon: 'fa-cow' },
-  health_records: { label: 'Health Records', color: '#F9A825', icon: 'fa-stethoscope' },
-  feeding_records: { label: 'Feeding Records', color: '#1976D2', icon: 'fa-wheat-awn' },
-  breeding_records: { label: 'Breeding Records', color: '#7B1FA2', icon: 'fa-venus-mars' },
-  production_records: { label: 'Production Records', color: '#0097A7', icon: 'fa-gauge' },
-  finance_records: { label: 'Finance Records', color: '#D32F2F', icon: 'fa-coins' },
-  tasks: { label: 'Tasks', color: '#5D4037', icon: 'fa-list-check' }
+  animals: { labelKey: 'tables.animals.label', color: '#2E7D32', icon: 'fa-cow' },
+  health_records: { labelKey: 'healthPage.title', color: '#F9A825', icon: 'fa-stethoscope' },
+  feeding_records: { labelKey: 'tables.feeding_records.singular', color: '#1976D2', icon: 'fa-wheat-awn' },
+  breeding_records: { labelKey: 'tables.breeding_records.singular', color: '#7B1FA2', icon: 'fa-venus-mars' },
+  production_records: { labelKey: 'tables.production_records.singular', color: '#0097A7', icon: 'fa-gauge' },
+  finance_records: { labelKey: 'tables.finance_records.singular', color: '#D32F2F', icon: 'fa-coins' },
+  tasks: { labelKey: 'tables.tasks.label', color: '#5D4037', icon: 'fa-list-check' }
 };
 const TYPE_KEYS = Object.keys(TYPE_META);
 
@@ -50,20 +51,21 @@ function markerIcon(meta) {
   });
 }
 
-function popupHtml(p, meta) {
+function popupHtml(p, meta, t) {
   return `
     <div class="spatial-popup">
-      <div class="spatial-popup-type" style="color:${meta.color}"><i class="fas ${meta.icon}"></i> ${esc(meta.label)}</div>
+      <div class="spatial-popup-type" style="color:${meta.color}"><i class="fas ${meta.icon}"></i> ${esc(t(meta.labelKey))}</div>
       <div class="spatial-popup-title">${esc(p.title)}</div>
-      ${p.status ? `<div class="spatial-popup-row"><strong>Status:</strong> ${esc(p.status)}</div>` : ''}
-      <div class="spatial-popup-row"><strong>Date:</strong> ${p.date ? esc(new Date(p.date).toLocaleDateString()) : '—'}</div>
-      <div class="spatial-popup-row"><strong>District:</strong> ${esc(p.district)}</div>
+      ${p.status ? `<div class="spatial-popup-row"><strong>${esc(t('tables.tasks.fields.status'))}:</strong> ${esc(p.status)}</div>` : ''}
+      <div class="spatial-popup-row"><strong>${esc(t('tables.finance_records.fields.date'))}:</strong> ${p.date ? esc(new Date(p.date).toLocaleDateString()) : '—'}</div>
+      <div class="spatial-popup-row"><strong>${esc(t('oneHealth.colDistrict'))}:</strong> ${esc(p.district)}</div>
       <div class="spatial-popup-farm"><i class="fas fa-user"></i> ${esc(p.farmName || p.userEmail)}</div>
     </div>
   `;
 }
 
 export default function SpatialMap() {
+  const { t } = useTranslation();
   const api = useApi();
   const showToast = useToast();
 
@@ -81,7 +83,7 @@ export default function SpatialMap() {
   useEffect(() => {
     (async () => {
       const { data, error } = await api.adminSpatial();
-      if (error) { showToast('Failed to load spatial data: ' + error.message, 'error'); setPoints([]); return; }
+      if (error) { showToast(t('records.loadFailed', { label: t('spatialMap.layers'), message: error.message }), 'error'); setPoints([]); return; }
       setPoints(data || []);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -151,7 +153,7 @@ export default function SpatialMap() {
         if (showBoundaries.districts) districts.addTo(map);
         if (showBoundaries.country) country.addTo(map);
       } catch (err) {
-        showToast('Failed to load administrative boundaries.', 'warning');
+        showToast(t('oneHealthMap.failedLoadBoundaries'), 'warning');
       }
     })();
 
@@ -205,7 +207,7 @@ export default function SpatialMap() {
       });
       list.forEach((p) => {
         const marker = L.marker([p.latitude, p.longitude], { icon: markerIcon(meta) });
-        marker.bindPopup(popupHtml(p, meta));
+        marker.bindPopup(popupHtml(p, meta, t));
         group.addLayer(marker);
       });
       clusterGroups[key] = group;
@@ -267,16 +269,16 @@ export default function SpatialMap() {
   return (
     <div className="spatial-layout">
       <div className="card spatial-legend-card">
-        <div className="card-header"><h3><i className="fas fa-layer-group" style={{ color: 'var(--primary)', marginRight: 6 }}></i> Layers</h3></div>
+        <div className="card-header"><h3><i className="fas fa-layer-group" style={{ color: 'var(--primary)', marginRight: 6 }}></i> {t('spatialMap.layers')}</h3></div>
         <div className="card-body">
           <p className="text-muted" style={{ fontSize: 12, marginBottom: 12 }}>
-            Every georeferenced record across all farms, {points === null ? 'loading…' : `${totalAll} total`}.
-            Captured automatically from the device location when a record is added.
+            {t('spatialMap.everyRecordCaption', { status: points === null ? t('spatialMap.loadingEllipsis') : t('spatialMap.totalCount', { count: totalAll }) })}
           </p>
 
-          <div className="spatial-legend-section-title">Record layers</div>
+          <div className="spatial-legend-section-title">{t('spatialMap.recordLayers')}</div>
           {TYPE_KEYS.map((key) => {
             const meta = TYPE_META[key];
+            const metaLabel = t(meta.labelKey);
             const checked = visibleTypes.includes(key);
             const mode = viewMode[key];
             return (
@@ -284,17 +286,17 @@ export default function SpatialMap() {
                 <label style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, cursor: 'pointer', minWidth: 0 }}>
                   <input type="checkbox" checked={checked} onChange={() => toggleType(key)} />
                   <span className="spatial-legend-swatch" style={{ background: meta.color }}><i className={`fas ${meta.icon}`}></i></span>
-                  <span className="spatial-legend-label">{meta.label}</span>
+                  <span className="spatial-legend-label">{metaLabel}</span>
                   <span className="spatial-legend-count">{counts[key]}</span>
                 </label>
-                <div className="spatial-mode-toggle" role="group" aria-label={`${meta.label} view mode`}>
+                <div className="spatial-mode-toggle" role="group" aria-label={`${metaLabel} ${t('oneHealthMap.viewMode').toLowerCase()}`}>
                   <button
-                    type="button" title="Markers" disabled={!checked}
+                    type="button" title={t('oneHealthMap.markers')} disabled={!checked}
                     className={`spatial-mode-btn${mode === 'markers' ? ' active' : ''}`}
                     onClick={() => setMode(key, 'markers')}
                   ><i className="fas fa-location-dot"></i></button>
                   <button
-                    type="button" title="Density" disabled={!checked}
+                    type="button" title={t('oneHealthMap.density')} disabled={!checked}
                     className={`spatial-mode-btn${mode === 'density' ? ' active' : ''}`}
                     onClick={() => setMode(key, 'density')}
                   ><i className="fas fa-fire"></i></button>
@@ -303,34 +305,32 @@ export default function SpatialMap() {
             );
           })}
           <div className="spatial-legend-actions">
-            <button className="btn btn-secondary btn-sm" onClick={() => setVisibleTypes(TYPE_KEYS)}>Show All</button>
-            <button className="btn btn-secondary btn-sm" onClick={() => setVisibleTypes([])}>Hide All</button>
+            <button className="btn btn-secondary btn-sm" onClick={() => setVisibleTypes(TYPE_KEYS)}>{t('spatialMap.showAll')}</button>
+            <button className="btn btn-secondary btn-sm" onClick={() => setVisibleTypes([])}>{t('spatialMap.hideAll')}</button>
           </div>
 
-          <div className="spatial-legend-section-title" style={{ marginTop: 16 }}>Administrative boundaries</div>
+          <div className="spatial-legend-section-title" style={{ marginTop: 16 }}>{t('spatialMap.adminBoundaries')}</div>
           <label className="spatial-legend-row">
             <input type="checkbox" checked={showBoundaries.country} onChange={() => toggleBoundary('country')} />
             <span className="spatial-legend-swatch" style={{ background: '#1B5E20' }}><i className="fas fa-flag"></i></span>
-            <span className="spatial-legend-label">Country border</span>
+            <span className="spatial-legend-label">{t('spatialMap.countryBorder')}</span>
           </label>
           <label className="spatial-legend-row">
             <input type="checkbox" checked={showBoundaries.districts} onChange={() => toggleBoundary('districts')} />
             <span className="spatial-legend-swatch" style={{ background: '#546E7A' }}><i className="fas fa-draw-polygon"></i></span>
-            <span className="spatial-legend-label">District borders</span>
+            <span className="spatial-legend-label">{t('spatialMap.districtBorders')}</span>
             <span className="spatial-legend-count">30</span>
           </label>
 
           <p className="text-muted" style={{ fontSize: 11.5, marginTop: 14, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
-            Showing {totalVisible} of {totalAll} points. <i className="fas fa-location-dot"></i> markers cluster and show details on click;
-            <i className="fas fa-fire" style={{ marginLeft: 4 }}></i> switches a layer to a density heatmap. Basemap (Street / Satellite / Light)
-            switches in the top-right of the map — boundaries stay visible on all three. Hover a district for its name.
+            {t('spatialMap.footerCaption', { visible: totalVisible, total: totalAll })}
           </p>
         </div>
       </div>
 
       <div className="card spatial-map-card" style={{ position: 'relative' }}>
         {points === null && (
-          <div className="spatial-loading-overlay"><i className="fas fa-spinner fa-spin"></i> Loading spatial data...</div>
+          <div className="spatial-loading-overlay"><i className="fas fa-spinner fa-spin"></i> {t('oneHealthMap.loadingSpatial')}</div>
         )}
         <div ref={containerRef} className="spatial-map-container"></div>
       </div>
