@@ -1784,6 +1784,25 @@ table.data-table {
   font-size: 14px;
 }
 
+.spatial-empty-banner {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text-light);
+  font-weight: 600;
+  font-size: 13px;
+  box-shadow: var(--shadow-lg);
+  pointer-events: none;
+}
+
 /* Leaflet marker + cluster symbology */
 .spatial-marker-pin {
   width: 26px;

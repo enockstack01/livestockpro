@@ -83,6 +83,7 @@ app.use(helmet({
       imgSrc: [
         "'self'", 'data:',
         'https://img.clerk.com',
+        'https://tile.openstreetmap.org',
         'https://*.tile.openstreetmap.org',
         'https://server.arcgisonline.com',
         'https://*.basemaps.cartocdn.com',

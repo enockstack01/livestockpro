@@ -120,7 +120,8 @@ export default function OneHealthMap() {
     const map = L.map(containerRef.current, { center: [-1.94, 29.9], zoom: 8, scrollWheelZoom: true });
     mapRef.current = map;
 
-    const street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    /* OSM's canonical tile host — the a/b/c subdomains are deprecated. */
+    const street = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 19
     });
     const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -134,7 +135,14 @@ export default function OneHealthMap() {
     L.control.layers({ Street: street, Satellite: satellite, Light: light }, {}, { position: 'topright', collapsed: false }).addTo(map);
     L.control.scale({ position: 'bottomleft' }).addTo(map);
 
-    return () => { map.remove(); mapRef.current = null; };
+    /* Leaflet measures its container once at init. On this page the map
+       mounts inside a fade-in/grid layout that is still settling, so it can
+       latch onto a stale size and draw only grey or partial tiles —
+       re-measure whenever the container actually changes size. */
+    const resizeObserver = new ResizeObserver(() => map.invalidateSize());
+    resizeObserver.observe(containerRef.current);
+
+    return () => { resizeObserver.disconnect(); map.remove(); mapRef.current = null; };
   }, []);
 
   /* Administrative boundaries, same source as the general Spatial Distribution map. */
@@ -321,7 +329,8 @@ export default function OneHealthMap() {
 
       <div className="card spatial-map-card" style={{ position: 'relative' }}>
         {points === null && <div className="spatial-loading-overlay"><i className="fas fa-spinner fa-spin"></i> {t('oneHealthMap.loadingSpatial')}</div>}
-        {points !== null && total === 0 && <div className="spatial-loading-overlay"><i className="fas fa-shield-heart"></i>&nbsp;{t('oneHealthMap.noSignalsYet')}</div>}
+        {/* Non-blocking: the basemap and boundaries stay visible when there's nothing to plot. */}
+        {points !== null && total === 0 && <div className="spatial-empty-banner"><i className="fas fa-shield-heart"></i>&nbsp;{t('oneHealthMap.noSignalsYet')}</div>}
         <div ref={containerRef} className="spatial-map-container"></div>
       </div>
     </div>
