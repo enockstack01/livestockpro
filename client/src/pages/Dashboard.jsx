@@ -5,6 +5,8 @@ import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { StatusBadge, PriorityBadge, fmtDate } from '../lib/badges.jsx';
 import { useCanvasChart } from '../lib/useChart.js';
+import { useChartTheme, cartesianOptions, doughnutOptions, barDataset } from '../lib/chartTheme.js';
+import FarmAnalytics from '../components/FarmAnalytics.jsx';
 import Modal from '../components/Modal.jsx';
 import { isOverdueTask } from '../../../shared/businessRules';
 
@@ -13,19 +15,20 @@ export default function Dashboard() {
   const api = useApi();
   const showToast = useToast();
 
-  const [data, setData] = useState({ animals: [], health: [], finance: [], production: [], tasks: [], breeding: [] });
+  const [data, setData] = useState({ animals: [], health: [], finance: [], production: [], tasks: [], breeding: [], feeding: [] });
   const [loading, setLoading] = useState(true);
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [taskForm, setTaskForm] = useState({ title: '', description: '', due_date: '', priority: 'Medium' });
 
   async function fetchAll() {
-    const [r1, r2, r3, r4, r5, r6] = await Promise.all([
+    const [r1, r2, r3, r4, r5, r6, r7] = await Promise.all([
       api.list('animals'),
       api.list('health_records'),
       api.list('finance_records'),
       api.list('production_records'),
       api.list('tasks', { order: 'due_date.asc' }),
-      api.list('breeding_records')
+      api.list('breeding_records'),
+      api.list('feeding_records')
     ]);
     setData({
       animals: r1.data || [],
@@ -33,7 +36,8 @@ export default function Dashboard() {
       finance: r3.data || [],
       production: r4.data || [],
       tasks: r5.data || [],
-      breeding: r6.data || []
+      breeding: r6.data || [],
+      feeding: r7.data || []
     });
     setLoading(false);
   }
@@ -117,14 +121,12 @@ export default function Dashboard() {
           <div className="card-body"><FinanceChart finance={f} /></div>
         </div>
         <div className="card">
-          <div className="card-header"><h3>{t('dashboardPage.chartProductionTrend')}</h3></div>
-          <div className="card-body"><ProductionChart production={data.production} /></div>
-        </div>
-        <div className="card">
           <div className="card-header"><h3>{t('dashboardPage.chartTaskStatus')}</h3></div>
           <div className="card-body"><TaskChart tasks={tasksArr} /></div>
         </div>
       </div>
+
+      <FarmAnalytics data={data} />
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
         <div className="card">
@@ -232,16 +234,17 @@ export default function Dashboard() {
 
 function HealthChart({ healthy, treatment, critical }) {
   const { t } = useTranslation();
+  const ct = useChartTheme();
   const total = healthy + treatment + critical;
   const canvasRef = useCanvasChart(() => {
     if (total === 0) return null;
     return {
       type: 'doughnut',
-      data: { labels: [t('enums.animalHealthStatus.Healthy'), t('enums.animalHealthStatus.Under Treatment'), t('enums.animalHealthStatus.Critical')], datasets: [{ data: [healthy, treatment, critical], backgroundColor: ['#2E7D32', '#F9A825', '#D32F2F'], borderWidth: 0, spacing: 2 }] },
-      options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true, pointStyleWidth: 10, font: { size: 12 } } } } }
+      data: { labels: [t('enums.animalHealthStatus.Healthy'), t('enums.animalHealthStatus.Under Treatment'), t('enums.animalHealthStatus.Critical')], datasets: [{ data: [healthy, treatment, critical], backgroundColor: [ct.status.good, ct.status.warning, ct.status.critical], borderColor: ct.surface, borderWidth: 2 }] },
+      options: doughnutOptions(ct)
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [healthy, treatment, critical, t]);
+  }, [healthy, treatment, critical, t, ct.scheme]);
 
   if (total === 0) return <div className="empty-state" style={{ padding: '30px 10px' }}><i className="fas fa-chart-pie"></i><h3>{t('dashboardPage.chartNoAnimalData')}</h3><p>{t('dashboardPage.chartAddAnimals')}</p></div>;
   return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
@@ -249,6 +252,7 @@ function HealthChart({ healthy, treatment, critical }) {
 
 function FinanceChart({ finance }) {
   const { t } = useTranslation();
+  const ct = useChartTheme();
   const now = new Date();
   const months = [], incomeData = [], expenseData = [];
   for (let i = 5; i >= 0; i--) {
@@ -263,43 +267,19 @@ function FinanceChart({ finance }) {
     if (!hasData) return null;
     return {
       type: 'bar',
-      data: { labels: months, datasets: [{ label: t('enums.financeType.Income'), data: incomeData, backgroundColor: '#2E7D32', borderRadius: 6 }, { label: t('dashboardPage.monthlyExpenses'), data: expenseData, backgroundColor: '#D32F2F', borderRadius: 6 }] },
-      options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#F0F0F0' }, ticks: { font: { size: 11 } } }, x: { grid: { display: false }, ticks: { font: { size: 11 } } } }, plugins: { legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true, font: { size: 12 } } } } }
+      data: { labels: months, datasets: [barDataset(ct, t('enums.financeType.Income'), incomeData, ct.positive), barDataset(ct, t('enums.financeType.Expense'), expenseData, ct.negative)] },
+      options: cartesianOptions(ct, { legend: true, money: true })
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(incomeData), JSON.stringify(expenseData), t]);
+  }, [JSON.stringify(incomeData), JSON.stringify(expenseData), t, ct.scheme]);
 
   if (!hasData) return <div className="empty-state" style={{ padding: '30px 10px' }}><i className="fas fa-chart-column"></i><h3>{t('dashboardPage.chartNoFinanceData')}</h3><p>{t('dashboardPage.chartAddFinance')}</p></div>;
   return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
 }
 
-function ProductionChart({ production }) {
-  const { t } = useTranslation();
-  const now = new Date();
-  const months = [], prodData = [];
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    months.push(d.toLocaleString('default', { month: 'short' }));
-    const mp = production.filter((p) => { const pd = new Date(p.production_date); return pd.getMonth() === d.getMonth() && pd.getFullYear() === d.getFullYear(); });
-    prodData.push(mp.reduce((s, p) => s + (p.quantity || 0), 0));
-  }
-  const hasData = prodData.some((v) => v > 0);
-  const canvasRef = useCanvasChart(() => {
-    if (!hasData) return null;
-    return {
-      type: 'line',
-      data: { labels: months, datasets: [{ label: t('dashboardPage.chartProductionTrend'), data: prodData, borderColor: '#1976D2', backgroundColor: 'rgba(25,118,210,0.1)', fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#1976D2' }] },
-      options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#F0F0F0' }, ticks: { font: { size: 11 } } }, x: { grid: { display: false }, ticks: { font: { size: 11 } } } }, plugins: { legend: { display: false } } }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(prodData), t]);
-
-  if (!hasData) return <div className="empty-state" style={{ padding: '30px 10px' }}><i className="fas fa-chart-line"></i><h3>{t('dashboardPage.chartNoProductionData')}</h3><p>{t('dashboardPage.chartAddProduction')}</p></div>;
-  return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
-}
-
 function TaskChart({ tasks }) {
   const { t } = useTranslation();
+  const ct = useChartTheme();
   const pending = tasks.filter((tk) => tk.status === 'Pending').length;
   const inProgress = tasks.filter((tk) => tk.status === 'In Progress').length;
   const completed = tasks.filter((tk) => tk.status === 'Completed').length;
@@ -309,11 +289,11 @@ function TaskChart({ tasks }) {
     if (total === 0) return null;
     return {
       type: 'doughnut',
-      data: { labels: [t('enums.taskStatus.Pending'), t('enums.taskStatus.In Progress'), t('enums.taskStatus.Completed')], datasets: [{ data: [pending, inProgress, completed], backgroundColor: ['#F9A825', '#1976D2', '#2E7D32'], borderWidth: 0, spacing: 2 }] },
-      options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true, pointStyleWidth: 10, font: { size: 12 } } } } }
+      data: { labels: [t('enums.taskStatus.Pending'), t('enums.taskStatus.In Progress'), t('enums.taskStatus.Completed')], datasets: [{ data: [pending, inProgress, completed], backgroundColor: [ct.series[3], ct.series[0], ct.brand], borderColor: ct.surface, borderWidth: 2 }] },
+      options: doughnutOptions(ct)
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pending, inProgress, completed, t]);
+  }, [pending, inProgress, completed, t, ct.scheme]);
 
   if (total === 0) return <div className="empty-state" style={{ padding: '30px 10px' }}><i className="fas fa-clipboard-list"></i><h3>{t('dashboardPage.chartNoTasksYet')}</h3><p>{t('dashboardPage.chartAddTasks')}</p></div>;
   return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
