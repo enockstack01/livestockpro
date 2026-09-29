@@ -8,6 +8,7 @@ import 'leaflet.heat';
 import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
+import { addBasemaps } from '../lib/basemaps.js';
 
 const TYPE_META = {
   animals: { labelKey: 'tables.animals.label', color: '#2E7D32', icon: 'fa-cow' },
@@ -102,22 +103,7 @@ export default function SpatialMap() {
     const map = L.map(containerRef.current, { center: [-1.94, 29.9], zoom: 8, scrollWheelZoom: true });
     mapRef.current = map;
 
-    /* See OneHealthMap: OSM blocks Referer-less tile requests, and helmet
-       sends Referrer-Policy: no-referrer site-wide. */
-    const street = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 19,
-      referrerPolicy: 'strict-origin-when-cross-origin'
-    });
-    const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri — Source: Esri, Maxar, Earthstar Geographics', maxZoom: 19
-    });
-    const light = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap contributors &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom: 19,
-      referrerPolicy: 'strict-origin-when-cross-origin'
-    });
-
-    street.addTo(map);
-    L.control.layers({ Street: street, Satellite: satellite, Light: light }, {}, { position: 'topright', collapsed: false }).addTo(map);
+    addBasemaps(map);
     L.control.scale({ position: 'bottomleft' }).addTo(map);
 
     return () => { map.remove(); mapRef.current = null; };

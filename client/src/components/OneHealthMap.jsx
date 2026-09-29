@@ -8,6 +8,7 @@ import 'leaflet.heat';
 import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
+import { addBasemaps } from '../lib/basemaps.js';
 
 /* Icon always encodes *what kind* of signal this is (fixed); color encodes
    whichever risk factor the user picked to look at (dynamic). Showing both
@@ -120,25 +121,7 @@ export default function OneHealthMap() {
     const map = L.map(containerRef.current, { center: [-1.94, 29.9], zoom: 8, scrollWheelZoom: true });
     mapRef.current = map;
 
-    /* OSM's canonical tile host — the a/b/c subdomains are deprecated. OSM's
-       tile policy blocks requests with no Referer (serving a 403 "Access
-       blocked" tile), and the server's helmet config sends
-       Referrer-Policy: no-referrer site-wide — so the tiles opt back in to
-       sending just our origin. */
-    const street = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 19,
-      referrerPolicy: 'strict-origin-when-cross-origin'
-    });
-    const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri — Source: Esri, Maxar, Earthstar Geographics', maxZoom: 19
-    });
-    const light = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap contributors &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom: 19,
-      referrerPolicy: 'strict-origin-when-cross-origin'
-    });
-
-    street.addTo(map);
-    L.control.layers({ Street: street, Satellite: satellite, Light: light }, {}, { position: 'topright', collapsed: false }).addTo(map);
+    addBasemaps(map);
     L.control.scale({ position: 'bottomleft' }).addTo(map);
 
     /* Leaflet measures its container once at init. On this page the map
