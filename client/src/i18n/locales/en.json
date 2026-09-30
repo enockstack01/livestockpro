@@ -22,7 +22,9 @@
     "notesPlaceholder": "Additional notes...",
     "selectEllipsis": "Select...",
     "age": "Age",
-    "lastCheck": "Last Check"
+    "lastCheck": "Last Check",
+    "prev": "Prev",
+    "next": "Next"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -36,7 +38,16 @@
     "reports": "Reports",
     "settings": "Settings",
     "more": "More",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "sections": {
+      "livestock": "Livestock",
+      "production": "Production",
+      "finance": "Finance",
+      "planning": "Planning",
+      "analytics": "Analytics",
+      "administration": "Administration",
+      "system": "System"
+    }
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -108,7 +119,11 @@
     "deleteFailed": "Failed to delete {{item}}.",
     "exported": "{{label}} exported to CSV.",
     "noRecordsToExport": "No {{label}} to export.",
-    "emptyListWeb": "No {{label}} yet. Add one to get started."
+    "emptyListWeb": "No {{label}} yet. Add one to get started.",
+    "detailsTitle": "{{item}} details",
+    "pageOf": "Page {{page}} of {{pages}} · {{count}} records",
+    "noMatches": "No matching records",
+    "tryDifferent": "Try a different search or clear the filters."
   },
   "tables": {
     "animals": {
@@ -393,7 +408,9 @@
     "preferences": "Preferences",
     "language": "Language",
     "languageHelp": "Choose your preferred language for the app interface.",
-    "typeDeleteToConfirm": "Type DELETE to confirm."
+    "typeDeleteToConfirm": "Type DELETE to confirm.",
+    "signedInAs": "Signed in as {{email}}",
+    "appVersion": "LivestockPro Mobile v{{version}}"
   },
   "dashboardPage": {
     "title": "Dashboard",
@@ -434,7 +451,11 @@
     "chartNoTasksYet": "No tasks yet",
     "chartAddTasks": "Add a task to see status breakdown.",
     "taskTitlePlaceholder": "e.g. Vaccinate cattle in Pen B",
-    "taskDescPlaceholder": "Optional details..."
+    "taskDescPlaceholder": "Optional details...",
+    "greetingMorning": "Good morning, {{name}}",
+    "greetingAfternoon": "Good afternoon, {{name}}",
+    "greetingEvening": "Good evening, {{name}}",
+    "todaySubtitle": "Here's what's happening across your farm today."
   },
   "reportsPage": {
     "title": "Full Farm Report",

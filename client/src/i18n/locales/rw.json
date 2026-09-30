@@ -22,7 +22,9 @@
     "notesPlaceholder": "Andi amakuru...",
     "selectEllipsis": "Hitamo...",
     "age": "Imyaka",
-    "lastCheck": "Isuzuma rya Nyuma"
+    "lastCheck": "Isuzuma rya Nyuma",
+    "prev": "Ibibanza",
+    "next": "Ibikurikira"
   },
   "nav": {
     "dashboard": "Ahabanza",
@@ -36,7 +38,16 @@
     "reports": "Raporo",
     "settings": "Igenamiterere",
     "more": "Ibindi",
-    "signOut": "Sohoka"
+    "signOut": "Sohoka",
+    "sections": {
+      "livestock": "Amatungo",
+      "production": "Umusaruro",
+      "finance": "Imari",
+      "planning": "Igenamigambi",
+      "analytics": "Isesengura",
+      "administration": "Ubuyobozi",
+      "system": "Sisitemu"
+    }
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -108,7 +119,11 @@
     "deleteFailed": "Gusiba {{item}} byanze.",
     "exported": "{{label}} zoherejwe muri CSV.",
     "noRecordsToExport": "Nta {{label}} zo kohereza.",
-    "emptyListWeb": "Nta {{label}} irahaba. Ongeramo kimwe kugira ngo utangire."
+    "emptyListWeb": "Nta {{label}} irahaba. Ongeramo kimwe kugira ngo utangire.",
+    "detailsTitle": "Ibisobanuro bya {{item}}",
+    "pageOf": "Urupapuro {{page}} kuri {{pages}} · amakuru {{count}}",
+    "noMatches": "Nta makuru ahuye",
+    "tryDifferent": "Gerageza gushakisha ukundi cyangwa ukureho uyungurura."
   },
   "tables": {
     "animals": {
@@ -393,7 +408,9 @@
     "preferences": "Ibyo Uhitamo",
     "language": "Ururimi",
     "languageHelp": "Hitamo ururimi ukunda kugira ngo rukoreshwe muri porogaramu.",
-    "typeDeleteToConfirm": "Andika DELETE kugira ngo wemeze."
+    "typeDeleteToConfirm": "Andika DELETE kugira ngo wemeze.",
+    "signedInAs": "Winjiye nka {{email}}",
+    "appVersion": "LivestockPro Mobile v{{version}}"
   },
   "dashboardPage": {
     "title": "Ikibaho",
@@ -434,7 +451,11 @@
     "chartNoTasksYet": "Nta mirimo irahaba",
     "chartAddTasks": "Ongeramo umurimo kugira ngo ubone imigabane y’imimerere.",
     "taskTitlePlaceholder": "urugero: Vaccinate cattle in Pen B",
-    "taskDescPlaceholder": "Ibisobanuro bitari ngombwa..."
+    "taskDescPlaceholder": "Ibisobanuro bitari ngombwa...",
+    "greetingMorning": "Mwaramutse, {{name}}",
+    "greetingAfternoon": "Mwiriwe, {{name}}",
+    "greetingEvening": "Muramuke, {{name}}",
+    "todaySubtitle": "Dore ibiri kuba mu bworozi bwawe uyu munsi."
   },
   "reportsPage": {
     "title": "Raporo Yuzuye y’Ubworozi",

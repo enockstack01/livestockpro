@@ -22,7 +22,9 @@
     "notesPlaceholder": "补充说明...",
     "selectEllipsis": "请选择...",
     "age": "年龄",
-    "lastCheck": "上次检查"
+    "lastCheck": "上次检查",
+    "prev": "上一页",
+    "next": "下一页"
   },
   "nav": {
     "dashboard": "仪表盘",
@@ -36,7 +38,16 @@
     "reports": "报告",
     "settings": "设置",
     "more": "更多",
-    "signOut": "退出登录"
+    "signOut": "退出登录",
+    "sections": {
+      "livestock": "牲畜",
+      "production": "生产",
+      "finance": "财务",
+      "planning": "计划",
+      "analytics": "分析",
+      "administration": "管理",
+      "system": "系统"
+    }
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -108,7 +119,11 @@
     "deleteFailed": "删除{{item}}失败。",
     "exported": "{{label}}已导出为CSV。",
     "noRecordsToExport": "没有可导出的{{label}}。",
-    "emptyListWeb": "暂无{{label}}。添加一条开始使用。"
+    "emptyListWeb": "暂无{{label}}。添加一条开始使用。",
+    "detailsTitle": "{{item}}详情",
+    "pageOf": "第 {{page}}/{{pages}} 页 · {{count}} 条记录",
+    "noMatches": "没有匹配的记录",
+    "tryDifferent": "请尝试其他搜索或清除筛选条件。"
   },
   "tables": {
     "animals": {
@@ -393,7 +408,9 @@
     "preferences": "偏好设置",
     "language": "语言",
     "languageHelp": "选择您在应用界面中偏好使用的语言。",
-    "typeDeleteToConfirm": "请输入 DELETE 以确认。"
+    "typeDeleteToConfirm": "请输入 DELETE 以确认。",
+    "signedInAs": "已登录为 {{email}}",
+    "appVersion": "LivestockPro Mobile v{{version}}"
   },
   "dashboardPage": {
     "title": "仪表板",
@@ -434,7 +451,11 @@
     "chartNoTasksYet": "暂无任务",
     "chartAddTasks": "添加任务以查看状态分布。",
     "taskTitlePlaceholder": "例如：Vaccinate cattle in Pen B",
-    "taskDescPlaceholder": "可选详细信息..."
+    "taskDescPlaceholder": "可选详细信息...",
+    "greetingMorning": "早上好，{{name}}",
+    "greetingAfternoon": "下午好，{{name}}",
+    "greetingEvening": "晚上好，{{name}}",
+    "todaySubtitle": "以下是您农场今天的动态。"
   },
   "reportsPage": {
     "title": "完整农场报告",

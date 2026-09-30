@@ -16,6 +16,8 @@ import DateField from '../../src/components/DateField';
 import FarmAnalytics from '../../src/screens/FarmAnalytics';
 import { computeDashboardSummary, monthBuckets, ym } from '../../../shared/analytics';
 import { fmtMoney } from '../../../shared/chartPalette';
+import { greeting } from '../../../shared/navigation';
+import { useUser } from '@clerk/expo';
 
 /* Port of client/src/pages/Dashboard.jsx: the ten summary cards, the three
    headline charts, Farm Analytics & Insights, recent animals / upcoming
@@ -27,8 +29,10 @@ export default function DashboardScreen() {
   const showToast = useToast();
   const cc = useChartColors();
   const { width } = useBreakpoint();
+  const { user } = useUser();
   const { syncing, lastSyncedAt, triggerSync } = useSync();
   const [data, setData] = useState(null);
+  const [farmName, setFarmName] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [taskOpen, setTaskOpen] = useState(false);
   const [taskForm, setTaskForm] = useState({ title: '', description: '', due_date: '', priority: 'Medium' });
@@ -39,6 +43,8 @@ export default function DashboardScreen() {
       repo.list('tasks', { order: 'due_date ASC' }), repo.list('breeding_records'), repo.list('feeding_records'),
     ]);
     setData({ animals, health, finance, production, tasks, breeding, feeding });
+    const [profile] = await repo.list('profiles');
+    setFarmName(profile?.farm_name || '');
   }, [repo]);
 
   useEffect(() => { load(); }, [load, lastSyncedAt]);
@@ -91,7 +97,7 @@ export default function DashboardScreen() {
 
   return (
     <Page refreshing={refreshing || syncing} onRefresh={onRefresh}>
-      <PageHeader title={t('dashboardPage.title')} subtitle={t('dashboardPage.subtitle')} />
+      <PageHeader title={greeting(t, user?.firstName || (user?.primaryEmailAddress?.emailAddress || '').split('@')[0] || farmName)} subtitle={t('dashboardPage.todaySubtitle')} />
 
       <Grid minItemWidth={small ? 160 : 220} columns={width <= 480 ? 2 : undefined} gap={small ? 10 : 16} style={{ marginBottom: 24 }}>
         {summaryItems.map((s) => <SummaryCard key={s.label} icon={s.icon} color={s.color} label={s.label} value={s.value} onPress={() => router.replace(s.link)} />)}

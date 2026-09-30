@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useClerk, useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
@@ -15,6 +15,7 @@ export default function Settings() {
   const api = useApi();
   const showToast = useToast();
   const navigate = useNavigate();
+  const { requestSignOut } = useOutletContext();
   const fileInputRef = useRef(null);
   const { language, setLanguage, languages } = useLanguage();
   const { preference, setThemePreference } = useTheme();
@@ -110,7 +111,7 @@ export default function Settings() {
   }
 
   return (
-    <>
+    <div className="settings-page">
       <div className="page-header">
         <div><h1>{t('settings.title')}</h1><p>{t('settings.subtitle')}</p></div>
       </div>
@@ -139,7 +140,7 @@ export default function Settings() {
         </div>
       </div>
 
-      <div className="settings-grid">
+      <div className="settings-stack">
         <div className="card">
           <div className="card-header"><h3><i className="fas fa-tractor" style={{ color: 'var(--primary)', marginRight: 6 }}></i> {t('settings.farmProfile')}</h3></div>
           <div className="card-body">
@@ -147,16 +148,6 @@ export default function Settings() {
             <div className="form-group"><label>{t('settings.location')}</label><input type="text" className="form-control" placeholder={t('settings.locationPlaceholder')} value={location} onChange={(e) => setLocation(e.target.value)} /></div>
             <div className="form-group"><label>{t('settings.phoneNumber')}</label><input type="tel" className="form-control" placeholder={t('settings.phonePlaceholder')} value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
             <button className="btn btn-primary" disabled={saving} onClick={saveProfile}><i className="fas fa-check"></i> {saving ? t('settings.saving') : t('settings.saveProfile')}</button>
-          </div>
-        </div>
-
-        <div className="card">
-          <div className="card-header"><h3><i className="fas fa-user-shield" style={{ color: 'var(--blue)', marginRight: 6 }}></i> {t('settings.accountSecurity')}</h3></div>
-          <div className="card-body">
-            <div className="settings-readonly-row"><span className="label">{t('settings.email')}</span><span className="value">{email}</span></div>
-            <div className="settings-readonly-row"><span className="label">{t('settings.userId')}</span><span className="value mono">{user?.id || ''}</span></div>
-            <p className="text-muted" style={{ fontSize: 13, margin: '16px 0' }}>{t('settings.passwordManagedNote')}</p>
-            <button className="btn btn-primary" onClick={() => openUserProfile()}><i className="fas fa-key"></i> {t('settings.manageAccountSecurity')}</button>
           </div>
         </div>
 
@@ -180,6 +171,20 @@ export default function Settings() {
             <p className="text-muted" style={{ fontSize: 13 }}>{t('settings.languageHelp')}</p>
           </div>
         </div>
+        <div className="card">
+          <div className="card-header"><h3><i className="fas fa-user-shield" style={{ color: 'var(--blue)', marginRight: 6 }}></i> {t('settings.accountSecurity')}</h3></div>
+          <div className="card-body">
+            <div className="settings-readonly-row"><span className="label">{t('settings.email')}</span><span className="value">{email}</span></div>
+            <div className="settings-readonly-row"><span className="label">{t('settings.userId')}</span><span className="value mono">{user?.id || ''}</span></div>
+            <p className="text-muted" style={{ fontSize: 13, margin: '16px 0' }}>{t('settings.passwordManagedNote')}</p>
+            <div className="d-flex gap-16 flex-wrap">
+              <button className="btn btn-primary" onClick={() => openUserProfile()}><i className="fas fa-key"></i> {t('settings.manageAccountSecurity')}</button>
+              <button className="btn btn-danger" onClick={requestSignOut}><i className="fas fa-right-from-bracket"></i> {t('nav.signOut')}</button>
+            </div>
+            <p className="text-muted" style={{ fontSize: 12, marginTop: 12 }}>{t('settings.signedInAs', { email })}</p>
+          </div>
+        </div>
+
       </div>
 
       <div className="card mt-24" style={{ border: '1.5px solid var(--red)' }}>
@@ -197,6 +202,6 @@ export default function Settings() {
         <p className="text-muted">{t('settings.deleteAccountConfirmText')}</p>
         <input type="text" className="form-control mt-16" placeholder={t('settings.typeDeleteHere')} value={deleteConfirmText} onChange={(e) => setDeleteConfirmText(e.target.value)} />
       </Modal>
-    </>
+    </div>
   );
 }

@@ -22,7 +22,9 @@
     "notesPlaceholder": "ملاحظات إضافية...",
     "selectEllipsis": "اختر...",
     "age": "العمر",
-    "lastCheck": "آخر فحص"
+    "lastCheck": "آخر فحص",
+    "prev": "السابق",
+    "next": "التالي"
   },
   "nav": {
     "dashboard": "لوحة التحكم",
@@ -36,7 +38,16 @@
     "reports": "التقارير",
     "settings": "الإعدادات",
     "more": "المزيد",
-    "signOut": "تسجيل الخروج"
+    "signOut": "تسجيل الخروج",
+    "sections": {
+      "livestock": "الماشية",
+      "production": "الإنتاج",
+      "finance": "المالية",
+      "planning": "التخطيط",
+      "analytics": "التحليلات",
+      "administration": "الإدارة",
+      "system": "النظام"
+    }
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -108,7 +119,11 @@
     "deleteFailed": "فشل حذف {{item}}.",
     "exported": "تم تصدير {{label}} إلى CSV.",
     "noRecordsToExport": "لا توجد {{label}} للتصدير.",
-    "emptyListWeb": "لا توجد {{label}} بعد. أضف واحدًا للبدء."
+    "emptyListWeb": "لا توجد {{label}} بعد. أضف واحدًا للبدء.",
+    "detailsTitle": "تفاصيل {{item}}",
+    "pageOf": "صفحة {{page}} من {{pages}} · {{count}} سجلات",
+    "noMatches": "لا توجد سجلات مطابقة",
+    "tryDifferent": "جرّب بحثًا آخر أو امسح عوامل التصفية."
   },
   "tables": {
     "animals": {
@@ -393,7 +408,9 @@
     "preferences": "التفضيلات",
     "language": "اللغة",
     "languageHelp": "اختر لغتك المفضلة لواجهة التطبيق.",
-    "typeDeleteToConfirm": "اكتب DELETE للتأكيد."
+    "typeDeleteToConfirm": "اكتب DELETE للتأكيد.",
+    "signedInAs": "تم تسجيل الدخول باسم {{email}}",
+    "appVersion": "LivestockPro Mobile v{{version}}"
   },
   "dashboardPage": {
     "title": "لوحة التحكم",
@@ -434,7 +451,11 @@
     "chartNoTasksYet": "لا توجد مهام بعد",
     "chartAddTasks": "أضف مهمة لرؤية توزيع الحالات.",
     "taskTitlePlaceholder": "مثال: Vaccinate cattle in Pen B",
-    "taskDescPlaceholder": "تفاصيل اختيارية..."
+    "taskDescPlaceholder": "تفاصيل اختيارية...",
+    "greetingMorning": "صباح الخير، {{name}}",
+    "greetingAfternoon": "مساء الخير، {{name}}",
+    "greetingEvening": "مساء الخير، {{name}}",
+    "todaySubtitle": "إليك ما يحدث في مزرعتك اليوم."
   },
   "reportsPage": {
     "title": "التقرير الكامل للمزرعة",

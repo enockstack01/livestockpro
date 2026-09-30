@@ -22,7 +22,9 @@
     "notesPlaceholder": "अतिरिक्त टिप्पणियाँ...",
     "selectEllipsis": "चुनें...",
     "age": "आयु",
-    "lastCheck": "अंतिम जांच"
+    "lastCheck": "अंतिम जांच",
+    "prev": "पिछला",
+    "next": "अगला"
   },
   "nav": {
     "dashboard": "डैशबोर्ड",
@@ -36,7 +38,16 @@
     "reports": "रिपोर्ट",
     "settings": "सेटिंग्स",
     "more": "अधिक",
-    "signOut": "साइन आउट करें"
+    "signOut": "साइन आउट करें",
+    "sections": {
+      "livestock": "पशुधन",
+      "production": "उत्पादन",
+      "finance": "वित्त",
+      "planning": "योजना",
+      "analytics": "विश्लेषण",
+      "administration": "प्रशासन",
+      "system": "सिस्टम"
+    }
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -108,7 +119,11 @@
     "deleteFailed": "{{item}} हटाने में विफल।",
     "exported": "{{label}} को CSV में निर्यात किया गया।",
     "noRecordsToExport": "निर्यात के लिए कोई {{label}} नहीं।",
-    "emptyListWeb": "अभी तक कोई {{label}} नहीं। शुरू करने के लिए एक जोड़ें।"
+    "emptyListWeb": "अभी तक कोई {{label}} नहीं। शुरू करने के लिए एक जोड़ें।",
+    "detailsTitle": "{{item}} विवरण",
+    "pageOf": "पृष्ठ {{page}} / {{pages}} · {{count}} रिकॉर्ड",
+    "noMatches": "कोई मिलता-जुलता रिकॉर्ड नहीं",
+    "tryDifferent": "कोई दूसरी खोज आज़माएँ या फ़िल्टर हटाएँ।"
   },
   "tables": {
     "animals": {
@@ -393,7 +408,9 @@
     "preferences": "प्राथमिकताएं",
     "language": "भाषा",
     "languageHelp": "ऐप इंटरफ़ेस के लिए अपनी पसंदीदा भाषा चुनें।",
-    "typeDeleteToConfirm": "पुष्टि करने के लिए DELETE टाइप करें।"
+    "typeDeleteToConfirm": "पुष्टि करने के लिए DELETE टाइप करें।",
+    "signedInAs": "{{email}} के रूप में साइन इन",
+    "appVersion": "LivestockPro Mobile v{{version}}"
   },
   "dashboardPage": {
     "title": "डैशबोर्ड",
@@ -434,7 +451,11 @@
     "chartNoTasksYet": "अभी तक कोई कार्य नहीं",
     "chartAddTasks": "स्थिति विवरण देखने के लिए एक कार्य जोड़ें।",
     "taskTitlePlaceholder": "उदा. Vaccinate cattle in Pen B",
-    "taskDescPlaceholder": "वैकल्पिक विवरण..."
+    "taskDescPlaceholder": "वैकल्पिक विवरण...",
+    "greetingMorning": "सुप्रभात, {{name}}",
+    "greetingAfternoon": "नमस्कार, {{name}}",
+    "greetingEvening": "शुभ संध्या, {{name}}",
+    "todaySubtitle": "आज आपके फार्म पर यह हो रहा है।"
   },
   "reportsPage": {
     "title": "पूर्ण फार्म रिपोर्ट",

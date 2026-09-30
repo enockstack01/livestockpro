@@ -8,22 +8,27 @@ import { useGeoCapture } from '../hooks/useGeoCapture';
 import { useToast } from '../lib/toast';
 import { useConfirm } from '../lib/confirm';
 import { useTheme } from '../theme/ThemeProvider';
-import { isOverdueTask, isThisMonth } from '../lib/shared';
+import { fmtDate, isOverdueTask, isThisMonth } from '../lib/shared';
 import Icon from '../components/Icon';
 import RecordForm, { emptyValues } from '../components/RecordForm';
 import CsvImportModal from '../components/CsvImportModal';
-import { Badge, Button, Card, CardBody, CardHeader, EmptyState, FilterBar, FinanceCard, IconButton, Modal, Page, PageHeader, Select, Spinner, SummaryCard, Tabs } from '../ui/kit';
+import { Badge, Button, Card, CardBody, CardHeader, EmptyState, FilterBar, FinanceCard, IconButton, Modal, Page, PageHeader, Select, SummaryCard, Tabs } from '../ui/kit';
 import { Grid, useBreakpoint } from '../ui/layout';
 import DataTable from '../ui/DataTable';
-import { useTopbarSearch } from '../ui/AppShell';
+import { usePageSearch } from '../ui/AppShell';
 import { RECORD_PAGES } from '../config/recordPages';
 
-/* One screen for all seven record types, laid out exactly like the matching
-   web page (client/src/pages/*.jsx): page header with Export CSV / Add
-   buttons, the page's own summary block, tabs and filter dropdowns, a card
-   holding the data table (edit/delete buttons per row), the add/edit form
-   modal and a delete-confirmation modal. Local-first: reads/writes go
-   through src/db/repository.js and sync in the background. */
+const PER_PAGE = 15;
+
+/* One screen for all seven record types, organized like the CropManager
+   app's module pages (and the matching web page, client/src/pages/*.jsx):
+   page header with the page's actions, its summary block, then search
+   (with a clear button), tabs and filters, and the records — a table on
+   wider screens, compact rows on phones — 15 per page with Prev/Next.
+   Tapping a record opens all of its fields with an Edit button; each row
+   also has edit/delete buttons. An empty list offers an Add button right
+   there. Local-first: reads/writes go through src/db/repository.js and
+   sync in the background. */
 export default function RecordListScreen({ config }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
@@ -49,8 +54,10 @@ export default function RecordListScreen({ config }) {
   const [values, setValues] = useState({});
   const [saving, setSaving] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [pageNum, setPageNum] = useState(1);
+  const [viewRow, setViewRow] = useState(null);
 
-  const inlineSearch = useTopbarSearch(t('records.searchPlaceholder', { label: label.toLowerCase() }), setSearch);
+  const searchBox = usePageSearch(t('records.searchPlaceholder', { label: label.toLowerCase() }), (v) => { setSearch(v); setPageNum(1); });
 
   const load = useCallback(async () => {
     setRecords(await repo.list(config.table, { order: 'created_at DESC' }));
@@ -141,7 +148,21 @@ export default function RecordListScreen({ config }) {
     }
   }
 
-  if (!records) return <Spinner />;
+  if (!records) return <ListSkeleton />;
+
+  const filtersActive = !!search.trim() || tab !== 'all' || Object.values(filters).some(Boolean);
+  const pages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  const current = Math.min(pageNum, pages);
+  const pageRows = filtered.slice((current - 1) * PER_PAGE, current * PER_PAGE);
+
+  /* Every field of a record, labelled and formatted, for the details view. */
+  const detailValue = (f, r) => {
+    const v = r[f.key];
+    if (v === null || v === undefined || v === '') return null;
+    if (f.type === 'date') return fmtDate(v);
+    if (f.i18nEnum) return t(`enums.${f.i18nEnum}.${v}`, v);
+    return String(v);
+  };
 
   const columns = page.columns(t, colors);
   const pendingDot = (r) => (r.sync_state === 'pending' ? <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: colors.orange }} /> : null);
@@ -160,12 +181,12 @@ export default function RecordListScreen({ config }) {
         <Button icon="plus" title={t(page.addKey)} onPress={openAdd} />
       </PageHeader>
 
-      {inlineSearch}
-
       <PageExtra kind={page.extra} rows={rows} t={t} colors={colors} width={width} />
 
+      {searchBox}
+
       {page.tabs ? (
-        <Tabs value={tab} onChange={setTab} items={[{ value: 'all', label: t('common.all') }, ...page.tabs.values.map((v) => ({ value: v, label: t(page.tabs.labelKey(v)) }))]} />
+        <Tabs value={tab} onChange={(v) => { setTab(v); setPageNum(1); }} items={[{ value: 'all', label: t('common.all') }, ...page.tabs.values.map((v) => ({ value: v, label: t(page.tabs.labelKey(v)) }))]} />
       ) : null}
 
       {page.filters.length ? (
@@ -173,7 +194,7 @@ export default function RecordListScreen({ config }) {
           {page.filters.map((f) => {
             const opts = f.fromData ? [...new Set(rows.map((r) => r[f.key]).filter(Boolean))] : f.options;
             return (
-              <Select key={f.key} compact value={filters[f.key] || ''} placeholder={t(f.allKey)} onChange={(v) => setFilters((p) => ({ ...p, [f.key]: v }))}
+              <Select key={f.key} compact value={filters[f.key] || ''} placeholder={t(f.allKey)} onChange={(v) => { setFilters((p) => ({ ...p, [f.key]: v })); setPageNum(1); }}
                 options={[{ value: '', label: t(f.allKey) }, ...opts.map((o) => ({ value: o, label: t(`enums.${f.enumGroup}.${o}`, o) }))]} />
             );
           })}
@@ -183,8 +204,10 @@ export default function RecordListScreen({ config }) {
       <Card>
         <CardBody flush>
           <DataTable
-            rows={filtered}
+            rows={pageRows}
             columns={[firstCol, ...columns.slice(1)]}
+            summary={(r) => { const v = page.summary(t)(r); return { ...v, title: <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}><Text style={{ fontSize: 13, fontWeight: '600', color: colors.text, flexShrink: 1 }} numberOfLines={2}>{v.title || '—'}</Text>{pendingDot(r)}</View> }; }}
+            onRowPress={setViewRow}
             actionsLabel={t('adminDashboard.colActions')}
             actions={(r) => (
               <>
@@ -192,10 +215,48 @@ export default function RecordListScreen({ config }) {
                 <IconButton icon="trash" danger label={t('common.delete')} onPress={() => remove(r)} />
               </>
             )}
-            empty={<EmptyState icon={page.emptyIcon} title={t('common.noneFound', { label })} message={t('records.emptyListWeb', { label: label.toLowerCase() })} />}
+            empty={filtersActive
+              ? <EmptyState icon="magnifying-glass" title={t('records.noMatches')} message={t('records.tryDifferent')} />
+              : (
+                <View>
+                  <EmptyState icon={page.emptyIcon} title={t('common.noneFound', { label })} message={t('records.emptyListWeb', { label: label.toLowerCase() })} />
+                  <View style={{ alignItems: 'center', marginTop: -16, marginBottom: 32 }}><Button icon="plus" title={t(page.addKey)} onPress={openAdd} /></View>
+                </View>
+              )}
           />
         </CardBody>
       </Card>
+
+      {pages > 1 ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingVertical: 16 }}>
+          <Text style={{ fontSize: 12, color: colors.textLight, flexShrink: 1 }}>{t('records.pageOf', { page: current, pages, count: filtered.length })}</Text>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <Button size="sm" variant="secondary" icon="chevron-left" title={t('common.prev')} disabled={current <= 1} onPress={() => setPageNum(current - 1)} />
+            <Button size="sm" variant="secondary" title={t('common.next')} disabled={current >= pages} onPress={() => setPageNum(current + 1)} />
+          </View>
+        </View>
+      ) : null}
+
+      <Modal
+        open={!!viewRow}
+        onClose={() => setViewRow(null)}
+        title={t('records.detailsTitle', { item: singular })}
+        footer={<>
+          <Button variant="secondary" title={t('common.close')} onPress={() => setViewRow(null)} />
+          <Button icon="pen" title={t('common.edit')} onPress={() => { const r = viewRow; setViewRow(null); openEdit(r); }} />
+        </>}
+      >
+        {viewRow ? localizedFields.map((f) => {
+          const v = detailValue(f, viewRow);
+          if (v === null) return null;
+          return (
+            <View key={f.key} style={{ paddingVertical: 9, borderBottomWidth: 1, borderBottomColor: colors.border, gap: 3 }}>
+              <Text style={{ fontSize: 11, fontWeight: '600', color: colors.textLight, textTransform: 'uppercase', letterSpacing: 0.3 }}>{f.label}</Text>
+              <Text style={{ fontSize: 14, color: colors.text }}>{v}</Text>
+            </View>
+          );
+        }) : null}
+      </Modal>
 
       <Modal
         open={modal !== null}
@@ -211,6 +272,27 @@ export default function RecordListScreen({ config }) {
       </Modal>
 
       {page.importable ? <CsvImportModal open={importOpen} onClose={() => setImportOpen(false)} onImported={load} /> : null}
+    </Page>
+  );
+}
+
+/* Placeholder shaped like the page (header, search, rows) while records load. */
+function ListSkeleton() {
+  const { colors } = useTheme();
+  const bar = (w, h, extra) => <View style={[{ width: w, height: h, borderRadius: 6, backgroundColor: colors.border, opacity: 0.6 }, extra]} />;
+  return (
+    <Page>
+      {bar('45%', 24)}
+      {bar('65%', 13, { marginTop: 10, marginBottom: 24 })}
+      {bar('100%', 42, { marginBottom: 16, borderRadius: 8 })}
+      <Card>
+        {Array.from({ length: 6 }, (_, i) => (
+          <View key={i} style={{ padding: 16, gap: 8, borderBottomWidth: i < 5 ? 1 : 0, borderBottomColor: colors.border }}>
+            {bar('55%', 13)}
+            {bar('80%', 11)}
+          </View>
+        ))}
+      </Card>
     </Page>
   );
 }

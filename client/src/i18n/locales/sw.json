@@ -22,7 +22,9 @@
     "notesPlaceholder": "Maelezo ya ziada...",
     "selectEllipsis": "Chagua...",
     "age": "Umri",
-    "lastCheck": "Ukaguzi wa Mwisho"
+    "lastCheck": "Ukaguzi wa Mwisho",
+    "prev": "Iliyopita",
+    "next": "Inayofuata"
   },
   "nav": {
     "dashboard": "Dashibodi",
@@ -36,7 +38,16 @@
     "reports": "Ripoti",
     "settings": "Mipangilio",
     "more": "Zaidi",
-    "signOut": "Toka"
+    "signOut": "Toka",
+    "sections": {
+      "livestock": "Mifugo",
+      "production": "Uzalishaji",
+      "finance": "Fedha",
+      "planning": "Mipango",
+      "analytics": "Uchambuzi",
+      "administration": "Utawala",
+      "system": "Mfumo"
+    }
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -108,7 +119,11 @@
     "deleteFailed": "Imeshindwa kufuta {{item}}.",
     "exported": "{{label}} zimehamishwa kwenda CSV.",
     "noRecordsToExport": "Hakuna {{label}} za kuhamisha.",
-    "emptyListWeb": "Bado hakuna {{label}}. Ongeza moja kuanza."
+    "emptyListWeb": "Bado hakuna {{label}}. Ongeza moja kuanza.",
+    "detailsTitle": "Maelezo ya {{item}}",
+    "pageOf": "Ukurasa {{page}} kati ya {{pages}} · rekodi {{count}}",
+    "noMatches": "Hakuna rekodi zinazolingana",
+    "tryDifferent": "Jaribu utafutaji mwingine au ondoa vichujio."
   },
   "tables": {
     "animals": {
@@ -393,7 +408,9 @@
     "preferences": "Mapendeleo",
     "language": "Lugha",
     "languageHelp": "Chagua lugha unayopendelea kwa mwonekano wa programu.",
-    "typeDeleteToConfirm": "Andika DELETE kuthibitisha."
+    "typeDeleteToConfirm": "Andika DELETE kuthibitisha.",
+    "signedInAs": "Umeingia kama {{email}}",
+    "appVersion": "LivestockPro Mobile v{{version}}"
   },
   "dashboardPage": {
     "title": "Dashibodi",
@@ -434,7 +451,11 @@
     "chartNoTasksYet": "Bado hakuna kazi",
     "chartAddTasks": "Ongeza kazi kuona mgawanyo wa hali.",
     "taskTitlePlaceholder": "mf. Vaccinate cattle in Pen B",
-    "taskDescPlaceholder": "Maelezo ya hiari..."
+    "taskDescPlaceholder": "Maelezo ya hiari...",
+    "greetingMorning": "Habari za asubuhi, {{name}}",
+    "greetingAfternoon": "Habari za mchana, {{name}}",
+    "greetingEvening": "Habari za jioni, {{name}}",
+    "todaySubtitle": "Haya ndiyo yanayoendelea shambani kwako leo."
   },
   "reportsPage": {
     "title": "Ripoti Kamili ya Shamba",

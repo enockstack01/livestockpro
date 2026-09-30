@@ -6,19 +6,9 @@ import { useApi } from '../lib/api.js';
 import { TopbarSearchProvider, useTopbarSearchBox } from '../lib/topbarSearch.jsx';
 import { useTheme } from '../theme/ThemeProvider.jsx';
 import { isOverdueTask } from '../../../shared/businessRules';
+import { NAV_SECTIONS } from '../../../shared/navigation';
+import Modal from './Modal.jsx';
 
-const NAV_ITEMS = [
-  { to: '/dashboard', icon: 'fa-gauge-high', labelKey: 'nav.dashboard' },
-  { to: '/animals', icon: 'fa-cow', labelKey: 'nav.animals' },
-  { to: '/health', icon: 'fa-stethoscope', labelKey: 'nav.health' },
-  { to: '/feeding', icon: 'fa-wheat-awn', labelKey: 'nav.feeding' },
-  { to: '/breeding', icon: 'fa-venus-mars', labelKey: 'nav.breeding' },
-  { to: '/production', icon: 'fa-gauge', labelKey: 'nav.production' },
-  { to: '/finance', icon: 'fa-coins', labelKey: 'nav.finance' },
-  { to: '/tasks', icon: 'fa-list-check', labelKey: 'nav.tasks' },
-  { to: '/reports', icon: 'fa-chart-bar', labelKey: 'nav.reports' },
-  { to: '/settings', icon: 'fa-gear', labelKey: 'nav.settings' }
-];
 
 const NOTIF_ORDER = { red: 0, orange: 1, blue: 2, purple: 3, green: 4 };
 
@@ -177,8 +167,9 @@ function LayoutInner() {
   const initials = email.substring(0, 2).toUpperCase() || 'U';
   const imageUrl = user?.imageUrl;
 
-  async function handleLogout(e) {
-    e.preventDefault();
+  const [signOutOpen, setSignOutOpen] = useState(false);
+  async function handleLogout() {
+    setSignOutOpen(false);
     await signOut();
     navigate('/');
   }
@@ -187,29 +178,30 @@ function LayoutInner() {
     <>
       <aside className={`sidebar${sidebarOpen ? ' open' : ''}`}>
         <div className="sidebar-header">
-          <div className="sidebar-logo"><i className="fas fa-cow"></i><span>LivestockPro</span></div>
+          <div className="sidebar-logo">
+            <span className="sidebar-logo-tile"><i className="fas fa-cow"></i></span>
+            <span>Livestock<span className="sidebar-logo-accent">Pro</span></span>
+          </div>
           <button className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fas fa-xmark"></i></button>
         </div>
         <nav className="sidebar-nav">
-          {NAV_ITEMS.map((item) => (
-            <NavLink key={item.to} to={item.to} className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')} onClick={() => setSidebarOpen(false)}>
-              <i className={`fas ${item.icon}`}></i> {t(item.labelKey)}
-            </NavLink>
+          {NAV_SECTIONS.filter((section) => !section.adminOnly || isAdmin).map((section) => (
+            <div key={section.labelKey || 'main'} className="nav-section">
+              {section.labelKey && <div className="nav-section-label">{t(section.labelKey)}</div>}
+              {section.items.map((item) => (
+                <NavLink key={item.key} to={item.path} className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')} onClick={() => setSidebarOpen(false)}>
+                  <i className={`fas fa-${item.icon}`} style={item.accent ? { color: item.accent } : undefined}></i> {t(item.labelKey)}
+                </NavLink>
+              ))}
+            </div>
           ))}
-          {isAdmin && (
-            <NavLink to="/admin" className={({ isActive }) => 'nav-item nav-item-admin' + (isActive ? ' active' : '')} onClick={() => setSidebarOpen(false)}>
-              <i className="fas fa-user-shield"></i> {t('layout.adminPanel')}
-            </NavLink>
-          )}
-          {isAdmin && (
-            <NavLink to="/onehealth" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')} onClick={() => setSidebarOpen(false)}>
-              <i className="fas fa-shield-virus" style={{ color: '#FFD54F' }}></i> {t('layout.oneHealth')}
-            </NavLink>
-          )}
-          <a href="#" className="nav-item logout-item" onClick={handleLogout}>
-            <i className="fas fa-right-from-bracket"></i> {t('layout.logout')}
-          </a>
         </nav>
+        {/* Sign out lives apart from the features, in the sidebar footer. */}
+        <div className="sidebar-footer">
+          <button type="button" className="nav-item logout-item" onClick={() => { setSidebarOpen(false); setSignOutOpen(true); }}>
+            <i className="fas fa-right-from-bracket"></i> {t('nav.signOut')}
+          </button>
+        </div>
       </aside>
       <div className={`sidebar-overlay${sidebarOpen ? ' show' : ''}`} onClick={() => setSidebarOpen(false)}></div>
 
@@ -265,8 +257,15 @@ function LayoutInner() {
       </header>
 
       <main className="main-content">
-        <Outlet context={{ role }} />
+        <Outlet context={{ role, requestSignOut: () => setSignOutOpen(true) }} />
       </main>
+
+      <Modal
+        open={signOutOpen} onClose={() => setSignOutOpen(false)} title={t('confirmDialogs.signOutTitle')} maxWidth={420}
+        footer={<><button className="btn btn-secondary" onClick={() => setSignOutOpen(false)}>{t('common.cancel')}</button><button className="btn btn-danger" onClick={handleLogout}><i className="fas fa-right-from-bracket"></i> {t('nav.signOut')}</button></>}
+      >
+        <p className="text-muted">{t('confirmDialogs.signOutMessage')}</p>
+      </Modal>
     </>
   );
 }

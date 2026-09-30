@@ -1,11 +1,11 @@
 import { Children, useState } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 
-/* Breakpoints mirror client/src/style.css's media queries: at 1024px and up
-   the green sidebar is pinned open (like the web's desktop layout); below
-   that it becomes a slide-in drawer behind a hamburger, exactly like the
-   web on tablets/phones. */
-export const BREAKPOINTS = { phone: 600, wide: 1024 };
+/* Breakpoints mirror client/src/style.css's media queries (480 / 768 /
+   1024): from 768px up (tablets) the green sidebar is pinned open; below
+   that it becomes a slide-in drawer behind the topbar's hamburger — the
+   same split the web app uses. */
+export const BREAKPOINTS = { phone: 600, tablet: 768, wide: 1024 };
 
 export function useBreakpoint() {
   const { width, height } = useWindowDimensions();
@@ -13,6 +13,7 @@ export function useBreakpoint() {
     width,
     height,
     isPhone: width < BREAKPOINTS.phone,
+    isTablet: width >= BREAKPOINTS.tablet,
     isWide: width >= BREAKPOINTS.wide,
   };
 }

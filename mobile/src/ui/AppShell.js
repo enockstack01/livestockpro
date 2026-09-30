@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, BackHandler, Image, Modal as RNModal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { usePathname, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,67 +10,86 @@ import Icon from '../components/Icon';
 import { useTheme } from '../theme/ThemeProvider';
 import { useConfirm } from '../lib/confirm';
 import { useToast } from '../lib/toast';
+import { haptics } from '../lib/haptics';
 import { useSync } from '../sync/SyncProvider';
 import { useRepository } from '../db/repository';
 import { wipeLocalData, getPendingSyncCount } from '../db/schema';
 import { isOverdueTask } from '../lib/shared';
+import { NAV_SECTIONS } from '../../../shared/navigation';
 import { useBreakpoint } from './layout';
 
-/* The app frame — a port of client/src/components/Layout.jsx: the fixed
-   deep-green sidebar (same items, icons, active state and logout) plus the
-   white topbar (menu toggle, page search, theme toggle, notifications,
-   avatar). At ≥1024px the sidebar is pinned open like the web's desktop
-   layout; below that it slides in over a dimmed overlay, exactly like the
-   web on tablets and phones. */
-
-export const NAV_ITEMS = [
-  { href: '/', icon: 'gauge-high', labelKey: 'nav.dashboard' },
-  { href: '/animals', icon: 'cow', labelKey: 'nav.animals' },
-  { href: '/health', icon: 'stethoscope', labelKey: 'nav.health' },
-  { href: '/feeding', icon: 'wheat-awn', labelKey: 'nav.feeding' },
-  { href: '/breeding', icon: 'venus-mars', labelKey: 'nav.breeding' },
-  { href: '/production', icon: 'gauge', labelKey: 'nav.production' },
-  { href: '/finance', icon: 'coins', labelKey: 'nav.finance' },
-  { href: '/tasks', icon: 'list-check', labelKey: 'nav.tasks' },
-  { href: '/reports', icon: 'chart-bar', labelKey: 'nav.reports' },
-  { href: '/settings', icon: 'gear', labelKey: 'nav.settings' },
-];
+/* The app frame, organized like the CropManager app (and the web app, which
+   shares the same sidebar definition in shared/navigation.js):
+   - a deep-green sidebar with the logo on a translucent tile, features
+     grouped under small uppercase section labels, and Sign out kept apart
+     in the sidebar footer;
+   - a slim white topbar: menu button (phones), theme toggle, notifications
+     bell with an unread count, and a round avatar that opens Settings.
+   From 768px up (tablets) the sidebar is pinned open; below that it slides
+   in over a dimmed overlay. Page search lives in each page, not the topbar. */
 
 const SIDEBAR_W = 260;
 const NOTIF_ORDER = { red: 0, orange: 1, blue: 2, purple: 3, green: 4 };
+const mobilePath = (item) => (item.key === 'dashboard' ? '/' : item.path);
+/* Mobile has no admin screens (the Admin Panel and One Health map are web-only). */
+const MOBILE_SECTIONS = NAV_SECTIONS.filter((s) => !s.adminOnly);
 
-/* ---------- Topbar search (client/src/lib/topbarSearch.jsx) ---------- */
-const SearchContext = createContext(null);
-
-/* A page registers its search box here; the topbar renders it on wide
-   screens (like the web). On phones — where the web hides the topbar search
-   — pages render the returned `inlineSearch` element in their body instead,
-   so search is never lost on a small screen. */
-export function useTopbarSearch(placeholder, onChange) {
-  const ctx = useContext(SearchContext);
-  const { width } = useBreakpoint();
+/* ---------- Page search (search box at the top of a list page) ---------- */
+/* Returns the search field element for the page to render, with a clear (×)
+   button once something is typed. */
+export function usePageSearch(placeholder, onChange) {
   const [value, setValue] = useState('');
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
-
   const update = useCallback((v) => { setValue(v); onChangeRef.current(v); }, []);
-  useEffect(() => {
-    ctx.setConfig({ placeholder, value, onChange: update });
-    return () => ctx.setConfig(null);
-  }, [placeholder, value]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const inTopbar = width > 768;
-  return inTopbar ? null : <InlineSearch placeholder={placeholder} value={value} onChange={update} />;
+  return <PageSearch placeholder={placeholder} value={value} onChange={update} />;
 }
 
-function InlineSearch({ placeholder, value, onChange }) {
+function PageSearch({ placeholder, value, onChange }) {
   const { colors } = useTheme();
+  const [focused, setFocused] = useState(false);
   return (
-    <View style={[baseStyles.searchBox, { backgroundColor: colors.card, borderWidth: 1.5, borderColor: colors.border, marginBottom: 16, minWidth: 0 }]}>
-      <Icon name="magnifying-glass" size={14} color={colors.textLight} />
-      <TextInput style={[baseStyles.searchInput, { color: colors.text }]} placeholder={placeholder} placeholderTextColor={colors.placeholder} value={value} onChangeText={onChange} />
+    <View style={[baseStyles.searchBox, { backgroundColor: colors.card, borderColor: focused ? colors.primary : colors.border }]}>
+      <Icon name="magnifying-glass" size={13} color={colors.placeholder} />
+      <TextInput
+        style={[baseStyles.searchInput, { color: colors.text }]}
+        placeholder={placeholder}
+        placeholderTextColor={colors.placeholder}
+        value={value}
+        onChangeText={onChange}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        returnKeyType="search"
+      />
+      {value ? (
+        <Pressable onPress={() => { haptics.select(); onChange(''); }} hitSlop={10} accessibilityLabel="Clear search">
+          <Icon name="circle-xmark" size={14} color={colors.placeholder} />
+        </Pressable>
+      ) : null}
     </View>
   );
+}
+
+/* ---------- Sign out (sidebar footer + Settings › Account) ---------- */
+/* Confirms, gives queued offline edits one last chance to sync, and only
+   then wipes this account's local copy and signs out — the prompt promises
+   the data stays synced, so never discard edits that haven't reached the
+   server yet. */
+export function useSignOut() {
+  const { t } = useTranslation();
+  const { signOut } = useAuth();
+  const db = useSQLiteContext();
+  const confirm = useConfirm();
+  const showToast = useToast();
+  const { triggerSync } = useSync();
+  return useCallback(async () => {
+    const ok = await confirm({ title: t('confirmDialogs.signOutTitle'), message: t('confirmDialogs.signOutMessage'), confirmLabel: t('confirmDialogs.signOutConfirm'), destructive: true });
+    if (!ok) return;
+    await triggerSync();
+    if ((await getPendingSyncCount(db)) > 0) { showToast(t('confirmDialogs.signOutSyncPending'), 'error'); return; }
+    await wipeLocalData(db); // don't leak this account's cached data to whoever signs in next
+    await signOut();
+  }, [t, confirm, triggerSync, db, showToast, signOut]);
 }
 
 /* ---------- Notifications (same rules as the web topbar bell) ---------- */
@@ -143,14 +162,13 @@ function useReadNotifications(userId) {
 export default function AppShell({ children }) {
   const { t } = useTranslation();
   const { colors, scheme, setThemePreference } = useTheme();
-  const { isWide, width } = useBreakpoint();
+  const { isTablet } = useBreakpoint();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useUser();
   const [open, setOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [search, setSearch] = useState(null);
   const notifItems = useNotifications(t);
   const { readIds, markRead, markAllRead } = useReadNotifications(user?.id);
   const unread = notifItems.filter((n) => !readIds.has(n.id)).length;
@@ -159,7 +177,7 @@ export default function AppShell({ children }) {
   useEffect(() => {
     Animated.timing(slide, { toValue: open ? 0 : -SIDEBAR_W, duration: 250, useNativeDriver: true }).start();
   }, [open, slide]);
-  useEffect(() => { if (isWide) setOpen(false); }, [isWide]);
+  useEffect(() => { if (isTablet) setOpen(false); }, [isTablet]);
 
   // Android back: close the drawer first, then fall back to the dashboard.
   useEffect(() => {
@@ -174,125 +192,130 @@ export default function AppShell({ children }) {
   const go = (href) => { setOpen(false); if (href !== pathname) router.replace(href); };
 
   const email = user?.primaryEmailAddress?.emailAddress || '';
-  const displayName = email.split('@')[0] || 'User';
-  const initials = email.substring(0, 2).toUpperCase() || 'U';
-  const searchCtx = useMemo(() => ({ setConfig: setSearch }), []);
+  const initials = (user?.firstName?.[0] || email[0] || 'U').toUpperCase() + (user?.lastName?.[0] || email[1] || '').toUpperCase();
 
-  const sidebar = <Sidebar pathname={pathname} onNavigate={go} onClose={() => setOpen(false)} closable={!isWide} topInset={insets.top} />;
+  const sidebar = <Sidebar pathname={pathname} onNavigate={go} onClose={() => setOpen(false)} closable={!isTablet} topInset={insets.top} bottomInset={insets.bottom} />;
 
   return (
-    <SearchContext.Provider value={searchCtx}>
-      <View style={[baseStyles.root, { backgroundColor: colors.bg }]}>
-        {isWide ? <View style={{ width: SIDEBAR_W }}>{sidebar}</View> : null}
+    <View style={[baseStyles.root, { backgroundColor: colors.bg }]}>
+      {isTablet ? <View style={{ width: SIDEBAR_W }}>{sidebar}</View> : null}
 
-        <View style={{ flex: 1 }}>
-          <View style={[baseStyles.topbar, { paddingTop: insets.top, height: 64 + insets.top, backgroundColor: colors.card, borderBottomColor: colors.border, paddingHorizontal: width <= 480 ? 14 : 24 }]}>
-            <View style={baseStyles.topbarLeft}>
-              {!isWide ? (
-                <Pressable onPress={() => setOpen(true)} hitSlop={10} accessibilityLabel="Menu"><Icon name="bars" size={20} color={colors.text} /></Pressable>
-              ) : null}
-              {search && width > 768 ? (
-                <View style={[baseStyles.searchBox, { backgroundColor: colors.bg, minWidth: isWide ? 280 : 180 }]}>
-                  <Icon name="magnifying-glass" size={14} color={colors.textLight} />
-                  <TextInput style={[baseStyles.searchInput, { color: colors.text }]} placeholder={search.placeholder} placeholderTextColor={colors.placeholder} value={search.value} onChangeText={search.onChange} />
-                </View>
-              ) : null}
-            </View>
-            <View style={baseStyles.topbarRight}>
-              <Pressable style={baseStyles.topbarBtn} onPress={() => setThemePreference(scheme === 'dark' ? 'light' : 'dark')} accessibilityLabel={t('layout.toggleTheme')}>
-                <Icon name={scheme === 'dark' ? 'sun' : 'moon'} size={18} color={colors.textLight} />
-              </Pressable>
-              <Pressable style={baseStyles.topbarBtn} onPress={() => setNotifOpen(true)} accessibilityLabel={t('layout.notifications')}>
-                <Icon name="bell" size={18} color={colors.textLight} />
-                {unread > 0 ? <View style={[baseStyles.notifCount, { backgroundColor: colors.red }]}><Text style={baseStyles.notifCountText}>{unread}</Text></View> : null}
-              </Pressable>
-              <Pressable style={baseStyles.userMenu} onPress={() => go('/settings')}>
-                <View style={[baseStyles.avatar, { backgroundColor: colors.primary }]}>
-                  {user?.imageUrl ? <Image source={{ uri: user.imageUrl }} style={{ width: 36, height: 36 }} /> : <Text style={baseStyles.avatarText}>{initials}</Text>}
-                </View>
-                {width > 768 ? <Text style={[baseStyles.userName, { color: colors.text }]}>{displayName}</Text> : null}
-              </Pressable>
-            </View>
-          </View>
-
-          <View style={{ flex: 1 }}>{children}</View>
+      <View style={{ flex: 1 }}>
+        <View style={[baseStyles.topbar, { paddingTop: insets.top, height: 60 + insets.top, backgroundColor: colors.card, borderBottomColor: colors.border }]}>
+          {!isTablet ? <TopbarButton icon="bars" label="Open menu" onPress={() => setOpen(true)} /> : null}
+          <View style={{ flex: 1 }} />
+          <TopbarButton icon={scheme === 'dark' ? 'sun' : 'moon'} label={t('layout.toggleTheme')} onPress={() => setThemePreference(scheme === 'dark' ? 'light' : 'dark')} />
+          <TopbarButton icon="bell" label={t('layout.notifications')} badge={unread} onPress={() => setNotifOpen(true)} />
+          <Pressable onPress={() => { haptics.select(); go('/settings'); }} accessibilityRole="button" accessibilityLabel={t('nav.settings')} style={({ pressed }) => ({ marginLeft: 6, opacity: pressed ? 0.8 : 1 })}>
+            {user?.imageUrl
+              ? <Image source={{ uri: user.imageUrl }} style={baseStyles.avatar} />
+              : <View style={[baseStyles.avatar, { backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center' }]}><Text style={[baseStyles.avatarText, { color: colors.primary }]}>{initials}</Text></View>}
+          </Pressable>
         </View>
 
-        {!isWide ? (
-          <View style={StyleSheet.absoluteFill} pointerEvents={open ? 'auto' : 'none'}>
-            <Pressable style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', opacity: open ? 1 : 0 }]} onPress={() => setOpen(false)} />
-            <Animated.View style={[baseStyles.drawer, { transform: [{ translateX: slide }] }]}>{sidebar}</Animated.View>
-          </View>
-        ) : null}
-
-        <NotificationsPanel
-          open={notifOpen}
-          onClose={() => setNotifOpen(false)}
-          items={notifItems}
-          readIds={readIds}
-          topInset={insets.top}
-          onItem={(n) => { markRead(n.id); setNotifOpen(false); go(n.link); }}
-          onMarkAll={() => markAllRead(notifItems.map((n) => n.id))}
-          onViewTasks={() => { setNotifOpen(false); go('/tasks'); }}
-        />
+        <View style={{ flex: 1 }}>{children}</View>
       </View>
-    </SearchContext.Provider>
+
+      {!isTablet ? (
+        <View style={StyleSheet.absoluteFill} pointerEvents={open ? 'auto' : 'none'}>
+          <Pressable style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', opacity: open ? 1 : 0 }]} onPress={() => setOpen(false)} />
+          <Animated.View style={[baseStyles.drawer, { transform: [{ translateX: slide }] }]}>{sidebar}</Animated.View>
+        </View>
+      ) : null}
+
+      <NotificationsPanel
+        open={notifOpen}
+        onClose={() => setNotifOpen(false)}
+        items={notifItems}
+        readIds={readIds}
+        topInset={insets.top}
+        onItem={(n) => { markRead(n.id); setNotifOpen(false); go(n.link); }}
+        onMarkAll={() => markAllRead(notifItems.map((n) => n.id))}
+        onViewTasks={() => { setNotifOpen(false); go('/tasks'); }}
+      />
+    </View>
   );
 }
 
-function Sidebar({ pathname, onNavigate, onClose, closable, topInset }) {
+/* Topbar icon button: 40px, radius 8, muted icon, optional count badge. */
+function TopbarButton({ icon, label, onPress, badge }) {
+  const { colors } = useTheme();
+  return (
+    <Pressable
+      onPress={() => { haptics.select(); onPress(); }}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      hitSlop={4}
+      style={({ pressed }) => [baseStyles.topbarBtn, pressed && { backgroundColor: colors.bg }]}
+    >
+      <Icon name={icon} size={17} color={colors.textLight} />
+      {badge ? (
+        <View style={[baseStyles.badge, { backgroundColor: colors.red }]}>
+          <Text style={baseStyles.badgeText}>{badge > 99 ? '99+' : badge}</Text>
+        </View>
+      ) : null}
+    </Pressable>
+  );
+}
+
+function NavItem({ icon, label, active, onPress, danger, accent }) {
+  const color = danger ? '#FFCDD2' : active ? '#FFFFFF' : 'rgba(255,255,255,0.7)';
+  return (
+    <Pressable
+      onPress={() => { haptics.select(); onPress(); }}
+      accessibilityRole="menuitem"
+      accessibilityState={{ selected: !!active }}
+      style={({ pressed }) => [baseStyles.navItem, active && baseStyles.navItemActive, pressed && !active && { backgroundColor: 'rgba(255,255,255,0.08)' }]}
+    >
+      <View style={{ width: 20, alignItems: 'center' }}><Icon name={icon} size={14} color={accent || color} /></View>
+      <Text style={[baseStyles.navText, { color }]} numberOfLines={1}>{label}</Text>
+    </Pressable>
+  );
+}
+
+function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInset }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const { signOut } = useAuth();
-  const db = useSQLiteContext();
-  const confirm = useConfirm();
-  const showToast = useToast();
+  const signOut = useSignOut();
   const { syncing, lastSyncedAt, lastError, failedCount, triggerSync } = useSync();
-
-  async function logout() {
-    const ok = await confirm({ title: t('confirmDialogs.signOutTitle'), message: t('confirmDialogs.signOutMessage'), confirmLabel: t('confirmDialogs.signOutConfirm'), destructive: true });
-    if (!ok) return;
-    onClose();
-    // Give queued offline edits one last chance to reach the server before
-    // wiping the local cache — the prompt promises data stays synced.
-    await triggerSync();
-    if ((await getPendingSyncCount(db)) > 0) { showToast(t('confirmDialogs.signOutSyncPending'), 'error'); return; }
-    await wipeLocalData(db); // don't leak this account's cached data to whoever signs in next
-    await signOut();
-  }
 
   const syncLine = syncing ? t('sync.syncing') : lastError ? t('sync.syncIssue')
     : lastSyncedAt ? t('sync.lastSynced', { time: new Date(lastSyncedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }) : t('sync.notSyncedYet');
 
   return (
-    <View style={[baseStyles.sidebar, { paddingTop: topInset, backgroundColor: colors.sidebar }]}>
-      <View style={baseStyles.sidebarHeader}>
-        <View style={baseStyles.sidebarLogo}>
-          <Icon name="cow" size={22} color="#81C784" />
-          <Text style={baseStyles.sidebarLogoText}>LivestockPro</Text>
-        </View>
-        {closable ? <Pressable onPress={onClose} hitSlop={10}><Icon name="xmark" size={18} color="rgba(255,255,255,0.6)" /></Pressable> : null}
+    <View style={[baseStyles.sidebar, { backgroundColor: colors.sidebar }]}>
+      {/* Logo on a translucent tile, name in two tones. */}
+      <View style={[baseStyles.sidebarHeader, { paddingTop: topInset + 14 }]}>
+        <View style={baseStyles.logoTile}><Icon name="cow" size={18} color="#81C784" /></View>
+        <Text style={baseStyles.logoText}>Livestock<Text style={{ color: '#81C784' }}>Pro</Text></Text>
+        <View style={{ flex: 1 }} />
+        {closable ? <Pressable onPress={onClose} hitSlop={10} accessibilityLabel="Close menu"><Icon name="xmark" size={18} color="rgba(255,255,255,0.6)" /></Pressable> : null}
       </View>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingVertical: 12 }}>
-        {NAV_ITEMS.map((item) => {
-          const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
-          return (
-            <Pressable key={item.href} onPress={() => onNavigate(item.href)} style={({ pressed }) => [baseStyles.navItem, active && baseStyles.navItemActive, pressed && !active && { backgroundColor: 'rgba(255,255,255,0.08)' }]}>
-              <Icon name={item.icon} size={15} color={active ? '#FFFFFF' : 'rgba(255,255,255,0.7)'} style={{ width: 20, textAlign: 'center' }} />
-              <Text style={[baseStyles.navText, active && { color: '#FFFFFF' }]}>{t(item.labelKey)}</Text>
-            </Pressable>
-          );
-        })}
+
+      {/* Features, grouped into labelled sections. */}
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 12 }}>
+        {MOBILE_SECTIONS.map((section) => (
+          <View key={section.labelKey || 'main'}>
+            {section.labelKey ? <Text style={baseStyles.sectionLabel}>{t(section.labelKey)}</Text> : <View style={{ height: 8 }} />}
+            {section.items.map((item) => {
+              const href = mobilePath(item);
+              const active = href === '/' ? pathname === '/' : pathname.startsWith(href);
+              return <NavItem key={item.key} icon={item.icon} label={t(item.labelKey)} active={active} onPress={() => onNavigate(href)} />;
+            })}
+          </View>
+        ))}
       </ScrollView>
-      {/* Offline sync status — mobile keeps a local copy of the farm's data. */}
-      <Pressable onPress={triggerSync} style={baseStyles.syncRow}>
-        <Icon name={syncing ? 'arrows-rotate' : lastError ? 'triangle-exclamation' : 'cloud'} size={13} color={lastError ? '#FFD54F' : '#81C784'} style={{ width: 20, textAlign: 'center' }} />
-        <Text style={baseStyles.syncText} numberOfLines={1}>{syncLine}{failedCount > 0 ? ` · ${t('sync.recordsFailed', { count: failedCount })}` : ''}</Text>
-      </Pressable>
-      <Pressable onPress={logout} style={[baseStyles.navItem, baseStyles.logout]}>
-        <Icon name="right-from-bracket" size={15} color="rgba(255,200,200,0.8)" style={{ width: 20, textAlign: 'center' }} />
-        <Text style={[baseStyles.navText, { color: 'rgba(255,200,200,0.8)' }]}>{t('layout.logout')}</Text>
-      </Pressable>
+
+      {/* Footer, apart from the features: offline sync status, then Sign out. */}
+      <View style={[baseStyles.sidebarFooter, { paddingBottom: bottomInset + 8 }]}>
+        <Pressable onPress={() => { haptics.select(); triggerSync(); }} style={baseStyles.syncRow} accessibilityRole="button">
+          <View style={{ width: 20, alignItems: 'center' }}>
+            <Icon name={syncing ? 'arrows-rotate' : lastError ? 'triangle-exclamation' : 'cloud'} size={12} color={lastError ? '#FFD54F' : '#81C784'} />
+          </View>
+          <Text style={baseStyles.syncText} numberOfLines={1}>{syncLine}{failedCount > 0 ? ` · ${t('sync.recordsFailed', { count: failedCount })}` : ''}</Text>
+        </Pressable>
+        <NavItem icon="right-from-bracket" label={t('nav.signOut')} onPress={() => { onClose(); signOut(); }} danger />
+      </View>
     </View>
   );
 }
@@ -306,7 +329,7 @@ function NotificationsPanel({ open, onClose, items, readIds, onItem, onMarkAll, 
     <RNModal visible={open} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
       <View style={[baseStyles.notifPanel, {
-        top: topInset + 58, right: width <= 480 ? 10 : 24, width: Math.min(360, width - 20), backgroundColor: colors.card,
+        top: topInset + 54, right: width <= 480 ? 10 : 16, width: Math.min(360, width - 20), backgroundColor: colors.card,
         shadowColor: shadowLg.color, shadowOpacity: shadowLg.opacity, shadowRadius: shadowLg.radius, shadowOffset: shadowLg.offset, elevation: shadowLg.elevation,
       }]}>
         <View style={[baseStyles.notifHeader, { borderBottomColor: colors.border }]}>
@@ -344,28 +367,25 @@ const baseStyles = StyleSheet.create({
   root: { flex: 1, flexDirection: 'row' },
   sidebar: { flex: 1, width: SIDEBAR_W },
   drawer: { position: 'absolute', left: 0, top: 0, bottom: 0, width: SIDEBAR_W, shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 12, elevation: 12 },
-  sidebarHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)' },
-  sidebarLogo: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  sidebarLogoText: { color: '#FFFFFF', fontSize: 18, fontWeight: '700' },
-  navItem: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11, paddingHorizontal: 20, borderLeftWidth: 3, borderLeftColor: 'transparent' },
-  navItemActive: { backgroundColor: 'rgba(255,255,255,0.12)', borderLeftColor: '#81C784' },
-  navText: { color: 'rgba(255,255,255,0.7)', fontSize: 14, fontWeight: '500' },
-  syncRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, paddingHorizontal: 23, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.12)' },
-  syncText: { color: 'rgba(255,255,255,0.6)', fontSize: 12, flex: 1 },
-  logout: { paddingBottom: 20 },
+  sidebarHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingBottom: 16, paddingHorizontal: 18, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)' },
+  logoTile: { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' },
+  logoText: { color: '#FFFFFF', fontSize: 17, fontWeight: '700' },
+  sectionLabel: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, color: 'rgba(255,255,255,0.35)', paddingTop: 16, paddingBottom: 6, paddingHorizontal: 20 },
+  navItem: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11, paddingLeft: 17, paddingRight: 20, borderLeftWidth: 3, borderLeftColor: 'transparent' },
+  navItemActive: { backgroundColor: 'rgba(255,255,255,0.12)', borderLeftColor: '#66BB6A' },
+  navText: { fontSize: 13, fontWeight: '500' },
+  sidebarFooter: { borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', paddingTop: 6 },
+  syncRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8, paddingLeft: 20, paddingRight: 20 },
+  syncText: { color: 'rgba(255,255,255,0.5)', fontSize: 11, flex: 1 },
 
-  topbar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1 },
-  topbarLeft: { flexDirection: 'row', alignItems: 'center', gap: 16, flexShrink: 1 },
-  topbarRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  topbarBtn: { width: 38, height: 38, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-  notifCount: { position: 'absolute', top: 2, right: 2, minWidth: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
-  notifCountText: { color: '#fff', fontSize: 9, fontWeight: '700' },
-  userMenu: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  avatar: { width: 36, height: 36, borderRadius: 8, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  avatarText: { color: '#fff', fontWeight: '700', fontSize: 13 },
-  userName: { fontSize: 13, fontWeight: '600' },
-  searchBox: { flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 8, paddingVertical: 8, paddingHorizontal: 14 },
-  searchInput: { flex: 1, fontSize: 13, padding: 0 },
+  topbar: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, borderBottomWidth: 1 },
+  topbarBtn: { width: 40, height: 40, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  badge: { position: 'absolute', top: 4, right: 4, minWidth: 18, height: 18, borderRadius: 9, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
+  badgeText: { color: '#fff', fontSize: 10, fontWeight: '700' },
+  avatar: { width: 34, height: 34, borderRadius: 17, overflow: 'hidden' },
+  avatarText: { fontWeight: '700', fontSize: 13 },
+  searchBox: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 8, borderWidth: 1, paddingHorizontal: 13, minHeight: 42, marginBottom: 10 },
+  searchInput: { flex: 1, fontSize: 13, paddingVertical: 10 },
 
   notifPanel: { position: 'absolute', borderRadius: 12, overflow: 'hidden' },
   notifHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16, borderBottomWidth: 1 },

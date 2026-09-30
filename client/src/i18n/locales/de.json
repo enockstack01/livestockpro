@@ -22,7 +22,9 @@
     "notesPlaceholder": "Zusätzliche Notizen...",
     "selectEllipsis": "Auswählen...",
     "age": "Alter",
-    "lastCheck": "Letzte Untersuchung"
+    "lastCheck": "Letzte Untersuchung",
+    "prev": "Zurück",
+    "next": "Weiter"
   },
   "nav": {
     "dashboard": "Übersicht",
@@ -36,7 +38,16 @@
     "reports": "Berichte",
     "settings": "Einstellungen",
     "more": "Mehr",
-    "signOut": "Abmelden"
+    "signOut": "Abmelden",
+    "sections": {
+      "livestock": "Tierbestand",
+      "production": "Produktion",
+      "finance": "Finanzen",
+      "planning": "Planung",
+      "analytics": "Auswertungen",
+      "administration": "Verwaltung",
+      "system": "System"
+    }
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -108,7 +119,11 @@
     "deleteFailed": "Fehler beim Löschen von {{item}}.",
     "exported": "{{label}} als CSV exportiert.",
     "noRecordsToExport": "Kein(e) {{label}} zum Exportieren.",
-    "emptyListWeb": "Noch kein(e) {{label}}. Fügen Sie eine(n) hinzu, um zu beginnen."
+    "emptyListWeb": "Noch kein(e) {{label}}. Fügen Sie eine(n) hinzu, um zu beginnen.",
+    "detailsTitle": "{{item}} – Details",
+    "pageOf": "Seite {{page}} von {{pages}} · {{count}} Einträge",
+    "noMatches": "Keine passenden Einträge",
+    "tryDifferent": "Versuchen Sie eine andere Suche oder setzen Sie die Filter zurück."
   },
   "tables": {
     "animals": {
@@ -393,7 +408,9 @@
     "preferences": "Einstellungen",
     "language": "Sprache",
     "languageHelp": "Wählen Sie Ihre bevorzugte Sprache für die App-Oberfläche.",
-    "typeDeleteToConfirm": "Geben Sie zur Bestätigung DELETE ein."
+    "typeDeleteToConfirm": "Geben Sie zur Bestätigung DELETE ein.",
+    "signedInAs": "Angemeldet als {{email}}",
+    "appVersion": "LivestockPro Mobile v{{version}}"
   },
   "dashboardPage": {
     "title": "Dashboard",
@@ -434,7 +451,11 @@
     "chartNoTasksYet": "Noch keine Aufgaben",
     "chartAddTasks": "Fügen Sie eine Aufgabe hinzu, um die Statusaufteilung zu sehen.",
     "taskTitlePlaceholder": "z. B. Vaccinate cattle in Pen B",
-    "taskDescPlaceholder": "Optionale Details..."
+    "taskDescPlaceholder": "Optionale Details...",
+    "greetingMorning": "Guten Morgen, {{name}}",
+    "greetingAfternoon": "Guten Tag, {{name}}",
+    "greetingEvening": "Guten Abend, {{name}}",
+    "todaySubtitle": "Das passiert heute auf Ihrem Betrieb."
   },
   "reportsPage": {
     "title": "Vollständiger Farmbericht",

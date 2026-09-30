@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useUser } from '@clerk/clerk-react';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { StatusBadge, PriorityBadge, fmtDate } from '../lib/badges.jsx';
 import { useCanvasChart } from '../lib/useChart.js';
 import { useChartTheme, cartesianOptions, doughnutOptions, barDataset } from '../lib/chartTheme.js';
 import FarmAnalytics from '../components/FarmAnalytics.jsx';
+import { greeting } from '../../../shared/navigation';
 import Modal from '../components/Modal.jsx';
 import { isOverdueTask } from '../../../shared/businessRules';
 
@@ -14,6 +16,8 @@ export default function Dashboard() {
   const { t } = useTranslation();
   const api = useApi();
   const showToast = useToast();
+  const { user } = useUser();
+  const greetName = user?.firstName || (user?.primaryEmailAddress?.emailAddress || '').split('@')[0] || '';
 
   const [data, setData] = useState({ animals: [], health: [], finance: [], production: [], tasks: [], breeding: [], feeding: [] });
   const [loading, setLoading] = useState(true);
@@ -99,7 +103,7 @@ export default function Dashboard() {
   return (
     <>
       <div className="page-header">
-        <div><h1>{t('dashboardPage.title')}</h1><p>{t('dashboardPage.subtitle')}</p></div>
+        <div><h1>{greeting(t, greetName)}</h1><p>{t('dashboardPage.todaySubtitle')}</p></div>
       </div>
 
       <div className="summary-grid">

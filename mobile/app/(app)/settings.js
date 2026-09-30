@@ -13,12 +13,15 @@ import Icon from '../../src/components/Icon';
 import { useTheme } from '../../src/theme/ThemeProvider';
 import { useLanguage } from '../../src/i18n/LanguageProvider';
 import { Button, Card, CardBody, CardHeader, FormGroup, Input, Modal, Muted, Page, PageHeader, Select } from '../../src/ui/kit';
-import { Grid } from '../../src/ui/layout';
+import Constants from 'expo-constants';
+import { useSignOut } from '../../src/ui/AppShell';
 
-/* Port of client/src/pages/Settings.jsx: profile header card (avatar,
-   name, email, photo actions), then Farm Profile / Account & Security /
-   Preferences cards, then the Danger Zone. Profile edits save to the local
-   database and sync like every other record. */
+/* Settings, organized like the CropManager app (and client/src/pages/
+   Settings.jsx) as one column: profile header card (avatar, name, email,
+   photo actions), Farm Profile, Preferences, Account (with Sign out — the
+   other place besides the sidebar footer), Danger Zone, and the app
+   version. Profile edits save to the local database and sync like every
+   other record. */
 export default function SettingsScreen() {
   const { t } = useTranslation();
   const { colors, preference, setThemePreference } = useTheme();
@@ -30,6 +33,7 @@ export default function SettingsScreen() {
   const showToast = useToast();
   const router = useRouter();
   const db = useSQLiteContext();
+  const requestSignOut = useSignOut();
 
   const [profile, setProfile] = useState(null);
   const [farmName, setFarmName] = useState('');
@@ -127,9 +131,10 @@ export default function SettingsScreen() {
 
   return (
     <Page>
+      <View style={{ width: '100%', maxWidth: 720, gap: 20 }}>
       <PageHeader title={t('settings.title')} subtitle={t('settings.subtitle')} />
 
-      <Card style={{ marginBottom: 20 }}>
+      <Card>
         <View style={styles.headerCard}>
           <Pressable onPress={changeAvatar} disabled={uploading} style={[styles.avatar, { backgroundColor: colors.primaryLight, borderColor: colors.card, opacity: uploading ? 0.6 : 1 }]}>
             {user?.imageUrl ? <Image source={{ uri: user.imageUrl }} style={styles.avatarImg} /> : <Text style={[styles.initials, { color: colors.primary }]}>{initials}</Text>}
@@ -146,7 +151,6 @@ export default function SettingsScreen() {
         </View>
       </Card>
 
-      <Grid minItemWidth={420} gap={20} style={{ marginBottom: 24 }}>
         <Card>
           <CardHeader title={t('settings.farmProfile')} icon="tractor" />
           <CardBody>
@@ -154,15 +158,6 @@ export default function SettingsScreen() {
             <FormGroup label={t('settings.location')}><Input placeholder={t('settings.locationPlaceholder')} value={location} onChangeText={setLocation} /></FormGroup>
             <FormGroup label={t('settings.phoneNumber')}><Input placeholder={t('settings.phonePlaceholder')} value={phone} onChangeText={setPhone} keyboardType="phone-pad" /></FormGroup>
             <Button icon="check" title={saving ? t('settings.saving') : t('settings.saveProfile')} onPress={saveProfile} loading={saving} style={{ alignSelf: 'flex-start' }} />
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader title={t('settings.accountSecurity')} icon="user-shield" iconColor={colors.blue} />
-          <CardBody>
-            <ReadonlyRow label={t('settings.email')} value={email} colors={colors} />
-            <ReadonlyRow label={t('settings.userId')} value={user?.id || ''} colors={colors} mono last />
-            <Muted style={{ marginTop: 16 }}>{t('settings.passwordNote')}</Muted>
           </CardBody>
         </Card>
 
@@ -179,7 +174,17 @@ export default function SettingsScreen() {
             <Muted>{rtlRestartNeeded ? t('settings.rtlRestartNotice') : t('settings.languageHelp')}</Muted>
           </CardBody>
         </Card>
-      </Grid>
+        <Card>
+          <CardHeader title={t('settings.accountSecurity')} icon="user-shield" iconColor={colors.blue} />
+          <CardBody>
+            <ReadonlyRow label={t('settings.email')} value={email} colors={colors} />
+            <ReadonlyRow label={t('settings.userId')} value={user?.id || ''} colors={colors} mono last />
+            <Muted style={{ marginTop: 16 }}>{t('settings.passwordNote')}</Muted>
+            <Muted style={{ marginTop: 12, marginBottom: 14 }}>{t('settings.signedInAs', { email })}</Muted>
+            <Button variant="danger" icon="right-from-bracket" title={t('nav.signOut')} onPress={requestSignOut} style={{ alignSelf: 'flex-start' }} />
+          </CardBody>
+        </Card>
+
 
       <Card danger>
         <CardHeader title={t('settings.dangerZone')} icon="triangle-exclamation" iconColor={colors.red} titleColor={colors.red} />
@@ -188,6 +193,9 @@ export default function SettingsScreen() {
           <Button variant="danger" icon="user-xmark" title={t('settings.deleteAccount')} onPress={() => setDeleteOpen(true)} style={{ alignSelf: 'flex-start' }} />
         </CardBody>
       </Card>
+
+      <Text style={{ fontSize: 11, color: colors.textLight, textAlign: 'center' }}>{t('settings.appVersion', { version: Constants.expoConfig?.version || '1.0.0' })}</Text>
+      </View>
 
       <Modal
         open={deleteOpen}

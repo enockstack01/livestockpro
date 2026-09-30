@@ -371,7 +371,7 @@ textarea.form-control {
   display: flex;
   flex-direction: column;
   transition: transform var(--transition);
-  overflow-y: auto;
+  overflow: hidden; /* the nav list scrolls; header and sign-out footer stay put */
 }
 
 .sidebar-header {
@@ -391,8 +391,40 @@ textarea.form-control {
 }
 
 .sidebar-logo i {
-  font-size: 22px;
+  font-size: 18px;
   color: #81C784;
+}
+
+/* Logo mark on a translucent tile, name in two tones ("Livestock" + green "Pro"). */
+.sidebar-logo-tile {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.15);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-logo-accent {
+  color: #81C784;
+}
+
+/* Features are grouped under small uppercase section labels. */
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: rgba(255,255,255,0.35);
+  padding: 16px 20px 6px;
+}
+
+/* Sign out sits apart from the features, pinned under a divider. */
+.sidebar-footer {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding: 6px 0 10px;
 }
 
 .sidebar-close {
@@ -404,17 +436,26 @@ textarea.form-control {
 
 .sidebar-nav {
   flex: 1;
-  padding: 12px 0;
+  padding: 4px 0 12px;
+  overflow-y: auto;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
   padding: 11px 20px;
   color: rgba(255,255,255,0.7);
   font-weight: 500;
-  font-size: 14px;
+  font-size: 13px;
+  background: none;
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
   transition: var(--transition);
   border-left: 3px solid transparent;
 }
@@ -427,7 +468,7 @@ textarea.form-control {
 .nav-item.active {
   color: var(--white);
   background: rgba(255,255,255,0.12);
-  border-left-color: #81C784;
+  border-left-color: #66BB6A;
 }
 
 .nav-item i {
@@ -451,7 +492,6 @@ textarea.form-control {
 }
 
 .nav-item.logout-item {
-  margin-top: auto;
   color: rgba(255,200,200,0.8);
 }
 
@@ -1401,6 +1441,18 @@ table.data-table {
   align-items: start;
 }
 
+/* Settings reads top to bottom in one column: profile, farm profile,
+   preferences, account (with Sign out), danger zone. */
+.settings-page {
+  max-width: 720px;
+}
+
+.settings-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .settings-readonly-row {
   display: flex;
   align-items: center;
@@ -1459,6 +1511,20 @@ table.data-table {
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1024px) {
+  .search-box {
+    min-width: 180px;
+  }
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* The sidebar stays pinned on tablets and up; below 768px it becomes a
+   slide-out menu behind the topbar's hamburger (same as the mobile app). */
+@media (max-width: 767px) {
   .sidebar {
     transform: translateX(-100%);
   }
@@ -1479,15 +1545,6 @@ table.data-table {
   }
   .menu-toggle {
     display: flex;
-  }
-  .search-box {
-    min-width: 180px;
-  }
-  .charts-grid {
-    grid-template-columns: 1fr;
-  }
-  .form-row {
-    grid-template-columns: 1fr;
   }
 }
 

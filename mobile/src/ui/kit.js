@@ -5,16 +5,18 @@ import Icon from '../components/Icon';
 import { useTheme } from '../theme/ThemeProvider';
 import { tone } from '../../../shared/statusMaps';
 import { useBreakpoint } from './layout';
+import { haptics } from '../lib/haptics';
 
-/* .main-content: the scrolling page body (24px gutters, 16px at ≤768px). */
+/* .main-content: the scrolling page body — 16px gutters on phones, 28px
+   from tablets up, content capped at 1400px and centered on big screens. */
 export function Page({ children, refreshing, onRefresh }) {
   const { colors } = useTheme();
-  const { width } = useBreakpoint();
-  const gutter = width <= 768 ? 16 : 24;
+  const { isTablet, isWide } = useBreakpoint();
+  const gutter = isTablet ? 28 : 16;
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.bg }}
-      contentContainerStyle={{ paddingHorizontal: gutter, paddingTop: 20, paddingBottom: 40 }}
+      contentContainerStyle={[{ paddingHorizontal: gutter, paddingTop: 20, paddingBottom: 40 }, isWide && { width: '100%', maxWidth: 1400, alignSelf: 'center' }]}
       keyboardShouldPersistTaps="handled"
       refreshControl={onRefresh ? <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} colors={[colors.primary]} tintColor={colors.primary} /> : undefined}
     >
@@ -87,7 +89,7 @@ export function Button({ title, icon, onPress, variant = 'primary', size, disabl
   const fg = variant === 'secondary' ? colors.text : colors.white;
   return (
     <Pressable
-      onPress={onPress}
+      onPress={onPress ? () => { haptics.tap(); onPress(); } : undefined}
       disabled={disabled || loading}
       style={({ pressed }) => [s.btn, s[`btn_${variant}`], size === 'sm' && s.btnSm, block && { alignSelf: 'stretch' }, (disabled || loading) && { opacity: 0.6 }, pressed && { opacity: 0.85 }, style]}
     >
@@ -149,7 +151,7 @@ export function Tabs({ items, value, onChange }) {
         {items.map((it) => {
           const active = it.value === value;
           return (
-            <Pressable key={it.value} onPress={() => onChange(it.value)} style={[s.tabBtn, active && s.tabBtnActive]}>
+            <Pressable key={it.value} onPress={() => { haptics.select(); onChange(it.value); }} style={[s.tabBtn, active && s.tabBtnActive]}>
               <Text style={[s.tabText, active && s.tabTextActive]}>{it.label}</Text>
             </Pressable>
           );
@@ -167,7 +169,7 @@ export function Segmented({ items, value, onChange }) {
       {items.map((it) => {
         const active = it.value === value;
         return (
-          <Pressable key={it.value} onPress={() => onChange(it.value)} style={[s.segBtn, active && s.segBtnActive]}>
+          <Pressable key={it.value} onPress={() => { haptics.select(); onChange(it.value); }} style={[s.segBtn, active && s.segBtnActive]}>
             <Text style={[s.segText, active && s.segTextActive]}>{it.label}</Text>
           </Pressable>
         );
@@ -261,7 +263,7 @@ export function Select({ value, options, onChange, placeholder, compact }) {
           renderItem={({ item }) => {
             const active = item.value === value;
             return (
-              <Pressable onPress={() => { onChange(item.value); setOpen(false); }} style={[s.option, active && s.optionActive]}>
+              <Pressable onPress={() => { haptics.select(); onChange(item.value); setOpen(false); }} style={[s.option, active && s.optionActive]}>
                 <Text style={[s.optionText, active && { color: colors.primary, fontWeight: '700' }]}>{item.label}</Text>
                 {active ? <Icon name="check" size={14} color={colors.primary} /> : null}
               </Pressable>
