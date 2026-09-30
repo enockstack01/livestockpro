@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from '../components/Icon';
 import { useTheme } from '../theme/ThemeProvider';
@@ -37,18 +37,24 @@ export function ToastProvider({ children }) {
   );
 }
 
+/* Same look as the web's .toast: a solid colored pill (green / red / orange
+   / blue) with white text — dark text on orange, which stays light in both
+   themes — pinned top-right on wide screens, full-width on phones. */
 function ToastView({ toast, opacity }) {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
+  const { width } = useWindowDimensions();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const typeColors = { success: colors.primary, error: colors.red, warning: colors.orange, info: colors.blue };
-  const tint = typeColors[toast.type] || typeColors.info;
+  const bg = typeColors[toast.type] || typeColors.info;
+  const fg = toast.type === 'warning' ? '#263238' : '#FFFFFF';
+  const wide = width > 600;
 
   return (
-    <Animated.View style={[styles.wrap, { top: insets.top + 8, opacity }]} pointerEvents="none">
-      <View style={[styles.toast, { borderLeftColor: tint }]}>
-        <Icon name={ICONS[toast.type] || ICONS.info} size={20} color={tint} />
-        <Text style={styles.text} numberOfLines={3}>{toast.message}</Text>
+    <Animated.View style={[styles.wrap, { top: insets.top + 20, opacity }, wide ? { right: 20, left: undefined, alignItems: 'flex-end' } : null]} pointerEvents="none">
+      <View style={[styles.toast, { backgroundColor: bg }]}>
+        <Icon name={ICONS[toast.type] || ICONS.info} size={16} color={fg} />
+        <Text style={[styles.text, { color: fg }]} numberOfLines={3}>{toast.message}</Text>
       </View>
     </Animated.View>
   );
@@ -64,11 +70,11 @@ function makeStyles(colors) {
   return StyleSheet.create({
     wrap: { position: 'absolute', left: 16, right: 16, zIndex: 999, alignItems: 'center' },
     toast: {
-      flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.card,
-      borderLeftWidth: 4, borderRadius: 10, paddingVertical: 12, paddingHorizontal: 14,
-      maxWidth: 480, width: '100%',
-      shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 4,
+      flexDirection: 'row', alignItems: 'center', gap: 10,
+      borderRadius: 10, paddingVertical: 14, paddingHorizontal: 20,
+      maxWidth: 380, width: '100%',
+      shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 30, shadowOffset: { width: 0, height: 8 }, elevation: 8,
     },
-    text: { flex: 1, color: colors.text, fontSize: 14 },
+    text: { flex: 1, fontSize: 13, fontWeight: '500' },
   });
 }

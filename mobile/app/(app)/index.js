@@ -1,43 +1,47 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useFocusEffect, useRouter } from 'expo-router';
-import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import { PieChart } from 'react-native-chart-kit';
+import { useCallback, useEffect, useState } from 'react';
+import { Text, View } from 'react-native';
+import { useTheme } from '../../src/theme/ThemeProvider';
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useRepository } from '../../src/db/repository';
 import { useSync } from '../../src/sync/SyncProvider';
-import { fmtDate, isOverdueTask, isThisMonth } from '../../src/lib/shared';
-import { StatusBadge } from '../../src/components/Badges';
-import Icon from '../../src/components/Icon';
-import ResponsiveScreen from '../../src/components/ResponsiveScreen';
-import { useTheme } from '../../src/theme/ThemeProvider';
+import { useToast } from '../../src/lib/toast';
+import { fmtDate, isOverdueTask } from '../../src/lib/shared';
+import { StatusBadge, PriorityBadge } from '../../src/components/Badges';
+import { Button, Card, CardBody, CardHeader, EmptyState, FormGroup, Input, Modal, Page, PageHeader, Select, Spinner, SummaryCard } from '../../src/ui/kit';
+import { Grid, useBreakpoint } from '../../src/ui/layout';
+import { BarChart, DonutChart, useChartColors } from '../../src/ui/charts';
+import DataTable from '../../src/ui/DataTable';
+import DateField from '../../src/components/DateField';
+import FarmAnalytics from '../../src/screens/FarmAnalytics';
+import { computeDashboardSummary, monthBuckets, ym } from '../../../shared/analytics';
+import { fmtMoney } from '../../../shared/chartPalette';
 
+/* Port of client/src/pages/Dashboard.jsx: the ten summary cards, the three
+   headline charts, Farm Analytics & Insights, recent animals / upcoming
+   tasks, and recent health alerts — same order, same styling. */
 export default function DashboardScreen() {
-  const { t } = useTranslation();
-  const { colors, radius, shadow } = useTheme();
-  const styles = useMemo(() => makeStyles(colors, radius, shadow), [colors, radius, shadow]);
-  const CHART_COLORS = useMemo(() => ({ green: colors.primary, orange: colors.orange, red: colors.red, gray: colors.textLight, blue: colors.blue }), [colors]);
-
+  const { t, i18n } = useTranslation();
   const repo = useRepository();
   const router = useRouter();
+  const showToast = useToast();
+  const cc = useChartColors();
+  const { width } = useBreakpoint();
   const { syncing, lastSyncedAt, triggerSync } = useSync();
-  const { width: windowWidth } = useWindowDimensions();
   const [data, setData] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [taskOpen, setTaskOpen] = useState(false);
+  const [taskForm, setTaskForm] = useState({ title: '', description: '', due_date: '', priority: 'Medium' });
 
   const load = useCallback(async () => {
-    const [animals, health, breeding, production, finance, tasks] = await Promise.all([
-      repo.list('animals'),
-      repo.list('health_records'),
-      repo.list('breeding_records'),
-      repo.list('production_records'),
-      repo.list('finance_records'),
-      repo.list('tasks'),
+    const [animals, health, finance, production, tasks, breeding, feeding] = await Promise.all([
+      repo.list('animals'), repo.list('health_records'), repo.list('finance_records'), repo.list('production_records'),
+      repo.list('tasks', { order: 'due_date ASC' }), repo.list('breeding_records'), repo.list('feeding_records'),
     ]);
-    setData({ animals, health, breeding, production, finance, tasks });
+    setData({ animals, health, finance, production, tasks, breeding, feeding });
   }, [repo]);
 
-  useFocusEffect(useCallback(() => { load(); }, [load]));
-  useEffect(() => { if (lastSyncedAt) load(); }, [lastSyncedAt]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load(); }, [load, lastSyncedAt]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -46,163 +50,169 @@ export default function DashboardScreen() {
     setRefreshing(false);
   }, [triggerSync, load]);
 
-  const kpis = useMemo(() => computeKpis(data, CHART_COLORS, colors, t), [data, CHART_COLORS, colors, t]);
-
-  if (!data) {
-    return <View style={styles.container} />;
+  async function saveQuickTask() {
+    const title = taskForm.title.trim();
+    if (!title) { showToast(t('tasksPage.taskTitleRequired'), 'error'); return; }
+    await repo.insert('tasks', { title, description: taskForm.description.trim(), due_date: taskForm.due_date || null, priority: taskForm.priority, status: 'Pending' });
+    showToast(t('records.added', { item: t('tables.tasks.singular') }), 'success');
+    setTaskOpen(false);
+    load();
   }
 
-  return (
-    <ResponsiveScreen>
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 40 }}
-      refreshControl={<RefreshControl refreshing={refreshing || syncing} onRefresh={onRefresh} colors={[colors.primary]} />}
-    >
-      <View style={styles.grid}>
-        <KpiCard styles={styles} label={t('dashboard.totalAnimals')} value={kpis.totalAnimals} icon="cow" color={CHART_COLORS.green} onPress={() => router.push('/animals')} />
-        <KpiCard styles={styles} label={t('dashboard.critical')} value={kpis.critical} icon="triangle-exclamation" color={CHART_COLORS.red} onPress={() => router.push('/health')} />
-        <KpiCard styles={styles} label={t('dashboard.pregnant')} value={kpis.pregnant} icon="venus-mars" color={CHART_COLORS.blue} onPress={() => router.push('/breeding')} />
-        <KpiCard styles={styles} label={t('dashboard.pendingTasks')} value={kpis.pendingTasks} sub={kpis.overdueTasks ? t('dashboard.overdueCount', { count: kpis.overdueTasks }) : null} icon="list-check" color={kpis.overdueTasks ? CHART_COLORS.red : CHART_COLORS.orange} onPress={() => router.push('/tasks')} />
-        <KpiCard styles={styles} label={t('dashboard.incomeMonth')} value={`$${kpis.monthlyIncome.toFixed(0)}`} icon="arrow-trend-up" color={CHART_COLORS.green} onPress={() => router.push('/finance')} />
-        <KpiCard styles={styles} label={t('dashboard.expenseMonth')} value={`$${kpis.monthlyExpense.toFixed(0)}`} icon="arrow-trend-down" color={CHART_COLORS.red} onPress={() => router.push('/finance')} />
-      </View>
+  if (!data) return <Spinner />;
 
-      <View style={[styles.card, { alignItems: 'center' }]}>
-        <Text style={styles.cardTitle}>{t('dashboard.herdHealth')}</Text>
-        {kpis.totalAnimals > 0 ? (
-          <PieChart
-            data={kpis.healthChartData}
-            width={Math.min(windowWidth, 640) - 64}
-            height={160}
-            accessor="value"
-            backgroundColor="transparent"
-            paddingLeft="8"
-            chartConfig={{ color: () => colors.text }}
-            hasLegend
+  const sum = computeDashboardSummary(data);
+  const summaryItems = [
+    { icon: 'cow', color: 'green', label: t('dashboardPage.totalAnimals'), value: sum.totalAnimals, link: '/animals' },
+    { icon: 'heart-pulse', color: 'green', label: t('dashboardPage.healthy'), value: sum.healthy, link: '/animals' },
+    { icon: 'stethoscope', color: 'orange', label: t('dashboardPage.underTreatment'), value: sum.underTreatment, link: '/health' },
+    { icon: 'triangle-exclamation', color: 'red', label: t('dashboardPage.criticalCases'), value: sum.critical, link: '/health' },
+    { icon: 'paw', color: 'purple', label: t('dashboardPage.pregnant'), value: sum.pregnant, link: '/breeding' },
+    { icon: 'egg', color: 'blue', label: t('dashboardPage.newborns'), value: sum.newborns, link: '/breeding' },
+    { icon: 'list-check', color: sum.overdueTasks > 0 ? 'red' : 'orange', label: t('dashboardPage.pendingTasks'), value: sum.pendingTasks, link: '/tasks' },
+    { icon: 'arrow-trend-up', color: 'green', label: t('dashboardPage.monthlyIncome'), value: fmtMoney(sum.monthIncome), link: '/finance' },
+    { icon: 'arrow-trend-down', color: 'red', label: t('dashboardPage.monthlyExpenses'), value: fmtMoney(sum.monthExpense), link: '/finance' },
+    { icon: 'chart-line', color: sum.profitLoss >= 0 ? 'blue' : 'red', label: t('dashboardPage.profitLoss'), value: fmtMoney(sum.profitLoss), link: '/finance' },
+  ];
+
+  // Income vs expenses, last 6 months.
+  const months = monthBuckets(6, i18n.language);
+  const monthTotal = (type, key) => data.finance.filter((f) => f.type === type && ym(f.date) === key).reduce((s, f) => s + (Number(f.amount) || 0), 0);
+  const incomeSeries = months.map((m) => monthTotal('Income', m.key));
+  const expenseSeries = months.map((m) => monthTotal('Expense', m.key));
+  const taskCounts = ['Pending', 'In Progress', 'Completed'].map((st) => data.tasks.filter((tk) => tk.status === st).length);
+
+  const recentAnimals = data.animals.slice().sort((x, y) => new Date(y.created_at) - new Date(x.created_at)).slice(0, 5);
+  const upcoming = data.tasks.filter((x) => x.status !== 'Completed').slice(0, 5);
+  const alerts = data.health.filter((x) => x.status === 'Under Treatment' || x.status === 'Critical')
+    .sort((x, y) => new Date(y.check_date) - new Date(x.check_date)).slice(0, 5);
+
+  const small = width <= 768;
+
+  return (
+    <Page refreshing={refreshing || syncing} onRefresh={onRefresh}>
+      <PageHeader title={t('dashboardPage.title')} subtitle={t('dashboardPage.subtitle')} />
+
+      <Grid minItemWidth={small ? 160 : 220} columns={width <= 480 ? 2 : undefined} gap={small ? 10 : 16} style={{ marginBottom: 24 }}>
+        {summaryItems.map((s) => <SummaryCard key={s.label} icon={s.icon} color={s.color} label={s.label} value={s.value} onPress={() => router.replace(s.link)} />)}
+      </Grid>
+
+      <Grid minItemWidth={340} gap={20} fillLast style={{ marginBottom: 24 }}>
+        <Card>
+          <CardHeader title={t('dashboardPage.chartAnimalHealth')} />
+          <CardBody>
+            {sum.healthy + sum.underTreatment + sum.critical === 0
+              ? <EmptyState icon="chart-pie" title={t('dashboardPage.chartNoAnimalData')} message={t('dashboardPage.chartAddAnimals')} compact />
+              : <DonutChart labels={[t('enums.animalHealthStatus.Healthy'), t('enums.animalHealthStatus.Under Treatment'), t('enums.animalHealthStatus.Critical')]} data={[sum.healthy, sum.underTreatment, sum.critical]} colors={[cc.status.good, cc.status.warning, cc.status.critical]} />}
+          </CardBody>
+        </Card>
+        <Card>
+          <CardHeader title={t('dashboardPage.chartIncomeExpenses')} />
+          <CardBody>
+            {incomeSeries.every((v) => v === 0) && expenseSeries.every((v) => v === 0)
+              ? <EmptyState icon="chart-column" title={t('dashboardPage.chartNoFinanceData')} message={t('dashboardPage.chartAddFinance')} compact />
+              : <BarChart money legend labels={months.map((m) => m.label)} datasets={[{ label: t('enums.financeType.Income'), data: incomeSeries, color: cc.positive }, { label: t('enums.financeType.Expense'), data: expenseSeries, color: cc.negative }]} />}
+          </CardBody>
+        </Card>
+        <Card>
+          <CardHeader title={t('dashboardPage.chartTaskStatus')} />
+          <CardBody>
+            {taskCounts.every((v) => v === 0)
+              ? <EmptyState icon="clipboard-list" title={t('dashboardPage.chartNoTasksYet')} message={t('dashboardPage.chartAddTasks')} compact />
+              : <DonutChart labels={[t('enums.taskStatus.Pending'), t('enums.taskStatus.In Progress'), t('enums.taskStatus.Completed')]} data={taskCounts} colors={[cc.series[3], cc.series[0], cc.brand]} />}
+          </CardBody>
+        </Card>
+      </Grid>
+
+      <FarmAnalytics data={data} />
+
+      <Grid minItemWidth={460} gap={20} style={{ marginBottom: 24 }}>
+        <Card>
+          <CardHeader title={t('dashboardPage.recentAnimals')} right={<Button size="sm" variant="secondary" title={t('common.viewAll')} onPress={() => router.replace('/animals')} />} />
+          <CardBody flush>
+            <DataTable
+              rows={recentAnimals}
+              empty={<EmptyState icon="cow" title={t('dashboardPage.noAnimalsYet')} message={t('dashboardPage.addFirstAnimal')} />}
+              columns={[
+                { key: 'tag_id', label: t('tables.animals.fields.tag_id'), strong: true },
+                { key: 'name', label: t('tables.animals.fields.name') },
+                { key: 'species', label: t('tables.animals.fields.species'), render: (a) => t(`enums.species.${a.species}`, a.species) },
+                { key: 'breed', label: t('tables.animals.fields.breed') },
+                { key: 'health_status', label: t('tables.animals.fields.health_status'), render: (a) => <StatusBadge status={a.health_status} /> },
+              ]}
+            />
+          </CardBody>
+        </Card>
+        <Card>
+          <CardHeader
+            title={t('dashboardPage.upcomingTasks')}
+            right={
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <Button size="sm" icon="plus" title={t('dashboardPage.add')} onPress={() => { setTaskForm({ title: '', description: '', due_date: '', priority: 'Medium' }); setTaskOpen(true); }} />
+                <Button size="sm" variant="secondary" title={t('common.viewAll')} onPress={() => router.replace('/tasks')} />
+              </View>
+            }
           />
-        ) : (
-          <Text style={styles.emptyText}>{t('dashboard.noAnimalsYet')}</Text>
-        )}
-      </View>
+          <CardBody flush>
+            <DataTable
+              rows={upcoming}
+              empty={<EmptyState icon="clipboard-check" title={t('dashboardPage.noPendingTasks')} message={t('dashboardPage.allCaughtUp')} />}
+              columns={[
+                { key: 'title', label: t('tables.tasks.fields.title'), strong: true },
+                { key: 'due_date', label: t('tables.tasks.fields.due_date'), render: (tk) => (isOverdueTask(tk) ? <DueDate value={tk.due_date} /> : fmtDate(tk.due_date)) },
+                { key: 'priority', label: t('tables.tasks.fields.priority'), render: (tk) => <PriorityBadge priority={tk.priority} /> },
+                { key: 'status', label: t('tables.tasks.fields.status'), render: (tk) => <StatusBadge status={tk.status} /> },
+              ]}
+            />
+          </CardBody>
+        </Card>
+      </Grid>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>{t('dashboard.recentAnimals')}</Text>
-        {data.animals.slice(0, 5).map((a) => (
-          <View key={a.id} style={styles.listRow}>
-            <Text style={styles.listRowTitle}>{a.tag_id} {a.name ? `· ${a.name}` : ''}</Text>
-            <StatusBadge status={a.health_status} />
-          </View>
-        ))}
-        {data.animals.length === 0 && <Text style={styles.emptyText}>{t('dashboard.noAnimalsYet')}</Text>}
-      </View>
+      <Card>
+        <CardHeader title={t('dashboardPage.recentHealthAlerts')} icon="triangle-exclamation" iconColor={cc.status.warning} right={<Button size="sm" variant="secondary" title={t('common.viewAll')} onPress={() => router.replace('/health')} />} />
+        <CardBody flush>
+          <DataTable
+            rows={alerts}
+            empty={<EmptyState icon="shield-heart" title={t('dashboardPage.noHealthAlerts')} message={t('dashboardPage.allAnimalsHealthy')} />}
+            columns={[
+              { key: 'tag_id', label: t('tables.animals.fields.tag_id'), strong: true },
+              { key: 'disease', label: t('tables.health_records.fields.disease') },
+              { key: 'treatment', label: t('tables.health_records.fields.treatment') },
+              { key: 'status', label: t('tables.health_records.fields.status'), render: (h) => <StatusBadge status={h.status} /> },
+            ]}
+          />
+        </CardBody>
+      </Card>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>{t('dashboard.upcomingTasks')}</Text>
-        {kpis.upcomingTasks.map((task) => (
-          <View key={task.id} style={styles.listRow}>
-            <Text style={styles.listRowTitle} numberOfLines={1}>{task.title}</Text>
-            <Text style={styles.listRowMeta}>{fmtDate(task.due_date)}</Text>
-          </View>
-        ))}
-        {kpis.upcomingTasks.length === 0 && <Text style={styles.emptyText}>{t('dashboard.nothingPending')}</Text>}
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>{t('dashboard.recentHealthAlerts')}</Text>
-        {kpis.healthAlerts.map((h) => (
-          <View key={h.id} style={styles.listRow}>
-            <Text style={styles.listRowTitle} numberOfLines={1}>{h.tag_id} — {h.disease || t('dashboard.checkup')}</Text>
-            <StatusBadge status={h.status} />
-          </View>
-        ))}
-        {kpis.healthAlerts.length === 0 && <Text style={styles.emptyText}>{t('dashboard.noActiveAlerts')}</Text>}
-      </View>
-    </ScrollView>
-    </ResponsiveScreen>
+      <Modal
+        open={taskOpen}
+        onClose={() => setTaskOpen(false)}
+        title={t('dashboardPage.quickAddTask')}
+        footer={<>
+          <Button variant="secondary" title={t('common.cancel')} onPress={() => setTaskOpen(false)} />
+          <Button icon="check" title={t('dashboardPage.saveTask')} onPress={saveQuickTask} />
+        </>}
+      >
+        <FormGroup label={t('tables.tasks.fields.title')} required>
+          <Input placeholder={t('dashboardPage.taskTitlePlaceholder')} value={taskForm.title} onChangeText={(v) => setTaskForm({ ...taskForm, title: v })} />
+        </FormGroup>
+        <FormGroup label={t('tables.tasks.fields.description')}>
+          <Input multiline placeholder={t('dashboardPage.taskDescPlaceholder')} value={taskForm.description} onChangeText={(v) => setTaskForm({ ...taskForm, description: v })} />
+        </FormGroup>
+        <FormGroup label={t('tables.tasks.fields.due_date')}>
+          <DateField value={taskForm.due_date} onChange={(v) => setTaskForm({ ...taskForm, due_date: v })} />
+        </FormGroup>
+        <FormGroup label={t('tables.tasks.fields.priority')}>
+          <Select value={taskForm.priority} onChange={(v) => setTaskForm({ ...taskForm, priority: v })} placeholder={t('tables.tasks.fields.priority')}
+            options={['Low', 'Medium', 'High'].map((p) => ({ value: p, label: t(`enums.taskPriority.${p}`) }))} />
+        </FormGroup>
+      </Modal>
+    </Page>
   );
 }
 
-function computeKpis(data, CHART_COLORS, colors, t) {
-  if (!data) return null;
-  const { animals, health, breeding, finance, tasks } = data;
-
-  const healthy = animals.filter((a) => a.health_status === 'Healthy').length;
-  const underTreatment = animals.filter((a) => a.health_status === 'Under Treatment').length;
-  const critical = animals.filter((a) => a.health_status === 'Critical').length;
-  const deceased = animals.filter((a) => a.health_status === 'Deceased').length;
-
-  const pregnant = breeding.filter((b) => b.pregnancy_status === 'Pregnant').length;
-
-  const pendingTasks = tasks.filter((t) => t.status !== 'Completed').length;
-  const overdueTasks = tasks.filter(isOverdueTask).length;
-  const upcomingTasks = tasks
-    .filter((t) => t.status !== 'Completed' && t.due_date)
-    .sort((a, b) => (a.due_date > b.due_date ? 1 : -1))
-    .slice(0, 5);
-
-  const monthlyIncome = finance.filter((f) => f.type === 'Income' && isThisMonth(f.date)).reduce((sum, f) => sum + (Number(f.amount) || 0), 0);
-  const monthlyExpense = finance.filter((f) => f.type === 'Expense' && isThisMonth(f.date)).reduce((sum, f) => sum + (Number(f.amount) || 0), 0);
-
-  const healthAlerts = health
-    .filter((h) => h.status === 'Under Treatment' || h.status === 'Critical')
-    .sort((a, b) => (b.check_date || '').localeCompare(a.check_date || ''))
-    .slice(0, 5);
-
-  const healthChartData = [
-    { name: t('enums.statusBadge.Healthy'), value: healthy, color: CHART_COLORS.green, legendFontColor: colors.textLight, legendFontSize: 12 },
-    { name: t('enums.statusBadge.Under Treatment'), value: underTreatment, color: CHART_COLORS.orange, legendFontColor: colors.textLight, legendFontSize: 12 },
-    { name: t('enums.statusBadge.Critical'), value: critical, color: CHART_COLORS.red, legendFontColor: colors.textLight, legendFontSize: 12 },
-    { name: t('enums.statusBadge.Deceased'), value: deceased, color: CHART_COLORS.gray, legendFontColor: colors.textLight, legendFontSize: 12 },
-  ].filter((d) => d.value > 0);
-
-  return {
-    totalAnimals: animals.length,
-    critical,
-    pregnant,
-    pendingTasks,
-    overdueTasks,
-    upcomingTasks,
-    monthlyIncome,
-    monthlyExpense,
-    healthAlerts,
-    healthChartData,
-  };
-}
-
-function KpiCard({ styles, label, value, sub, icon, color, onPress }) {
-  return (
-    <Pressable style={styles.kpiCard} onPress={onPress}>
-      <View style={[styles.kpiIcon, { backgroundColor: color + '1A' }]}>
-        <Icon name={icon} size={16} color={color} />
-      </View>
-      <Text style={styles.kpiValue}>{value}</Text>
-      <Text style={styles.kpiLabel}>{label}</Text>
-      {sub ? <Text style={[styles.kpiSub, { color }]}>{sub}</Text> : null}
-    </Pressable>
-  );
-}
-
-function makeStyles(colors, radius, shadow) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.bg },
-    grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-    kpiCard: {
-      width: '31%', backgroundColor: colors.card, borderRadius: radius.card, padding: 12, gap: 4,
-      shadowColor: shadow.color, shadowOpacity: shadow.opacity, shadowRadius: shadow.radius, shadowOffset: shadow.offset, elevation: shadow.elevation,
-    },
-    kpiIcon: { width: 30, height: 30, borderRadius: radius.button, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
-    kpiValue: { fontSize: 18, fontWeight: '800', color: colors.primaryDark },
-    kpiLabel: { fontSize: 11, color: colors.textLight },
-    kpiSub: { fontSize: 10, fontWeight: '700' },
-    card: {
-      backgroundColor: colors.card, borderRadius: radius.card, padding: 16, gap: 10,
-      shadowColor: shadow.color, shadowOpacity: shadow.opacity, shadowRadius: shadow.radius, shadowOffset: shadow.offset, elevation: shadow.elevation,
-    },
-    cardTitle: { fontSize: 15, fontWeight: '700', color: colors.primaryDark },
-    listRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: colors.bg },
-    listRowTitle: { flex: 1, fontSize: 13, color: colors.text, marginRight: 8 },
-    listRowMeta: { fontSize: 12, color: colors.textLight },
-    emptyText: { color: colors.textLight, fontSize: 13 },
-  });
+/* Overdue due dates render red and bold, as on the web. */
+function DueDate({ value }) {
+  const { colors } = useTheme();
+  return <Text style={{ color: colors.red, fontWeight: '600', fontSize: 13 }}>{fmtDate(value)}</Text>;
 }

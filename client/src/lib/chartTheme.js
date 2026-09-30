@@ -1,49 +1,18 @@
 import { useTheme } from '../theme/ThemeProvider.jsx';
+import { chartPalette, CHART_STATUS, fmtMoney } from '../../../shared/chartPalette';
 
-/* Chart colors per theme. The categorical slots are a colorblind-validated
-   8-hue order (adjacent-pair CVD ΔE ≥ 8 in both modes, checked against this
-   app's own card surfaces #FFFFFF / #1E1E1E) — assign them in order and let
-   a color follow its entity; never cycle or generate a 9th. Single-series
-   charts use the brand green instead. Neutrals mirror style.css's
-   --text-light / --border / --card, but live here as literals because the
-   data-theme attribute flips in an effect *after* React renders, so reading
-   CSS variables at render time would lag one theme behind. */
-const PALETTE = {
-  light: {
-    series: ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#4a3aa7', '#e34948'],
-    brand: '#2E7D32',
-    positive: '#2a78d6',
-    negative: '#e34948',
-    neutral: '#78909C',
-    /* Ordinal ramp (ordered bins such as age bands) — one hue, light→dark. */
-    ramp: ['#86b6ef', '#5598e7', '#2a78d6', '#1c5cab', '#104281'],
-    text: '#546E7A',
-    grid: '#ECEFF1',
-    surface: '#FFFFFF'
-  },
-  dark: {
-    series: ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'],
-    brand: '#4CAF50',
-    positive: '#3987e5',
-    negative: '#e66767',
-    neutral: '#90A4AE',
-    ramp: ['#184f95', '#256abf', '#3987e5', '#6da7ec', '#9ec5f4'],
-    text: '#9AA7AB',
-    grid: '#2C2C2C',
-    surface: '#1E1E1E'
-  }
-};
-
-/* Reserved for meaning good/bad — never reused as an ordinary series color,
-   and always shown alongside a text label. */
-export const STATUS = { good: '#0ca30c', warning: '#fab219', serious: '#ec835a', critical: '#d03b3b' };
+/* Palette + status colors live in shared/chartPalette.js (the mobile app
+   draws its charts from the same values). They're keyed off the theme
+   scheme rather than read from CSS variables, because the data-theme
+   attribute flips in an effect *after* React renders, so reading CSS
+   variables at render time would lag one theme behind. */
+export const STATUS = CHART_STATUS;
+export { fmtMoney };
 
 export function useChartTheme() {
   const { scheme } = useTheme();
-  return { scheme, status: STATUS, ...PALETTE[scheme === 'dark' ? 'dark' : 'light'] };
+  return chartPalette(scheme);
 }
-
-export const fmtMoney = (v) => '$' + Math.round(Number(v) || 0).toLocaleString();
 
 /* Shared Chart.js options for bar/line charts: recessive hairline grid, no
    axis clutter, index-mode tooltips (a hover anywhere in a column shows

@@ -13,6 +13,29 @@ import ar from './locales/ar.json';
 import zh from './locales/zh.json';
 import hi from './locales/hi.json';
 
+import webEn from '../../../client/src/i18n/locales/en.json';
+import webFr from '../../../client/src/i18n/locales/fr.json';
+import webSw from '../../../client/src/i18n/locales/sw.json';
+import webRw from '../../../client/src/i18n/locales/rw.json';
+import webEs from '../../../client/src/i18n/locales/es.json';
+import webPt from '../../../client/src/i18n/locales/pt.json';
+import webDe from '../../../client/src/i18n/locales/de.json';
+import webAr from '../../../client/src/i18n/locales/ar.json';
+import webZh from '../../../client/src/i18n/locales/zh.json';
+import webHi from '../../../client/src/i18n/locales/hi.json';
+
+/* The mobile screens mirror the web app's design, so they use the web app's
+   strings (dashboardPage.*, analytics.*, animalsPage.*, …). Mobile's own
+   files are layered on top for the mobile-only keys (sync, geo, native
+   auth flows) and win on any overlap. */
+function deepMerge(base, over) {
+  const out = { ...base };
+  Object.entries(over).forEach(([k, v]) => {
+    out[k] = v && typeof v === 'object' && !Array.isArray(v) && base[k] && typeof base[k] === 'object' ? deepMerge(base[k], v) : v;
+  });
+  return out;
+}
+
 /* Every supported language — SUPPORTED_LANGUAGES drives the picker UI in
    Settings/the drawer menu; `code` must match a resources key below.
    Kinyarwanda, English, French, and Kiswahili are the required baseline;
@@ -32,16 +55,16 @@ export const SUPPORTED_LANGUAGES = [
 ];
 
 const resources = {
-  en: { translation: en },
-  fr: { translation: fr },
-  sw: { translation: sw },
-  rw: { translation: rw },
-  es: { translation: es },
-  pt: { translation: pt },
-  de: { translation: de },
-  ar: { translation: ar },
-  zh: { translation: zh },
-  hi: { translation: hi },
+  en: { translation: deepMerge(webEn, en) },
+  fr: { translation: deepMerge(webFr, fr) },
+  sw: { translation: deepMerge(webSw, sw) },
+  rw: { translation: deepMerge(webRw, rw) },
+  es: { translation: deepMerge(webEs, es) },
+  pt: { translation: deepMerge(webPt, pt) },
+  de: { translation: deepMerge(webDe, de) },
+  ar: { translation: deepMerge(webAr, ar) },
+  zh: { translation: deepMerge(webZh, zh) },
+  hi: { translation: deepMerge(webHi, hi) },
 };
 
 const supportedCodes = SUPPORTED_LANGUAGES.map((l) => l.code);

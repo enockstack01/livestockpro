@@ -34,6 +34,7 @@ export function PregnancyBadge({ status }) {
 }
 
 const styles = StyleSheet.create({
-  badge: { paddingVertical: 4, paddingHorizontal: 10, borderRadius: 999, alignSelf: 'flex-start' },
-  text: { fontSize: 12, fontWeight: '600' },
+  // .badge in client/src/style.css
+  badge: { paddingVertical: 4, paddingHorizontal: 10, borderRadius: 20, alignSelf: 'flex-start' },
+  text: { fontSize: 11, fontWeight: '600' },
 });

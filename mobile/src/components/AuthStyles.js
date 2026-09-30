@@ -11,16 +11,17 @@ import { StyleSheet } from 'react-native';
 export function makeAuthStyles(colors, radius) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.bg },
-    content: { flexGrow: 1, justifyContent: 'center', gap: 12, padding: 24, width: '100%', maxWidth: 480, alignSelf: 'center' },
+    // .auth-form-section / .auth-form-wrapper: centered column, 420px max.
+    content: { flexGrow: 1, justifyContent: 'center', gap: 12, paddingVertical: 30, paddingHorizontal: 20, width: '100%', maxWidth: 460, alignSelf: 'center' },
     forgotRow: { alignItems: 'flex-end', marginTop: -4 },
-    brand: { alignItems: 'center', marginBottom: 24, gap: 8 },
-    brandName: { fontSize: 22, fontWeight: '800', color: colors.primaryDark },
-    title: { fontSize: 20, fontWeight: '700', color: colors.primaryDark, marginBottom: 4 },
+    title: { fontSize: 26, fontWeight: '700', color: colors.text, marginBottom: 2 },
     subtitle: { fontSize: 14, color: colors.textLight, marginBottom: 12 },
-    input: { borderWidth: 1, borderColor: colors.border, borderRadius: radius.card, paddingVertical: 13, paddingHorizontal: 14, fontSize: 15, color: colors.text, backgroundColor: colors.card },
-    button: { backgroundColor: colors.primary, paddingVertical: 14, borderRadius: radius.button, alignItems: 'center', marginTop: 4 },
+    // .form-control
+    input: { borderWidth: 1.5, borderColor: colors.border, borderRadius: 8, paddingVertical: 11, paddingHorizontal: 14, fontSize: 14, color: colors.text, backgroundColor: colors.card },
+    // .btn .btn-primary .btn-block
+    button: { backgroundColor: colors.primary, paddingVertical: 12, borderRadius: 8, alignItems: 'center', marginTop: 4 },
     buttonDisabled: { opacity: 0.5 },
-    buttonText: { color: colors.white, fontWeight: '700', fontSize: 15 },
+    buttonText: { color: colors.white, fontWeight: '600', fontSize: 14 },
     error: { color: colors.red, fontSize: 13 },
     footerRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 16 },
     footerText: { color: colors.textLight },

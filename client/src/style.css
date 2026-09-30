@@ -941,7 +941,9 @@ table.data-table {
 /* ---------- Charts Container ---------- */
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  /* 340px lets the dashboard's three headline charts sit on one row beside
+     the pinned sidebar instead of wrapping one chart onto its own row. */
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 20px;
   margin-bottom: 24px;
 }

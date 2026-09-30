@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSignUp } from '@clerk/expo';
 import { Link, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { makeAuthStyles } from '../../src/components/AuthStyles';
-import Icon from '../../src/components/Icon';
+import AuthShell from '../../src/components/AuthShell';
 import GoogleSignInButton from '../../src/components/GoogleSignInButton';
 import { useWarmUpBrowser } from '../../src/hooks/useWarmUpBrowser';
 import { useTheme } from '../../src/theme/ThemeProvider';
@@ -61,7 +61,7 @@ export default function SignUpScreen() {
 
   if (needsVerification) {
     return (
-      <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <AuthShell>
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           <Text style={styles.title}>{t('auth.checkYourEmail')}</Text>
           <Text style={styles.subtitle}>{t('auth.verifyCodeSentSignUp', { email })}</Text>
@@ -74,17 +74,13 @@ export default function SignUpScreen() {
             <Text style={styles.link}>{t('auth.resendCode')}</Text>
           </Pressable>
         </ScrollView>
-      </KeyboardAvoidingView>
+      </AuthShell>
     );
   }
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <AuthShell>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <View style={styles.brand}>
-          <Icon name="cow" size={36} color={colors.primary} />
-          <Text style={styles.brandName}>{t('auth.brandName')}</Text>
-        </View>
         <Text style={styles.title}>{t('auth.createAccount')}</Text>
 
         <GoogleSignInButton onError={setError} />
@@ -128,6 +124,6 @@ export default function SignUpScreen() {
             CAPTCHA and logs a warning on every sign-up. */}
         <View nativeID="clerk-captcha" />
       </ScrollView>
-    </KeyboardAvoidingView>
+    </AuthShell>
   );
 }

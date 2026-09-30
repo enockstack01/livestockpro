@@ -51,7 +51,7 @@ background, so the app works with no signal in the field.
 app/                 Expo Router file-based routes
   _layout.js            root: ClerkProvider, SQLiteProvider, ToastProvider, SyncProvider
   (auth)/               signed-out stack: sign-in, sign-up
-  (app)/                signed-in tab layout: dashboard + all record screens
+  (app)/                signed-in layout (src/ui/AppShell.js: green sidebar + topbar, same as the web app) around the dashboard + all record screens
 
 src/
   api/client.js         REST client — mirrors client/src/lib/api.js's {data,error} contract

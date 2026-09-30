@@ -1,88 +1,59 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useFocusEffect } from 'expo-router';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRepository } from '../db/repository';
+import { csvCell, shareCsv } from '../lib/shareCsv';
 import { useSync } from '../sync/SyncProvider';
 import { useGeoCapture } from '../hooks/useGeoCapture';
 import { useToast } from '../lib/toast';
 import { useConfirm } from '../lib/confirm';
 import { useTheme } from '../theme/ThemeProvider';
+import { isOverdueTask, isThisMonth } from '../lib/shared';
 import Icon from '../components/Icon';
-import ResponsiveScreen from '../components/ResponsiveScreen';
-import RNModal from '../components/Modal';
 import RecordForm, { emptyValues } from '../components/RecordForm';
-import SelectField from '../components/SelectField';
-import { StatusBadge, PriorityBadge, PregnancyBadge } from '../components/Badges';
+import { Badge, Button, Card, CardBody, CardHeader, EmptyState, FilterBar, FinanceCard, IconButton, Modal, Page, PageHeader, Select, Spinner, SummaryCard, Tabs } from '../ui/kit';
+import { Grid, useBreakpoint } from '../ui/layout';
+import DataTable from '../ui/DataTable';
+import { useTopbarSearch } from '../ui/AppShell';
+import { RECORD_PAGES } from '../config/recordPages';
 
-const BADGE_COMPONENTS = { status: StatusBadge, pregnancy: PregnancyBadge };
-
-/* Config-driven CRUD screen shared by all 7 record-type routes (see
-   mobile/src/config/tables.js and app/(app)/{animals,health,...}.js).
-   Local-first: reads/writes go through src/db/repository.js (instant,
-   optimistic), sync happens in the background via src/sync/SyncProvider.js.
-   config/tables.js carries only canonical English field keys/option values —
-   every label and option shown here is resolved through i18next at render
-   time (tables.<table>.label/singular/fields.<key>, enums.<i18nEnum>.<value>),
-   so this one screen implementation is already fully translated for all 7
-   record types and every supported language. */
+/* One screen for all seven record types, laid out exactly like the matching
+   web page (client/src/pages/*.jsx): page header with Export CSV / Add
+   buttons, the page's own summary block, tabs and filter dropdowns, a card
+   holding the data table (edit/delete buttons per row), the add/edit form
+   modal and a delete-confirmation modal. Local-first: reads/writes go
+   through src/db/repository.js and sync in the background. */
 export default function RecordListScreen({ config }) {
   const { t } = useTranslation();
-  const { colors, radius, shadow } = useTheme();
-  const styles = useMemo(() => makeStyles(colors, radius, shadow), [colors, radius, shadow]);
+  const { colors } = useTheme();
+  const { width } = useBreakpoint();
   const repo = useRepository();
   const { lastSyncedAt, syncing, triggerSync } = useSync();
   const showToast = useToast();
   const confirm = useConfirm();
   const geo = useGeoCapture();
+  const page = RECORD_PAGES[config.table];
 
   const label = t(`tables.${config.table}.label`);
   const singular = t(`tables.${config.table}.singular`);
   const fieldLabel = useCallback((key) => t(`tables.${config.table}.fields.${key}`), [t, config.table]);
 
-  const localizedFields = useMemo(() => config.fields.map((f) => ({
-    ...f,
-    label: fieldLabel(f.key),
-    options: f.options ? f.options.map((opt) => ({ value: opt, label: f.i18nEnum ? t(`enums.${f.i18nEnum}.${opt}`) : opt })) : undefined,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  })), [config.fields, fieldLabel, t]);
-
-  const localizedFilters = useMemo(() => config.filters.map((f) => ({
-    ...f,
-    label: fieldLabel(f.key),
-    options: f.options.map((opt) => ({ value: opt, label: f.i18nEnum ? t(`enums.${f.i18nEnum}.${opt}`) : opt })),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  })), [config.filters, fieldLabel, t]);
-
-  const GEO_MESSAGES = {
-    loading: t('geo.capturing'),
-    denied: t('geo.denied'),
-    error: t('geo.error'),
-    unsupported: t('geo.unsupported'),
-  };
-
-  const [records, setRecords] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [records, setRecords] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState('');
-  const [activeFilter, setActiveFilter] = useState({});
-  const [modalMode, setModalMode] = useState(null); // 'add' | 'edit' | null
+  const [filters, setFilters] = useState({});
+  const [tab, setTab] = useState('all');
+  const [modal, setModal] = useState(null); // 'add' | 'edit' | null
   const [editingId, setEditingId] = useState(null);
   const [values, setValues] = useState({});
   const [saving, setSaving] = useState(false);
 
+  const inlineSearch = useTopbarSearch(t('records.searchPlaceholder', { label: label.toLowerCase() }), setSearch);
+
   const load = useCallback(async () => {
-    const rows = await repo.list(config.table, { order: 'created_at DESC' });
-    setRecords(rows);
-    setLoading(false);
+    setRecords(await repo.list(config.table, { order: 'created_at DESC' }));
   }, [repo, config.table]);
-
-  useFocusEffect(useCallback(() => { load(); }, [load]));
-
-  useEffect(() => {
-    if (lastSyncedAt) load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lastSyncedAt]);
+  useEffect(() => { load(); }, [load, lastSyncedAt]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -91,18 +62,24 @@ export default function RecordListScreen({ config }) {
     setRefreshing(false);
   }, [triggerSync, load]);
 
+  const localizedFields = useMemo(() => config.fields.map((f) => ({
+    ...f,
+    label: fieldLabel(f.key),
+    options: f.options ? f.options.map((opt) => ({ value: opt, label: f.i18nEnum ? t(`enums.${f.i18nEnum}.${opt}`) : opt })) : undefined,
+  })), [config.fields, fieldLabel, t]);
+
+  const rows = records || [];
   const filtered = useMemo(() => {
-    let rows = records;
     const q = search.trim().toLowerCase();
-    if (q) rows = rows.filter((r) => config.searchFields.some((f) => String(r[f] || '').toLowerCase().includes(q)));
-    Object.entries(activeFilter).forEach(([key, val]) => {
-      if (val) rows = rows.filter((r) => r[key] === val);
+    return rows.filter((r) => {
+      if (q && !config.searchFields.some((f) => String(r[f] || '').toLowerCase().includes(q))) return false;
+      if (page.tabs && tab !== 'all' && r[page.tabs.key] !== tab) return false;
+      return Object.entries(filters).every(([k, v]) => !v || r[k] === v);
     });
-    return rows;
-  }, [records, search, activeFilter, config.searchFields]);
+  }, [rows, search, filters, tab, config.searchFields, page.tabs]);
 
   function openAdd() {
-    setModalMode('add');
+    setModal('add');
     setEditingId(null);
     setValues(emptyValues(config.fields));
     geo.reset();
@@ -110,43 +87,31 @@ export default function RecordListScreen({ config }) {
   }
 
   function openEdit(record) {
-    setModalMode('edit');
-    setEditingId(record.id);
     const v = {};
     config.fields.forEach((f) => { v[f.key] = record[f.key] ?? ''; });
     setValues(v);
+    setEditingId(record.id);
+    setModal('edit');
   }
 
-  function closeModal() {
-    setModalMode(null);
-    setEditingId(null);
-  }
-
-  async function handleSave() {
+  async function save() {
     const missing = config.fields.find((f) => f.required && !String(values[f.key] || '').trim());
-    if (missing) {
-      showToast(t('records.fieldRequired', { field: fieldLabel(missing.key) }), 'error');
-      return;
-    }
+    if (missing) { showToast(t('records.fieldRequired', { field: fieldLabel(missing.key) }), 'error'); return; }
     setSaving(true);
     try {
       const payload = { ...values };
       config.fields.forEach((f) => {
         if (f.type === 'number') payload[f.key] = payload[f.key] === '' || payload[f.key] === null ? null : Number(payload[f.key]);
       });
-
-      if (modalMode === 'add') {
-        if (geo.status === 'success') {
-          payload.latitude = geo.latitude;
-          payload.longitude = geo.longitude;
-        }
+      if (modal === 'add') {
+        if (geo.status === 'success') { payload.latitude = geo.latitude; payload.longitude = geo.longitude; }
         await repo.insert(config.table, payload);
         showToast(t('records.added', { item: singular }), 'success');
       } else {
         await repo.update(config.table, editingId, payload);
         showToast(t('records.updated', { item: singular }), 'success');
       }
-      closeModal();
+      setModal(null);
       await load();
     } catch (err) {
       showToast(t('records.saveFailed', { message: err.message }), 'error');
@@ -155,149 +120,168 @@ export default function RecordListScreen({ config }) {
     }
   }
 
-  async function handleDelete(record) {
-    const ok = await confirm({
-      title: t('confirmDialogs.deleteRecordTitle', { item: singular.toLowerCase() }),
-      message: t('confirmDialogs.cannotBeUndone'),
-      confirmLabel: t('common.delete'),
-      destructive: true,
-    });
+  async function remove(record) {
+    const ok = await confirm({ title: t('common.confirmDelete'), message: t('confirmDialogs.cannotBeUndone'), confirmLabel: t('common.delete'), destructive: true });
     if (!ok) return;
     await repo.remove(config.table, record.id);
     showToast(t('records.deleted', { item: singular }), 'success');
     await load();
   }
 
-  const BadgeComp = config.badgeField ? BADGE_COMPONENTS[config.badgeField.kind] : null;
+  async function exportCsv() {
+    if (rows.length === 0) { showToast(t('records.noRecordsToExport', { label: label.toLowerCase() }), 'warning'); return; }
+    const csv = [page.exportFields.join(','), ...rows.map((r) => page.exportFields.map((h) => csvCell(r[h])).join(','))].join('\n');
+    try {
+      if (!(await shareCsv(csv, `${config.table}_export.csv`))) { showToast(t('reports.sharingUnavailable'), 'error'); return; }
+      showToast(t('records.exported', { label }), 'success');
+    } catch (err) {
+      showToast(t('reports.exportFailed', { message: err.message }), 'error');
+    }
+  }
+
+  if (!records) return <Spinner />;
+
+  const columns = page.columns(t, colors);
+  const pendingDot = (r) => (r.sync_state === 'pending' ? <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: colors.orange }} /> : null);
+  const firstCol = { ...columns[0], render: (r) => (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+      {columns[0].render ? columns[0].render(r) : <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text }}>{r[columns[0].key] || '—'}</Text>}
+      {pendingDot(r)}
+    </View>
+  ) };
 
   return (
-    <ResponsiveScreen>
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.headerIcon}>
-          <Icon name={config.icon} size={16} color={colors.primary} />
-        </View>
-        <Text style={styles.headerTitle}>{label}</Text>
-      </View>
+    <Page refreshing={refreshing || syncing} onRefresh={onRefresh}>
+      <PageHeader title={t(`${page.page}.title`)} subtitle={t(`${page.page}.subtitle`)}>
+        {page.exportable ? <Button variant="secondary" icon="file-export" title={t('reports.exportCsv')} onPress={exportCsv} /> : null}
+        <Button icon="plus" title={t(page.addKey)} onPress={openAdd} />
+      </PageHeader>
 
-      <View style={styles.searchRow}>
-        <Icon name="magnifying-glass" size={16} color={colors.placeholder} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder={t('records.searchPlaceholder', { label: label.toLowerCase() })}
-          value={search}
-          onChangeText={setSearch}
-          placeholderTextColor={colors.placeholder}
-        />
-      </View>
+      {inlineSearch}
 
-      {localizedFilters.map((f) => (
-        <View key={f.key} style={styles.filterWrap}>
-          <SelectField
-            value={activeFilter[f.key] || ''}
-            options={[{ value: '', label: t('records.all', { label: f.label }) }, ...f.options]}
-            onChange={(v) => setActiveFilter((prev) => ({ ...prev, [f.key]: v }))}
+      <PageExtra kind={page.extra} rows={rows} t={t} colors={colors} width={width} />
+
+      {page.tabs ? (
+        <Tabs value={tab} onChange={setTab} items={[{ value: 'all', label: t('common.all') }, ...page.tabs.values.map((v) => ({ value: v, label: t(page.tabs.labelKey(v)) }))]} />
+      ) : null}
+
+      {page.filters.length ? (
+        <FilterBar>
+          {page.filters.map((f) => {
+            const opts = f.fromData ? [...new Set(rows.map((r) => r[f.key]).filter(Boolean))] : f.options;
+            return (
+              <Select key={f.key} compact value={filters[f.key] || ''} placeholder={t(f.allKey)} onChange={(v) => setFilters((p) => ({ ...p, [f.key]: v }))}
+                options={[{ value: '', label: t(f.allKey) }, ...opts.map((o) => ({ value: o, label: t(`enums.${f.enumGroup}.${o}`, o) }))]} />
+            );
+          })}
+        </FilterBar>
+      ) : null}
+
+      <Card>
+        <CardBody flush>
+          <DataTable
+            rows={filtered}
+            columns={[firstCol, ...columns.slice(1)]}
+            actionsLabel={t('adminDashboard.colActions')}
+            actions={(r) => (
+              <>
+                <IconButton icon="pen-to-square" label={t('common.edit')} onPress={() => openEdit(r)} />
+                <IconButton icon="trash" danger label={t('common.delete')} onPress={() => remove(r)} />
+              </>
+            )}
+            empty={<EmptyState icon={page.emptyIcon} title={t('common.noneFound', { label })} message={t('records.emptyListWeb', { label: label.toLowerCase() })} />}
           />
-        </View>
-      ))}
+        </CardBody>
+      </Card>
 
-      {loading ? (
-        <ActivityIndicator style={{ marginTop: 40 }} color={colors.primary} />
-      ) : (
-        <FlatList
-          data={filtered}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContent}
-          refreshControl={<RefreshControl refreshing={refreshing || syncing} onRefresh={onRefresh} colors={[colors.primary]} />}
-          ListEmptyComponent={<Text style={styles.empty}>{t('records.emptyList', { label: label.toLowerCase() })}</Text>}
-          renderItem={({ item }) => (
-            <Pressable style={styles.card} onPress={() => openEdit(item)}>
-              <View style={{ flex: 1, gap: 4 }}>
-                <View style={styles.cardTitleRow}>
-                  <Text style={styles.cardTitle} numberOfLines={1}>{item[config.titleField] || t('common.untitled')}</Text>
-                  {item.sync_state === 'pending' && <View style={styles.pendingDot} />}
-                </View>
-                <Text style={styles.cardSubtitle} numberOfLines={1}>
-                  {config.subtitleFields.map((f) => item[f]).filter(Boolean).join(' · ') || '—'}
-                </Text>
-                {config.priorityField ? <PriorityBadge priority={item[config.priorityField]} /> : null}
-              </View>
-              <View style={styles.cardActions}>
-                {BadgeComp ? <BadgeComp status={item[config.badgeField.key]} /> : null}
-                <Pressable hitSlop={10} onPress={() => handleDelete(item)}>
-                  <Icon name="trash-can" size={16} color={colors.textLight} />
-                </Pressable>
-              </View>
-            </Pressable>
-          )}
-        />
-      )}
-
-      <Pressable style={styles.fab} onPress={openAdd}>
-        <Icon name="plus" size={24} color={colors.white} />
-      </Pressable>
-
-      <RNModal
-        open={modalMode !== null}
-        onClose={closeModal}
-        title={modalMode === 'add' ? t('records.addTitle', { item: singular }) : t('records.editTitle', { item: singular })}
-        footer={
-          <>
-            <Pressable style={[styles.btn, styles.btnSecondary]} onPress={closeModal}>
-              <Text style={styles.btnSecondaryText}>{t('common.cancel')}</Text>
-            </Pressable>
-            <Pressable style={[styles.btn, styles.btnPrimary]} onPress={handleSave} disabled={saving}>
-              {saving ? <ActivityIndicator color={colors.white} /> : <Text style={styles.btnPrimaryText}>{t('common.save')}</Text>}
-            </Pressable>
-          </>
-        }
+      <Modal
+        open={modal !== null}
+        onClose={() => setModal(null)}
+        title={modal === 'add' ? t('records.addTitle', { item: singular }) : t('records.editTitle', { item: singular })}
+        footer={<>
+          <Button variant="secondary" title={t('common.cancel')} onPress={() => setModal(null)} />
+          <Button icon="check" title={t('common.save')} onPress={save} loading={saving} />
+        </>}
       >
+        {modal === 'add' && geo.status !== 'idle' ? <LocationBadge geo={geo} t={t} colors={colors} /> : null}
         <RecordForm fields={localizedFields} values={values} onChange={(k, v) => setValues((prev) => ({ ...prev, [k]: v }))} />
-        {modalMode === 'add' && geo.status !== 'idle' ? (
-          <Pressable onPress={geo.status !== 'loading' ? geo.capture : undefined} style={styles.geoLine}>
-            {geo.status === 'loading' ? <ActivityIndicator size="small" color={colors.primary} /> : <Icon name="location-dot" size={14} color={geo.status === 'success' ? colors.primary : colors.orange} />}
-            <Text style={styles.geoText}>
-              {geo.status === 'success' ? t('geo.captured', { lat: geo.latitude.toFixed(3), lng: geo.longitude.toFixed(3) }) : GEO_MESSAGES[geo.status]}
-              {geo.status !== 'loading' && geo.status !== 'success' ? t('geo.tapToRetry') : ''}
-            </Text>
-          </Pressable>
-        ) : null}
-      </RNModal>
-    </View>
-    </ResponsiveScreen>
+      </Modal>
+    </Page>
   );
 }
 
-function makeStyles(colors, radius, shadow) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.bg },
-    header: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingTop: 16 },
-    headerIcon: { width: 30, height: 30, borderRadius: radius.button, backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center' },
-    headerTitle: { fontSize: 18, fontWeight: '700', color: colors.primaryDark },
-    searchRow: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.card, margin: 16, marginBottom: 8, paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.card, borderWidth: 1, borderColor: colors.border },
-    searchInput: { flex: 1, fontSize: 15, color: colors.text },
-    filterWrap: { paddingHorizontal: 16, marginBottom: 4 },
-    listContent: { padding: 16, paddingTop: 8, paddingBottom: 100, gap: 10 },
-    empty: { textAlign: 'center', color: colors.textLight, marginTop: 40, fontSize: 14 },
-    card: {
-      flexDirection: 'row', backgroundColor: colors.card, borderRadius: radius.card, padding: 14, gap: 10,
-      shadowColor: shadow.color, shadowOpacity: shadow.opacity, shadowRadius: shadow.radius, shadowOffset: shadow.offset, elevation: shadow.elevation,
-    },
-    cardTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-    cardTitle: { fontSize: 15, fontWeight: '700', color: colors.primaryDark, flexShrink: 1 },
-    cardSubtitle: { fontSize: 13, color: colors.textLight },
-    pendingDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.orange },
-    cardActions: { alignItems: 'flex-end', gap: 10, justifyContent: 'space-between' },
-    fab: {
-      position: 'absolute', right: 20, bottom: 24, width: 56, height: 56, borderRadius: 28, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center',
-      shadowColor: shadow.color, shadowOpacity: 0.25, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 5,
-    },
-    btn: { flex: 1, paddingVertical: 13, borderRadius: radius.button, alignItems: 'center' },
-    btnPrimary: { backgroundColor: colors.primary },
-    btnPrimaryText: { color: colors.white, fontWeight: '700' },
-    btnSecondary: { backgroundColor: colors.bg, borderWidth: 1.5, borderColor: colors.border },
-    btnSecondaryText: { color: colors.text, fontWeight: '700' },
-    geoLine: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4, paddingVertical: 8 },
-    geoText: { flex: 1, fontSize: 12, color: colors.textLight },
-  });
+/* The block each web page shows between the header and the table. */
+function PageExtra({ kind, rows, t, colors, width }) {
+  if (kind === 'financeSummary') {
+    const month = rows.filter((f) => isThisMonth(f.date));
+    const income = month.filter((f) => f.type === 'Income').reduce((s, f) => s + (Number(f.amount) || 0), 0);
+    const expense = month.filter((f) => f.type === 'Expense').reduce((s, f) => s + (Number(f.amount) || 0), 0);
+    const pl = income - expense;
+    return (
+      <Grid minItemWidth={200} columns={width <= 480 ? 1 : width <= 768 ? 2 : undefined} fit fillLast style={{ marginBottom: 24 }}>
+        <FinanceCard label={t('financePage.monthlyIncome')} value={`$${income.toLocaleString()}`} color={colors.primary} />
+        <FinanceCard label={t('financePage.monthlyExpenses')} value={`$${expense.toLocaleString()}`} color={colors.red} />
+        <FinanceCard label={t('financePage.profitLoss')} value={`${pl < 0 ? '-' : ''}$${Math.abs(pl).toLocaleString()}`} color={pl >= 0 ? colors.blue : colors.red} />
+      </Grid>
+    );
+  }
+  if (kind === 'productionSummary') {
+    const month = rows.filter((p) => isThisMonth(p.production_date));
+    const total = (type) => month.filter((p) => p.production_type === type).reduce((s, p) => s + (Number(p.quantity) || 0), 0);
+    return (
+      <Grid minItemWidth={200} columns={width <= 480 ? 1 : width <= 768 ? 2 : undefined} fit fillLast style={{ marginBottom: 24 }}>
+        <FinanceCard label={t('productionPage.milkThisMonth')} value={`${total('Milk').toFixed(1)} L`} color={colors.primary} />
+        <FinanceCard label={t('productionPage.eggsThisMonth')} value={`${total('Eggs')} units`} color={colors.orange} />
+        <FinanceCard label={t('productionPage.meatThisMonth')} value={`${total('Meat').toFixed(1)} kg`} color={colors.primary} />
+      </Grid>
+    );
+  }
+  if (kind === 'taskSummary') {
+    const count = (st) => rows.filter((x) => x.status === st).length;
+    const small = width <= 768;
+    return (
+      <Grid minItemWidth={small ? 160 : 220} columns={width <= 480 ? 2 : undefined} gap={small ? 10 : 16} style={{ marginBottom: 24 }}>
+        <SummaryCard icon="list-check" color="blue" value={rows.length} label={t('tasksPage.totalTasks')} />
+        <SummaryCard icon="clock" color="orange" value={count('Pending')} label={t('enums.taskStatus.Pending')} />
+        <SummaryCard icon="spinner" color="green" value={count('In Progress')} label={t('enums.taskStatus.In Progress')} />
+        <SummaryCard icon="circle-check" color="green" value={count('Completed')} label={t('enums.taskStatus.Completed')} />
+        <SummaryCard icon="triangle-exclamation" color="red" value={rows.filter(isOverdueTask).length} label={t('tasksPage.overdue')} />
+      </Grid>
+    );
+  }
+  if (kind === 'feedAlerts') {
+    // Same rule as the web: a feed used at most twice in 30 days is flagged.
+    const since = new Date(Date.now() - 30 * 86400000);
+    const groups = {};
+    rows.filter((f) => new Date(f.feeding_date) >= since).forEach((f) => { groups[f.feed_type] = (groups[f.feed_type] || 0) + 1; });
+    const low = Object.entries(groups).filter(([, c]) => c <= 2);
+    return (
+      <Card style={{ marginBottom: 24 }}>
+        <CardHeader title={t('feedingPage.stockAlerts')} icon="triangle-exclamation" iconColor={colors.orange} />
+        <CardBody>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            {low.length === 0
+              ? <Badge color="green" icon="check" label={t('feedingPage.allFeedLevelsNormal')} />
+              : low.map(([type, count]) => <Badge key={type} color="orange" icon="triangle-exclamation" label={t('feedingPage.lowUsageDetected', { type, count })} />)}
+          </View>
+        </CardBody>
+      </Card>
+    );
+  }
+  return null;
+}
+
+/* The web's LocationCaptureBadge: GPS status shown at the top of the add form. */
+function LocationBadge({ geo, t, colors }) {
+  const messages = { loading: t('geo.capturing'), denied: t('geo.denied'), error: t('geo.error'), unsupported: t('geo.unsupported') };
+  const ok = geo.status === 'success';
+  return (
+    <Pressable onPress={geo.status !== 'loading' && !ok ? geo.capture : undefined} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, borderRadius: 8, marginBottom: 16, backgroundColor: ok ? colors.primaryLight : colors.bg }}>
+      {geo.status === 'loading' ? <ActivityIndicator size="small" color={colors.primary} /> : <Icon name="location-dot" size={13} color={ok ? colors.primary : colors.orange} />}
+      <Text style={{ flex: 1, fontSize: 12, color: ok ? colors.primary : colors.textLight, fontWeight: '500' }}>
+        {ok ? t('geo.captured', { lat: geo.latitude.toFixed(4), lng: geo.longitude.toFixed(4) }) : messages[geo.status]}
+        {geo.status !== 'loading' && !ok ? t('geo.tapToRetry') : ''}
+      </Text>
+    </Pressable>
+  );
 }

@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSignIn } from '@clerk/expo';
 import { Link, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { makeAuthStyles } from '../../src/components/AuthStyles';
-import Icon from '../../src/components/Icon';
+import AuthShell from '../../src/components/AuthShell';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
 /* signIn.create({ identifier }) opens a sign-in attempt for this email
@@ -76,12 +76,8 @@ export default function ForgotPasswordScreen() {
   }
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <AuthShell>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <View style={styles.brand}>
-          <Icon name="cow" size={36} color={colors.primary} />
-          <Text style={styles.brandName}>{t('auth.brandName')}</Text>
-        </View>
         <Text style={styles.title}>{t('auth.resetPasswordTitle')}</Text>
 
         {!codeSent ? (
@@ -142,6 +138,6 @@ export default function ForgotPasswordScreen() {
           <Link href="/sign-in"><Text style={styles.link}>{t('auth.backToSignIn')}</Text></Link>
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </AuthShell>
   );
 }

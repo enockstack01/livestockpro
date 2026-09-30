@@ -1,8 +1,8 @@
 /* Design tokens mirrored 1:1 from client/src/style.css's :root CSS variables
    for the light palette, so the mobile app (which can't read CSS custom
    properties) renders the same palette/radii as the web app instead of an
-   independently-invented one. The web app itself has no dark mode — DARK is
-   a mobile-only addition, tuned to keep the same brand hue (green primary,
+   independently-invented one. DARK mirrors style.css's :root[data-theme='dark']
+   palette (both clients now have a dark mode), tuned to keep the same brand hue (green primary,
    the badge tones) while swapping the light neutrals for dark-surface ones.
    Update LIGHT alongside style.css if the web design changes; DARK only
    needs to keep pace with LIGHT's brand colors (primary/red/blue/purple/orange). */
@@ -22,6 +22,7 @@ export const LIGHT_COLORS = {
   red: '#D32F2F',
   blue: '#1976D2',
   purple: '#7B1FA2',
+  sidebar: '#1B5E20', // style.css --sidebar-bg: brand surface, identical in both themes
 };
 
 export const DARK_COLORS = {
@@ -39,6 +40,7 @@ export const DARK_COLORS = {
   red: '#EF5350',
   blue: '#64B5F6',
   purple: '#BA68C8',
+  sidebar: '#1B5E20',
 };
 
 /* Back-compat default export — client/src/lib/badges.jsx and any mobile code

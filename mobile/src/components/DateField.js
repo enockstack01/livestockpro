@@ -29,7 +29,7 @@ export default function DateField({ value, onChange, placeholder = '' }) {
           type="date"
           value={value || ''}
           onChange={(e) => onChange(e.target.value)}
-          style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: 15, color: colors.text, fontFamily: 'inherit', colorScheme: scheme }}
+          style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: 14, color: colors.text, fontFamily: 'inherit', colorScheme: scheme }}
         />
       </View>
     );
@@ -58,12 +58,13 @@ export default function DateField({ value, onChange, placeholder = '' }) {
 
 function makeStyles(colors, radius) {
   return StyleSheet.create({
+    // Same box as the web's .form-control
     input: {
       flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-      borderWidth: 1, borderColor: colors.border, borderRadius: radius.card, paddingVertical: 12, paddingHorizontal: 14, backgroundColor: colors.card,
+      borderWidth: 1.5, borderColor: colors.border, borderRadius: 8, paddingVertical: 10, paddingHorizontal: 14, backgroundColor: colors.card,
     },
-    value: { fontSize: 15, color: colors.text },
-    placeholder: { fontSize: 15, color: colors.placeholder },
+    value: { fontSize: 14, color: colors.text },
+    placeholder: { fontSize: 14, color: colors.placeholder },
     iosPicker: { backgroundColor: colors.card, borderRadius: radius.card, marginTop: 6, borderWidth: 1, borderColor: colors.border },
     doneBtn: { alignSelf: 'flex-end', paddingVertical: 8, paddingHorizontal: 16 },
     doneText: { color: colors.primary, fontWeight: '700' },

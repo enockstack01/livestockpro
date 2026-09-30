@@ -1,76 +1,55 @@
-import { useMemo } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import DateField from './DateField';
-import SelectField from './SelectField';
-import { useTheme } from '../theme/ThemeProvider';
+import { FormGroup, Input, Select } from '../ui/kit';
+import { useBreakpoint } from '../ui/layout';
 
 /* Renders one input per field from a config/tables.js `fields[]` list,
    already localized by the caller (RecordListScreen.js resolves `label` and
-   `options[].label` through i18next before handing fields to this component
-   — this component itself stays presentation-only, no i18n awareness needed
-   here). Config-driven so all 7 record-type screens share one form
-   implementation instead of 7 hand-written ones. */
+   `options[].label` through i18next). Styled like the web forms
+   (.form-group label + .form-control; dropdowns for selects) and, like the
+   web's .form-row, pairs short fields two per row on wide screens while
+   notes/textareas always take the full width. */
 export default function RecordForm({ fields, values, onChange }) {
-  const { colors, radius } = useTheme();
-  const styles = useMemo(() => makeStyles(colors, radius), [colors, radius]);
+  const { t } = useTranslation();
+  const { width } = useBreakpoint();
+  const twoCol = width > 1024;
+
+  const groups = [];
+  fields.forEach((f) => {
+    const last = groups[groups.length - 1];
+    if (twoCol && f.type !== 'textarea' && last && last.length === 1 && last[0].type !== 'textarea') last.push(f);
+    else groups.push([f]);
+  });
 
   return (
-    <View style={{ gap: 16 }}>
-      {fields.map((field) => (
-        <View key={field.key}>
-          <Text style={styles.label}>
-            {field.label}
-            {field.required ? <Text style={styles.required}> *</Text> : null}
-          </Text>
-          <FieldInput field={field} value={values[field.key]} onChange={(v) => onChange(field.key, v)} styles={styles} colors={colors} />
+    <View>
+      {groups.map((group) => (
+        <View key={group.map((f) => f.key).join('|')} style={{ flexDirection: 'row', gap: 16 }}>
+          {group.map((field) => (
+            <FormGroup key={field.key} label={field.label} required={field.required} style={{ flex: 1 }}>
+              <FieldInput field={field} value={values[field.key]} onChange={(v) => onChange(field.key, v)} t={t} />
+            </FormGroup>
+          ))}
         </View>
       ))}
     </View>
   );
 }
 
-function FieldInput({ field, value, onChange, styles, colors }) {
+function FieldInput({ field, value, onChange, t }) {
   if (field.type === 'select') {
-    return <SelectField value={value} options={field.options} onChange={onChange} />;
+    const options = field.required ? field.options : [{ value: '', label: '—' }, ...field.options];
+    return <Select value={value ?? ''} options={options} onChange={onChange} placeholder={field.label} />;
   }
-  if (field.type === 'date') {
-    return <DateField value={value} onChange={onChange} placeholder={field.label} />;
-  }
+  if (field.type === 'date') return <DateField value={value} onChange={onChange} placeholder={field.label} />;
   if (field.type === 'textarea') {
-    return (
-      <TextInput
-        style={[styles.input, styles.textarea]}
-        value={value || ''}
-        onChangeText={onChange}
-        multiline
-        numberOfLines={3}
-        placeholder={field.label}
-        placeholderTextColor={colors.placeholder}
-      />
-    );
+    return <Input multiline numberOfLines={3} value={value || ''} onChangeText={onChange} placeholder={t('common.notesPlaceholder', { defaultValue: field.label })} />;
   }
   if (field.type === 'number') {
-    return (
-      <TextInput
-        style={styles.input}
-        value={value === null || value === undefined ? '' : String(value)}
-        onChangeText={(t) => onChange(t === '' ? '' : t)}
-        keyboardType="decimal-pad"
-        placeholder={field.label}
-        placeholderTextColor={colors.placeholder}
-      />
-    );
+    return <Input value={value === null || value === undefined ? '' : String(value)} onChangeText={(v) => onChange(v === '' ? '' : v)} keyboardType="decimal-pad" placeholder={field.label} />;
   }
-  return (
-    <TextInput
-      style={styles.input}
-      value={value || ''}
-      onChangeText={onChange}
-      placeholder={field.label}
-      placeholderTextColor={colors.placeholder}
-      autoCapitalize={field.key === 'tag_id' ? 'characters' : 'sentences'}
-    />
-  );
+  return <Input value={value || ''} onChangeText={onChange} placeholder={field.label} autoCapitalize={field.key === 'tag_id' ? 'characters' : 'sentences'} />;
 }
 
 /* Fills in each select field's configured default and leaves everything else
@@ -79,13 +58,4 @@ export function emptyValues(fields) {
   const out = {};
   fields.forEach((f) => { out[f.key] = f.default || ''; });
   return out;
-}
-
-function makeStyles(colors, radius) {
-  return StyleSheet.create({
-    label: { fontSize: 13, fontWeight: '600', color: colors.textLight, marginBottom: 6 },
-    required: { color: colors.red },
-    input: { borderWidth: 1, borderColor: colors.border, borderRadius: radius.card, paddingVertical: 12, paddingHorizontal: 14, fontSize: 15, color: colors.text, backgroundColor: colors.card },
-    textarea: { minHeight: 80, textAlignVertical: 'top' },
-  });
 }

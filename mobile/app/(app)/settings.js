@@ -1,6 +1,6 @@
-import { useCallback, useMemo, useState } from 'react';
-import { useFocusEffect, useRouter } from 'expo-router';
-import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth, useUser } from '@clerk/expo';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -9,19 +9,20 @@ import { useRepository } from '../../src/db/repository';
 import { useApi } from '../../src/api/client';
 import { useToast } from '../../src/lib/toast';
 import { wipeLocalData } from '../../src/db/schema';
-import Modal from '../../src/components/Modal';
 import Icon from '../../src/components/Icon';
-import SelectField from '../../src/components/SelectField';
-import ResponsiveScreen from '../../src/components/ResponsiveScreen';
 import { useTheme } from '../../src/theme/ThemeProvider';
 import { useLanguage } from '../../src/i18n/LanguageProvider';
+import { Button, Card, CardBody, CardHeader, FormGroup, Input, Modal, Muted, Page, PageHeader, Select } from '../../src/ui/kit';
+import { Grid } from '../../src/ui/layout';
 
+/* Port of client/src/pages/Settings.jsx: profile header card (avatar,
+   name, email, photo actions), then Farm Profile / Account & Security /
+   Preferences cards, then the Danger Zone. Profile edits save to the local
+   database and sync like every other record. */
 export default function SettingsScreen() {
   const { t } = useTranslation();
-  const { colors, radius, shadow, preference, setThemePreference } = useTheme();
-  const styles = useMemo(() => makeStyles(colors, radius, shadow), [colors, radius, shadow]);
+  const { colors, preference, setThemePreference } = useTheme();
   const { language, setLanguage, languages, rtlRestartNeeded } = useLanguage();
-
   const { user } = useUser();
   const { signOut } = useAuth();
   const repo = useRepository();
@@ -48,11 +49,10 @@ export default function SettingsScreen() {
     setLocation(p?.location || '');
     setPhone(p?.phone || '');
   }, [repo]);
-
-  useFocusEffect(useCallback(() => { load(); }, [load]));
+  useEffect(() => { load(); }, [load]);
 
   const email = user?.primaryEmailAddress?.emailAddress || '';
-  const displayName = farmName || email.split('@')[0] || 'User';
+  const displayName = email.split('@')[0] || 'User';
   const initials = (email.slice(0, 2) || 'U').toUpperCase();
 
   async function saveProfile() {
@@ -72,23 +72,17 @@ export default function SettingsScreen() {
 
   async function changeAvatar() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      showToast(t('settings.photoPermissionNeeded'), 'error');
-      return;
-    }
+    if (!permission.granted) { showToast(t('settings.photoPermissionNeeded'), 'error'); return; }
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8, allowsEditing: true, aspect: [1, 1] });
     if (result.canceled) return;
-
     setUploading(true);
     try {
-      const asset = result.assets[0];
-      const response = await fetch(asset.uri);
-      const blob = await response.blob();
+      const blob = await (await fetch(result.assets[0].uri)).blob();
       await user.setProfileImage({ file: blob });
       await user.reload();
       showToast(t('settings.photoUpdated'), 'success');
     } catch (err) {
-      showToast(t('settings.uploadFailed'), 'error');
+      showToast(t('settings.uploadFailed', { message: err?.errors?.[0]?.message || err.message }), 'error');
     } finally {
       setUploading(false);
     }
@@ -108,10 +102,7 @@ export default function SettingsScreen() {
   }
 
   async function deleteAccount() {
-    if (confirmText !== 'DELETE') {
-      showToast(t('settings.typeDeleteToConfirm'), 'error');
-      return;
-    }
+    if (confirmText !== 'DELETE') { showToast(t('settings.typeDeleteToConfirm'), 'error'); return; }
     setDeleting(true);
     try {
       if (profile) await repo.remove('profiles', profile.id);
@@ -134,145 +125,105 @@ export default function SettingsScreen() {
     }
   }
 
-  const themeOptions = [
-    { value: 'light', label: t('settings.themeLight') },
-    { value: 'dark', label: t('settings.themeDark') },
-    { value: 'system', label: t('settings.themeSystem') },
-  ];
-  const languageOptions = languages.map((l) => ({ value: l.code, label: l.nativeLabel }));
-
   return (
-    <ResponsiveScreen>
-    <ScrollView style={styles.container} contentContainerStyle={{ padding: 16, gap: 16 }}>
-      <View style={styles.headerCard}>
-        <Pressable onPress={changeAvatar} disabled={uploading}>
-          {user?.imageUrl ? (
-            <Image source={{ uri: user.imageUrl }} style={styles.avatar} />
-          ) : (
-            <View style={[styles.avatar, styles.avatarPlaceholder]}><Text style={styles.avatarInitials}>{initials}</Text></View>
-          )}
-          <View style={styles.avatarEdit}><Icon name="camera" size={12} color={colors.white} /></View>
-        </Pressable>
-        <Text style={styles.headerName}>{displayName}</Text>
-        <Text style={styles.headerEmail}>{email}</Text>
-        <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
-          <Pressable style={styles.smallBtn} onPress={changeAvatar} disabled={uploading}>
-            {uploading ? <ActivityIndicator size="small" color={colors.text} /> : <Text style={styles.smallBtnText}>{t('settings.changePhoto')}</Text>}
+    <Page>
+      <PageHeader title={t('settings.title')} subtitle={t('settings.subtitle')} />
+
+      <Card style={{ marginBottom: 20 }}>
+        <View style={styles.headerCard}>
+          <Pressable onPress={changeAvatar} disabled={uploading} style={[styles.avatar, { backgroundColor: colors.primaryLight, borderColor: colors.card, opacity: uploading ? 0.6 : 1 }]}>
+            {user?.imageUrl ? <Image source={{ uri: user.imageUrl }} style={styles.avatarImg} /> : <Text style={[styles.initials, { color: colors.primary }]}>{initials}</Text>}
+            <View style={[styles.avatarEdit, { backgroundColor: colors.primary, borderColor: colors.card }]}><Icon name="camera" size={9} color="#fff" /></View>
           </Pressable>
-          {user?.imageUrl ? (
-            <Pressable style={styles.smallBtn} onPress={removeAvatar} disabled={uploading}>
-              <Text style={styles.smallBtnText}>{t('settings.remove')}</Text>
-            </Pressable>
-          ) : null}
+          <View style={{ flex: 1, minWidth: 160 }}>
+            <Text style={[styles.name, { color: colors.text }]}>{displayName}</Text>
+            <Text style={{ fontSize: 13, color: colors.textLight }}>{email}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            <Button size="sm" variant="secondary" icon="upload" title={uploading ? t('settings.workingEllipsis') : t('settings.changePhoto')} onPress={changeAvatar} disabled={uploading} />
+            {user?.imageUrl ? <Button size="sm" variant="secondary" icon="trash" title={t('settings.remove')} onPress={removeAvatar} disabled={uploading} /> : null}
+          </View>
         </View>
-      </View>
+      </Card>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>{t('settings.appearance')}</Text>
-        <SelectField value={preference} options={themeOptions} onChange={setThemePreference} />
-      </View>
+      <Grid minItemWidth={420} gap={20} style={{ marginBottom: 24 }}>
+        <Card>
+          <CardHeader title={t('settings.farmProfile')} icon="tractor" />
+          <CardBody>
+            <FormGroup label={t('settings.farmName')}><Input placeholder={t('settings.farmNamePlaceholder')} value={farmName} onChangeText={setFarmName} /></FormGroup>
+            <FormGroup label={t('settings.location')}><Input placeholder={t('settings.locationPlaceholder')} value={location} onChangeText={setLocation} /></FormGroup>
+            <FormGroup label={t('settings.phoneNumber')}><Input placeholder={t('settings.phonePlaceholder')} value={phone} onChangeText={setPhone} keyboardType="phone-pad" /></FormGroup>
+            <Button icon="check" title={saving ? t('settings.saving') : t('settings.saveProfile')} onPress={saveProfile} loading={saving} style={{ alignSelf: 'flex-start' }} />
+          </CardBody>
+        </Card>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>{t('settings.language')}</Text>
-        <SelectField value={language} options={languageOptions} onChange={setLanguage} />
-        {rtlRestartNeeded ? <Text style={styles.hint}>{t('settings.rtlRestartNotice')}</Text> : null}
-      </View>
+        <Card>
+          <CardHeader title={t('settings.accountSecurity')} icon="user-shield" iconColor={colors.blue} />
+          <CardBody>
+            <ReadonlyRow label={t('settings.email')} value={email} colors={colors} />
+            <ReadonlyRow label={t('settings.userId')} value={user?.id || ''} colors={colors} mono last />
+            <Muted style={{ marginTop: 16 }}>{t('settings.passwordNote')}</Muted>
+          </CardBody>
+        </Card>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>{t('settings.farmProfile')}</Text>
-        <Field styles={styles} colors={colors} label={t('settings.farmName')} value={farmName} onChangeText={setFarmName} placeholder={t('settings.farmNamePlaceholder')} />
-        <Field styles={styles} colors={colors} label={t('settings.location')} value={location} onChangeText={setLocation} placeholder={t('settings.locationPlaceholder')} />
-        <Field styles={styles} colors={colors} label={t('settings.phoneNumber')} value={phone} onChangeText={setPhone} placeholder={t('settings.phonePlaceholder')} keyboardType="phone-pad" />
-        <Pressable style={styles.saveBtn} onPress={saveProfile} disabled={saving}>
-          {saving ? <ActivityIndicator color={colors.white} /> : <Text style={styles.saveBtnText}>{t('settings.saveProfile')}</Text>}
-        </Pressable>
-      </View>
+        <Card>
+          <CardHeader title={t('settings.preferences')} icon="globe" />
+          <CardBody>
+            <FormGroup label={t('settings.appearance')}>
+              <Select value={preference} onChange={setThemePreference} placeholder={t('settings.appearance')}
+                options={[{ value: 'light', label: t('settings.themeLight') }, { value: 'dark', label: t('settings.themeDark') }, { value: 'system', label: t('settings.themeSystem') }]} />
+            </FormGroup>
+            <FormGroup label={t('settings.language')}>
+              <Select value={language} onChange={setLanguage} placeholder={t('settings.language')} options={languages.map((l) => ({ value: l.code, label: l.nativeLabel }))} />
+            </FormGroup>
+            <Muted>{rtlRestartNeeded ? t('settings.rtlRestartNotice') : t('settings.languageHelp')}</Muted>
+          </CardBody>
+        </Card>
+      </Grid>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>{t('settings.account')}</Text>
-        <Row styles={styles} label={t('settings.email')} value={email} />
-        <Row styles={styles} label={t('settings.userId')} value={user?.id || ''} mono />
-        <Text style={styles.hint}>{t('settings.passwordNote')}</Text>
-      </View>
-
-      <View style={[styles.card, styles.dangerCard]}>
-        <Text style={[styles.cardTitle, { color: colors.red }]}>{t('settings.dangerZone')}</Text>
-        <Text style={styles.hint}>{t('settings.deleteWarning')}</Text>
-        <Pressable style={styles.deleteBtn} onPress={() => setDeleteOpen(true)}>
-          <Text style={styles.deleteBtnText}>{t('settings.deleteAccount')}</Text>
-        </Pressable>
-      </View>
+      <Card danger>
+        <CardHeader title={t('settings.dangerZone')} icon="triangle-exclamation" iconColor={colors.red} titleColor={colors.red} />
+        <CardBody>
+          <Muted style={{ marginBottom: 16 }}>{t('settings.dangerZoneWarning')}</Muted>
+          <Button variant="danger" icon="user-xmark" title={t('settings.deleteAccount')} onPress={() => setDeleteOpen(true)} style={{ alignSelf: 'flex-start' }} />
+        </CardBody>
+      </Card>
 
       <Modal
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}
         title={t('settings.deleteAccount')}
-        footer={
-          <>
-            <Pressable style={styles.smallBtn} onPress={() => setDeleteOpen(false)}><Text style={styles.smallBtnText}>{t('common.cancel')}</Text></Pressable>
-            <Pressable style={styles.deleteBtn} onPress={deleteAccount} disabled={deleting}>
-              {deleting ? <ActivityIndicator color={colors.white} /> : <Text style={styles.deleteBtnText}>{t('settings.deleteForever')}</Text>}
-            </Pressable>
-          </>
-        }
+        maxWidth={420}
+        footer={<>
+          <Button variant="secondary" title={t('common.cancel')} onPress={() => setDeleteOpen(false)} />
+          <Button variant="danger" icon="trash" title={t('settings.deleteForever')} onPress={deleteAccount} loading={deleting} />
+        </>}
       >
-        <Text style={styles.hint}>{t('settings.deleteConfirmMessage')}</Text>
-        <TextInput style={styles.confirmInput} value={confirmText} onChangeText={setConfirmText} placeholder={t('settings.typeDeleteHere')} autoCapitalize="characters" />
+        <Muted>{t('settings.deleteAccountConfirmText')}</Muted>
+        <Input style={{ marginTop: 16 }} placeholder={t('settings.typeDeleteHere')} value={confirmText} onChangeText={setConfirmText} autoCapitalize="characters" />
       </Modal>
-    </ScrollView>
-    </ResponsiveScreen>
+    </Page>
   );
 }
 
-function Field({ styles, colors, label, ...props }) {
+function ReadonlyRow({ label, value, colors, mono, last }) {
   return (
-    <View style={{ marginBottom: 12 }}>
-      <Text style={styles.fieldLabel}>{label}</Text>
-      <TextInput style={styles.input} placeholderTextColor={colors.placeholder} {...props} />
+    <View style={[styles.row, { borderBottomColor: colors.border }, last && { borderBottomWidth: 0 }]}>
+      <Text style={[styles.rowLabel, { color: colors.textLight }]}>{label}</Text>
+      <Text style={[styles.rowValue, { color: mono ? colors.textLight : colors.text }, mono && styles.mono]} numberOfLines={2}>{value}</Text>
     </View>
   );
 }
 
-function Row({ styles, label, value, mono }) {
-  return (
-    <View style={styles.row}>
-      <Text style={styles.rowLabel}>{label}</Text>
-      <Text style={[styles.rowValue, mono && { fontFamily: 'monospace' }]} numberOfLines={1}>{value}</Text>
-    </View>
-  );
-}
-
-function makeStyles(colors, radius, shadow) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.bg },
-    headerCard: {
-      backgroundColor: colors.card, borderRadius: radius.card, padding: 20, alignItems: 'center',
-      shadowColor: shadow.color, shadowOpacity: shadow.opacity, shadowRadius: shadow.radius, shadowOffset: shadow.offset, elevation: shadow.elevation,
-    },
-    avatar: { width: 72, height: 72, borderRadius: 36 },
-    avatarPlaceholder: { backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center' },
-    avatarInitials: { fontSize: 24, fontWeight: '800', color: colors.primary },
-    avatarEdit: { position: 'absolute', right: -2, bottom: -2, backgroundColor: colors.primary, borderRadius: 10, padding: 5, borderWidth: 2, borderColor: colors.card },
-    headerName: { fontSize: 17, fontWeight: '700', color: colors.primaryDark, marginTop: 12 },
-    headerEmail: { fontSize: 13, color: colors.textLight, marginTop: 2 },
-    smallBtn: { backgroundColor: colors.bg, borderWidth: 1.5, borderColor: colors.border, paddingVertical: 9, paddingHorizontal: 14, borderRadius: radius.button },
-    smallBtnText: { color: colors.text, fontWeight: '700', fontSize: 13 },
-    card: {
-      backgroundColor: colors.card, borderRadius: radius.card, padding: 16,
-      shadowColor: shadow.color, shadowOpacity: shadow.opacity, shadowRadius: shadow.radius, shadowOffset: shadow.offset, elevation: shadow.elevation,
-    },
-    cardTitle: { fontSize: 15, fontWeight: '700', color: colors.primaryDark, marginBottom: 12 },
-    fieldLabel: { fontSize: 12, fontWeight: '600', color: colors.textLight, marginBottom: 6 },
-    input: { borderWidth: 1, borderColor: colors.border, borderRadius: radius.card, paddingVertical: 11, paddingHorizontal: 12, fontSize: 14, color: colors.text },
-    saveBtn: { backgroundColor: colors.primary, paddingVertical: 13, borderRadius: radius.button, alignItems: 'center', marginTop: 4 },
-    saveBtnText: { color: colors.white, fontWeight: '700' },
-    row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.bg },
-    rowLabel: { color: colors.textLight, fontSize: 13 },
-    rowValue: { color: colors.text, fontSize: 13, flexShrink: 1, marginLeft: 12 },
-    hint: { color: colors.textLight, fontSize: 12, marginTop: 8 },
-    dangerCard: { borderWidth: 1, borderColor: colors.red },
-    deleteBtn: { backgroundColor: colors.red, paddingVertical: 12, borderRadius: radius.button, alignItems: 'center', marginTop: 12, paddingHorizontal: 16 },
-    deleteBtnText: { color: colors.white, fontWeight: '700' },
-    confirmInput: { borderWidth: 1, borderColor: colors.border, borderRadius: radius.card, paddingVertical: 11, paddingHorizontal: 12, marginTop: 12, fontSize: 14 },
-  });
-}
+const styles = StyleSheet.create({
+  headerCard: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 20, padding: 24 },
+  avatar: { width: 64, height: 64, borderRadius: 32, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
+  avatarImg: { width: 60, height: 60, borderRadius: 30 },
+  initials: { fontSize: 20, fontWeight: '700' },
+  avatarEdit: { position: 'absolute', bottom: -2, right: -2, width: 22, height: 22, borderRadius: 11, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
+  name: { fontSize: 18, fontWeight: '700', marginBottom: 2 },
+  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingVertical: 10, borderBottomWidth: 1 },
+  rowLabel: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.4 },
+  rowValue: { fontSize: 13, fontWeight: '600', textAlign: 'right', flexShrink: 1 },
+  mono: { fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }), fontSize: 12, fontWeight: '500' },
+});

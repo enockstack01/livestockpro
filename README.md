@@ -106,7 +106,7 @@ client/             React (Vite) frontend
   dist/               production build output (git-ignored, created by `npm run build`)
 
 mobile/             React Native (Expo) app — Android + iOS, see mobile/README.md
-  app/                 Expo Router file-based routes (auth stack + tab layout)
+  app/                 Expo Router file-based routes (auth stack + web-style sidebar layout)
   src/
     api/client.js        REST client mirroring client/src/lib/api.js's {data,error} contract
     db/                   local SQLite schema + repository (offline-first reads/writes)

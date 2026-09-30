@@ -1,20 +1,18 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { createContext, useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Modal from '../components/Modal';
-import { useTheme } from '../theme/ThemeProvider';
+import { Button, Modal, Muted } from '../ui/kit';
 
 /* Imperative confirm() dialog, same pattern as useToast(). Built on our own
    Modal instead of React Native's Alert.alert() — react-native-web's Alert
    is a no-op stub (`static alert() {}`, see node_modules/react-native-web/
    dist/exports/Alert/index.js), so Alert.alert-based confirms silently do
-   nothing on the web target. This works identically on web and native. */
+   nothing on the web target. This works identically on web and native, and
+   looks like the web app's confirm modals (secondary Cancel + primary or
+   danger action, right-aligned in the footer). */
 const ConfirmContext = createContext(null);
 
 export function ConfirmProvider({ children }) {
   const { t } = useTranslation();
-  const { colors, radius } = useTheme();
-  const styles = useMemo(() => makeStyles(colors, radius), [colors, radius]);
   const [state, setState] = useState(null); // { title, message, confirmLabel, destructive, resolve }
 
   const confirm = useCallback((opts) => new Promise((resolve) => setState({ ...opts, resolve })), []);
@@ -31,18 +29,20 @@ export function ConfirmProvider({ children }) {
         open={!!state}
         onClose={() => close(false)}
         title={state?.title || t('common.confirm')}
+        maxWidth={420}
         footer={
           <>
-            <Pressable style={[styles.btn, styles.btnSecondary]} onPress={() => close(false)}>
-              <Text style={styles.btnSecondaryText}>{t('common.cancel')}</Text>
-            </Pressable>
-            <Pressable style={[styles.btn, state?.destructive ? styles.btnDanger : styles.btnPrimary]} onPress={() => close(true)}>
-              <Text style={styles.btnPrimaryText}>{state?.confirmLabel || t('common.confirm')}</Text>
-            </Pressable>
+            <Button variant="secondary" title={t('common.cancel')} onPress={() => close(false)} />
+            <Button
+              variant={state?.destructive ? 'danger' : 'primary'}
+              icon={state?.destructive ? 'trash' : 'check'}
+              title={state?.confirmLabel || t('common.confirm')}
+              onPress={() => close(true)}
+            />
           </>
         }
       >
-        <Text style={styles.message}>{state?.message}</Text>
+        <Muted>{state?.message}</Muted>
       </Modal>
     </ConfirmContext.Provider>
   );
@@ -53,16 +53,4 @@ export function useConfirm() {
   const ctx = useContext(ConfirmContext);
   if (!ctx) throw new Error('useConfirm() must be used inside <ConfirmProvider>');
   return ctx;
-}
-
-function makeStyles(colors, radius) {
-  return StyleSheet.create({
-    message: { fontSize: 14, color: colors.textLight, lineHeight: 20 },
-    btn: { flex: 1, paddingVertical: 13, borderRadius: radius.button, alignItems: 'center' },
-    btnPrimary: { backgroundColor: colors.primary },
-    btnPrimaryText: { color: colors.white, fontWeight: '700' },
-    btnSecondary: { backgroundColor: colors.bg, borderWidth: 1.5, borderColor: colors.border },
-    btnSecondaryText: { color: colors.text, fontWeight: '700' },
-    btnDanger: { backgroundColor: colors.red },
-  });
 }
