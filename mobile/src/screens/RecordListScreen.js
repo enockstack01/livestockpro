@@ -11,6 +11,7 @@ import { useTheme } from '../theme/ThemeProvider';
 import { isOverdueTask, isThisMonth } from '../lib/shared';
 import Icon from '../components/Icon';
 import RecordForm, { emptyValues } from '../components/RecordForm';
+import CsvImportModal from '../components/CsvImportModal';
 import { Badge, Button, Card, CardBody, CardHeader, EmptyState, FilterBar, FinanceCard, IconButton, Modal, Page, PageHeader, Select, Spinner, SummaryCard, Tabs } from '../ui/kit';
 import { Grid, useBreakpoint } from '../ui/layout';
 import DataTable from '../ui/DataTable';
@@ -47,6 +48,7 @@ export default function RecordListScreen({ config }) {
   const [editingId, setEditingId] = useState(null);
   const [values, setValues] = useState({});
   const [saving, setSaving] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   const inlineSearch = useTopbarSearch(t('records.searchPlaceholder', { label: label.toLowerCase() }), setSearch);
 
@@ -153,6 +155,7 @@ export default function RecordListScreen({ config }) {
   return (
     <Page refreshing={refreshing || syncing} onRefresh={onRefresh}>
       <PageHeader title={t(`${page.page}.title`)} subtitle={t(`${page.page}.subtitle`)}>
+        {page.importable ? <Button variant="secondary" icon="file-import" title={t('animalsPage.importCsv')} onPress={() => setImportOpen(true)} /> : null}
         {page.exportable ? <Button variant="secondary" icon="file-export" title={t('reports.exportCsv')} onPress={exportCsv} /> : null}
         <Button icon="plus" title={t(page.addKey)} onPress={openAdd} />
       </PageHeader>
@@ -206,6 +209,8 @@ export default function RecordListScreen({ config }) {
         {modal === 'add' && geo.status !== 'idle' ? <LocationBadge geo={geo} t={t} colors={colors} /> : null}
         <RecordForm fields={localizedFields} values={values} onChange={(k, v) => setValues((prev) => ({ ...prev, [k]: v }))} />
       </Modal>
+
+      {page.importable ? <CsvImportModal open={importOpen} onClose={() => setImportOpen(false)} onImported={load} /> : null}
     </Page>
   );
 }

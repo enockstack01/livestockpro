@@ -6,6 +6,7 @@ import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import { StatusBadge, calcAge, fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
+import { animalsFromCsv } from '../../../shared/csv';
 
 const EMPTY_FORM = { tag_id: '', name: '', species: '', breed: '', sex: '', date_of_birth: '', location: '', health_status: 'Healthy', notes: '' };
 const SPECIES_OPTIONS = ['Cattle', 'Sheep', 'Goat', 'Pig', 'Poultry', 'Horse', 'Donkey', 'Rabbit', 'Other'];
@@ -108,61 +109,16 @@ export default function Animals() {
     showToast(t('records.exported', { label }), 'success');
   }
 
-  /* Splits one CSV line respecting double-quoted fields (so a quoted value
-     containing a comma, e.g. exportCSV's own `"Pasture A, north side"`,
-     round-trips correctly instead of being split mid-field). */
-  function parseCsvLine(line) {
-    const values = [];
-    let cur = '';
-    let inQuotes = false;
-    for (let i = 0; i < line.length; i++) {
-      const c = line[i];
-      if (inQuotes) {
-        if (c === '"' && line[i + 1] === '"') { cur += '"'; i++; }
-        else if (c === '"') inQuotes = false;
-        else cur += c;
-      } else if (c === '"') {
-        inQuotes = true;
-      } else if (c === ',') {
-        values.push(cur);
-        cur = '';
-      } else {
-        cur += c;
-      }
-    }
-    values.push(cur);
-    return values;
-  }
-
-  function parseCSV(text) {
-    const lines = text.split(/\r?\n/).map((l) => l.trim()).filter((l) => l);
-    if (lines.length < 2) return [];
-    const headers = parseCsvLine(lines[0]).map((h) => h.trim());
-    return lines.slice(1).map((line) => {
-      const values = parseCsvLine(line);
-      const obj = {};
-      headers.forEach((h, i) => { obj[h] = (values[i] || '').trim(); });
-      return obj;
-    });
-  }
-
   function handleFileChange(e) {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = async (ev) => {
       try {
-        const rows = parseCSV(ev.target.result);
-        if (rows.length === 0) { showToast(t('animalsPage.csvEmpty'), 'error'); return; }
-        // Same required fields the manual "Add Animal" form enforces (see save() above).
-        const validRows = rows.filter((row) => row.tag_id && row.species);
-        const skipped = rows.length - validRows.length;
-        if (validRows.length === 0) { showToast(t('animalsPage.noValidRows'), 'error'); return; }
-        const records = validRows.map((row) => ({
-          tag_id: row.tag_id, name: row.name || '', species: row.species, breed: row.breed || '',
-          sex: row.sex || '', date_of_birth: row.date_of_birth || null, location: row.location || '',
-          health_status: row.health_status || 'Healthy', notes: row.notes || ''
-        }));
+        // Parsing + required-field rules are shared with the mobile app (shared/csv.js).
+        const { total, records, skipped } = animalsFromCsv(ev.target.result);
+        if (total === 0) { showToast(t('animalsPage.csvEmpty'), 'error'); return; }
+        if (records.length === 0) { showToast(t('animalsPage.noValidRows'), 'error'); return; }
         const { error } = await api.insert('animals', records);
         if (error) { showToast(t('records.saveFailed', { message: error.message }), 'error'); return; }
         showToast(t('animalsPage.importedSuccess', { count: records.length }) + (skipped ? t('animalsPage.skippedRows', { count: skipped }) : ''), 'success');

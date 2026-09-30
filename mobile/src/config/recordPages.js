@@ -17,7 +17,7 @@ const TYPE_ICON = { Milk: 'bottle-droplet', Eggs: 'egg', Meat: 'drumstick-bite' 
 
 export const RECORD_PAGES = {
   animals: {
-    page: 'animalsPage', addKey: 'animalsPage.addAnimal', emptyIcon: 'cow', exportable: true,
+    page: 'animalsPage', addKey: 'animalsPage.addAnimal', emptyIcon: 'cow', exportable: true, importable: true,
     exportFields: ['tag_id', 'name', 'species', 'breed', 'sex', 'date_of_birth', 'location', 'health_status', 'last_check_date', 'notes'],
     columns: (t) => [
       { key: 'tag_id', label: t('tables.animals.fields.tag_id'), strong: true },
