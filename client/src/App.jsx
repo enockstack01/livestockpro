@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
 import Layout from './components/Layout.jsx';
+import AccountGate from './components/AccountGate.jsx';
 import Login from './pages/Login.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Animals from './pages/Animals.jsx';
@@ -26,7 +27,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
-      <Route element={<RequireAuth><Layout /></RequireAuth>}>
+      <Route element={<RequireAuth><AccountGate><Layout /></AccountGate></RequireAuth>}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/animals" element={<Animals />} />
         <Route path="/health" element={<Health />} />

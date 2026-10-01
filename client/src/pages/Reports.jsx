@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
+import { formatMoney } from '../../../shared/currency';
 
 export default function Reports() {
   const { t } = useTranslation();
@@ -155,9 +156,9 @@ export default function Reports() {
           <div className="finance-card"><h4>{t('reports.underTreatment')}</h4><div className="amount expense">{treatmentCount}</div></div>
           <div className="finance-card"><h4>{t('reports.criticalStatus')}</h4><div className="amount loss">{criticalCount}</div></div>
           <div className="finance-card"><h4>{t('dashboardPage.pregnant')}</h4><div className="amount" style={{ color: 'var(--purple)' }}>{pregnantCount}</div></div>
-          <div className="finance-card"><h4>{t('reportsPage.totalIncome')}</h4><div className="amount income">${totalIncome.toLocaleString()}</div></div>
-          <div className="finance-card"><h4>{t('reportsPage.totalExpenses')}</h4><div className="amount expense">${totalExpense.toLocaleString()}</div></div>
-          <div className="finance-card"><h4>{t('reportsPage.netProfit')}</h4><div className={`amount ${netProfit >= 0 ? 'profit' : 'loss'}`}>${netProfit.toLocaleString()}</div></div>
+          <div className="finance-card"><h4>{t('reportsPage.totalIncome')}</h4><div className="amount income">{formatMoney(totalIncome)}</div></div>
+          <div className="finance-card"><h4>{t('reportsPage.totalExpenses')}</h4><div className="amount expense">{formatMoney(totalExpense)}</div></div>
+          <div className="finance-card"><h4>{t('reportsPage.netProfit')}</h4><div className={`amount ${netProfit >= 0 ? 'profit' : 'loss'}`}>{formatMoney(netProfit)}</div></div>
         </div>
 
         <div className="finance-summary mb-24">
@@ -184,7 +185,7 @@ export default function Reports() {
 
         <ReportSection title={t('tables.finance_records.singular')} icon="fa-coins" count={filteredFinance.length}
           headers={[t('tables.finance_records.fields.type'), t('tables.finance_records.fields.category'), t('tables.finance_records.fields.amount'), t('tables.finance_records.fields.date'), t('tables.finance_records.fields.description')]}
-          rows={filteredFinance.map((r) => [r.type || '—', r.category || '—', '$' + (r.amount || 0).toLocaleString(), fmtDate(r.date), (r.description || '—').substring(0, 50)])} />
+          rows={filteredFinance.map((r) => [r.type || '—', r.category || '—', formatMoney(r.amount), fmtDate(r.date), (r.description || '—').substring(0, 50)])} />
       </div>
     </>
   );

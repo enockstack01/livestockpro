@@ -7,27 +7,12 @@ import { TopbarSearchProvider, useTopbarSearchBox } from '../lib/topbarSearch.js
 import { useTheme } from '../theme/ThemeProvider.jsx';
 import { isOverdueTask } from '../../../shared/businessRules';
 import { NAV_SECTIONS } from '../../../shared/navigation';
+import { accountDisplayName } from '../../../shared/account';
+import { useAccount } from './AccountGate.jsx';
 import Modal from './Modal.jsx';
 
 
 const NOTIF_ORDER = { red: 0, orange: 1, blue: 2, purple: 3, green: 4 };
-
-/* Resolved server-side (Clerk publicMetadata.role, with an env-var bootstrap
-   fallback) rather than trusted from the client — this only drives UI, the
-   backend re-checks on every /api/admin/* call regardless. */
-function useRole() {
-  const api = useApi();
-  const [role, setRole] = useState(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    api.myRole().then((res) => { if (!cancelled) setRole((res.data && res.data.role) || 'user'); });
-    return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return role;
-}
 
 function useNotifications(t) {
   const api = useApi();
@@ -157,14 +142,17 @@ function LayoutInner() {
   const notifItems = useNotifications(t);
   const { readIds, markRead, markAllRead } = useReadNotifications(user?.id);
   const unreadCount = notifItems.filter((n) => !readIds.has(n.id)).length;
-  const role = useRole();
+  /* Resolved server-side (Clerk publicMetadata.role, with an env-var bootstrap
+     fallback) and delivered with the account by AccountGate — this only
+     drives UI, the backend re-checks on every /api/admin/* call regardless. */
+  const { account } = useAccount();
+  const role = account.role || 'user';
   const isAdmin = role === 'admin' || role === 'super_admin';
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
 
-  const email = user?.primaryEmailAddress?.emailAddress || '';
-  const displayName = email.split('@')[0] || 'User';
-  const initials = email.substring(0, 2).toUpperCase() || 'U';
+  const displayName = accountDisplayName(t, account, role);
+  const initials = (displayName[0] || 'U').toUpperCase();
   const imageUrl = user?.imageUrl;
 
   const [signOutOpen, setSignOutOpen] = useState(false);

@@ -10,6 +10,7 @@ const { connect } = require('./db');
 const dataRoutes = require('./routes/dataRoutes');
 const rpcRoutes = require('./routes/rpcRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const accountRoutes = require('./routes/accountRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -112,6 +113,7 @@ app.use(clerkMiddleware());
 app.use('/api/data', dataRoutes);
 app.use('/api/rpc', rpcRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/account', accountRoutes);
 
 const clientDist = path.join(__dirname, '..', 'client', 'dist');
 app.use(express.static(clientDist));

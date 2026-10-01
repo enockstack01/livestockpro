@@ -7,6 +7,7 @@ import { fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
 import { useOpenAddFromUrl } from '../lib/useOpenAddFromUrl.js';
+import { formatMoney, currencySymbol } from '../../../shared/currency';
 
 const EMPTY_FORM = { type: 'Income', amount: '', category: '', date: '', description: '' };
 const CATEGORIES = ['Milk Sales', 'Egg Sales', 'Meat Sales', 'Animal Sales', 'Other Income', 'Feed', 'Veterinary', 'Medicine', 'Labor', 'Equipment', 'Maintenance', 'Transport', 'Other Expense'];
@@ -109,9 +110,9 @@ export default function Finance() {
       </div>
 
       <div className="finance-summary">
-        <div className="finance-card"><h4>{t('financePage.monthlyIncome')}</h4><div className="amount income">${summary.totalIncome.toLocaleString()}</div></div>
-        <div className="finance-card"><h4>{t('financePage.monthlyExpenses')}</h4><div className="amount expense">${summary.totalExpense.toLocaleString()}</div></div>
-        <div className="finance-card"><h4>{t('financePage.profitLoss')}</h4><div className={`amount ${summary.pl >= 0 ? 'profit' : 'loss'}`}>${summary.pl.toLocaleString()}</div></div>
+        <div className="finance-card"><h4>{t('financePage.monthlyIncome')}</h4><div className="amount income">{formatMoney(summary.totalIncome)}</div></div>
+        <div className="finance-card"><h4>{t('financePage.monthlyExpenses')}</h4><div className="amount expense">{formatMoney(summary.totalExpense)}</div></div>
+        <div className="finance-card"><h4>{t('financePage.profitLoss')}</h4><div className={`amount ${summary.pl >= 0 ? 'profit' : 'loss'}`}>{formatMoney(summary.pl)}</div></div>
       </div>
 
       <div className="tabs">
@@ -134,7 +135,7 @@ export default function Finance() {
                     <tr key={f.id}>
                       <td><span className={`badge ${f.type === 'Income' ? 'badge-green' : 'badge-red'}`}><i className={`fas ${f.type === 'Income' ? 'fa-arrow-up' : 'fa-arrow-down'}`}></i> {t(`enums.financeType.${f.type}`, f.type)}</span></td>
                       <td>{f.category ? t(`enums.financeCategory.${f.category}`, f.category) : '—'}</td>
-                      <td className={`fw-600 ${f.type === 'Income' ? 'text-green' : 'text-red'}`}>{f.type === 'Income' ? '+' : '-'}${(f.amount || 0).toLocaleString()}</td>
+                      <td className={`fw-600 ${f.type === 'Income' ? 'text-green' : 'text-red'}`}>{f.type === 'Income' ? '+' : '-'}{formatMoney(f.amount)}</td>
                       <td>{fmtDate(f.date)}</td>
                       <td>{desc.substring(0, 40)}{desc.length > 40 ? '...' : ''}</td>
                       <td>
@@ -164,7 +165,7 @@ export default function Finance() {
               <option value="Income">{t('enums.financeType.Income')}</option><option value="Expense">{t('enums.financeType.Expense')}</option>
             </select>
           </div>
-          <div className="form-group"><label>{t('tables.finance_records.fields.amount')} ($) *</label><input type="number" className="form-control" placeholder="0.00" step="0.01" min="0" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></div>
+          <div className="form-group"><label>{t('tables.finance_records.fields.amount')} ({currencySymbol()}) *</label><input type="number" className="form-control" placeholder="0.00" step="0.01" min="0" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></div>
         </div>
         <div className="form-group">
           <label>{t('tables.finance_records.fields.category')}</label>

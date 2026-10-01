@@ -7,6 +7,9 @@ import { useToast } from '../lib/toast.jsx';
 import { useLanguage } from '../i18n/LanguageProvider.jsx';
 import { useTheme } from '../theme/ThemeProvider.jsx';
 import Modal from '../components/Modal.jsx';
+import { useAccount } from '../components/AccountGate.jsx';
+import { accountDisplayName } from '../../../shared/account';
+import { CURRENCIES, currencyName } from '../../../shared/currency';
 
 export default function Settings() {
   const { t } = useTranslation();
@@ -19,6 +22,8 @@ export default function Settings() {
   const fileInputRef = useRef(null);
   const { language, setLanguage, languages } = useLanguage();
   const { preference, setThemePreference } = useTheme();
+  const { account, setAccount } = useAccount();
+  const [savingCurrency, setSavingCurrency] = useState(false);
 
   const [profile, setProfile] = useState(null);
   const [farmName, setFarmName] = useState('');
@@ -31,9 +36,9 @@ export default function Settings() {
   const [deleting, setDeleting] = useState(false);
 
   const email = user?.primaryEmailAddress?.emailAddress || '';
-  const initials = email.substring(0, 2).toUpperCase() || 'U';
+  const initials = (accountDisplayName(t, account, account.role)[0] || 'U').toUpperCase();
   const imageUrl = user?.imageUrl;
-  const displayName = farmName || email.split('@')[0] || 'User';
+  const displayName = accountDisplayName(t, account, account.role);
 
   useEffect(() => {
     (async () => {
@@ -90,6 +95,15 @@ export default function Settings() {
     if (result.error) { showToast(t('settings.saveFailed', { message: result.error.message }), 'error'); return; }
     if (!profile && result.data) setProfile(result.data[0]);
     showToast(t('settings.profileSaved'), 'success');
+  }
+
+  async function changeCurrency(code) {
+    setSavingCurrency(true);
+    const { data, error } = await api.setPreferences({ currency: code });
+    setSavingCurrency(false);
+    if (error) { showToast(t('account.currencyFailed', { message: error.message }), 'error'); return; }
+    setAccount(data);
+    showToast(t('account.currencySaved'), 'success');
   }
 
   async function deleteAccount() {
@@ -168,12 +182,20 @@ export default function Settings() {
                 {languages.map((l) => <option key={l.code} value={l.code}>{l.nativeLabel}</option>)}
               </select>
             </div>
-            <p className="text-muted" style={{ fontSize: 13 }}>{t('settings.languageHelp')}</p>
+            <p className="text-muted" style={{ fontSize: 13, marginBottom: 18 }}>{t('settings.languageHelp')}</p>
+            <div className="form-group">
+              <label>{t('account.currency')}</label>
+              <select className="form-control" value={account.currency || 'USD'} disabled={savingCurrency} onChange={(e) => changeCurrency(e.target.value)}>
+                {CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.code} — {currencyName(c.code, language)}</option>)}
+              </select>
+            </div>
+            <p className="text-muted" style={{ fontSize: 13 }}>{t('account.currencyHelp')}</p>
           </div>
         </div>
         <div className="card">
           <div className="card-header"><h3><i className="fas fa-user-shield" style={{ color: 'var(--blue)', marginRight: 6 }}></i> {t('settings.accountSecurity')}</h3></div>
           <div className="card-body">
+            <div className="settings-readonly-row"><span className="label">{t('account.accountType')}</span><span className="value">{displayName}</span></div>
             <div className="settings-readonly-row"><span className="label">{t('settings.email')}</span><span className="value">{email}</span></div>
             <div className="settings-readonly-row"><span className="label">{t('settings.userId')}</span><span className="value mono">{user?.id || ''}</span></div>
             <p className="text-muted" style={{ fontSize: 13, margin: '16px 0' }}>{t('settings.passwordManagedNote')}</p>

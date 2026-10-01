@@ -6,6 +6,9 @@
    follow its entity; never cycle or generate a 9th. Single-series charts use
    the brand green instead. Neutrals mirror the theme's textLight / border /
    card tokens. */
+
+import { formatMoney } from './currency';
+
 export const CHART_PALETTE = {
   light: {
     series: ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#4a3aa7', '#e34948'],
@@ -40,7 +43,5 @@ export function chartPalette(scheme) {
   return { scheme, status: CHART_STATUS, ...CHART_PALETTE[scheme === 'dark' ? 'dark' : 'light'] };
 }
 
-export const fmtMoney = (v) => {
-  const n = Math.round(Number(v) || 0);
-  return (n < 0 ? '-$' : '$') + Math.abs(n).toLocaleString();
-};
+/* Whole-unit money in the user's chosen currency (shared/currency.js). */
+export const fmtMoney = (v) => formatMoney(v, { decimals: 0 });

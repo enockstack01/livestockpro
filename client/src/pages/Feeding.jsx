@@ -7,6 +7,7 @@ import { fmtDate } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
 import { useOpenAddFromUrl } from '../lib/useOpenAddFromUrl.js';
+import { formatMoney, currencySymbol } from '../../../shared/currency';
 
 const EMPTY_FORM = { feed_type: '', quantity: '', unit: 'kg', cost: '', feeding_date: '', animal_group: '', notes: '' };
 
@@ -119,7 +120,7 @@ export default function Feeding() {
                   <tr key={f.id}>
                     <td className="fw-600">{f.feed_type}</td>
                     <td>{f.quantity || '—'} {f.unit ? t(`enums.feedingUnit.${f.unit}`, f.unit) : ''}</td>
-                    <td>${(f.cost || 0).toFixed(2)}</td>
+                    <td>{formatMoney(f.cost, { decimals: 2 })}</td>
                     <td>{fmtDate(f.feeding_date)}</td>
                     <td>{f.animal_group || '—'}</td>
                     <td>{f.notes || '—'}</td>
@@ -153,7 +154,7 @@ export default function Feeding() {
           </div>
         </div>
         <div className="form-row">
-          <div className="form-group"><label>{t('tables.feeding_records.fields.cost')} ($)</label><input type="number" className="form-control" placeholder="0.00" step="0.01" min="0" value={form.cost} onChange={(e) => setForm({ ...form, cost: e.target.value })} /></div>
+          <div className="form-group"><label>{t('tables.feeding_records.fields.cost')} ({currencySymbol()})</label><input type="number" className="form-control" placeholder="0.00" step="0.01" min="0" value={form.cost} onChange={(e) => setForm({ ...form, cost: e.target.value })} /></div>
           <div className="form-group"><label>{t('tables.feeding_records.fields.feeding_date')}</label><input type="date" className="form-control" value={form.feeding_date} onChange={(e) => setForm({ ...form, feeding_date: e.target.value })} /></div>
         </div>
         <div className="form-group"><label>{t('tables.feeding_records.fields.animal_group')}</label><input type="text" className="form-control" placeholder={t('feedingPage.animalGroupPlaceholder')} value={form.animal_group} onChange={(e) => setForm({ ...form, animal_group: e.target.value })} /></div>

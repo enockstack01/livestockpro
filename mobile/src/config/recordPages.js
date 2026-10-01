@@ -2,6 +2,7 @@ import { Text, View } from 'react-native';
 import { StatusBadge, PriorityBadge, PregnancyBadge } from '../components/Badges';
 import { Badge } from '../ui/kit';
 import { calcAge, fmtDate, isOverdueTask } from '../lib/shared';
+import { formatMoney } from '../../../shared/currency';
 
 /* Page-level presentation for each record screen, lifted from the matching
    web page (client/src/pages/{Animals,Health,Feeding,Breeding,Production,
@@ -58,11 +59,11 @@ export const RECORD_PAGES = {
   },
   feeding_records: {
     page: 'feedingPage', addKey: 'feedingPage.addRecord', emptyIcon: 'wheat-awn', extra: 'feedAlerts',
-    summary: (t) => (f) => ({ title: f.feed_type, subtitle: dot(`${f.quantity || '—'} ${f.unit ? t(`enums.feedingUnit.${f.unit}`, f.unit) : ''}`.trim(), f.animal_group), meta: dot('$' + (Number(f.cost) || 0).toFixed(2), fmtDate(f.feeding_date)) }),
+    summary: (t) => (f) => ({ title: f.feed_type, subtitle: dot(`${f.quantity || '—'} ${f.unit ? t(`enums.feedingUnit.${f.unit}`, f.unit) : ''}`.trim(), f.animal_group), meta: dot(formatMoney(f.cost, { decimals: 2 }), fmtDate(f.feeding_date)) }),
     columns: (t) => [
       { key: 'feed_type', label: t('tables.feeding_records.fields.feed_type'), strong: true },
       { key: 'quantity', label: t('tables.feeding_records.fields.quantity'), render: (f) => `${f.quantity || '—'} ${f.unit ? t(`enums.feedingUnit.${f.unit}`, f.unit) : ''}` },
-      { key: 'cost', label: t('tables.feeding_records.fields.cost'), render: (f) => '$' + (Number(f.cost) || 0).toFixed(2) },
+      { key: 'cost', label: t('tables.feeding_records.fields.cost'), render: (f) => formatMoney(f.cost, { decimals: 2 }) },
       { key: 'feeding_date', label: t('tables.feeding_records.fields.feeding_date'), render: (f) => fmtDate(f.feeding_date) },
       { key: 'animal_group', label: t('tables.feeding_records.fields.animal_group') },
       { key: 'notes', label: t('tables.feeding_records.fields.notes') },
@@ -102,13 +103,13 @@ export const RECORD_PAGES = {
   },
   finance_records: {
     page: 'financePage', addKey: 'financePage.addRecord', emptyIcon: 'receipt', exportable: true, extra: 'financeSummary',
-    summary: (t) => (f) => ({ title: `${f.type === 'Income' ? '+' : '-'}$${(Number(f.amount) || 0).toLocaleString()}`, subtitle: dot(f.category ? t(`enums.financeCategory.${f.category}`, f.category) : null, trunc(f.description, 50) === '—' ? null : trunc(f.description, 50)), badge: <Badge color={f.type === 'Income' ? 'green' : 'red'} icon={f.type === 'Income' ? 'arrow-up' : 'arrow-down'} label={t(`enums.financeType.${f.type}`, f.type)} />, meta: fmtDate(f.date) }),
+    summary: (t) => (f) => ({ title: `${f.type === 'Income' ? '+' : '-'}${formatMoney(f.amount)}`, subtitle: dot(f.category ? t(`enums.financeCategory.${f.category}`, f.category) : null, trunc(f.description, 50) === '—' ? null : trunc(f.description, 50)), badge: <Badge color={f.type === 'Income' ? 'green' : 'red'} icon={f.type === 'Income' ? 'arrow-up' : 'arrow-down'} label={t(`enums.financeType.${f.type}`, f.type)} />, meta: fmtDate(f.date) }),
     exportFields: ['type', 'category', 'amount', 'date', 'description'],
     tabs: { key: 'type', values: ['Income', 'Expense'], labelKey: (v) => `enums.financeType.${v}` },
     columns: (t, colors) => [
       { key: 'type', label: t('tables.finance_records.fields.type'), render: (f) => <Badge color={f.type === 'Income' ? 'green' : 'red'} icon={f.type === 'Income' ? 'arrow-up' : 'arrow-down'} label={t(`enums.financeType.${f.type}`, f.type)} /> },
       { key: 'category', label: t('tables.finance_records.fields.category'), render: (f) => (f.category ? t(`enums.financeCategory.${f.category}`, f.category) : '—') },
-      { key: 'amount', label: t('tables.finance_records.fields.amount'), render: (f) => <Text style={{ fontSize: 13, fontWeight: '600', color: f.type === 'Income' ? colors.primary : colors.red }}>{f.type === 'Income' ? '+' : '-'}${(Number(f.amount) || 0).toLocaleString()}</Text> },
+      { key: 'amount', label: t('tables.finance_records.fields.amount'), render: (f) => <Text style={{ fontSize: 13, fontWeight: '600', color: f.type === 'Income' ? colors.primary : colors.red }}>{f.type === 'Income' ? '+' : '-'}{formatMoney(f.amount)}</Text> },
       { key: 'date', label: t('tables.finance_records.fields.date'), render: (f) => fmtDate(f.date) },
       { key: 'description', label: t('tables.finance_records.fields.description'), render: (f) => trunc(f.description, 40) },
     ],

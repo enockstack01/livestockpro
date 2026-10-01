@@ -1,5 +1,6 @@
 import { isOverdueTask, todayIso } from './businessRules';
 import { fmtMoney } from './chartPalette';
+import { formatMoney } from './currency';
 
 /* Farm Analytics & Insights — the numbers behind the dashboard's analytics
    section, shared by the web app (client/src/components/FarmAnalytics.jsx)
@@ -208,7 +209,7 @@ function computeInsights({ enumLabel, animals, living, health, breeding, product
   const litres = production
     .filter((p) => p.production_type === 'Milk' && p.unit === 'liters' && ym(p.production_date) >= rangeStart)
     .reduce((s, p) => s + (Number(p.quantity) || 0), 0);
-  if (feedSpend > 0 && litres > 0) add('feedPerLiter', 'info', 'feedPerLiter', { value: '$' + (feedSpend / litres).toFixed(2) });
+  if (feedSpend > 0 && litres > 0) add('feedPerLiter', 'info', 'feedPerLiter', { value: formatMoney(feedSpend / litres, { decimals: 2 }) });
 
   const income = financeInRange.filter((f) => f.type === 'Income').reduce((s, f) => s + (Number(f.amount) || 0), 0);
   const expense = financeInRange.filter((f) => f.type === 'Expense').reduce((s, f) => s + (Number(f.amount) || 0), 0);

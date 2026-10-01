@@ -79,5 +79,14 @@ export function useApi() {
     async myRole() {
       return request(getToken, '/admin/role');
     },
+    async myAccount() {
+      return request(getToken, '/account');
+    },
+    async requestAccount(fields) {
+      return request(getToken, '/account/request', { method: 'POST', body: JSON.stringify(fields) });
+    },
+    async setPreferences(prefs) {
+      return request(getToken, '/account/preferences', { method: 'PATCH', body: JSON.stringify(prefs) });
+    },
   }), [getToken]);
 }

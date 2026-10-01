@@ -15,6 +15,9 @@ import { useLanguage } from '../../src/i18n/LanguageProvider';
 import { Button, Card, CardBody, CardHeader, FormGroup, Input, Modal, Muted, Page, PageHeader, Select } from '../../src/ui/kit';
 import Constants from 'expo-constants';
 import { useSignOut } from '../../src/ui/AppShell';
+import { useAccount } from '../../src/account/AccountProvider';
+import { accountDisplayName } from '../../../shared/account';
+import { CURRENCIES, currencyName } from '../../../shared/currency';
 
 /* Settings, organized like the CropManager app (and client/src/pages/
    Settings.jsx) as one column: profile header card (avatar, name, email,
@@ -34,6 +37,8 @@ export default function SettingsScreen() {
   const router = useRouter();
   const db = useSQLiteContext();
   const requestSignOut = useSignOut();
+  const { account, setAccount } = useAccount();
+  const [savingCurrency, setSavingCurrency] = useState(false);
 
   const [profile, setProfile] = useState(null);
   const [farmName, setFarmName] = useState('');
@@ -56,8 +61,18 @@ export default function SettingsScreen() {
   useEffect(() => { load(); }, [load]);
 
   const email = user?.primaryEmailAddress?.emailAddress || '';
-  const displayName = email.split('@')[0] || 'User';
-  const initials = (email.slice(0, 2) || 'U').toUpperCase();
+  const displayName = accountDisplayName(t, account, account?.role);
+  const initials = (displayName[0] || 'U').toUpperCase();
+
+  async function changeCurrency(code) {
+    if (code === account?.currency) return;
+    setSavingCurrency(true);
+    const { data, error } = await api.setPreferences({ currency: code });
+    setSavingCurrency(false);
+    if (error) { showToast(t('account.currencyFailed', { message: error.message }), 'error'); return; }
+    setAccount(data);
+    showToast(t('account.currencySaved'), 'success');
+  }
 
   async function saveProfile() {
     setSaving(true);
@@ -171,12 +186,18 @@ export default function SettingsScreen() {
             <FormGroup label={t('settings.language')}>
               <Select value={language} onChange={setLanguage} placeholder={t('settings.language')} options={languages.map((l) => ({ value: l.code, label: l.nativeLabel }))} />
             </FormGroup>
-            <Muted>{rtlRestartNeeded ? t('settings.rtlRestartNotice') : t('settings.languageHelp')}</Muted>
+            <Muted style={{ marginBottom: 16 }}>{rtlRestartNeeded ? t('settings.rtlRestartNotice') : t('settings.languageHelp')}</Muted>
+            <FormGroup label={t('account.currency')}>
+              <Select value={account?.currency || 'USD'} onChange={changeCurrency} placeholder={t('account.currency')}
+                options={CURRENCIES.map((c) => ({ value: c.code, label: `${c.code} — ${currencyName(c.code, language)}` }))} />
+            </FormGroup>
+            <Muted>{savingCurrency ? t('settings.saving') : t('account.currencyHelp')}</Muted>
           </CardBody>
         </Card>
         <Card>
           <CardHeader title={t('settings.accountSecurity')} icon="user-shield" iconColor={colors.blue} />
           <CardBody>
+            <ReadonlyRow label={t('account.accountType')} value={displayName} colors={colors} />
             <ReadonlyRow label={t('settings.email')} value={email} colors={colors} />
             <ReadonlyRow label={t('settings.userId')} value={user?.id || ''} colors={colors} mono last />
             <Muted style={{ marginTop: 16 }}>{t('settings.passwordNote')}</Muted>

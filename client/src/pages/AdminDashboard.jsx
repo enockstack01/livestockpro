@@ -8,6 +8,7 @@ import { useCanvasChart } from '../lib/useChart.js';
 import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import Modal from '../components/Modal.jsx';
 import SpatialMap from '../components/SpatialMap.jsx';
+import { ACCOUNT_TYPE_ICONS } from '../../../shared/account';
 
 const RESOURCE_LABELS = {
   animals: { labelKey: 'tables.animals.label', icon: 'fa-cow', color: '#2E7D32' },
@@ -21,6 +22,21 @@ const RESOURCE_LABELS = {
 
 const ROLE_BADGE = { super_admin: 'badge-purple', admin: 'badge-blue', user: 'badge-gray' };
 const ROLE_LABEL_KEY = { super_admin: 'adminDashboard.roleSuperAdmin', admin: 'adminDashboard.roleAdmin', user: 'adminDashboard.roleUser' };
+const ACCOUNT_BADGE = { approved: 'badge-green', pending: 'badge-orange', on_hold: 'badge-blue', rejected: 'badge-red', none: 'badge-gray' };
+
+/* The account-review actions available for a user in a given state, in the
+   order they're offered: approve/activate/re-activate all set 'approved'. */
+function accountActions(u) {
+  const out = [];
+  const status = u.accountStatus;
+  if (status !== 'approved' || u.banned) {
+    const key = status === 'pending' ? 'approve' : status === 'none' ? 'activate' : 'reactivate';
+    out.push({ status: 'approved', key, icon: 'fa-user-check', btn: 'btn-primary' });
+  }
+  if (status === 'approved' || status === 'pending') out.push({ status: 'on_hold', key: 'hold', icon: 'fa-circle-pause', btn: 'btn-secondary' });
+  if (status === 'pending' || status === 'none') out.push({ status: 'rejected', key: 'reject', icon: 'fa-user-xmark', btn: 'btn-danger' });
+  return out;
+}
 
 function fmtDateTime(ms) {
   return ms ? new Date(ms).toLocaleString() : '—';
@@ -102,6 +118,9 @@ export default function AdminDashboard() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [grantUserId, setGrantUserId] = useState('');
+  const [accountTarget, setAccountTarget] = useState(null);
+  const [accountNote, setAccountNote] = useState('');
+  const [requestFilter, setRequestFilter] = useState('pending');
 
   const isSuperAdmin = role === 'super_admin';
 
@@ -138,7 +157,7 @@ export default function AdminDashboard() {
     let list = users.filter((u) => {
       const matchSearch = !q || u.email.toLowerCase().includes(q) || (u.farmName || '').toLowerCase().includes(q);
       const matchRole = !roleFilter || u.role === roleFilter;
-      const matchStatus = !statusFilter || (statusFilter === 'banned' ? u.banned : !u.banned);
+      const matchStatus = !statusFilter || (statusFilter === 'banned' ? u.banned : u.accountStatus === statusFilter && !u.banned);
       return matchSearch && matchRole && matchStatus;
     });
     list = list.slice().sort((a, b) => {
@@ -153,6 +172,10 @@ export default function AdminDashboard() {
     return list;
   }, [users, search, roleFilter, statusFilter, sortKey, sortDir]);
 
+  const pendingCount = useMemo(() => users.filter((u) => u.role === 'user' && u.accountStatus === 'pending').length, [users]);
+  const requests = useMemo(() => users
+    .filter((u) => u.role === 'user' && (requestFilter === 'all' ? u.request : u.accountStatus === requestFilter))
+    .sort((a, b) => String((b.request && b.request.submittedAt) || '').localeCompare(String((a.request && a.request.submittedAt) || ''))), [users, requestFilter]);
   const admins = useMemo(() => users.filter((u) => u.role !== 'user').sort((a, b) => b.createdAt - a.createdAt), [users]);
   const promotableUsers = useMemo(() => users.filter((u) => u.role === 'user' && u.id !== currentUser?.id), [users, currentUser]);
   const recentSignups = useMemo(() => users.slice().sort((a, b) => b.createdAt - a.createdAt).slice(0, 5), [users]);
@@ -198,6 +221,23 @@ export default function AdminDashboard() {
     await loadAll(true);
   }
 
+  function openAccountAction(user, action) {
+    setAccountTarget({ user, ...action });
+    setAccountNote('');
+  }
+
+  async function applyAccountAction() {
+    if (!accountTarget) return;
+    const { user, status } = accountTarget;
+    setBusyId(user.id);
+    const { error } = await api.setAccountStatus(user.id, status, accountNote.trim());
+    setBusyId(null);
+    if (error) { showToast(t('adminDashboard.failedWithMessage', { message: error.message }), 'error'); return; }
+    showToast(t('adminDashboard.accountUpdated'), 'success');
+    setAccountTarget(null);
+    await loadAll(true);
+  }
+
   async function changeRole(userId, newRole) {
     setBusyId(userId);
     const { error } = await api.setUserRole(userId, newRole);
@@ -232,6 +272,7 @@ export default function AdminDashboard() {
     { key: 'totalUsers', icon: 'fa-users', color: 'blue', label: t('adminDashboard.totalUsers'), value: stats.totalUsers },
     { key: 'totalRecords', icon: 'fa-database', color: 'green', label: t('adminDashboard.totalRecords'), value: stats.totalRecords },
     { key: 'newUsers7d', icon: 'fa-user-plus', color: 'purple', label: t('adminDashboard.newUsers7d'), value: stats.newUsersLast7Days },
+    { key: 'pendingRequests', icon: 'fa-user-clock', color: pendingCount > 0 ? 'orange' : 'green', label: t('adminDashboard.pendingRequests'), value: pendingCount },
     { key: 'bannedUsers', icon: 'fa-user-slash', color: stats.bannedUsers > 0 ? 'red' : 'orange', label: t('adminDashboard.bannedUsers'), value: stats.bannedUsers },
     { key: 'avgRecordsPerFarm', icon: 'fa-chart-simple', color: 'blue', label: t('adminDashboard.avgRecordsPerFarm'), value: stats.totalUsers ? Math.round(stats.totalRecords / stats.totalUsers) : 0 },
     { key: 'activeThisWeek', icon: 'fa-signal', color: 'green', label: t('adminDashboard.activeThisWeek'), value: engagement.today + engagement.week }
@@ -255,6 +296,7 @@ export default function AdminDashboard() {
         <>
           <div className="tabs">
             <button className={`tab-btn${tab === 'overview' ? ' active' : ''}`} onClick={() => setTab('overview')}><i className="fas fa-chart-line"></i> {t('adminDashboard.tabOverview')}</button>
+            <button className={`tab-btn${tab === 'requests' ? ' active' : ''}`} onClick={() => setTab('requests')}><i className="fas fa-user-clock"></i> {t('adminDashboard.tabRequests')} <span className="tab-count">{pendingCount}</span></button>
             <button className={`tab-btn${tab === 'users' ? ' active' : ''}`} onClick={() => setTab('users')}><i className="fas fa-users"></i> {t('adminDashboard.tabUsers')} <span className="tab-count">{users.length}</span></button>
             <button className={`tab-btn${tab === 'admins' ? ' active' : ''}`} onClick={() => setTab('admins')}><i className="fas fa-user-shield"></i> {t('adminDashboard.tabAdmins')} <span className="tab-count">{admins.length}</span></button>
             <button className={`tab-btn${tab === 'map' ? ' active' : ''}`} onClick={() => setTab('map')}><i className="fas fa-map-location-dot"></i> {t('adminDashboard.tabMap')}</button>
@@ -263,7 +305,7 @@ export default function AdminDashboard() {
           {tab === 'overview' && (
             <div className="admin-fade-in">
               <div className="summary-grid">
-                {overview.map((s) => <StatCard key={s.key} {...s} link={s.key === 'totalUsers' || s.key === 'bannedUsers' ? () => setTab('users') : undefined} />)}
+                {overview.map((s) => <StatCard key={s.key} {...s} link={s.key === 'pendingRequests' ? () => { setRequestFilter('pending'); setTab('requests'); } : s.key === 'totalUsers' || s.key === 'bannedUsers' ? () => setTab('users') : undefined} />)}
               </div>
 
               <div className="charts-grid">
@@ -341,6 +383,65 @@ export default function AdminDashboard() {
             </div>
           )}
 
+          {tab === 'requests' && (
+            <div className="admin-fade-in">
+              <div className="filter-bar">
+                <select className="form-control" value={requestFilter} onChange={(e) => setRequestFilter(e.target.value)}>
+                  <option value="pending">{t('account.status.pending')}</option>
+                  <option value="on_hold">{t('account.status.on_hold')}</option>
+                  <option value="rejected">{t('account.status.rejected')}</option>
+                  <option value="approved">{t('account.status.approved')}</option>
+                  <option value="all">{t('adminDashboard.allRequests')}</option>
+                </select>
+              </div>
+              {requests.length === 0 ? (
+                <div className="card"><div className="empty-state"><i className="fas fa-inbox"></i><h3>{t('adminDashboard.noRequests')}</h3><p>{t('adminDashboard.noRequestsHint')}</p></div></div>
+              ) : (
+                <div className="request-grid">
+                  {requests.map((u) => {
+                    const r = u.request || {};
+                    const type = u.accountType || 'farmer';
+                    return (
+                      <div key={u.id} className="card request-card">
+                        <div className="card-body">
+                          <div className="request-card-head">
+                            <div className="summary-icon green"><i className={`fas fa-${ACCOUNT_TYPE_ICONS[type] || 'user'}`}></i></div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <h4>{r.fullName || u.email}</h4>
+                              <p>{u.email}</p>
+                            </div>
+                            <span className={`badge ${ACCOUNT_BADGE[u.accountStatus]}`}>{t(`account.status.${u.accountStatus}`)}</span>
+                          </div>
+                          <div className="request-fields">
+                            <div><span>{t('account.accountType')}</span>{t(`account.types.${type}`)}</div>
+                            <div><span>{t('account.farmName')}</span>{r.farmName || '—'}</div>
+                            <div><span>{t('settings.location')}</span>{r.location || '—'}</div>
+                            <div><span>{t('settings.phoneNumber')}</span>{r.phone || '—'}</div>
+                            <div><span>{t('account.herdSize')}</span>{r.herdSize || '—'}</div>
+                            <div><span>{t('account.livestockTypes')}</span>{r.livestockTypes || '—'}</div>
+                          </div>
+                          {r.notes && <div className="request-notes">{r.notes}</div>}
+                          {u.reviewNote && u.accountStatus !== 'pending' && <div className="request-notes"><strong>{t('account.adminNote')}:</strong> {u.reviewNote}</div>}
+                          <div className="text-muted" style={{ fontSize: 12 }}>{r.submittedAt ? t('account.submittedOn', { date: new Date(r.submittedAt).toLocaleString() }) : ''}</div>
+                          <div className="request-actions">
+                            {accountActions(u).map((a) => (
+                              <button key={a.key} className={`btn btn-sm ${a.btn}`} disabled={busyId === u.id} onClick={() => openAccountAction(u, a)}>
+                                <i className={`fas ${a.icon}`}></i> {t(`adminDashboard.${a.key}`)}
+                              </button>
+                            ))}
+                            <button className="btn btn-sm btn-secondary" disabled={busyId === u.id} onClick={() => { setDeleteTarget(u); setDeleteConfirmText(''); }}>
+                              <i className="fas fa-trash"></i> {t('common.delete')}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
           {tab === 'users' && (
             <div className="admin-fade-in">
               <div className="filter-bar">
@@ -352,7 +453,11 @@ export default function AdminDashboard() {
                 </select>
                 <select className="form-control" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
                   <option value="">{t('adminDashboard.allStatuses')}</option>
-                  <option value="active">{t('adminDashboard.active')}</option>
+                  <option value="approved">{t('account.status.approved')}</option>
+                  <option value="pending">{t('account.status.pending')}</option>
+                  <option value="on_hold">{t('account.status.on_hold')}</option>
+                  <option value="rejected">{t('account.status.rejected')}</option>
+                  <option value="none">{t('account.status.none')}</option>
                   <option value="banned">{t('adminDashboard.banned')}</option>
                 </select>
                 {(roleFilter || statusFilter || search) && (
@@ -405,20 +510,28 @@ export default function AdminDashboard() {
                               <td>{fmtDateTime(u.createdAt)}</td>
                               <td>{timeAgo(u.lastSignInAt, t)}</td>
                               <td>{u.recordCount.toLocaleString()}</td>
-                              <td><span className={`badge ${u.banned ? 'badge-red' : 'badge-green'}`}>{u.banned ? t('adminDashboard.banned') : t('adminDashboard.active')}</span></td>
+                              <td>{u.banned
+                                ? <span className="badge badge-red">{t('adminDashboard.banned')}</span>
+                                : <span className={`badge ${ACCOUNT_BADGE[u.accountStatus] || 'badge-gray'}`}>{t(`account.status.${u.accountStatus || 'none'}`)}</span>}</td>
                               <td>
                                 <div className="table-actions">
+                                  {/* Pending rows keep to approve / reject here; Account Requests offers hold too. */}
+                                  {!isSelf && canBan && u.role === 'user' && accountActions(u).filter((a) => !(u.accountStatus === 'pending' && a.status === 'on_hold')).map((a) => (
+                                    <button key={a.key} className={`btn-icon${a.status === 'rejected' ? ' danger' : ''}`} title={t(`adminDashboard.${a.key}`)} disabled={rowBusy} onClick={() => openAccountAction(u, a)}>
+                                      <i className={`fas ${a.icon}`}></i>
+                                    </button>
+                                  ))}
                                   {!isSelf && canBan && (
                                     <button className="btn-icon" title={u.banned ? t('adminDashboard.unban') : t('adminDashboard.ban')} disabled={rowBusy} onClick={() => setBanTarget(u)}>
-                                      <i className={`fas ${u.banned ? 'fa-user-check' : 'fa-user-slash'}`}></i>
+                                      <i className={`fas ${u.banned ? 'fa-unlock' : 'fa-ban'}`}></i>
                                     </button>
                                   )}
-                                  {!isSelf && isSuperAdmin && (
+                                  {!isSelf && canBan && (
                                     <button className="btn-icon danger" title={t('adminDashboard.deleteAccountTooltip')} disabled={rowBusy} onClick={() => { setDeleteTarget(u); setDeleteConfirmText(''); }}>
                                       <i className="fas fa-trash"></i>
                                     </button>
                                   )}
-                                  {(isSelf || (!canBan && !isSuperAdmin)) && <span className="text-muted" style={{ fontSize: 12 }}>—</span>}
+                                  {(isSelf || !canBan) && <span className="text-muted" style={{ fontSize: 12 }}>—</span>}
                                 </div>
                               </td>
                             </tr>
@@ -514,6 +627,24 @@ export default function AdminDashboard() {
             ? t('adminDashboard.restoreAccessConfirm', { email: banTarget?.email })
             : t('adminDashboard.blockSignInConfirm', { email: banTarget?.email })}
         </p>
+      </Modal>
+
+      <Modal
+        open={!!accountTarget} onClose={() => setAccountTarget(null)} title={accountTarget ? t(`adminDashboard.${accountTarget.key}AccountTitle`) : ''} maxWidth={440}
+        footer={<>
+          <button className="btn btn-secondary" onClick={() => setAccountTarget(null)}>{t('common.cancel')}</button>
+          <button className={`btn ${accountTarget?.btn === 'btn-danger' ? 'btn-danger' : 'btn-primary'}`} disabled={busyId === accountTarget?.user.id} onClick={applyAccountAction}>
+            <i className={`fas ${accountTarget?.icon}`}></i> {accountTarget ? t(`adminDashboard.${accountTarget.key}`) : ''}
+          </button>
+        </>}
+      >
+        <p className="text-muted">{accountTarget ? t(`adminDashboard.${accountTarget.key}AccountConfirm`, { email: accountTarget.user.email }) : ''}</p>
+        {accountTarget && accountTarget.status !== 'approved' && (
+          <div className="form-group mt-16" style={{ marginBottom: 0 }}>
+            <label>{t('adminDashboard.reviewNoteLabel')}</label>
+            <textarea className="form-control" rows={3} placeholder={t('adminDashboard.reviewNotePlaceholder')} value={accountNote} onChange={(e) => setAccountNote(e.target.value)}></textarea>
+          </div>
+        )}
       </Modal>
 
       <Modal

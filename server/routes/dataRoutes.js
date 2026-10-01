@@ -2,6 +2,7 @@ const express = require('express');
 const crypto = require('crypto');
 const { getDb } = require('../db');
 const { requireAuth } = require('../authMiddleware');
+const { requireApproved } = require('../lib/accounts');
 const { sendPushToUser } = require('../lib/pushNotify');
 
 const router = express.Router();
@@ -52,6 +53,8 @@ function notifyCriticalChange(table, doc, userId) {
 }
 
 router.use(requireAuth);
+/* Farm data is only reachable once an admin has approved the account. */
+router.use(requireApproved);
 
 router.param('table', (req, res, next, table) => {
   if (!Object.prototype.hasOwnProperty.call(SCHEMAS, table)) {

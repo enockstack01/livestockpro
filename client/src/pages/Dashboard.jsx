@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useUser } from '@clerk/clerk-react';
 import { useApi } from '../lib/api.js';
 import { useCanvasChart } from '../lib/useChart.js';
 import { useChartTheme, cartesianOptions, doughnutOptions, barDataset } from '../lib/chartTheme.js';
@@ -12,6 +11,8 @@ import { greeting } from '../../../shared/navigation';
 import { computeDashboardSummary } from '../../../shared/analytics';
 import { computeAlerts, computeRecentActivity, computeUpcoming } from '../../../shared/dashboardFeed';
 import { fmtMoney } from '../../../shared/chartPalette';
+import { accountDisplayName } from '../../../shared/account';
+import { useAccount } from '../components/AccountGate.jsx';
 import '../dashboard.css';
 
 /* Dashboard, arranged exactly like the mobile app's dashboard on a phone,
@@ -25,8 +26,8 @@ export default function Dashboard() {
   const { t, i18n } = useTranslation();
   const api = useApi();
   const navigate = useNavigate();
-  const { user } = useUser();
-  const greetName = user?.firstName || (user?.primaryEmailAddress?.emailAddress || '').split('@')[0] || '';
+  const { account } = useAccount();
+  const greetName = accountDisplayName(t, account, account.role);
 
   const [data, setData] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -81,7 +82,7 @@ export default function Dashboard() {
   return (
     <div className="dashboard-stack">
       <div className="page-header">
-        <div><h1>{greeting(t, greetName || profile?.farm_name)}</h1><p>{t('dashboardPage.todaySubtitle')}</p></div>
+        <div><h1>{greeting(t, greetName)}</h1><p>{t('dashboardPage.todaySubtitle')}</p></div>
       </div>
 
       <HerdProfile animals={data.animals} profile={profile} kpis={kpis} onKpiClick={(link) => navigate(link)} />

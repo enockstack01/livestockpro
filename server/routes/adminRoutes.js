@@ -1,6 +1,7 @@
 const express = require('express');
 const { getDb } = require('../db');
 const { requireAuth, requireRole, getRole, primaryEmail, clerkClient } = require('../authMiddleware');
+const { ACCOUNT_STATUSES, accounts, getAccount, forgetApproval } = require('../lib/accounts');
 
 const router = express.Router();
 
@@ -39,8 +40,9 @@ router.get('/stats', async (req, res) => {
       return out;
     }
 
-    const [userList, healthBreakdown, speciesBreakdown, taskBreakdown, ...counts] = await Promise.all([
+    const [userList, pendingRequests, healthBreakdown, speciesBreakdown, taskBreakdown, ...counts] = await Promise.all([
       clerkClient.users.getUserList({ limit: 500 }),
+      accounts().countDocuments({ status: 'pending' }),
       groupCounts('animals', 'health_status'),
       groupCounts('animals', 'species'),
       groupCounts('tasks', 'status'),
@@ -62,6 +64,7 @@ router.get('/stats', async (req, res) => {
         byCollection,
         newUsersLast7Days,
         bannedUsers,
+        pendingRequests,
         healthBreakdown,
         speciesBreakdown,
         taskBreakdown
@@ -138,6 +141,8 @@ router.get('/users', async (req, res) => {
     const db = getDb();
     const list = await clerkClient.users.getUserList({ limit: 500 });
     const sorted = list.data.slice().sort((a, b) => b.createdAt - a.createdAt);
+    const accountDocs = await accounts().find({ _id: { $in: sorted.map((u) => u.id) } }).toArray();
+    const accountById = new Map(accountDocs.map((a) => [a._id, a]));
 
     const users = await Promise.all(sorted.map(async (u) => {
       const [profile, ...counts] = await Promise.all([
@@ -146,17 +151,33 @@ router.get('/users', async (req, res) => {
       ]);
       const byCollection = {};
       RESOURCE_COLLECTIONS.forEach((name, i) => { byCollection[name] = counts[i]; });
+      const recordCount = counts.reduce((s, c) => s + c, 0);
+      const role = (u.publicMetadata && u.publicMetadata.role) || 'user';
+      const account = accountById.get(u.id);
+      /* Same rule as lib/accounts.js: admins are always in, and users who
+         had data before approval existed are grandfathered as approved. */
+      let accountStatus = (account && account.status) || ((profile || recordCount > 0) ? 'approved' : 'none');
+      if (role !== 'user') accountStatus = 'approved';
       return {
         id: u.id,
         email: primaryEmail(u),
         createdAt: u.createdAt,
         lastSignInAt: u.lastSignInAt,
         banned: !!u.banned,
-        role: (u.publicMetadata && u.publicMetadata.role) || 'user',
+        role,
         farmName: (profile && profile.farm_name) || '',
         location: (profile && profile.location) || '',
-        recordCount: counts.reduce((s, c) => s + c, 0),
-        byCollection
+        recordCount,
+        byCollection,
+        accountStatus,
+        accountType: (account && account.account_type) || (role === 'user' ? 'farmer' : null),
+        request: account && account.submitted_at ? {
+          fullName: account.full_name || '', farmName: account.farm_name || '', location: account.location || '',
+          phone: account.phone || '', herdSize: account.herd_size || '', livestockTypes: account.livestock_types || '',
+          notes: account.notes || '', submittedAt: account.submitted_at
+        } : null,
+        reviewNote: (account && account.review_note) || '',
+        reviewedAt: (account && account.reviewed_at) || null
       };
     }));
 
@@ -183,6 +204,44 @@ router.patch('/users/:id/status', async (req, res) => {
     if (banned) await clerkClient.users.banUser(targetId);
     else await clerkClient.users.unbanUser(targetId);
     res.json({ data: { id: targetId, banned }, error: null });
+  } catch (err) {
+    res.status(500).json({ error: { message: err.message } });
+  }
+});
+
+/* PATCH /api/admin/users/:id/account  { status, note } — review an account:
+   approve / activate / re-activate ('approved'), reject ('rejected') or put
+   on hold ('on_hold'). Same reach rule as ban: a plain admin may only act on
+   regular users. Activating also lifts a Clerk ban, so a previously banned
+   user can be brought back from here. */
+router.patch('/users/:id/account', async (req, res) => {
+  try {
+    const targetId = req.params.id;
+    const status = req.body && req.body.status;
+    if (!ACCOUNT_STATUSES.includes(status) || status === 'pending') {
+      return res.status(400).json({ error: { message: 'Invalid account status.' } });
+    }
+    if (targetId === req.user.id) {
+      return res.status(400).json({ error: { message: 'You cannot change your own account status.' } });
+    }
+    const targetRole = await getRole(targetId);
+    if (targetRole !== 'user' && req.user.role !== 'super_admin') {
+      return res.status(403).json({ error: { message: "Only a super admin can change an admin's account." } });
+    }
+    await getAccount(targetId);
+    const now = new Date().toISOString();
+    const note = typeof (req.body && req.body.note) === 'string' ? req.body.note.trim().slice(0, 500) : '';
+    await accounts().updateOne(
+      { _id: targetId },
+      { $set: { status, review_note: note, reviewed_at: now, reviewed_by: req.user.id, updated_at: now }, $setOnInsert: { user_id: targetId, currency: 'USD', created_at: now } },
+      { upsert: true }
+    );
+    forgetApproval(targetId);
+    if (status === 'approved') {
+      const target = await clerkClient.users.getUser(targetId);
+      if (target.banned) await clerkClient.users.unbanUser(targetId);
+    }
+    res.json({ data: { id: targetId, status }, error: null });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
   }
@@ -547,17 +606,23 @@ router.get('/onehealth/map', async (req, res) => {
   }
 });
 
-/* DELETE /api/admin/users/:id — super_admin only. Wipes the user's Mongo
-   documents and their Clerk account entirely. */
-router.delete('/users/:id', requireRole('super_admin'), async (req, res) => {
+/* DELETE /api/admin/users/:id — wipes the user's Mongo documents and their
+   Clerk account entirely. Admins may delete regular users; only a super
+   admin may delete another admin. */
+router.delete('/users/:id', async (req, res) => {
   try {
     const targetId = req.params.id;
     if (targetId === req.user.id) {
       return res.status(400).json({ error: { message: 'Use Settings to delete your own account.' } });
     }
+    const targetRole = await getRole(targetId);
+    if (targetRole !== 'user' && req.user.role !== 'super_admin') {
+      return res.status(403).json({ error: { message: 'Only a super admin can delete an admin account.' } });
+    }
     const db = getDb();
-    await Promise.all(['profiles', 'push_tokens', ...RESOURCE_COLLECTIONS].map((name) => db.collection(name).deleteMany({ user_id: targetId })));
+    await Promise.all(['profiles', 'push_tokens', 'accounts', ...RESOURCE_COLLECTIONS].map((name) => db.collection(name).deleteMany({ user_id: targetId })));
     await clerkClient.users.deleteUser(targetId);
+    forgetApproval(targetId);
     res.json({ data: {}, error: null });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });

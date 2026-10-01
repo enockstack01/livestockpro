@@ -16,6 +16,8 @@ import { useRepository } from '../db/repository';
 import { wipeLocalData, getPendingSyncCount } from '../db/schema';
 import { isOverdueTask } from '../lib/shared';
 import { NAV_SECTIONS } from '../../../shared/navigation';
+import { accountDisplayName } from '../../../shared/account';
+import { useAccount } from '../account/AccountProvider';
 import { useBreakpoint } from './layout';
 
 /* The app frame, organized like the CropManager app (and the web app, which
@@ -167,6 +169,7 @@ export default function AppShell({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useUser();
+  const { account } = useAccount();
   const [open, setOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifItems = useNotifications(t);
@@ -191,8 +194,7 @@ export default function AppShell({ children }) {
 
   const go = (href) => { setOpen(false); if (href !== pathname) router.replace(href); };
 
-  const email = user?.primaryEmailAddress?.emailAddress || '';
-  const initials = (user?.firstName?.[0] || email[0] || 'U').toUpperCase() + (user?.lastName?.[0] || email[1] || '').toUpperCase();
+  const initials = (accountDisplayName(t, account, account?.role)[0] || 'U').toUpperCase();
 
   const sidebar = <Sidebar pathname={pathname} onNavigate={go} onClose={() => setOpen(false)} closable={!isTablet} topInset={insets.top} bottomInset={insets.bottom} />;
 

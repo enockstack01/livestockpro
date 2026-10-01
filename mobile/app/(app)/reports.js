@@ -12,6 +12,7 @@ import DateField from '../../src/components/DateField';
 import { Badge, Button, Card, CardBody, CardHeader, EmptyState, FilterBar, FinanceCard, FormGroup, Input, Page, PageHeader, Spinner } from '../../src/ui/kit';
 import { Grid, useBreakpoint } from '../../src/ui/layout';
 import DataTable from '../../src/ui/DataTable';
+import { formatMoney } from '../../../shared/currency';
 
 /* Port of client/src/pages/Reports.jsx: date-range / animal-tag filters,
    the headline figures as finance cards, then one table card per record
@@ -100,9 +101,9 @@ export default function ReportsScreen() {
       { label: t('reports.underTreatment'), value: String(count(data.animals, (a) => a.health_status === 'Under Treatment')), tone: 'red' },
       { label: t('reports.criticalStatus'), value: String(count(data.animals, (a) => a.health_status === 'Critical')), tone: 'red' },
       { label: t('dashboardPage.pregnant'), value: String(count(data.breeding, (b) => b.pregnancy_status === 'Pregnant')), tone: 'purple' },
-      { label: t('reportsPage.totalIncome'), value: `$${income.toLocaleString()}`, tone: 'primary' },
-      { label: t('reportsPage.totalExpenses'), value: `$${expense.toLocaleString()}`, tone: 'red' },
-      { label: t('reportsPage.netProfit'), value: `${net < 0 ? '-' : ''}$${Math.abs(net).toLocaleString()}`, tone: net >= 0 ? 'blue' : 'red' },
+      { label: t('reportsPage.totalIncome'), value: formatMoney(income), tone: 'primary' },
+      { label: t('reportsPage.totalExpenses'), value: formatMoney(expense), tone: 'red' },
+      { label: t('reportsPage.netProfit'), value: formatMoney(net), tone: net >= 0 ? 'blue' : 'red' },
     ],
     [
       { label: t('reportsPage.milkProduced'), value: `${prod('Milk').toFixed(1)} L`, tone: 'primary' },
@@ -137,7 +138,7 @@ export default function ReportsScreen() {
     ] },
     { title: t('tables.finance_records.singular'), icon: 'coins', rows: fFinance, columns: [
       { key: 'type', label: t('tables.finance_records.fields.type'), strong: true }, { key: 'category', label: t('tables.finance_records.fields.category') },
-      { key: 'amount', label: t('tables.finance_records.fields.amount'), render: (r) => '$' + (Number(r.amount) || 0).toLocaleString() },
+      { key: 'amount', label: t('tables.finance_records.fields.amount'), render: (r) => formatMoney(r.amount) },
       { key: 'date', label: t('tables.finance_records.fields.date'), render: (r) => fmtDate(r.date) }, { key: 'description', label: t('tables.finance_records.fields.description'), render: (r) => (r.description || '—').substring(0, 50) },
     ] },
   ];

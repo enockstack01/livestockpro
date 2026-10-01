@@ -228,6 +228,239 @@ table {
   display: block;
 }
 
+/* ---------- Account request / approval gate (components/AccountGate.jsx) ----------
+   Same split brand panel + form column as the sign-in page. */
+.account-gate-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  color: var(--primary);
+  font-size: 32px;
+}
+
+.account-gate .auth-form-section {
+  align-items: flex-start;
+  overflow-y: auto;
+}
+
+.account-gate-wrapper {
+  max-width: 520px;
+  margin: auto 0;
+  padding: 12px 0;
+}
+
+.account-gate-mark {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 24px;
+}
+
+.account-gate-mark .accent {
+  color: var(--primary);
+}
+
+.account-gate-mark .sidebar-logo-tile {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--sidebar-bg);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.account-type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.account-type-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--text);
+  font-weight: 500;
+  font-size: 13.5px;
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.account-type-option i {
+  color: var(--text-light);
+  width: 18px;
+  text-align: center;
+}
+
+.account-type-option:hover {
+  border-color: var(--primary);
+}
+
+.account-type-option.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary-dark);
+}
+
+.account-type-option.active i {
+  color: var(--primary);
+}
+
+.account-gate textarea.form-control {
+  resize: vertical;
+}
+
+.account-gate-foot {
+  margin: 16px 0 0 !important;
+  text-align: center;
+  font-size: 13px;
+}
+
+.account-state {
+  text-align: center;
+}
+
+.account-state .subtitle {
+  margin-bottom: 24px;
+}
+
+.account-state-icon {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+}
+
+.account-state-icon.green { background: var(--primary-light); color: var(--primary); }
+.account-state-icon.orange { background: rgba(249, 168, 37, 0.15); color: var(--orange); }
+.account-state-icon.red { background: rgba(211, 47, 47, 0.12); color: var(--red); }
+
+.account-summary,
+.account-note {
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  background: var(--bg);
+}
+
+.account-summary-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.account-note p {
+  margin-top: 4px;
+  color: var(--text-light);
+  white-space: pre-wrap;
+}
+
+.account-state-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Admin Panel > Account Requests */
+.request-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.request-card .card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.request-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.request-card-head .summary-icon {
+  flex-shrink: 0;
+}
+
+.request-card-head h4 {
+  font-size: 15px;
+  margin-bottom: 2px;
+  word-break: break-word;
+}
+
+.request-card-head p {
+  font-size: 12.5px;
+  color: var(--text-light);
+  word-break: break-all;
+}
+
+.request-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  font-size: 13px;
+}
+
+.request-fields span {
+  display: block;
+  font-size: 11.5px;
+  color: var(--text-light);
+}
+
+.request-notes {
+  font-size: 13px;
+  color: var(--text-light);
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 8px 12px;
+  white-space: pre-wrap;
+}
+
+.request-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .account-gate-mark {
+    display: flex;
+  }
+  .account-gate .form-row,
+  .request-fields {
+    grid-template-columns: 1fr;
+  }
+  .request-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ---------- Forms ---------- */
 .form-group {
   margin-bottom: 18px;

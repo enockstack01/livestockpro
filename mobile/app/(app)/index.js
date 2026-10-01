@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { useUser } from '@clerk/expo';
 import { useRepository } from '../../src/db/repository';
 import { useSync } from '../../src/sync/SyncProvider';
 import { Card, CardBody, CardHeader, EmptyState, Page, PageHeader, Spinner } from '../../src/ui/kit';
@@ -16,6 +15,8 @@ import { computeDashboardSummary, monthBuckets, ym } from '../../../shared/analy
 import { computeAlerts, computeRecentActivity, computeUpcoming } from '../../../shared/dashboardFeed';
 import { fmtMoney } from '../../../shared/chartPalette';
 import { greeting } from '../../../shared/navigation';
+import { accountDisplayName } from '../../../shared/account';
+import { useAccount } from '../../src/account/AccountProvider';
 
 /* Dashboard, laid out like the CropManager dashboard and identical to the
    web's (client/src/pages/Dashboard.jsx): greeting, the Herd Profile card
@@ -28,7 +29,7 @@ export default function DashboardScreen() {
   const router = useRouter();
   const cc = useChartColors();
   const { colors } = useTheme();
-  const { user } = useUser();
+  const { account } = useAccount();
   const { syncing, lastSyncedAt, triggerSync } = useSync();
   const [data, setData] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -80,7 +81,7 @@ export default function DashboardScreen() {
   const incomeSeries = months.map((m) => monthTotal('Income', m.key));
   const expenseSeries = months.map((m) => monthTotal('Expense', m.key));
   const taskCounts = ['Pending', 'In Progress', 'Completed'].map((st) => data.tasks.filter((tk) => tk.status === st).length);
-  const name = user?.firstName || (user?.primaryEmailAddress?.emailAddress || '').split('@')[0] || profile?.farm_name;
+  const name = accountDisplayName(t, account, account?.role);
 
   return (
     <Page refreshing={refreshing || syncing} onRefresh={onRefresh}>

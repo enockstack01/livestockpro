@@ -7,6 +7,7 @@ import { useApi } from '../api/client';
 import { runSync } from './syncEngine';
 import { rescheduleReminders } from '../notifications/scheduler';
 import { registerForPushNotifications } from '../notifications/registerPushToken';
+import { useAccount } from '../account/AccountProvider';
 
 const SyncContext = createContext(null);
 
@@ -18,11 +19,15 @@ export function SyncProvider({ children }) {
   const db = useSQLiteContext();
   const api = useApi();
   const { isSignedIn } = useAuth();
+  /* Nothing to sync (and every data call would be refused) until an admin
+     has approved the account — see src/account/AccountProvider.js. */
+  const { approved } = useAccount();
+  const enabled = isSignedIn && approved;
   const [state, setState] = useState({ syncing: false, lastSyncedAt: null, lastError: null, failedCount: 0 });
   const runningRef = useRef(false);
 
   const triggerSync = useCallback(async () => {
-    if (!isSignedIn || runningRef.current) return;
+    if (!enabled || runningRef.current) return;
     runningRef.current = true;
     setState((s) => ({ ...s, syncing: true }));
     try {
@@ -34,10 +39,10 @@ export function SyncProvider({ children }) {
     } finally {
       runningRef.current = false;
     }
-  }, [db, api, isSignedIn]);
+  }, [db, api, enabled]);
 
   useEffect(() => {
-    if (!isSignedIn) return;
+    if (!enabled) return;
     triggerSync();
     registerForPushNotifications(api).catch(() => {}); // best-effort; local reminders don't depend on this
     const appSub = AppState.addEventListener('change', (next) => {
@@ -51,7 +56,7 @@ export function SyncProvider({ children }) {
       unsubNet();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSignedIn]);
+  }, [enabled]);
 
   return <SyncContext.Provider value={{ ...state, triggerSync }}>{children}</SyncContext.Provider>;
 }

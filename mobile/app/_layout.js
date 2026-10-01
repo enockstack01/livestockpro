@@ -12,6 +12,7 @@ import { DB_NAME, migrateDbIfNeeded } from '../src/db/schema';
 import { ToastProvider } from '../src/lib/toast';
 import { ConfirmProvider } from '../src/lib/confirm';
 import { SyncProvider } from '../src/sync/SyncProvider';
+import { AccountProvider } from '../src/account/AccountProvider';
 import { ThemeProvider, useTheme } from '../src/theme/ThemeProvider';
 import { LanguageProvider } from '../src/i18n/LanguageProvider';
 import LoadingScreen from '../src/components/LoadingScreen';
@@ -33,10 +34,12 @@ export default function RootLayout() {
                 <SQLiteProvider databaseName={DB_NAME} onInit={migrateDbIfNeeded}>
                   <ToastProvider>
                     <ConfirmProvider>
-                      <SyncProvider>
-                        <ThemedStatusBar />
-                        <Slot />
-                      </SyncProvider>
+                      <AccountProvider>
+                        <SyncProvider>
+                          <ThemedStatusBar />
+                          <Slot />
+                        </SyncProvider>
+                      </AccountProvider>
                     </ConfirmProvider>
                   </ToastProvider>
                 </SQLiteProvider>

@@ -18,6 +18,7 @@ import { Grid, useBreakpoint } from '../ui/layout';
 import DataTable from '../ui/DataTable';
 import { usePageSearch } from '../ui/AppShell';
 import { RECORD_PAGES } from '../config/recordPages';
+import { formatMoney } from '../../../shared/currency';
 
 const PER_PAGE = 15;
 
@@ -317,9 +318,9 @@ function PageExtra({ kind, rows, t, colors, width }) {
     const pl = income - expense;
     return (
       <Grid minItemWidth={200} columns={width <= 480 ? 1 : width <= 768 ? 2 : undefined} fit fillLast style={{ marginBottom: 24 }}>
-        <FinanceCard label={t('financePage.monthlyIncome')} value={`$${income.toLocaleString()}`} color={colors.primary} />
-        <FinanceCard label={t('financePage.monthlyExpenses')} value={`$${expense.toLocaleString()}`} color={colors.red} />
-        <FinanceCard label={t('financePage.profitLoss')} value={`${pl < 0 ? '-' : ''}$${Math.abs(pl).toLocaleString()}`} color={pl >= 0 ? colors.blue : colors.red} />
+        <FinanceCard label={t('financePage.monthlyIncome')} value={formatMoney(income)} color={colors.primary} />
+        <FinanceCard label={t('financePage.monthlyExpenses')} value={formatMoney(expense)} color={colors.red} />
+        <FinanceCard label={t('financePage.profitLoss')} value={formatMoney(pl)} color={pl >= 0 ? colors.blue : colors.red} />
       </Grid>
     );
   }

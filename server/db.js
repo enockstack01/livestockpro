@@ -20,7 +20,8 @@ const DATA_COLLECTIONS = [
 async function ensureIndexes(database) {
   await Promise.all([
     ...DATA_COLLECTIONS.map((name) => database.collection(name).createIndex({ user_id: 1, updated_at: 1 })),
-    database.collection('push_tokens').createIndex({ user_id: 1, device_id: 1 })
+    database.collection('push_tokens').createIndex({ user_id: 1, device_id: 1 }),
+    database.collection('accounts').createIndex({ status: 1 })
   ]);
 }
 
