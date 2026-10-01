@@ -305,3 +305,18 @@
   transition: var(--transition);
 }
 .quick-action-btn:hover i { background: var(--primary); color: var(--white); }
+
+/* ============================================================
+   Phone arrangement at every width: the web dashboard stacks its
+   sections in one full-width column, in the same order and with the
+   same in-card layouts as the mobile app on a phone.
+   ============================================================ */
+.dashboard-stack .charts-grid,
+.dashboard-stack .feed-grid,
+.dashboard-stack .insights-grid { grid-template-columns: minmax(0, 1fr); }
+.dashboard-stack .analytics-grid > .card { grid-column: 1 / -1 !important; }
+.dashboard-stack .analytics-header { flex-direction: column; align-items: flex-start; }
+.dashboard-stack .herd-profile-body { display: flex; flex-direction: column; align-items: stretch; gap: 22px; }
+.dashboard-stack .herd-profile-health { align-self: stretch; }
+.dashboard-stack .herd-profile-kpis,
+.dashboard-stack .quick-actions-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }

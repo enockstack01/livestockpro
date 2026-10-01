@@ -14,11 +14,13 @@ import { computeAlerts, computeRecentActivity, computeUpcoming } from '../../../
 import { fmtMoney } from '../../../shared/chartPalette';
 import '../dashboard.css';
 
-/* Dashboard, laid out like the CropManager dashboard (and identical to the
-   mobile app's): greeting, the Herd Profile card (herd health ring, "Farm at
-   a glance" figures, herd by species), the headline charts, Farm Analytics
-   & Insights, then Recent Activity, Upcoming Events, Alerts and Quick
-   Actions. */
+/* Dashboard, arranged exactly like the mobile app's dashboard on a phone,
+   at every screen size (see .dashboard-stack in dashboard.css): one column
+   of full-width cards — greeting, the Herd Profile card (herd-health ring,
+   "Farm at a glance" tiles two per row, herd by species), Income vs
+   Expenses, Task Status, Farm Analytics & Insights (insights one per row,
+   then each chart card), Recent Activity, Upcoming Events, Alerts and
+   Quick Actions (two per row). */
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
   const api = useApi();
@@ -77,7 +79,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <>
+    <div className="dashboard-stack">
       <div className="page-header">
         <div><h1>{greeting(t, greetName || profile?.farm_name)}</h1><p>{t('dashboardPage.todaySubtitle')}</p></div>
       </div>
@@ -105,7 +107,7 @@ export default function Dashboard() {
         <AlertsCard items={feed.alerts} />
         <QuickActions />
       </div>
-    </>
+    </div>
   );
 }
 
