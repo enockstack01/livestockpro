@@ -12,7 +12,7 @@ function readStoredPreference() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     return saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'system';
-  } catch (e) {
+  } catch {
     return 'system';
   }
 }
@@ -43,7 +43,7 @@ export function ThemeProvider({ children }) {
 
   function setThemePreference(next) {
     setPreference(next);
-    try { localStorage.setItem(STORAGE_KEY, next); } catch (e) { /* storage unavailable */ }
+    try { localStorage.setItem(STORAGE_KEY, next); } catch { /* storage unavailable */ }
   }
 
   const value = { scheme, preference, setThemePreference };

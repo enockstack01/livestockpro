@@ -142,7 +142,7 @@ export default function SpatialMap() {
         boundaryLayersRef.current = { country, districts };
         if (showBoundaries.districts) districts.addTo(map);
         if (showBoundaries.country) country.addTo(map);
-      } catch (err) {
+      } catch {
         showToast(t('oneHealthMap.failedLoadBoundaries'), 'warning');
       }
     })();

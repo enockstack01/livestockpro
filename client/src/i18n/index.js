@@ -50,7 +50,7 @@ function detectInitialLanguage() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved && supportedCodes.includes(saved)) return saved;
-  } catch (e) {
+  } catch {
     /* localStorage unavailable (private mode, etc.) — fall through to browser detection */
   }
   const browserLanguages = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language]) || [];

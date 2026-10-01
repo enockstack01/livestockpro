@@ -26,7 +26,7 @@ export function LanguageProvider({ children }) {
     setLanguageState(code);
     applyDocumentDirection(code);
     if (persist) {
-      try { localStorage.setItem(STORAGE_KEY, code); } catch (e) { /* storage unavailable */ }
+      try { localStorage.setItem(STORAGE_KEY, code); } catch { /* storage unavailable */ }
     }
   }
 

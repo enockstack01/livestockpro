@@ -98,7 +98,7 @@ export default function SettingsScreen() {
       await user.setProfileImage({ file: null });
       await user.reload();
       showToast(t('settings.photoRemoved'), 'success');
-    } catch (err) {
+    } catch {
       showToast(t('settings.removeFailed'), 'error');
     } finally {
       setUploading(false);
@@ -122,7 +122,7 @@ export default function SettingsScreen() {
       await wipeLocalData(db);
       await signOut();
       router.replace('/sign-in');
-    } catch (err) {
+    } catch {
       showToast(t('settings.partialDeleteWarning'), 'warning');
     } finally {
       setDeleting(false);

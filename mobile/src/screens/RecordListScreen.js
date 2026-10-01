@@ -88,7 +88,7 @@ export default function RecordListScreen({ config }) {
     options: f.options ? f.options.map((opt) => ({ value: opt, label: f.i18nEnum ? t(`enums.${f.i18nEnum}.${opt}`) : opt })) : undefined,
   })), [config.fields, fieldLabel, t]);
 
-  const rows = records || [];
+  const rows = useMemo(() => records || [], [records]);
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return rows.filter((r) => {

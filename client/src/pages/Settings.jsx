@@ -73,7 +73,7 @@ export default function Settings() {
       await user.setProfileImage({ file: null });
       await user.reload();
       showToast(t('settings.photoRemoved'), 'success');
-    } catch (err) {
+    } catch {
       showToast(t('settings.removeFailed'), 'error');
     } finally {
       setUploading(false);
@@ -102,7 +102,7 @@ export default function Settings() {
       else showToast(t('settings.accountDeleted'), 'success');
       await signOut();
       navigate('/');
-    } catch (err) {
+    } catch {
       await signOut();
       navigate('/');
     } finally {

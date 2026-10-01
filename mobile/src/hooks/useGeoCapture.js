@@ -17,7 +17,7 @@ export function useGeoCapture() {
       }
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
       setState({ status: 'success', latitude: pos.coords.latitude, longitude: pos.coords.longitude });
-    } catch (err) {
+    } catch {
       setState({ status: 'error', latitude: null, longitude: null });
     }
   }, []);

@@ -8,19 +8,19 @@ async function request(getToken, path, options = {}) {
   try {
     const token = await getToken();
     if (token) headers.Authorization = 'Bearer ' + token;
-  } catch (e) {
+  } catch {
     /* not signed in */
   }
 
   let res;
   try {
     res = await fetch(API_BASE + path, { ...options, headers });
-  } catch (err) {
+  } catch {
     return { data: null, error: { message: 'Network error: could not reach the server.' } };
   }
 
   let json = null;
-  try { json = await res.json(); } catch (e) { /* empty body */ }
+  try { json = await res.json(); } catch { /* empty body */ }
 
   if (!res.ok) {
     const message = (json && json.error && json.error.message) || `Request failed (${res.status})`;

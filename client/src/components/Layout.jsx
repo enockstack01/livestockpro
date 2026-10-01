@@ -107,7 +107,7 @@ function useReadNotifications(userId) {
     try {
       const raw = localStorage.getItem(storageKey);
       setReadIds(raw ? new Set(JSON.parse(raw)) : new Set());
-    } catch (e) {
+    } catch {
       setReadIds(new Set());
     }
   }, [storageKey]);
@@ -115,7 +115,7 @@ function useReadNotifications(userId) {
   function persist(nextSet) {
     setReadIds(nextSet);
     if (storageKey) {
-      try { localStorage.setItem(storageKey, JSON.stringify([...nextSet])); } catch (e) { /* storage unavailable */ }
+      try { localStorage.setItem(storageKey, JSON.stringify([...nextSet])); } catch { /* storage unavailable */ }
     }
   }
 

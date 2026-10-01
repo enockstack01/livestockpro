@@ -30,7 +30,7 @@ export function parseCsvLine(line) {
 /* Header row + data rows -> array of objects keyed by the (trimmed) header.
    Blank lines are skipped; a leading UTF-8 BOM (Excel adds one) is dropped. */
 export function parseCSV(text) {
-  const lines = String(text).replace(/^﻿/, '').split(/\r?\n/).map((l) => l.trim()).filter((l) => l);
+  const lines = String(text).replace(/^\uFEFF/, '').split(/\r?\n/).map((l) => l.trim()).filter((l) => l);
   if (lines.length < 2) return [];
   const headers = parseCsvLine(lines[0]).map((h) => h.trim());
   return lines.slice(1).map((line) => {
