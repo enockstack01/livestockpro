@@ -1,257 +1,112 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '@clerk/clerk-react';
 import { useApi } from '../lib/api.js';
-import { useToast } from '../lib/toast.jsx';
-import { StatusBadge, PriorityBadge, fmtDate } from '../lib/badges.jsx';
 import { useCanvasChart } from '../lib/useChart.js';
 import { useChartTheme, cartesianOptions, doughnutOptions, barDataset } from '../lib/chartTheme.js';
 import FarmAnalytics from '../components/FarmAnalytics.jsx';
+import HerdProfile from '../components/dashboard/HerdProfile.jsx';
+import { RecentActivity, UpcomingEvents, AlertsCard, QuickActions } from '../components/dashboard/DashboardFeed.jsx';
 import { greeting } from '../../../shared/navigation';
-import Modal from '../components/Modal.jsx';
-import { isOverdueTask } from '../../../shared/businessRules';
+import { computeDashboardSummary } from '../../../shared/analytics';
+import { computeAlerts, computeRecentActivity, computeUpcoming } from '../../../shared/dashboardFeed';
+import { fmtMoney } from '../../../shared/chartPalette';
+import '../dashboard.css';
 
+/* Dashboard, laid out like the CropManager dashboard (and identical to the
+   mobile app's): greeting, the Herd Profile card (herd health ring, "Farm at
+   a glance" figures, herd by species), the headline charts, Farm Analytics
+   & Insights, then Recent Activity, Upcoming Events, Alerts and Quick
+   Actions. */
 export default function Dashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const api = useApi();
-  const showToast = useToast();
+  const navigate = useNavigate();
   const { user } = useUser();
   const greetName = user?.firstName || (user?.primaryEmailAddress?.emailAddress || '').split('@')[0] || '';
 
-  const [data, setData] = useState({ animals: [], health: [], finance: [], production: [], tasks: [], breeding: [], feeding: [] });
-  const [loading, setLoading] = useState(true);
-  const [taskModalOpen, setTaskModalOpen] = useState(false);
-  const [taskForm, setTaskForm] = useState({ title: '', description: '', due_date: '', priority: 'Medium' });
+  const [data, setData] = useState(null);
+  const [profile, setProfile] = useState(null);
 
-  async function fetchAll() {
-    const [r1, r2, r3, r4, r5, r6, r7] = await Promise.all([
-      api.list('animals'),
-      api.list('health_records'),
-      api.list('finance_records'),
-      api.list('production_records'),
-      api.list('tasks', { order: 'due_date.asc' }),
-      api.list('breeding_records'),
-      api.list('feeding_records')
-    ]);
-    setData({
-      animals: r1.data || [],
-      health: r2.data || [],
-      finance: r3.data || [],
-      production: r4.data || [],
-      tasks: r5.data || [],
-      breeding: r6.data || [],
-      feeding: r7.data || []
-    });
-    setLoading(false);
-  }
+  useEffect(() => {
+    (async () => {
+      const [r1, r2, r3, r4, r5, r6, r7, r8] = await Promise.all([
+        api.list('animals'),
+        api.list('health_records'),
+        api.list('finance_records'),
+        api.list('production_records'),
+        api.list('tasks', { order: 'due_date.asc' }),
+        api.list('breeding_records'),
+        api.list('feeding_records'),
+        api.list('profiles')
+      ]);
+      setData({
+        animals: r1.data || [],
+        health: r2.data || [],
+        finance: r3.data || [],
+        production: r4.data || [],
+        tasks: r5.data || [],
+        breeding: r6.data || [],
+        feeding: r7.data || []
+      });
+      setProfile((r8.data || [])[0] || null);
+    })();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { fetchAll(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const feed = useMemo(() => (data ? {
+    alerts: computeAlerts(data, t),
+    recent: computeRecentActivity(data, t),
+    upcoming: computeUpcoming(data, t, i18n.language)
+  } : null), [data, t, i18n.language]);
 
-  async function saveQuickTask() {
-    const title = taskForm.title.trim();
-    if (!title) { showToast(t('tasksPage.taskTitleRequired'), 'error'); return; }
-    const result = await api.insert('tasks', [{
-      title,
-      description: taskForm.description.trim(),
-      due_date: taskForm.due_date || null,
-      priority: taskForm.priority,
-      status: 'Pending'
-    }]);
-    if (result.error) { showToast(t('records.saveFailed', { message: result.error.message }), 'error'); return; }
-    showToast(t('records.added', { item: t('tables.tasks.singular') }), 'success');
-    setTaskModalOpen(false);
-    const taskResult = await api.list('tasks', { order: 'due_date.asc' });
-    setData((d) => ({ ...d, tasks: taskResult.data || [] }));
-  }
+  if (!data) return null;
 
-  if (loading) return null;
-
-  const a = data.animals, h = data.health, tasksArr = data.tasks, b = data.breeding, f = data.finance;
-  const healthyCount = a.filter((x) => x.health_status === 'Healthy').length;
-  const treatmentCount = a.filter((x) => x.health_status === 'Under Treatment').length;
-  const criticalCount = a.filter((x) => x.health_status === 'Critical').length;
-  const pregnantCount = b.filter((x) => x.pregnancy_status === 'Pregnant').length;
-  const newbornCount = b.filter((x) => x.birth_date).reduce((s, x) => s + (x.newborn_count || 0), 0);
-  const pendingTasks = tasksArr.filter((x) => x.status === 'Pending').length;
-  const overdueTasks = tasksArr.filter(isOverdueTask).length;
-
-  const now = new Date();
-  const monthFinance = f.filter((x) => { const d = new Date(x.date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); });
-  const monthIncome = monthFinance.filter((x) => x.type === 'Income').reduce((s, x) => s + (x.amount || 0), 0);
-  const monthExpense = monthFinance.filter((x) => x.type === 'Expense').reduce((s, x) => s + (x.amount || 0), 0);
-  const profitLoss = monthIncome - monthExpense;
-
-  const summaryItems = [
-    { icon: 'fa-cow', color: 'green', label: t('dashboardPage.totalAnimals'), value: a.length, link: '/animals' },
-    { icon: 'fa-heart-pulse', color: 'green', label: t('dashboardPage.healthy'), value: healthyCount, link: '/animals' },
-    { icon: 'fa-stethoscope', color: 'orange', label: t('dashboardPage.underTreatment'), value: treatmentCount, link: '/health' },
-    { icon: 'fa-triangle-exclamation', color: 'red', label: t('dashboardPage.criticalCases'), value: criticalCount, link: '/health' },
-    { icon: 'fa-paw', color: 'purple', label: t('dashboardPage.pregnant'), value: pregnantCount, link: '/breeding' },
-    { icon: 'fa-egg', color: 'blue', label: t('dashboardPage.newborns'), value: newbornCount, link: '/breeding' },
-    { icon: 'fa-list-check', color: overdueTasks > 0 ? 'red' : 'orange', label: t('dashboardPage.pendingTasks'), value: pendingTasks, link: '/tasks' },
-    { icon: 'fa-arrow-trend-up', color: 'green', label: t('dashboardPage.monthlyIncome'), value: '$' + monthIncome.toLocaleString(), link: '/finance' },
-    { icon: 'fa-arrow-trend-down', color: 'red', label: t('dashboardPage.monthlyExpenses'), value: '$' + monthExpense.toLocaleString(), link: '/finance' },
-    { icon: 'fa-chart-line', color: profitLoss >= 0 ? 'blue' : 'red', label: t('dashboardPage.profitLoss'), value: '$' + profitLoss.toLocaleString(), link: '/finance' }
+  const sum = computeDashboardSummary(data);
+  const kpis = [
+    { icon: 'fa-cow', color: 'green', label: t('dashboardPage.totalAnimals'), value: sum.totalAnimals, link: '/animals' },
+    { icon: 'fa-heart-pulse', color: 'green', label: t('dashboardPage.healthy'), value: sum.healthy, link: '/animals' },
+    { icon: 'fa-stethoscope', color: 'orange', label: t('dashboardPage.underTreatment'), value: sum.underTreatment, link: '/health' },
+    { icon: 'fa-triangle-exclamation', color: 'red', label: t('dashboardPage.criticalCases'), value: sum.critical, link: '/health' },
+    { icon: 'fa-paw', color: 'purple', label: t('dashboardPage.pregnant'), value: sum.pregnant, link: '/breeding' },
+    { icon: 'fa-egg', color: 'blue', label: t('dashboardPage.newborns'), value: sum.newborns, link: '/breeding' },
+    { icon: 'fa-list-check', color: sum.overdueTasks > 0 ? 'red' : 'orange', label: t('dashboardPage.pendingTasks'), value: sum.pendingTasks, link: '/tasks' },
+    { icon: 'fa-arrow-trend-up', color: 'green', label: t('dashboardPage.monthlyIncome'), value: fmtMoney(sum.monthIncome), link: '/finance' },
+    { icon: 'fa-arrow-trend-down', color: 'red', label: t('dashboardPage.monthlyExpenses'), value: fmtMoney(sum.monthExpense), link: '/finance' },
+    { icon: 'fa-chart-line', color: sum.profitLoss >= 0 ? 'blue' : 'red', label: t('dashboardPage.profitLoss'), value: fmtMoney(sum.profitLoss), link: '/finance' }
   ];
-
-  const recentAnimals = a.slice().sort((x, y) => new Date(y.created_at) - new Date(x.created_at)).slice(0, 5);
-  const pendingTasksList = tasksArr.filter((x) => x.status !== 'Completed').slice(0, 5);
-  const alerts = h.filter((x) => x.status === 'Under Treatment' || x.status === 'Critical')
-    .sort((x, y) => new Date(y.check_date) - new Date(x.check_date)).slice(0, 5);
 
   return (
     <>
       <div className="page-header">
-        <div><h1>{greeting(t, greetName)}</h1><p>{t('dashboardPage.todaySubtitle')}</p></div>
+        <div><h1>{greeting(t, greetName || profile?.farm_name)}</h1><p>{t('dashboardPage.todaySubtitle')}</p></div>
       </div>
 
-      <div className="summary-grid">
-        {summaryItems.map((s) => (
-          <Link key={s.label} to={s.link} className="summary-card" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div className={`summary-icon ${s.color}`}><i className={`fas ${s.icon}`}></i></div>
-            <div className="summary-info"><h4>{s.value}</h4><p>{s.label}</p></div>
-          </Link>
-        ))}
-      </div>
+      <HerdProfile animals={data.animals} profile={profile} kpis={kpis} onKpiClick={(link) => navigate(link)} />
 
       <div className="charts-grid">
         <div className="card">
-          <div className="card-header"><h3>{t('dashboardPage.chartAnimalHealth')}</h3></div>
-          <div className="card-body"><HealthChart healthy={healthyCount} treatment={treatmentCount} critical={criticalCount} /></div>
+          <div className="card-header"><h3><i className="fas fa-chart-column" style={{ color: 'var(--primary)', marginRight: 8 }}></i>{t('dashboardPage.chartIncomeExpenses')}</h3></div>
+          <div className="card-body"><FinanceChart finance={data.finance} /></div>
         </div>
         <div className="card">
-          <div className="card-header"><h3>{t('dashboardPage.chartIncomeExpenses')}</h3></div>
-          <div className="card-body"><FinanceChart finance={f} /></div>
-        </div>
-        <div className="card">
-          <div className="card-header"><h3>{t('dashboardPage.chartTaskStatus')}</h3></div>
-          <div className="card-body"><TaskChart tasks={tasksArr} /></div>
+          <div className="card-header"><h3><i className="fas fa-list-check" style={{ color: 'var(--blue)', marginRight: 8 }}></i>{t('dashboardPage.chartTaskStatus')}</h3></div>
+          <div className="card-body"><TaskChart tasks={data.tasks} /></div>
         </div>
       </div>
 
       <FarmAnalytics data={data} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-        <div className="card">
-          <div className="card-header"><h3>{t('dashboardPage.recentAnimals')}</h3><Link to="/animals" className="btn btn-sm btn-secondary">{t('common.viewAll')}</Link></div>
-          <div className="card-body" style={{ padding: 0 }}>
-            {recentAnimals.length === 0 ? (
-              <div className="empty-state"><i className="fas fa-cow"></i><h3>{t('dashboardPage.noAnimalsYet')}</h3><p><Link to="/animals" style={{ color: 'var(--primary)', fontWeight: 600 }}>{t('dashboardPage.addFirstAnimal')}</Link></p></div>
-            ) : (
-              <div className="table-wrapper"><table className="data-table">
-                <thead><tr><th>{t('tables.animals.fields.tag_id')}</th><th>{t('tables.animals.fields.name')}</th><th>{t('tables.animals.fields.species')}</th><th>{t('tables.animals.fields.breed')}</th><th>{t('tables.animals.fields.health_status')}</th></tr></thead>
-                <tbody>{recentAnimals.map((an) => (
-                  <tr key={an.id} style={{ cursor: 'pointer' }} onClick={() => (window.location.href = '/animals')}>
-                    <td className="fw-600">{an.tag_id}</td><td>{an.name || '—'}</td><td>{an.species}</td><td>{an.breed || '—'}</td>
-                    <td><StatusBadge status={an.health_status} /></td>
-                  </tr>
-                ))}</tbody>
-              </table></div>
-            )}
-          </div>
-        </div>
-
-        <div className="card">
-          <div className="card-header">
-            <h3>{t('dashboardPage.upcomingTasks')}</h3>
-            <div className="d-flex gap-16">
-              <button className="btn btn-sm btn-primary" onClick={() => { setTaskForm({ title: '', description: '', due_date: '', priority: 'Medium' }); setTaskModalOpen(true); }}><i className="fas fa-plus"></i> {t('dashboardPage.add')}</button>
-              <Link to="/tasks" className="btn btn-sm btn-secondary">{t('common.viewAll')}</Link>
-            </div>
-          </div>
-          <div className="card-body" style={{ padding: 0 }}>
-            {pendingTasksList.length === 0 ? (
-              <div className="empty-state"><i className="fas fa-clipboard-check"></i><h3>{t('dashboardPage.noPendingTasks')}</h3><p>{t('dashboardPage.allCaughtUp')} <Link to="/tasks" style={{ color: 'var(--primary)', fontWeight: 600 }}>{t('layout.viewAllTasks')}</Link></p></div>
-            ) : (
-              <div className="table-wrapper"><table className="data-table">
-                <thead><tr><th>{t('tables.tasks.fields.title')}</th><th>{t('tables.tasks.fields.due_date')}</th><th>{t('tables.tasks.fields.priority')}</th><th>{t('tables.tasks.fields.status')}</th></tr></thead>
-                <tbody>{pendingTasksList.map((tk) => {
-                  const isOverdue = isOverdueTask(tk);
-                  return (
-                    <tr key={tk.id} style={{ cursor: 'pointer' }} onClick={() => (window.location.href = '/tasks')}>
-                      <td className="fw-600">{tk.title}</td>
-                      <td>{isOverdue ? <span style={{ color: 'var(--red)', fontWeight: 600 }}>{fmtDate(tk.due_date)}</span> : fmtDate(tk.due_date)}</td>
-                      <td><PriorityBadge priority={tk.priority} /></td>
-                      <td><StatusBadge status={tk.status} /></td>
-                    </tr>
-                  );
-                })}</tbody>
-              </table></div>
-            )}
-          </div>
-        </div>
+      <div className="feed-grid">
+        <RecentActivity items={feed.recent} />
+        <UpcomingEvents items={feed.upcoming} />
       </div>
-
-      <div className="card mt-24">
-        <div className="card-header"><h3><i className="fas fa-triangle-exclamation text-orange"></i> {t('dashboardPage.recentHealthAlerts')}</h3><Link to="/health" className="btn btn-sm btn-secondary">{t('common.viewAll')}</Link></div>
-        <div className="card-body" style={{ padding: 0 }}>
-          {alerts.length === 0 ? (
-            <div className="empty-state"><i className="fas fa-shield-heart"></i><h3>{t('dashboardPage.noHealthAlerts')}</h3><p>{t('dashboardPage.allAnimalsHealthy')}</p></div>
-          ) : (
-            <div className="table-wrapper"><table className="data-table">
-              <thead><tr><th>{t('tables.animals.fields.tag_id')}</th><th>{t('tables.health_records.fields.disease')}</th><th>{t('tables.health_records.fields.treatment')}</th><th>{t('tables.health_records.fields.status')}</th></tr></thead>
-              <tbody>{alerts.map((al) => (
-                <tr key={al.id} style={{ cursor: 'pointer' }} onClick={() => (window.location.href = '/health')}>
-                  <td className="fw-600">{al.tag_id || '—'}</td><td>{al.disease || '—'}</td><td>{al.treatment || '—'}</td>
-                  <td><StatusBadge status={al.status} /></td>
-                </tr>
-              ))}</tbody>
-            </table></div>
-          )}
-        </div>
+      <div className="feed-grid">
+        <AlertsCard items={feed.alerts} />
+        <QuickActions />
       </div>
-
-      <Modal
-        open={taskModalOpen}
-        onClose={() => setTaskModalOpen(false)}
-        title={t('dashboardPage.quickAddTask')}
-        footer={<>
-          <button className="btn btn-secondary" onClick={() => setTaskModalOpen(false)}>{t('common.cancel')}</button>
-          <button className="btn btn-primary" onClick={saveQuickTask}><i className="fas fa-check"></i> {t('dashboardPage.saveTask')}</button>
-        </>}
-      >
-        <div className="form-group">
-          <label>{t('tables.tasks.fields.title')} *</label>
-          <input type="text" className="form-control" placeholder={t('dashboardPage.taskTitlePlaceholder')} value={taskForm.title} onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })} />
-        </div>
-        <div className="form-group">
-          <label>{t('tables.tasks.fields.description')}</label>
-          <textarea className="form-control" placeholder={t('dashboardPage.taskDescPlaceholder')} value={taskForm.description} onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })} />
-        </div>
-        <div className="form-row">
-          <div className="form-group">
-            <label>{t('tables.tasks.fields.due_date')}</label>
-            <input type="date" className="form-control" value={taskForm.due_date} onChange={(e) => setTaskForm({ ...taskForm, due_date: e.target.value })} />
-          </div>
-          <div className="form-group">
-            <label>{t('tables.tasks.fields.priority')}</label>
-            <select className="form-control" value={taskForm.priority} onChange={(e) => setTaskForm({ ...taskForm, priority: e.target.value })}>
-              <option value="Low">{t('enums.taskPriority.Low')}</option><option value="Medium">{t('enums.taskPriority.Medium')}</option><option value="High">{t('enums.taskPriority.High')}</option>
-            </select>
-          </div>
-        </div>
-      </Modal>
     </>
   );
-}
-
-function HealthChart({ healthy, treatment, critical }) {
-  const { t } = useTranslation();
-  const ct = useChartTheme();
-  const total = healthy + treatment + critical;
-  const canvasRef = useCanvasChart(() => {
-    if (total === 0) return null;
-    return {
-      type: 'doughnut',
-      data: { labels: [t('enums.animalHealthStatus.Healthy'), t('enums.animalHealthStatus.Under Treatment'), t('enums.animalHealthStatus.Critical')], datasets: [{ data: [healthy, treatment, critical], backgroundColor: [ct.status.good, ct.status.warning, ct.status.critical], borderColor: ct.surface, borderWidth: 2 }] },
-      options: doughnutOptions(ct)
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [healthy, treatment, critical, t, ct.scheme]);
-
-  if (total === 0) return <div className="empty-state" style={{ padding: '30px 10px' }}><i className="fas fa-chart-pie"></i><h3>{t('dashboardPage.chartNoAnimalData')}</h3><p>{t('dashboardPage.chartAddAnimals')}</p></div>;
-  return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
 }
 
 function FinanceChart({ finance }) {

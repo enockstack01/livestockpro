@@ -809,5 +809,46 @@
       "sexRatio": "जीवित पशुधन में प्रति नर {{ratio}} मादाएँ हैं।",
       "taskCompletion": "{{pct}}% कार्य पूरे हो चुके हैं; {{overdue}} अतिदेय हैं।"
     }
+  },
+  "herdProfile": {
+    "eyebrow": "पशुधन प्रोफ़ाइल · अवलोकन",
+    "myFarm": "मेरा फार्म",
+    "noLocation": "सेटिंग्स में अपने फार्म का स्थान जोड़ें",
+    "livingHerd": "पशु झुंड में",
+    "allSpecies": "सभी पशु",
+    "healthy": "स्वस्थ",
+    "atAGlance": "फार्म एक नज़र में",
+    "bySpecies": "प्रजाति के अनुसार पशुधन",
+    "byBreed": "नस्ल के अनुसार पशुधन",
+    "healthyOf": "{{count}} में से {{healthy}} स्वस्थ",
+    "more": "+ {{count}} और",
+    "empty": "अपना पशुधन प्रोफ़ाइल देखने के लिए पशु जोड़ें।"
+  },
+  "dashboardFeed": {
+    "recentActivity": "हाल की गतिविधि",
+    "upcomingEvents": "आगामी घटनाएँ",
+    "alerts": "अलर्ट",
+    "quickActions": "त्वरित क्रियाएँ",
+    "noActivity": "अभी कोई गतिविधि नहीं",
+    "noUpcoming": "अगले 30 दिनों में कुछ निर्धारित नहीं",
+    "allClear": "सब ठीक — कोई अलर्ट नहीं",
+    "actAnimal": "नया पशु",
+    "actHealth": "स्वास्थ्य जाँच",
+    "actBirth": "जन्म",
+    "actBreeding": "प्रजनन",
+    "actFeeding": "आहार",
+    "actProduction": "उत्पादन",
+    "actTaskDone": "कार्य पूरा",
+    "evTask": "देय कार्य — {{title}}",
+    "evBirth": "अपेक्षित जन्म — {{tag}}",
+    "evCheck": "स्वास्थ्य जाँच — {{tag}}",
+    "qaAnimal": "पशु जोड़ें",
+    "qaHealth": "स्वास्थ्य जाँच दर्ज करें",
+    "qaBreeding": "प्रजनन दर्ज करें",
+    "qaFeeding": "आहार दर्ज करें",
+    "qaProduction": "उत्पादन दर्ज करें",
+    "qaFinance": "आय / व्यय जोड़ें",
+    "qaTask": "कार्य जोड़ें",
+    "qaReports": "रिपोर्ट देखें"
   }
 }

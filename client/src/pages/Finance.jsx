@@ -6,6 +6,7 @@ import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import { fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
+import { useOpenAddFromUrl } from '../lib/useOpenAddFromUrl.js';
 
 const EMPTY_FORM = { type: 'Income', amount: '', category: '', date: '', description: '' };
 const CATEGORIES = ['Milk Sales', 'Egg Sales', 'Meat Sales', 'Animal Sales', 'Other Income', 'Feed', 'Veterinary', 'Medicine', 'Labor', 'Equipment', 'Maintenance', 'Transport', 'Other Expense'];
@@ -35,6 +36,7 @@ export default function Finance() {
     setRecords(data || []);
   }
   useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useOpenAddFromUrl(openAdd);
 
   const filtered = records.filter((f) => {
     const q = search.toLowerCase();

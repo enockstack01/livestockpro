@@ -813,5 +813,46 @@
       "notChecked_one": "1 animal has had no health check in the last 90 days.",
       "upcomingBirths_one": "1 birth is expected in the next 30 days."
     }
+  },
+  "herdProfile": {
+    "eyebrow": "Herd Profile · Overview",
+    "myFarm": "My Farm",
+    "noLocation": "Add your farm location in Settings",
+    "livingHerd": "animals in the herd",
+    "allSpecies": "All animals",
+    "healthy": "healthy",
+    "atAGlance": "Farm at a glance",
+    "bySpecies": "Herd by species",
+    "byBreed": "Herd by breed",
+    "healthyOf": "{{healthy}} of {{count}} healthy",
+    "more": "+ {{count}} more",
+    "empty": "Add animals to see your herd profile."
+  },
+  "dashboardFeed": {
+    "recentActivity": "Recent Activity",
+    "upcomingEvents": "Upcoming Events",
+    "alerts": "Alerts",
+    "quickActions": "Quick Actions",
+    "noActivity": "No activity yet",
+    "noUpcoming": "Nothing scheduled in the next 30 days",
+    "allClear": "All clear — no alerts",
+    "actAnimal": "New animal",
+    "actHealth": "Health check",
+    "actBirth": "Birth",
+    "actBreeding": "Breeding",
+    "actFeeding": "Feeding",
+    "actProduction": "Production",
+    "actTaskDone": "Task completed",
+    "evTask": "Task due — {{title}}",
+    "evBirth": "Expected birth — {{tag}}",
+    "evCheck": "Health check — {{tag}}",
+    "qaAnimal": "Add Animal",
+    "qaHealth": "Record Health Check",
+    "qaBreeding": "Record Breeding",
+    "qaFeeding": "Record Feeding",
+    "qaProduction": "Record Production",
+    "qaFinance": "Add Income / Expense",
+    "qaTask": "Add Task",
+    "qaReports": "View Reports"
   }
 }

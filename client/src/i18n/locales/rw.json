@@ -809,5 +809,46 @@
       "sexRatio": "Amatungo ariho afite ingore {{ratio}} kuri buri pfizi.",
       "taskCompletion": "{{pct}}% by’imirimo byarangiye; {{overdue}} byarengeje igihe."
     }
+  },
+  "herdProfile": {
+    "eyebrow": "Imiterere y’Amatungo · Incamake",
+    "myFarm": "Ubworozi Bwanjye",
+    "noLocation": "Ongeramo aho ubworozi bwawe buherereye muri Igenamiterere",
+    "livingHerd": "amatungo ari mu bworozi",
+    "allSpecies": "Amatungo yose",
+    "healthy": "bafite ubuzima",
+    "atAGlance": "Ubworozi mu ncamake",
+    "bySpecies": "Amatungo ku bwoko",
+    "byBreed": "Amatungo ku bwoko bw’imbere",
+    "healthyOf": "{{healthy}} kuri {{count}} bafite ubuzima",
+    "more": "+ {{count}} izindi",
+    "empty": "Ongeramo amatungo kugira ngo ubone imiterere y’ubworozi bwawe."
+  },
+  "dashboardFeed": {
+    "recentActivity": "Ibikorwa Biheruka",
+    "upcomingEvents": "Ibiteganyijwe",
+    "alerts": "Imenyesha",
+    "quickActions": "Ibikorwa Byihuse",
+    "noActivity": "Nta gikorwa kiraba",
+    "noUpcoming": "Nta kiteganyijwe mu minsi 30 iri imbere",
+    "allClear": "Byose ni byiza — nta menyesha",
+    "actAnimal": "Itungo rishya",
+    "actHealth": "Isuzuma ry’ubuzima",
+    "actBirth": "Kubyara",
+    "actBreeding": "Imyororokere",
+    "actFeeding": "Igaburo",
+    "actProduction": "Umusaruro",
+    "actTaskDone": "Umurimo warangiye",
+    "evTask": "Umurimo ugomba gukorwa — {{title}}",
+    "evBirth": "Kubyara bitegerejwe — {{tag}}",
+    "evCheck": "Isuzuma ry’ubuzima — {{tag}}",
+    "qaAnimal": "Ongeramo Itungo",
+    "qaHealth": "Andika Isuzuma",
+    "qaBreeding": "Andika Imyororokere",
+    "qaFeeding": "Andika Igaburo",
+    "qaProduction": "Andika Umusaruro",
+    "qaFinance": "Ongeramo Inyungu / Ayasohotse",
+    "qaTask": "Ongeramo Umurimo",
+    "qaReports": "Reba Raporo"
   }
 }

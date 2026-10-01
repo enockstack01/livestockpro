@@ -809,5 +809,46 @@
       "sexRatio": "El rebaño vivo tiene {{ratio}} hembras por cada macho.",
       "taskCompletion": "El {{pct}} % de las tareas están completadas; {{overdue}} están vencidas."
     }
+  },
+  "herdProfile": {
+    "eyebrow": "Perfil del rebaño · Resumen",
+    "myFarm": "Mi granja",
+    "noLocation": "Añade la ubicación de tu granja en Ajustes",
+    "livingHerd": "animales en el rebaño",
+    "allSpecies": "Todos los animales",
+    "healthy": "sanos",
+    "atAGlance": "La granja de un vistazo",
+    "bySpecies": "Rebaño por especie",
+    "byBreed": "Rebaño por raza",
+    "healthyOf": "{{healthy}} de {{count}} sanos",
+    "more": "+ {{count}} más",
+    "empty": "Añade animales para ver el perfil de tu rebaño."
+  },
+  "dashboardFeed": {
+    "recentActivity": "Actividad reciente",
+    "upcomingEvents": "Próximos eventos",
+    "alerts": "Alertas",
+    "quickActions": "Acciones rápidas",
+    "noActivity": "Aún no hay actividad",
+    "noUpcoming": "Nada programado en los próximos 30 días",
+    "allClear": "Todo en orden — sin alertas",
+    "actAnimal": "Nuevo animal",
+    "actHealth": "Control de salud",
+    "actBirth": "Nacimiento",
+    "actBreeding": "Reproducción",
+    "actFeeding": "Alimentación",
+    "actProduction": "Producción",
+    "actTaskDone": "Tarea completada",
+    "evTask": "Tarea pendiente — {{title}}",
+    "evBirth": "Parto previsto — {{tag}}",
+    "evCheck": "Control de salud — {{tag}}",
+    "qaAnimal": "Añadir animal",
+    "qaHealth": "Registrar control de salud",
+    "qaBreeding": "Registrar reproducción",
+    "qaFeeding": "Registrar alimentación",
+    "qaProduction": "Registrar producción",
+    "qaFinance": "Añadir ingreso / gasto",
+    "qaTask": "Añadir tarea",
+    "qaReports": "Ver informes"
   }
 }

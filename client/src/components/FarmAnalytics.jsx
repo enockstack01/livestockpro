@@ -119,7 +119,7 @@ export default function FarmAnalytics({ data }) {
             options: cartesianOptions(ct, { integer: true })
           })} />
         </ChartCard>
-        <ChartCard title={t('analytics.herdGrowth')} icon="fa-arrow-trend-up" empty={animals.length === 0}>
+        <ChartCard title={t('analytics.herdGrowth')} icon="fa-arrow-trend-up" empty={(data.animals || []).length === 0}>
           <Chart depKey={JSON.stringify([growth, labels])} build={(ct) => ({
             type: 'line',
             data: { labels, datasets: [lineDataset(t('analytics.registered'), growth, ct.brand, { fill: true })] },

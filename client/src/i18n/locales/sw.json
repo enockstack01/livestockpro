@@ -809,5 +809,46 @@
       "sexRatio": "Mifugo hai ina majike {{ratio}} kwa kila dume.",
       "taskCompletion": "{{pct}}% ya kazi zimekamilika; {{overdue}} zimechelewa."
     }
+  },
+  "herdProfile": {
+    "eyebrow": "Wasifu wa Mifugo · Muhtasari",
+    "myFarm": "Shamba Langu",
+    "noLocation": "Ongeza eneo la shamba lako kwenye Mipangilio",
+    "livingHerd": "wanyama kwenye kundi",
+    "allSpecies": "Wanyama wote",
+    "healthy": "wazima",
+    "atAGlance": "Shamba kwa mtazamo",
+    "bySpecies": "Mifugo kwa aina",
+    "byBreed": "Mifugo kwa mbari",
+    "healthyOf": "{{healthy}} kati ya {{count}} wazima",
+    "more": "+ {{count}} zaidi",
+    "empty": "Ongeza wanyama ili kuona wasifu wa mifugo yako."
+  },
+  "dashboardFeed": {
+    "recentActivity": "Shughuli za Hivi Karibuni",
+    "upcomingEvents": "Matukio Yajayo",
+    "alerts": "Tahadhari",
+    "quickActions": "Vitendo vya Haraka",
+    "noActivity": "Bado hakuna shughuli",
+    "noUpcoming": "Hakuna kilichopangwa ndani ya siku 30 zijazo",
+    "allClear": "Kila kitu shwari — hakuna tahadhari",
+    "actAnimal": "Mnyama mpya",
+    "actHealth": "Ukaguzi wa afya",
+    "actBirth": "Uzazi",
+    "actBreeding": "Upandishaji",
+    "actFeeding": "Ulishaji",
+    "actProduction": "Uzalishaji",
+    "actTaskDone": "Kazi imekamilika",
+    "evTask": "Kazi inayotakiwa — {{title}}",
+    "evBirth": "Uzazi unaotarajiwa — {{tag}}",
+    "evCheck": "Ukaguzi wa afya — {{tag}}",
+    "qaAnimal": "Ongeza Mnyama",
+    "qaHealth": "Rekodi Ukaguzi wa Afya",
+    "qaBreeding": "Rekodi Upandishaji",
+    "qaFeeding": "Rekodi Ulishaji",
+    "qaProduction": "Rekodi Uzalishaji",
+    "qaFinance": "Ongeza Mapato / Matumizi",
+    "qaTask": "Ongeza Kazi",
+    "qaReports": "Tazama Ripoti"
   }
 }

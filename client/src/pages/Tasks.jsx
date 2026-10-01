@@ -7,6 +7,7 @@ import { StatusBadge, PriorityBadge, fmtDate } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
 import { isOverdueTask } from '../../../shared/businessRules';
+import { useOpenAddFromUrl } from '../lib/useOpenAddFromUrl.js';
 
 const EMPTY_FORM = { title: '', description: '', due_date: '', priority: 'Medium', status: 'Pending' };
 const FILTER_TABS = ['all', 'Pending', 'In Progress', 'Completed'];
@@ -36,6 +37,7 @@ export default function Tasks() {
     setTasks(data || []);
   }
   useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useOpenAddFromUrl(openAdd);
 
   const summary = useMemo(() => {
     const pending = tasks.filter((t) => t.status === 'Pending').length;

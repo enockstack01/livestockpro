@@ -7,6 +7,7 @@ import { StatusBadge, calcAge, fmtDate, downloadCSV, csvCell } from '../lib/badg
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
 import { animalsFromCsv } from '../../../shared/csv';
+import { useOpenAddFromUrl } from '../lib/useOpenAddFromUrl.js';
 
 const EMPTY_FORM = { tag_id: '', name: '', species: '', breed: '', sex: '', date_of_birth: '', location: '', health_status: 'Healthy', notes: '' };
 const SPECIES_OPTIONS = ['Cattle', 'Sheep', 'Goat', 'Pig', 'Poultry', 'Horse', 'Donkey', 'Rabbit', 'Other'];
@@ -44,6 +45,7 @@ export default function Animals() {
   }
 
   useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useOpenAddFromUrl(openAdd);
 
   const speciesOptions = useMemo(() => [...new Set(animals.map((a) => a.species).filter(Boolean))], [animals]);
 

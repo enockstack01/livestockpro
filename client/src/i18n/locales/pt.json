@@ -809,5 +809,46 @@
       "sexRatio": "O rebanho vivo tem {{ratio}} fêmeas para cada macho.",
       "taskCompletion": "{{pct}}% das tarefas foram concluídas; {{overdue}} estão atrasadas."
     }
+  },
+  "herdProfile": {
+    "eyebrow": "Perfil do rebanho · Visão geral",
+    "myFarm": "Minha fazenda",
+    "noLocation": "Adicione a localização da fazenda em Configurações",
+    "livingHerd": "animais no rebanho",
+    "allSpecies": "Todos os animais",
+    "healthy": "saudáveis",
+    "atAGlance": "A fazenda num relance",
+    "bySpecies": "Rebanho por espécie",
+    "byBreed": "Rebanho por raça",
+    "healthyOf": "{{healthy}} de {{count}} saudáveis",
+    "more": "+ {{count}} a mais",
+    "empty": "Adicione animais para ver o perfil do seu rebanho."
+  },
+  "dashboardFeed": {
+    "recentActivity": "Atividade recente",
+    "upcomingEvents": "Próximos eventos",
+    "alerts": "Alertas",
+    "quickActions": "Ações rápidas",
+    "noActivity": "Ainda sem atividade",
+    "noUpcoming": "Nada agendado nos próximos 30 dias",
+    "allClear": "Tudo certo — sem alertas",
+    "actAnimal": "Novo animal",
+    "actHealth": "Verificação de saúde",
+    "actBirth": "Nascimento",
+    "actBreeding": "Reprodução",
+    "actFeeding": "Alimentação",
+    "actProduction": "Produção",
+    "actTaskDone": "Tarefa concluída",
+    "evTask": "Tarefa a vencer — {{title}}",
+    "evBirth": "Parto previsto — {{tag}}",
+    "evCheck": "Verificação de saúde — {{tag}}",
+    "qaAnimal": "Adicionar animal",
+    "qaHealth": "Registrar verificação",
+    "qaBreeding": "Registrar reprodução",
+    "qaFeeding": "Registrar alimentação",
+    "qaProduction": "Registrar produção",
+    "qaFinance": "Adicionar receita / despesa",
+    "qaTask": "Adicionar tarefa",
+    "qaReports": "Ver relatórios"
   }
 }

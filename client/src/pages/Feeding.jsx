@@ -6,6 +6,7 @@ import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import { fmtDate } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
+import { useOpenAddFromUrl } from '../lib/useOpenAddFromUrl.js';
 
 const EMPTY_FORM = { feed_type: '', quantity: '', unit: 'kg', cost: '', feeding_date: '', animal_group: '', notes: '' };
 
@@ -33,6 +34,7 @@ export default function Feeding() {
     setRecords(data || []);
   }
   useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useOpenAddFromUrl(openAdd);
 
   const filtered = records.filter((f) => {
     const q = search.toLowerCase();

@@ -6,6 +6,7 @@ import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import { fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
+import { useOpenAddFromUrl } from '../lib/useOpenAddFromUrl.js';
 
 const EMPTY_FORM = { tag_id: '', production_type: 'Milk', quantity: '', unit: 'liters', production_date: '', notes: '' };
 const TYPE_ICON = { Milk: 'fa-glass-water', Eggs: 'fa-egg', Meat: 'fa-drumstick-bite' };
@@ -37,6 +38,7 @@ export default function Production() {
     setRecords(data || []);
   }
   useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useOpenAddFromUrl(openAdd);
 
   const filtered = records.filter((p) => {
     const q = search.toLowerCase();

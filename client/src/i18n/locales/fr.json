@@ -809,5 +809,46 @@
       "sexRatio": "Le troupeau vivant compte {{ratio}} femelles pour un mâle.",
       "taskCompletion": "{{pct}} % des tâches sont terminées ; {{overdue}} sont en retard."
     }
+  },
+  "herdProfile": {
+    "eyebrow": "Profil du troupeau · Aperçu",
+    "myFarm": "Ma ferme",
+    "noLocation": "Ajoutez l’emplacement de votre ferme dans Paramètres",
+    "livingHerd": "animaux dans le troupeau",
+    "allSpecies": "Tous les animaux",
+    "healthy": "en bonne santé",
+    "atAGlance": "La ferme en un coup d’œil",
+    "bySpecies": "Troupeau par espèce",
+    "byBreed": "Troupeau par race",
+    "healthyOf": "{{healthy}} sur {{count}} en bonne santé",
+    "more": "+ {{count}} de plus",
+    "empty": "Ajoutez des animaux pour voir le profil de votre troupeau."
+  },
+  "dashboardFeed": {
+    "recentActivity": "Activité récente",
+    "upcomingEvents": "Événements à venir",
+    "alerts": "Alertes",
+    "quickActions": "Actions rapides",
+    "noActivity": "Aucune activité pour le moment",
+    "noUpcoming": "Rien de prévu dans les 30 prochains jours",
+    "allClear": "Tout va bien — aucune alerte",
+    "actAnimal": "Nouvel animal",
+    "actHealth": "Contrôle de santé",
+    "actBirth": "Naissance",
+    "actBreeding": "Reproduction",
+    "actFeeding": "Alimentation",
+    "actProduction": "Production",
+    "actTaskDone": "Tâche terminée",
+    "evTask": "Tâche à rendre — {{title}}",
+    "evBirth": "Naissance prévue — {{tag}}",
+    "evCheck": "Contrôle de santé — {{tag}}",
+    "qaAnimal": "Ajouter un animal",
+    "qaHealth": "Enregistrer un contrôle",
+    "qaBreeding": "Enregistrer une saillie",
+    "qaFeeding": "Enregistrer l’alimentation",
+    "qaProduction": "Enregistrer la production",
+    "qaFinance": "Ajouter recette / dépense",
+    "qaTask": "Ajouter une tâche",
+    "qaReports": "Voir les rapports"
   }
 }

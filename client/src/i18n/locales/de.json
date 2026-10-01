@@ -809,5 +809,46 @@
       "sexRatio": "Die lebende Herde hat {{ratio}} Weibchen pro Männchen.",
       "taskCompletion": "{{pct}} % der Aufgaben sind erledigt; {{overdue}} sind überfällig."
     }
+  },
+  "herdProfile": {
+    "eyebrow": "Herdenprofil · Überblick",
+    "myFarm": "Mein Betrieb",
+    "noLocation": "Fügen Sie den Standort Ihres Betriebs in den Einstellungen hinzu",
+    "livingHerd": "Tiere in der Herde",
+    "allSpecies": "Alle Tiere",
+    "healthy": "gesund",
+    "atAGlance": "Betrieb auf einen Blick",
+    "bySpecies": "Herde nach Tierart",
+    "byBreed": "Herde nach Rasse",
+    "healthyOf": "{{healthy}} von {{count}} gesund",
+    "more": "+ {{count}} weitere",
+    "empty": "Fügen Sie Tiere hinzu, um Ihr Herdenprofil zu sehen."
+  },
+  "dashboardFeed": {
+    "recentActivity": "Letzte Aktivitäten",
+    "upcomingEvents": "Anstehende Termine",
+    "alerts": "Warnungen",
+    "quickActions": "Schnellaktionen",
+    "noActivity": "Noch keine Aktivitäten",
+    "noUpcoming": "Nichts geplant in den nächsten 30 Tagen",
+    "allClear": "Alles in Ordnung — keine Warnungen",
+    "actAnimal": "Neues Tier",
+    "actHealth": "Gesundheitskontrolle",
+    "actBirth": "Geburt",
+    "actBreeding": "Zucht",
+    "actFeeding": "Fütterung",
+    "actProduction": "Produktion",
+    "actTaskDone": "Aufgabe erledigt",
+    "evTask": "Aufgabe fällig — {{title}}",
+    "evBirth": "Erwartete Geburt — {{tag}}",
+    "evCheck": "Gesundheitskontrolle — {{tag}}",
+    "qaAnimal": "Tier hinzufügen",
+    "qaHealth": "Kontrolle erfassen",
+    "qaBreeding": "Zucht erfassen",
+    "qaFeeding": "Fütterung erfassen",
+    "qaProduction": "Produktion erfassen",
+    "qaFinance": "Einnahme / Ausgabe hinzufügen",
+    "qaTask": "Aufgabe hinzufügen",
+    "qaReports": "Berichte ansehen"
   }
 }

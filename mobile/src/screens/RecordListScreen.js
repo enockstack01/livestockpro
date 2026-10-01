@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useRepository } from '../db/repository';
 import { csvCell, shareCsv } from '../lib/shareCsv';
 import { useSync } from '../sync/SyncProvider';
@@ -63,6 +64,16 @@ export default function RecordListScreen({ config }) {
     setRecords(await repo.list(config.table, { order: 'created_at DESC' }));
   }, [repo, config.table]);
   useEffect(() => { load(); }, [load, lastSyncedAt]);
+
+  // Dashboard Quick Actions open a page with ?new=1 to go straight to its Add form.
+  const params = useLocalSearchParams();
+  const router = useRouter();
+  useEffect(() => {
+    if (params.new !== '1') return;
+    openAdd();
+    router.setParams({ new: undefined });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.new]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);

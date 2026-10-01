@@ -809,5 +809,46 @@
       "sexRatio": "يضم القطيع الحي {{ratio}} إناث لكل ذكر.",
       "taskCompletion": "اكتملت {{pct}}% من المهام؛ و{{overdue}} متأخرة."
     }
+  },
+  "herdProfile": {
+    "eyebrow": "ملف القطيع · نظرة عامة",
+    "myFarm": "مزرعتي",
+    "noLocation": "أضف موقع مزرعتك في الإعدادات",
+    "livingHerd": "حيوانًا في القطيع",
+    "allSpecies": "كل الحيوانات",
+    "healthy": "سليمة",
+    "atAGlance": "المزرعة في لمحة",
+    "bySpecies": "القطيع حسب النوع",
+    "byBreed": "القطيع حسب السلالة",
+    "healthyOf": "{{healthy}} من {{count}} سليمة",
+    "more": "+ {{count}} أخرى",
+    "empty": "أضف حيوانات لرؤية ملف قطيعك."
+  },
+  "dashboardFeed": {
+    "recentActivity": "النشاط الأخير",
+    "upcomingEvents": "الأحداث القادمة",
+    "alerts": "التنبيهات",
+    "quickActions": "إجراءات سريعة",
+    "noActivity": "لا يوجد نشاط بعد",
+    "noUpcoming": "لا شيء مجدول خلال الثلاثين يومًا القادمة",
+    "allClear": "كل شيء على ما يرام — لا تنبيهات",
+    "actAnimal": "حيوان جديد",
+    "actHealth": "فحص صحي",
+    "actBirth": "ولادة",
+    "actBreeding": "تزاوج",
+    "actFeeding": "تغذية",
+    "actProduction": "إنتاج",
+    "actTaskDone": "اكتملت المهمة",
+    "evTask": "مهمة مستحقة — {{title}}",
+    "evBirth": "ولادة متوقعة — {{tag}}",
+    "evCheck": "فحص صحي — {{tag}}",
+    "qaAnimal": "إضافة حيوان",
+    "qaHealth": "تسجيل فحص صحي",
+    "qaBreeding": "تسجيل تزاوج",
+    "qaFeeding": "تسجيل تغذية",
+    "qaProduction": "تسجيل إنتاج",
+    "qaFinance": "إضافة دخل / مصروف",
+    "qaTask": "إضافة مهمة",
+    "qaReports": "عرض التقارير"
   }
 }

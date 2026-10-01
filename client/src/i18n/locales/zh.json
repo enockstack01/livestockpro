@@ -809,5 +809,46 @@
       "sexRatio": "存栏畜群中每头雄性对应 {{ratio}} 头雌性。",
       "taskCompletion": "已完成 {{pct}}% 的任务；{{overdue}} 项已逾期。"
     }
+  },
+  "herdProfile": {
+    "eyebrow": "畜群概况 · 总览",
+    "myFarm": "我的农场",
+    "noLocation": "在设置中添加农场位置",
+    "livingHerd": "头存栏动物",
+    "allSpecies": "全部动物",
+    "healthy": "健康",
+    "atAGlance": "农场一览",
+    "bySpecies": "按物种划分的畜群",
+    "byBreed": "按品种划分的畜群",
+    "healthyOf": "{{count}} 头中 {{healthy}} 头健康",
+    "more": "+ 另外 {{count}} 项",
+    "empty": "添加动物即可查看畜群概况。"
+  },
+  "dashboardFeed": {
+    "recentActivity": "最近动态",
+    "upcomingEvents": "即将到来",
+    "alerts": "提醒",
+    "quickActions": "快捷操作",
+    "noActivity": "暂无动态",
+    "noUpcoming": "未来30天内没有安排",
+    "allClear": "一切正常 — 无提醒",
+    "actAnimal": "新动物",
+    "actHealth": "健康检查",
+    "actBirth": "分娩",
+    "actBreeding": "配种",
+    "actFeeding": "饲喂",
+    "actProduction": "产出",
+    "actTaskDone": "任务完成",
+    "evTask": "待办任务 — {{title}}",
+    "evBirth": "预计分娩 — {{tag}}",
+    "evCheck": "健康检查 — {{tag}}",
+    "qaAnimal": "添加动物",
+    "qaHealth": "记录健康检查",
+    "qaBreeding": "记录配种",
+    "qaFeeding": "记录饲喂",
+    "qaProduction": "记录产出",
+    "qaFinance": "添加收入/支出",
+    "qaTask": "添加任务",
+    "qaReports": "查看报告"
   }
 }

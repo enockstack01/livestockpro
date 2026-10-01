@@ -6,6 +6,7 @@ import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import { PregnancyBadge, fmtDate } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
+import { useOpenAddFromUrl } from '../lib/useOpenAddFromUrl.js';
 
 const EMPTY_FORM = { tag_id: '', breeding_date: '', pregnancy_status: 'Not Confirmed', expected_birth_date: '', birth_date: '', newborn_count: '', newborn_details: '', notes: '' };
 
@@ -34,6 +35,7 @@ export default function Breeding() {
     setRecords(data || []);
   }
   useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useOpenAddFromUrl(openAdd);
 
   const filtered = records.filter((b) => {
     const q = search.toLowerCase();
