@@ -3,6 +3,7 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
 import { useTheme } from '../theme/ThemeProvider';
 import { chartPalette, fmtMoney } from '../../../shared/chartPalette';
+import { formatCompact, formatMoneyCompact } from '../../../shared/currency';
 
 /* Native counterparts of the web dashboard's Chart.js charts (see
    client/src/lib/chartTheme.js), drawn with react-native-svg from the same
@@ -10,7 +11,10 @@ import { chartPalette, fmtMoney } from '../../../shared/chartPalette';
    between stacked segments, hairline grid, no axis lines, smoothed lines
    that never overshoot, donuts with surface-colored separators, and a
    tap-to-inspect tooltip showing every series at that point (the web's
-   index-mode hover). */
+   index-mode hover). Like the web's valueLabels plugin, every chart prints
+   its numbers: bar ends (upright when wider than the bar), stacked segments
+   that fit plus the stack total, every line point, and donut slices plus
+   "label: value (pct%)" in the legend. */
 
 export function useChartColors() {
   const { scheme } = useTheme();
@@ -21,6 +25,23 @@ const FONT = 11;
 // SVG text defaults to a serif face in browsers; match the app's UI font.
 const FONT_FAMILY = Platform.select({ web: 'Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif', default: undefined });
 const fmtNum = (v) => (Math.abs(v) >= 1000 ? Math.round(v).toLocaleString() : String(Math.round(v * 10) / 10));
+const LABEL = 10;
+const textW = (s) => String(s).length * 5.8;
+
+/* Headroom so the label on the tallest bar / highest point fits (web: grace). */
+const GRACE = 1.18;
+
+/* A value label; halo draws a surface-colored outline first so it stays
+   readable where it crosses a line. */
+function ValueText({ x, y, children, fill, anchor = 'middle', rotate, halo, bold = true }) {
+  const common = { x, y, fontSize: LABEL, fontFamily: FONT_FAMILY, fontWeight: bold ? '700' : '400', textAnchor: anchor, transform: rotate ? `rotate(-90 ${x} ${y})` : undefined };
+  return (
+    <G>
+      {halo ? <SvgText {...common} fill={halo} stroke={halo} strokeWidth={3}>{children}</SvgText> : null}
+      <SvgText {...common} fill={fill}>{children}</SvgText>
+    </G>
+  );
+}
 
 function niceStep(range, target = 4) {
   const raw = range / target || 1;
@@ -114,11 +135,12 @@ export function BarChart({ labels, datasets, horizontal, stacked, money, integer
   const [w, onLayout] = useWidth();
   const [sel, setSel] = useState(null);
   const fmt = money ? fmtMoney : fmtNum;
+  const short = money ? (v) => formatMoneyCompact(v) : formatCompact;
   const n = labels.length;
 
   const sums = labels.map((_, i) => datasets.reduce((s, d) => s + Math.max(0, d.data[i] || 0), 0));
   const allValues = stacked ? sums : datasets.flatMap((d) => d.data);
-  const sc = scale(Math.min(0, ...allValues), Math.max(0, ...allValues), integer);
+  const sc = scale(Math.min(0, ...allValues) * GRACE, Math.max(0, ...allValues) * GRACE, integer);
   const plotH = height - (legend ? 34 : 0);
 
   let chart = null;
@@ -153,14 +175,31 @@ export function BarChart({ labels, datasets, horizontal, stacked, money, integer
                     const y0 = y(acc), y1 = y(acc + v);
                     acc += v;
                     const isTop = datasets.slice(di + 1).every((dd) => !(dd.data[i] > 0));
-                    return <Path key={di} d={barPath(cx - barW / 2, y1 + 1, barW, Math.max(0, y0 - y1 - 2), 2, isTop ? 'top' : 'none')} fill={color} />;
+                    const fits = y0 - y1 >= 14 && barW >= textW(short(v)) + 4;
+                    return (
+                      <G key={di}>
+                        <Path d={barPath(cx - barW / 2, y1 + 1, barW, Math.max(0, y0 - y1 - 2), 2, isTop ? 'top' : 'none')} fill={color} />
+                        {fits ? <ValueText x={cx} y={(y0 + y1) / 2 + 3.5} fill="#FFFFFF">{short(v)}</ValueText> : null}
+                      </G>
+                    );
                   }
                   const x = cx - (barW * groups) / 2 + barW * di;
                   const y0 = y(0), y1 = y(v);
-                  return v >= 0
-                    ? <Path key={di} d={barPath(x + 1, y1, barW - 2, y0 - y1, 4, 'top')} fill={color} />
-                    : <Path key={di} d={barPath(x + 1, y0, barW - 2, y1 - y0, 4, 'bottom')} fill={color} />;
+                  const label = short(v);
+                  const upright = textW(label) > barW + 4;
+                  const lx = x + barW / 2;
+                  return (
+                    <G key={di}>
+                      {v >= 0
+                        ? <Path d={barPath(x + 1, y1, barW - 2, y0 - y1, 4, 'top')} fill={color} />
+                        : <Path d={barPath(x + 1, y0, barW - 2, y1 - y0, 4, 'bottom')} fill={color} />}
+                      {upright
+                        ? <ValueText x={lx + 3.5} y={v >= 0 ? y1 - 4 : y1 + 4} anchor={v >= 0 ? 'start' : 'end'} rotate fill={cc.text}>{label}</ValueText>
+                        : <ValueText x={lx} y={v >= 0 ? y1 - 4 : y1 + 12} fill={cc.text}>{label}</ValueText>}
+                    </G>
+                  );
                 })}
+                {stacked && sums[i] > 0 ? <ValueText x={cx} y={y(sums[i]) - 4} fill={cc.text}>{short(sums[i])}</ValueText> : null}
                 {i % every === 0 ? <SvgText x={cx} y={plotH - 8} fontSize={FONT} fontFamily={FONT_FAMILY} fill={cc.text} textAnchor="middle">{lab}</SvgText> : null}
                 <Rect x={left + band * i} y={top} width={band} height={ph} fill="transparent" onPress={() => setSel(sel === i ? null : i)} />
               </G>
@@ -178,7 +217,8 @@ export function BarChart({ labels, datasets, horizontal, stacked, money, integer
       }
     } else {
       const labelW = Math.min(w * 0.36, Math.max(...labels.map((l) => String(l).length)) * 6.6 + 12);
-      const left = labelW, top = 4, bottom = 24, right = 10;
+      const endLabelW = Math.max(...labels.map((_, i) => textW(short(stacked ? sums[i] : Math.max(...datasets.map((d) => d.data[i] || 0)))))) + 8;
+      const left = labelW, top = 4, bottom = 24, right = Math.max(10, endLabelW);
       const pw = w - left - right, ph = plotH - top - bottom;
       const x = (v) => left + ((v - sc.min) / (sc.max - sc.min)) * pw;
       const band = ph / n;
@@ -208,10 +248,25 @@ export function BarChart({ labels, datasets, horizontal, stacked, money, integer
                     const x0 = x(acc), x1 = x(acc + v);
                     acc += v;
                     const isEnd = datasets.slice(di + 1).every((dd) => !(dd.data[i] > 0));
-                    return <Path key={di} d={barPath(x0 + 1, cy - barH / 2, Math.max(0, x1 - x0 - 2), barH, 2, isEnd ? 'right' : 'none')} fill={color} />;
+                    const fits = x1 - x0 >= textW(short(v)) + 6 && barH >= 12;
+                    return (
+                      <G key={di}>
+                        <Path d={barPath(x0 + 1, cy - barH / 2, Math.max(0, x1 - x0 - 2), barH, 2, isEnd ? 'right' : 'none')} fill={color} />
+                        {fits ? <ValueText x={(x0 + x1) / 2} y={cy + 3.5} fill="#FFFFFF">{short(v)}</ValueText> : null}
+                      </G>
+                    );
                   }
-                  return <Path key={di} d={barPath(x(0), cy - barH / 2, x(v) - x(0), barH, 4, 'right')} fill={color} />;
+                  const groupsH = datasets.length;
+                  const bh = groupsH > 1 ? barH / groupsH : barH;
+                  const by = groupsH > 1 ? cy - barH / 2 + bh * di : cy - barH / 2;
+                  return (
+                    <G key={di}>
+                      <Path d={barPath(x(0), by, x(v) - x(0), bh, 4, 'right')} fill={color} />
+                      <ValueText x={x(v) + 5} y={by + bh / 2 + 3.5} anchor="start" fill={cc.text}>{short(v)}</ValueText>
+                    </G>
+                  );
                 })}
+                {stacked && sums[i] > 0 ? <ValueText x={x(sums[i]) + 5} y={cy + 3.5} anchor="start" fill={cc.text}>{short(sums[i])}</ValueText> : null}
                 <Rect x={0} y={top + band * i} width={w} height={band} fill="transparent" onPress={() => setSel(sel === i ? null : i)} />
               </G>
             );
@@ -243,9 +298,10 @@ export function LineChart({ labels, datasets, money, integer, legend, height = 2
   const [w, onLayout] = useWidth();
   const [sel, setSel] = useState(null);
   const fmt = money ? fmtMoney : fmtNum;
+  const short = money ? (v) => formatMoneyCompact(v) : formatCompact;
   const n = labels.length;
   const all = datasets.flatMap((d) => d.data);
-  const sc = scale(Math.min(0, ...all), Math.max(0, ...all), integer);
+  const sc = scale(Math.min(0, ...all) * GRACE, Math.max(0, ...all) * GRACE, integer);
   const plotH = height - (legend ? 34 : 0);
 
   let chart = null;
@@ -273,6 +329,12 @@ export function LineChart({ labels, datasets, money, integer, legend, height = 2
             <G key={di}>
               {d.fill ? <Path d={`${line}L${pts[pts.length - 1][0]},${y(Math.max(0, sc.min))}L${pts[0][0]},${y(Math.max(0, sc.min))}Z`} fill={d.color} fillOpacity={0.13} /> : null}
               <Path d={line} stroke={d.color} strokeWidth={2} fill="none" />
+              {pts.map(([px, py], i) => (
+                <G key={i}>
+                  <Circle cx={px} cy={py} r={3} fill={d.color} />
+                  <ValueText x={px} y={py - 8} fill={cc.text} halo={cc.surface}>{short(d.data[i] || 0)}</ValueText>
+                </G>
+              ))}
             </G>
           );
         })}
@@ -323,7 +385,9 @@ export function DonutChart({ labels, data, colors, height = 280 }) {
     const p = (rad, a) => `${c + rad * Math.cos(a)},${r + rad * Math.sin(a)}`;
     const full = v === total;
     const d = `M${p(r, a0)}A${r},${r} 0 ${large} 1 ${p(r, a1)}L${p(ir, a1)}A${ir},${ir} 0 ${large} 0 ${p(ir, a0)}Z`;
-    arcs.push({ d, color: colors[i], i, full });
+    const mid = (a0 + a1) / 2;
+    const lr = (r + ir) / 2;
+    arcs.push({ d, color: colors[i], i, full, big: a1 - a0 >= 0.3, lx: c + lr * Math.cos(mid), ly: r + lr * Math.sin(mid) });
     a0 = a1;
   });
 
@@ -336,6 +400,9 @@ export function DonutChart({ labels, data, colors, height = 280 }) {
               // A single 100% slice: an SVG arc can't start and end at the same point, so draw a ring.
               ? <Circle key={a.i} cx={c} cy={r} r={(r + ir) / 2} stroke={a.color} strokeWidth={r - ir} fill="none" onPress={() => setSel(sel === a.i ? null : a.i)} />
               : <Path key={a.i} d={a.d} fill={a.color} stroke={cc.surface} strokeWidth={2} onPress={() => setSel(sel === a.i ? null : a.i)} />))}
+            {arcs.filter((a) => a.big).map((a) => (
+              <ValueText key={`v${a.i}`} x={a.full ? c : a.lx} y={(a.full ? r - (r + ir) / 2 : a.ly) + 3.5} fill="#FFFFFF">{formatCompact(data[a.i])}</ValueText>
+            ))}
           </Svg>
           {sel !== null ? (
             <View pointerEvents="none" style={[styles.donutCenter, { top: size / 2 - 22 }]}>
@@ -345,7 +412,7 @@ export function DonutChart({ labels, data, colors, height = 280 }) {
           ) : null}
         </View>
       ) : null}
-      <Legend cc={cc} items={labels.map((l, i) => ({ label: l, color: colors[i] }))} />
+      <Legend cc={cc} items={labels.map((l, i) => ({ label: `${l}: ${formatCompact(data[i] || 0)} (${total ? Math.round(((data[i] || 0) / total) * 100) : 0}%)`, color: colors[i] }))} />
     </View>
   );
 }

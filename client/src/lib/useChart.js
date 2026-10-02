@@ -1,5 +1,8 @@
 import { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
+import { registerValueLabels } from './valueLabels.js';
+
+registerValueLabels();
 
 /* Mounts/tears down a vanilla Chart.js instance on a <canvas ref={...}>.
    `build` returns a Chart.js config, or null/undefined to skip rendering

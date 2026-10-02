@@ -4,7 +4,8 @@ import Icon from '../../components/Icon';
 import { useTheme } from '../../theme/ThemeProvider';
 import { useTint } from '../../ui/kit';
 import { useChartColors } from '../../ui/charts';
-import { Meter, MiniColumns, Sparkline, TileGrid } from '../../ui/microViz';
+import { Meter, MiniColumns, SeriesValues, Sparkline, TileGrid } from '../../ui/microViz';
+import { formatCompact, formatMoneyCompact } from '../../../../shared/currency';
 import { haptics } from '../../lib/haptics';
 import { fmtMoney } from '../../../../shared/chartPalette';
 
@@ -60,6 +61,7 @@ export default function GlanceTiles({ g, onOpen }) {
       <Tile icon="cow" tone="green" label={t('dashboardPage.totalAnimals')} value={g.animals.total.toLocaleString()} onPress={() => onOpen('/animals')}
         badge={g.animals.addedThisMonth > 0 ? <Badge tone="green" icon="arrow-up">{g.animals.addedThisMonth}</Badge> : null}>
         <Sparkline values={g.animals.series} color={cc.brand} />
+        <SeriesValues values={g.animals.series} fmt={formatCompact} months={g.monthNames} />
       </Tile>
 
       <Tile icon="paw" tone="purple" label={t('dashboardPage.pregnant')} value={String(g.pregnant.count)} onPress={() => onOpen('/breeding')}
@@ -70,6 +72,7 @@ export default function GlanceTiles({ g, onOpen }) {
 
       <Tile icon="baby" tone="blue" label={t('dashboardPage.newborns')} value={String(g.newborns.total)} onPress={() => onOpen('/breeding')}>
         <MiniColumns values={g.newborns.series} color={cc.series[0]} />
+        <View style={styles.axis}>{g.monthNames.map((m, i) => <Text key={i} style={{ flex: 1, textAlign: 'center', fontSize: 9.5, color: colors.textLight }}>{m}</Text>)}</View>
       </Tile>
 
       <Tile icon="list-check" tone={g.tasks.overdue > 0 ? 'red' : 'orange'} label={t('dashboardPage.pendingTasks')} value={String(g.tasks.pending)} onPress={() => onOpen('/tasks')}
@@ -80,15 +83,17 @@ export default function GlanceTiles({ g, onOpen }) {
 
       <Tile icon="arrow-trend-up" tone="blue" label={t('dashboardPage.monthlyIncome')} value={fmtMoney(g.income.month)} onPress={() => onOpen('/finance')}>
         <Sparkline values={g.income.series} color={cc.positive} />
+        <SeriesValues values={g.income.series} fmt={formatCompact} months={g.monthNames} />
       </Tile>
 
       <Tile icon="arrow-trend-down" tone="red" label={t('dashboardPage.monthlyExpenses')} value={fmtMoney(g.expense.month)} onPress={() => onOpen('/finance')}>
         <Sparkline values={g.expense.series} color={cc.negative} />
+        <SeriesValues values={g.expense.series} fmt={formatCompact} months={g.monthNames} />
       </Tile>
 
       <Tile wide icon="scale-balanced" tone={g.net.month >= 0 ? 'blue' : 'red'} label={t('dashboardPage.profitLoss')} value={fmtMoney(g.net.month)} onPress={() => onOpen('/finance')}
         badge={<Text style={muted}>{t('dashboardPage.sixMonths')}: <Text style={{ fontWeight: '700', color: colors.text }}>{fmtMoney(g.net.total)}</Text></Text>}>
-        <MiniColumns values={g.net.series} color={cc.positive} negColor={cc.negative} height={48} />
+        <MiniColumns values={g.net.series} color={cc.positive} negColor={cc.negative} height={48} valueFmt={(v) => formatMoneyCompact(v)} />
         <View style={styles.axis}>{g.monthNames.map((m, i) => <Text key={i} style={{ flex: 1, textAlign: 'center', fontSize: 10, color: colors.textLight }}>{m}</Text>)}</View>
       </Tile>
     </TileGrid>

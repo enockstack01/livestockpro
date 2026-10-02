@@ -150,3 +150,28 @@ export function moneyOf(record, field = 'amount') {
 export function formatRecordMoney(record, field = 'amount', opts = {}) {
   return formatMoney(record && record[field], { ...opts, currency: recordCurrency(record) });
 }
+
+/* ---------- Compact numbers for chart labels ----------
+   Every chart prints the value of each mark; these keep long figures short
+   enough to sit on a bar: 950 → "950", 12 400 → "12.4K", 3 100 000 → "3.1M". */
+function compactParts(value) {
+  const n = Number(value) || 0;
+  const a = Math.abs(n);
+  if (a < 1000) return { sign: n < 0 && Math.round(a * 10) ? '-' : '', num: String(a >= 100 ? Math.round(a) : Math.round(a * 10) / 10), suffix: '' };
+  const [div, suffix] = a >= 1e9 ? [1e9, 'B'] : a >= 1e6 ? [1e6, 'M'] : [1e3, 'K'];
+  const scaled = a / div;
+  return { sign: n < 0 ? '-' : '', num: scaled >= 100 ? String(Math.round(scaled)) : String(Math.round(scaled * 10) / 10), suffix };
+}
+
+export function formatCompact(value) {
+  const { sign, num, suffix } = compactParts(value);
+  return `${sign}${num}${suffix}`;
+}
+
+export function formatMoneyCompact(value, { currency = current } = {}) {
+  const n = Number(value) || 0;
+  if (Math.abs(n) < 1000) return formatMoney(Math.round(n), { decimals: 0, currency });
+  const { sign, num, suffix } = compactParts(n);
+  const sym = currencySymbol(currency);
+  return `${sign}${sym}${sym.length > 1 ? ' ' : ''}${num}${suffix}`;
+}

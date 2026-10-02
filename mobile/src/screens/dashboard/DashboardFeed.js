@@ -142,10 +142,30 @@ function EventCard({ e, onPress }) {
   );
 }
 
-function TimelineDot({ e }) {
+/* One timeline stop per day: its date above, and how many events fall on
+   it inside the dot when there is more than one (same as the web). */
+function timelineStops(items) {
+  const byDay = new Map();
+  items.forEach((e) => {
+    const s = byDay.get(e.daysLeft) || { daysLeft: e.daysLeft, day: e.day, color: e.color, count: 0 };
+    s.count++;
+    if (s.color !== e.color) s.color = 'blue';
+    byDay.set(e.daysLeft, s);
+  });
+  return [...byDay.values()];
+}
+
+function TimelineStop({ s }) {
   const { colors } = useTheme();
-  const c = useToneColor(e.color);
-  return <View style={[styles.timelineDot, { left: `${(e.daysLeft / UPCOMING_WINDOW_DAYS) * 100}%`, backgroundColor: c.fg, borderColor: colors.card }]} />;
+  const c = useToneColor(s.color);
+  return (
+    <View style={[styles.timelineStop, { left: `${(s.daysLeft / UPCOMING_WINDOW_DAYS) * 100}%` }]}>
+      <Text style={{ fontSize: 10, fontWeight: '700', color: colors.text }}>{s.day}</Text>
+      <View style={[styles.timelineDot, { backgroundColor: c.fg, borderColor: colors.card }]}>
+        {s.count > 1 ? <Text style={{ fontSize: 10, fontWeight: '800', color: '#FFFFFF' }}>{s.count}</Text> : null}
+      </View>
+    </View>
+  );
 }
 
 export function UpcomingEvents({ items }) {
@@ -159,9 +179,9 @@ export function UpcomingEvents({ items }) {
         {items.length === 0 ? <Empty icon="calendar" text={t('dashboardFeed.noUpcoming')} /> : (
           <>
             <View style={{ paddingHorizontal: 6, paddingTop: 4, paddingBottom: 14 }}>
-              <View style={{ height: 18 }}>
+              <View style={{ height: 36 }}>
                 <View style={[styles.track, { backgroundColor: colors.border }]} />
-                {items.map((e) => <TimelineDot key={e.id} e={e} />)}
+                {timelineStops(items).map((s) => <TimelineStop key={s.daysLeft} s={s} />)}
               </View>
               <View style={styles.axisSpread}>
                 <Text style={{ fontSize: 10.5, color: colors.textLight }}>{t('dashboardFeed.today')}</Text>
@@ -284,8 +304,9 @@ const styles = StyleSheet.create({
   chartBlock: { paddingHorizontal: 4, paddingTop: 4, paddingBottom: 14, marginBottom: 4, borderBottomWidth: 1 },
   chartHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 },
   axisSpread: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 },
-  track: { position: 'absolute', left: 0, right: 0, top: 8, height: 2, borderRadius: 1 },
-  timelineDot: { position: 'absolute', top: 3, width: 12, height: 12, marginLeft: -6, borderRadius: 6, borderWidth: 2 },
+  track: { position: 'absolute', left: 0, right: 0, bottom: 10, height: 2, borderRadius: 1 },
+  timelineStop: { position: 'absolute', bottom: 0, width: 28, marginLeft: -14, alignItems: 'center', gap: 2 },
+  timelineDot: { minWidth: 20, height: 20, paddingHorizontal: 3, borderRadius: 10, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   eventCard: { width: 132, gap: 2, padding: 12, borderWidth: 1, borderRadius: 12 },
   eventTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
   countdown: { alignSelf: 'flex-start', marginTop: 8, paddingVertical: 2, paddingHorizontal: 8, borderRadius: 999 },

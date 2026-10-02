@@ -150,7 +150,7 @@
 /* ---------- micro charts (components/dashboard/MicroViz.jsx) ---------- */
 .micro-viz { display: block; width: 100%; overflow: visible; }
 .spark-wrap { position: relative; display: block; }
-.spark-dot { position: absolute; right: calc(3.33% - 4px); width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 0 2px var(--card); }
+.spark-dot { position: absolute; right: calc(100% / var(--n, 6) / 2 - 4px); width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 0 2px var(--card); }
 .micro-meter { height: 8px; border-radius: 4px; background: var(--bg); overflow: hidden; }
 .micro-meter span { display: block; height: 100%; border-radius: 4px; transition: width 0.6s ease; }
 .micro-ring { position: relative; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
@@ -162,6 +162,13 @@
 .micro-col span.pos { border-radius: 4px 4px 0 0; }
 .micro-col span.neg { border-radius: 0 0 4px 4px; }
 .micro-cols-zero { position: absolute; left: 0; right: 0; height: 1px; background: var(--border); }
+.micro-cols { margin-top: 16px; }
+.micro-cols.has-neg { margin-bottom: 16px; }
+.micro-col-val { position: absolute; left: 50%; transform: translateX(-50%); font-size: 10px; font-style: normal; font-weight: 700; color: var(--text); white-space: nowrap; line-height: 1; }
+.series-values { display: block; margin-top: 4px; }
+.series-row { display: flex; font-size: 9.5px; font-weight: 700; color: var(--text); line-height: 14px; }
+.series-row > * { flex: 1; min-width: 0; text-align: center; white-space: nowrap; font-weight: inherit; letter-spacing: -0.2px; }
+.series-row.muted { font-size: 9.5px; font-weight: 500; color: var(--text-light); }
 .micro-split { display: flex; gap: 2px; height: 8px; border-radius: 4px; overflow: hidden; background: var(--bg); }
 .micro-split span { display: block; height: 100%; }
 
@@ -295,13 +302,15 @@
 
 /* upcoming: 30-day timeline + swipeable date cards */
 .timeline { padding: 6px 6px 14px; }
-.timeline-track { position: relative; height: 18px; }
-.timeline-track::before { content: ''; position: absolute; left: 0; right: 0; top: 8px; height: 2px; border-radius: 1px; background: var(--border); }
+.timeline-track { position: relative; height: 34px; }
+.timeline-track::before { content: ''; position: absolute; left: 0; right: 0; bottom: 8px; height: 2px; border-radius: 1px; background: var(--border); }
+.timeline-stop { position: absolute; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.timeline-stop small { font-size: 10px; font-weight: 700; color: var(--text); line-height: 1; }
 .timeline-dot {
-  position: absolute; top: 3px;
-  width: 12px; height: 12px;
-  margin-left: -6px;
-  border-radius: 50%;
+  min-width: 18px; height: 18px; padding: 0 3px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; color: #fff;
   background: var(--tone);
   box-shadow: 0 0 0 2px var(--card);
 }

@@ -64,9 +64,24 @@ export function RecentActivity({ activity }) {
   );
 }
 
+/* One timeline stop per day: its date above, and how many events fall on
+   it inside the dot when there is more than one. */
+function timelineStops(items) {
+  const byDay = new Map();
+  items.forEach((e) => {
+    const s = byDay.get(e.daysLeft) || { daysLeft: e.daysLeft, day: e.day, month: e.month, color: e.color, count: 0, names: [] };
+    s.count++;
+    s.names.push(e.name);
+    if (s.color !== e.color) s.color = 'blue';
+    byDay.set(e.daysLeft, s);
+  });
+  return [...byDay.values()];
+}
+
 export function UpcomingEvents({ items }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const stops = timelineStops(items);
   const countdown = (d) => (d === 0 ? t('dashboardFeed.today') : t('dashboardFeed.inDays', { count: d }));
   return (
     <FeedCard title={t('dashboardFeed.upcomingEvents')} icon="calendar-days" iconColor="var(--blue)" right={items.length > 0 && <span className="feed-count">{items.length}</span>}>
@@ -74,8 +89,11 @@ export function UpcomingEvents({ items }) {
         <>
           <div className="timeline" aria-hidden="true">
             <div className="timeline-track">
-              {items.map((e) => (
-                <span key={e.id} className={`timeline-dot tone-${e.color}`} style={{ left: `${(e.daysLeft / UPCOMING_WINDOW_DAYS) * 100}%` }} title={`${e.name} · ${e.day} ${e.month}`} />
+              {stops.map((s) => (
+                <span key={s.daysLeft} className={`timeline-stop tone-${s.color}`} style={{ left: `${(s.daysLeft / UPCOMING_WINDOW_DAYS) * 100}%` }} title={`${s.day} ${s.month}: ${s.names.join(', ')}`}>
+                  <small>{s.day}</small>
+                  <span className="timeline-dot">{s.count > 1 ? s.count : ''}</span>
+                </span>
               ))}
             </div>
             <div className="timeline-scale"><span>{t('dashboardFeed.today')}</span><span>+15</span><span>+{UPCOMING_WINDOW_DAYS}</span></div>

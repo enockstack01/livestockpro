@@ -37,17 +37,18 @@ export function cartesianOptions(ct, { horizontal = false, stacked = false, lege
     scales: horizontal ? { x: valueAxis, y: categoryAxis } : { x: categoryAxis, y: valueAxis },
     plugins: {
       legend: { display: legend, position: 'bottom', labels: { color: ct.text, usePointStyle: true, pointStyleWidth: 10, padding: 14, font: { size: 12 } } },
+      valueLabels: { money, color: ct.text, surface: ct.surface },
       tooltip
     }
   };
 }
 
-export function doughnutOptions(ct) {
+export function doughnutOptions(ct, { money = false } = {}) {
   return {
     responsive: true,
     maintainAspectRatio: false,
     cutout: '65%',
-    plugins: { legend: { position: 'bottom', labels: { color: ct.text, usePointStyle: true, pointStyleWidth: 10, padding: 14, font: { size: 12 } } } }
+    plugins: { legend: { position: 'bottom', labels: { color: ct.text, usePointStyle: true, pointStyleWidth: 10, padding: 14, font: { size: 12 } } }, valueLabels: { money, color: ct.text } }
   };
 }
 
@@ -76,7 +77,7 @@ export function lineDataset(label, data, color, { fill = false } = {}) {
     borderWidth: 2,
     tension: 0.3,
     cubicInterpolationMode: 'monotone', // no overshoot below zero between sparse points
-    pointRadius: 0,
+    pointRadius: 3, // a visible dot for each labelled value
     pointHoverRadius: 5,
     pointHitRadius: 14,
     pointBackgroundColor: color
