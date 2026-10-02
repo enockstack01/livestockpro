@@ -18,7 +18,7 @@ import { Grid, useBreakpoint } from '../ui/layout';
 import DataTable from '../ui/DataTable';
 import { usePageSearch } from '../ui/AppShell';
 import { RECORD_PAGES } from '../config/recordPages';
-import { formatMoney } from '../../../shared/currency';
+import { formatMoney, getCurrency, moneyOf, recordCurrency } from '../../../shared/currency';
 
 const PER_PAGE = 15;
 
@@ -109,7 +109,7 @@ export default function RecordListScreen({ config }) {
 
   function openEdit(record) {
     const v = {};
-    config.fields.forEach((f) => { v[f.key] = record[f.key] ?? ''; });
+    config.fields.forEach((f) => { v[f.key] = f.type === 'currency' ? record[f.key] || getCurrency() : record[f.key] ?? ''; });
     setValues(v);
     setEditingId(record.id);
     setModal('edit');
@@ -151,7 +151,7 @@ export default function RecordListScreen({ config }) {
 
   async function exportCsv() {
     if (rows.length === 0) { showToast(t('records.noRecordsToExport', { label: label.toLowerCase() }), 'warning'); return; }
-    const csv = [page.exportFields.join(','), ...rows.map((r) => page.exportFields.map((h) => csvCell(r[h])).join(','))].join('\n');
+    const csv = [page.exportFields.join(','), ...rows.map((r) => page.exportFields.map((h) => csvCell(h === 'currency' ? recordCurrency(r) : r[h])).join(','))].join('\n');
     try {
       if (!(await shareCsv(csv, `${config.table}_export.csv`))) { showToast(t('reports.sharingUnavailable'), 'error'); return; }
       showToast(t('records.exported', { label }), 'success');
@@ -313,15 +313,19 @@ function ListSkeleton() {
 function PageExtra({ kind, rows, t, colors, width }) {
   if (kind === 'financeSummary') {
     const month = rows.filter((f) => isThisMonth(f.date));
-    const income = month.filter((f) => f.type === 'Income').reduce((s, f) => s + (Number(f.amount) || 0), 0);
-    const expense = month.filter((f) => f.type === 'Expense').reduce((s, f) => s + (Number(f.amount) || 0), 0);
+    const income = month.filter((f) => f.type === 'Income').reduce((s, f) => s + moneyOf(f), 0);
+    const expense = month.filter((f) => f.type === 'Expense').reduce((s, f) => s + moneyOf(f), 0);
     const pl = income - expense;
+    const mixed = month.some((f) => recordCurrency(f) !== getCurrency());
     return (
+      <>
       <Grid minItemWidth={200} columns={width <= 480 ? 1 : width <= 768 ? 2 : undefined} fit fillLast style={{ marginBottom: 24 }}>
         <FinanceCard label={t('financePage.monthlyIncome')} value={formatMoney(income)} color={colors.primary} />
         <FinanceCard label={t('financePage.monthlyExpenses')} value={formatMoney(expense)} color={colors.red} />
         <FinanceCard label={t('financePage.profitLoss')} value={formatMoney(pl)} color={pl >= 0 ? colors.blue : colors.red} />
       </Grid>
+      {mixed ? <Text style={{ fontSize: 12, color: colors.textLight, marginTop: -16, marginBottom: 20 }}>{t('financePage.convertedNote', { currency: getCurrency() })}</Text> : null}
+      </>
     );
   }
   if (kind === 'productionSummary') {

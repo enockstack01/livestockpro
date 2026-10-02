@@ -65,6 +65,9 @@ export function useApi() {
     async myRole() {
       return request(getToken, '/admin/role');
     },
+    async rates() {
+      return request(getToken, '/rates');
+    },
     async myAccount() {
       return request(getToken, '/account');
     },

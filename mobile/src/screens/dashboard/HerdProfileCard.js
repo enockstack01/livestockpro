@@ -4,10 +4,10 @@ import Svg, { Circle, Defs, LinearGradient, Rect, Stop } from 'react-native-svg'
 import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import { useTheme } from '../../theme/ThemeProvider';
-import { useTint } from '../../ui/kit';
-import { Grid, useBreakpoint } from '../../ui/layout';
+import { useBreakpoint } from '../../ui/layout';
 import { haptics } from '../../lib/haptics';
 import { computeHerdProfile } from '../../../../shared/dashboardFeed';
+import GlanceTiles from './GlanceTiles';
 
 /* Herd Profile — the first section of the dashboard, laid out like the
    CropManager Farm Profile card and identical to the web's
@@ -43,27 +43,7 @@ function HealthRing({ segments, total, pct, label, size, colors }) {
   );
 }
 
-function KpiTile({ k, onPress }) {
-  const { colors } = useTheme();
-  const tint = useTint(k.color);
-  const fg = k.color === 'green' ? colors.primary : colors[k.color] || tint.fg;
-  return (
-    <Pressable
-      onPress={() => { haptics.tap(); onPress(k.link); }}
-      style={({ pressed }) => [styles.kpi, { borderColor: pressed ? colors.primary : colors.border, backgroundColor: colors.card, transform: [{ scale: pressed ? 0.98 : 1 }] }]}
-      accessibilityRole="button"
-      accessibilityLabel={`${k.label}: ${k.value}`}
-    >
-      <View style={[styles.kpiIcon, { backgroundColor: tint.bg }]}><Icon name={k.icon} size={14} color={fg} /></View>
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <Text style={[styles.kpiLabel, { color: colors.textLight }]} numberOfLines={1}>{k.label}</Text>
-        <Text style={[styles.kpiValue, { color: colors.text }]} numberOfLines={1} adjustsFontSizeToFit>{k.value}</Text>
-      </View>
-    </Pressable>
-  );
-}
-
-export default function HerdProfileCard({ animals, profile, kpis, onKpiPress }) {
+export default function HerdProfileCard({ animals, profile, glance, onOpen }) {
   const { t } = useTranslation();
   const { colors, shadow } = useTheme();
   const { width, isWide } = useBreakpoint();
@@ -96,12 +76,10 @@ export default function HerdProfileCard({ animals, profile, kpis, onKpiPress }) 
     </View>
   ) : <Text style={{ textAlign: 'center', fontSize: 13, color: colors.textLight, paddingVertical: 8 }}>{t('herdProfile.empty')}</Text>;
 
-  const glance = (
+  const glanceSection = (
     <View>
       <Text style={[styles.section, { color: colors.textLight }]}>{t('herdProfile.atAGlance')}</Text>
-      <Grid minItemWidth={isWide ? 175 : 140} gap={10}>
-        {kpis.map((k) => <KpiTile key={k.label} k={k} onPress={onKpiPress} />)}
-      </Grid>
+      <GlanceTiles g={glance} onOpen={onOpen} />
     </View>
   );
 
@@ -176,14 +154,14 @@ export default function HerdProfileCard({ animals, profile, kpis, onKpiPress }) 
           <>
             <View style={{ flexDirection: 'row', gap: 32, alignItems: 'center' }}>
               <View style={{ width: 380 }}>{health}</View>
-              <View style={{ flex: 1 }}>{glance}</View>
+              <View style={{ flex: 1 }}>{glanceSection}</View>
             </View>
             {groups}
           </>
         ) : (
           <>
             {health}
-            {glance}
+            {glanceSection}
             {groups}
           </>
         )}
@@ -211,10 +189,6 @@ const styles = StyleSheet.create({
   legendLabel: { flex: 1, fontSize: 12 },
   legendValue: { fontSize: 12, fontWeight: '700' },
   section: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 },
-  kpi: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderWidth: 1, borderRadius: 10 },
-  kpiIcon: { width: 34, height: 34, borderRadius: 9, alignItems: 'center', justifyContent: 'center' },
-  kpiLabel: { fontSize: 11, fontWeight: '500' },
-  kpiValue: { fontSize: 16, fontWeight: '700', marginTop: 1 },
   groupRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 5 },
   groupName: { flex: 1, fontSize: 13, fontWeight: '600' },
   groupCount: { fontSize: 12, fontWeight: '700', minWidth: 32, textAlign: 'right' },

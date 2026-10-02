@@ -166,7 +166,8 @@
         "cost": "Cost",
         "feeding_date": "Feeding Date",
         "animal_group": "Animal Group",
-        "notes": "Notes"
+        "notes": "Notes",
+        "currency": "Currency"
       }
     },
     "breeding_records": {
@@ -203,7 +204,8 @@
         "amount": "Amount",
         "category": "Category",
         "date": "Date",
-        "description": "Description"
+        "description": "Description",
+        "currency": "Currency"
       }
     },
     "tasks": {
@@ -455,7 +457,8 @@
     "greetingMorning": "Good morning, {{name}}",
     "greetingAfternoon": "Good afternoon, {{name}}",
     "greetingEvening": "Good evening, {{name}}",
-    "todaySubtitle": "Here's what's happening across your farm today."
+    "todaySubtitle": "Here's what's happening across your farm today.",
+    "sixMonths": "6 months"
   },
   "reportsPage": {
     "title": "Full Farm Report",
@@ -563,7 +566,8 @@
     "selectCategory": "Select category",
     "descriptionPlaceholder": "Details about this transaction...",
     "confirmDeleteMessage": "Are you sure you want to delete this finance record?",
-    "amountMustBeGreaterThanZero": "Amount must be greater than 0."
+    "amountMustBeGreaterThanZero": "Amount must be greater than 0.",
+    "convertedNote": "Totals converted to {{currency}} at current exchange rates."
   },
   "tasksPage": {
     "title": "Tasks",
@@ -835,6 +839,30 @@
       "overdueFollowUps_one": "1 follow-up health check is overdue for an animal still under treatment or critical.",
       "notChecked_one": "1 animal has had no health check in the last 90 days.",
       "upcomingBirths_one": "1 birth is expected in the next 30 days."
+    },
+    "insightLabel": {
+      "herdHealth": "Healthy herd",
+      "mortality": "Mortality",
+      "recovery": "Recovery rate",
+      "topCondition": "Top condition · 90 days",
+      "overdueFollowUps": "Overdue follow-ups",
+      "notChecked": "Unchecked · 90 days",
+      "productionUp": "{{type}} · 30 days",
+      "productionDown": "{{type}} · 30 days",
+      "feedPerLiter": "Feed cost per litre",
+      "profitMargin": "Profit margin",
+      "topExpense": "Largest expense",
+      "vetPerAnimal": "Vet cost per animal",
+      "revenuePerAnimal": "Revenue per animal",
+      "upcomingBirths": "Births · next 30 days",
+      "sexRatio": "Females per male",
+      "taskCompletion": "Tasks completed"
+    },
+    "part": {
+      "recovered": "Recovered",
+      "died": "Died",
+      "female": "Female",
+      "male": "Male"
     }
   },
   "herdProfile": {
@@ -876,7 +904,22 @@
     "qaProduction": "Record Production",
     "qaFinance": "Add Income / Expense",
     "qaTask": "Add Task",
-    "qaReports": "View Reports"
+    "qaReports": "View Reports",
+    "last12Weeks": "Last 12 weeks",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{{count}}d ago",
+    "weeksAgo": "{{count}}w ago",
+    "inDays": "in {{count}}d",
+    "daysLate": "{{count}}d late",
+    "alertKinds": {
+      "taskOverdue": "Overdue tasks",
+      "checkMissed": "Missed checks",
+      "critical": "Critical",
+      "treatment": "In treatment",
+      "checkDue": "Checks due",
+      "birthSoon": "Births soon"
+    }
   },
   "account": {
     "types": {

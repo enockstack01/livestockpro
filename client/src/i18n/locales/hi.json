@@ -166,7 +166,8 @@
         "cost": "लागत",
         "feeding_date": "आहार तिथि",
         "animal_group": "पशु समूह",
-        "notes": "टिप्पणियां"
+        "notes": "टिप्पणियां",
+        "currency": "मुद्रा"
       }
     },
     "breeding_records": {
@@ -203,7 +204,8 @@
         "amount": "राशि",
         "category": "श्रेणी",
         "date": "तिथि",
-        "description": "विवरण"
+        "description": "विवरण",
+        "currency": "मुद्रा"
       }
     },
     "tasks": {
@@ -455,7 +457,8 @@
     "greetingMorning": "सुप्रभात, {{name}}",
     "greetingAfternoon": "नमस्कार, {{name}}",
     "greetingEvening": "शुभ संध्या, {{name}}",
-    "todaySubtitle": "आज आपके फार्म पर यह हो रहा है।"
+    "todaySubtitle": "आज आपके फार्म पर यह हो रहा है।",
+    "sixMonths": "6 महीने"
   },
   "reportsPage": {
     "title": "पूर्ण फार्म रिपोर्ट",
@@ -563,7 +566,8 @@
     "selectCategory": "श्रेणी चुनें",
     "descriptionPlaceholder": "इस लेनदेन के बारे में विवरण...",
     "confirmDeleteMessage": "क्या आप वाकई इस वित्तीय रिकॉर्ड को हटाना चाहते हैं?",
-    "amountMustBeGreaterThanZero": "राशि 0 से अधिक होनी चाहिए।"
+    "amountMustBeGreaterThanZero": "राशि 0 से अधिक होनी चाहिए।",
+    "convertedNote": "कुल राशि वर्तमान विनिमय दरों पर {{currency}} में बदली गई है।"
   },
   "tasksPage": {
     "title": "कार्य",
@@ -831,6 +835,30 @@
       "upcomingBirths": "अगले 30 दिनों में {{count}} जन्म अपेक्षित हैं।",
       "sexRatio": "जीवित पशुधन में प्रति नर {{ratio}} मादाएँ हैं।",
       "taskCompletion": "{{pct}}% कार्य पूरे हो चुके हैं; {{overdue}} अतिदेय हैं।"
+    },
+    "insightLabel": {
+      "herdHealth": "स्वस्थ झुंड",
+      "mortality": "मृत्यु दर",
+      "recovery": "ठीक होने की दर",
+      "topCondition": "मुख्य बीमारी · 90 दिन",
+      "overdueFollowUps": "लंबित फ़ॉलो-अप",
+      "notChecked": "बिना जांच · 90 दिन",
+      "productionUp": "{{type}} · 30 दिन",
+      "productionDown": "{{type}} · 30 दिन",
+      "feedPerLiter": "प्रति लीटर चारा लागत",
+      "profitMargin": "लाभ मार्जिन",
+      "topExpense": "सबसे बड़ा खर्च",
+      "vetPerAnimal": "प्रति पशु पशु-चिकित्सा लागत",
+      "revenuePerAnimal": "प्रति पशु आय",
+      "upcomingBirths": "जन्म · अगले 30 दिन",
+      "sexRatio": "प्रति नर मादा",
+      "taskCompletion": "पूरे हुए कार्य"
+    },
+    "part": {
+      "recovered": "ठीक हुए",
+      "died": "मृत",
+      "female": "मादा",
+      "male": "नर"
     }
   },
   "herdProfile": {
@@ -872,7 +900,22 @@
     "qaProduction": "उत्पादन दर्ज करें",
     "qaFinance": "आय / व्यय जोड़ें",
     "qaTask": "कार्य जोड़ें",
-    "qaReports": "रिपोर्ट देखें"
+    "qaReports": "रिपोर्ट देखें",
+    "last12Weeks": "पिछले 12 सप्ताह",
+    "today": "आज",
+    "yesterday": "कल",
+    "daysAgo": "{{count}} दिन पहले",
+    "weeksAgo": "{{count}} सप्ताह पहले",
+    "inDays": "{{count}} दिन में",
+    "daysLate": "{{count}} दिन देर",
+    "alertKinds": {
+      "taskOverdue": "लंबित कार्य",
+      "checkMissed": "छूटी जांचें",
+      "critical": "गंभीर",
+      "treatment": "उपचार में",
+      "checkDue": "जांच बाकी",
+      "birthSoon": "जल्द जन्म"
+    }
   },
   "account": {
     "types": {

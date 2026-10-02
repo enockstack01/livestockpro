@@ -166,7 +166,8 @@
         "cost": "Custo",
         "feeding_date": "Data de Alimentação",
         "animal_group": "Grupo de Animais",
-        "notes": "Notas"
+        "notes": "Notas",
+        "currency": "Moeda"
       }
     },
     "breeding_records": {
@@ -203,7 +204,8 @@
         "amount": "Valor",
         "category": "Categoria",
         "date": "Data",
-        "description": "Descrição"
+        "description": "Descrição",
+        "currency": "Moeda"
       }
     },
     "tasks": {
@@ -455,7 +457,8 @@
     "greetingMorning": "Bom dia, {{name}}",
     "greetingAfternoon": "Boa tarde, {{name}}",
     "greetingEvening": "Boa noite, {{name}}",
-    "todaySubtitle": "Veja o que está acontecendo na sua fazenda hoje."
+    "todaySubtitle": "Veja o que está acontecendo na sua fazenda hoje.",
+    "sixMonths": "6 meses"
   },
   "reportsPage": {
     "title": "Relatório completo da fazenda",
@@ -563,7 +566,8 @@
     "selectCategory": "Selecione a categoria",
     "descriptionPlaceholder": "Detalhes sobre esta transação...",
     "confirmDeleteMessage": "Tem certeza de que deseja excluir este registro financeiro?",
-    "amountMustBeGreaterThanZero": "O valor deve ser maior que 0."
+    "amountMustBeGreaterThanZero": "O valor deve ser maior que 0.",
+    "convertedNote": "Totais convertidos para {{currency}} às taxas de câmbio atuais."
   },
   "tasksPage": {
     "title": "Tarefas",
@@ -831,6 +835,30 @@
       "upcomingBirths": "{{count}} nascimentos são esperados nos próximos 30 dias.",
       "sexRatio": "O rebanho vivo tem {{ratio}} fêmeas para cada macho.",
       "taskCompletion": "{{pct}}% das tarefas foram concluídas; {{overdue}} estão atrasadas."
+    },
+    "insightLabel": {
+      "herdHealth": "Rebanho saudável",
+      "mortality": "Mortalidade",
+      "recovery": "Taxa de recuperação",
+      "topCondition": "Principal doença · 90 dias",
+      "overdueFollowUps": "Acompanhamentos atrasados",
+      "notChecked": "Sem verificação · 90 dias",
+      "productionUp": "{{type}} · 30 dias",
+      "productionDown": "{{type}} · 30 dias",
+      "feedPerLiter": "Custo de ração por litro",
+      "profitMargin": "Margem de lucro",
+      "topExpense": "Maior despesa",
+      "vetPerAnimal": "Custo veterinário por animal",
+      "revenuePerAnimal": "Receita por animal",
+      "upcomingBirths": "Partos · próximos 30 dias",
+      "sexRatio": "Fêmeas por macho",
+      "taskCompletion": "Tarefas concluídas"
+    },
+    "part": {
+      "recovered": "Recuperados",
+      "died": "Mortos",
+      "female": "Fêmea",
+      "male": "Macho"
     }
   },
   "herdProfile": {
@@ -872,7 +900,22 @@
     "qaProduction": "Registrar produção",
     "qaFinance": "Adicionar receita / despesa",
     "qaTask": "Adicionar tarefa",
-    "qaReports": "Ver relatórios"
+    "qaReports": "Ver relatórios",
+    "last12Weeks": "Últimas 12 semanas",
+    "today": "Hoje",
+    "yesterday": "Ontem",
+    "daysAgo": "há {{count}} d",
+    "weeksAgo": "há {{count}} sem",
+    "inDays": "em {{count}} d",
+    "daysLate": "{{count}} d de atraso",
+    "alertKinds": {
+      "taskOverdue": "Tarefas atrasadas",
+      "checkMissed": "Verificações perdidas",
+      "critical": "Críticos",
+      "treatment": "Em tratamento",
+      "checkDue": "Verificações próximas",
+      "birthSoon": "Partos próximos"
+    }
   },
   "account": {
     "types": {

@@ -11,6 +11,7 @@ const dataRoutes = require('./routes/dataRoutes');
 const rpcRoutes = require('./routes/rpcRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const accountRoutes = require('./routes/accountRoutes');
+const ratesRoutes = require('./routes/ratesRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -114,6 +115,7 @@ app.use('/api/data', dataRoutes);
 app.use('/api/rpc', rpcRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/account', accountRoutes);
+app.use('/api/rates', ratesRoutes);
 
 const clientDist = path.join(__dirname, '..', 'client', 'dist');
 app.use(express.static(clientDist));

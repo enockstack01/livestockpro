@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
-import { formatMoney } from '../../../shared/currency';
+import { formatMoney, formatRecordMoney, moneyOf, recordCurrency } from '../../../shared/currency';
 
 export default function Reports() {
   const { t } = useTranslation();
@@ -61,8 +61,8 @@ export default function Reports() {
     lines.push('');
 
     lines.push(`=== FINANCE RECORDS (${data.finance.length}) ===`);
-    lines.push(['Type', 'Category', 'Amount', 'Date', 'Description'].join(','));
-    data.finance.forEach((r) => lines.push([csvCell(r.type), csvCell(r.category), csvCell(r.amount), csvCell(r.date), csvCell(r.description)].join(',')));
+    lines.push(['Type', 'Category', 'Amount', 'Currency', 'Date', 'Description'].join(','));
+    data.finance.forEach((r) => lines.push([csvCell(r.type), csvCell(r.category), csvCell(r.amount), csvCell(recordCurrency(r)), csvCell(r.date), csvCell(r.description)].join(',')));
 
     downloadCSV(lines.join('\n'), 'full_farm_report_' + new Date().toISOString().split('T')[0] + '.csv');
     showToast(t('reportsPage.fullReportExported'), 'success');
@@ -96,8 +96,8 @@ export default function Reports() {
   const treatmentCount = data.animals.filter((a) => a.health_status === 'Under Treatment').length;
   const criticalCount = data.animals.filter((a) => a.health_status === 'Critical').length;
   const pregnantCount = data.breeding.filter((b) => b.pregnancy_status === 'Pregnant').length;
-  const totalIncome = data.finance.filter((r) => r.type === 'Income').reduce((s, r) => s + (r.amount || 0), 0);
-  const totalExpense = data.finance.filter((r) => r.type === 'Expense').reduce((s, r) => s + (r.amount || 0), 0);
+  const totalIncome = data.finance.filter((r) => r.type === 'Income').reduce((s, r) => s + moneyOf(r), 0);
+  const totalExpense = data.finance.filter((r) => r.type === 'Expense').reduce((s, r) => s + moneyOf(r), 0);
   const netProfit = totalIncome - totalExpense;
   const milkTotal = data.production.filter((p) => p.production_type === 'Milk').reduce((s, p) => s + (p.quantity || 0), 0);
   const eggsTotal = data.production.filter((p) => p.production_type === 'Eggs').reduce((s, p) => s + (p.quantity || 0), 0);
@@ -185,7 +185,7 @@ export default function Reports() {
 
         <ReportSection title={t('tables.finance_records.singular')} icon="fa-coins" count={filteredFinance.length}
           headers={[t('tables.finance_records.fields.type'), t('tables.finance_records.fields.category'), t('tables.finance_records.fields.amount'), t('tables.finance_records.fields.date'), t('tables.finance_records.fields.description')]}
-          rows={filteredFinance.map((r) => [r.type || '—', r.category || '—', formatMoney(r.amount), fmtDate(r.date), (r.description || '—').substring(0, 50)])} />
+          rows={filteredFinance.map((r) => [r.type || '—', r.category || '—', formatRecordMoney(r), fmtDate(r.date), (r.description || '—').substring(0, 50)])} />
       </div>
     </>
   );

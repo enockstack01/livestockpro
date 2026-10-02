@@ -12,7 +12,7 @@ import DateField from '../../src/components/DateField';
 import { Badge, Button, Card, CardBody, CardHeader, EmptyState, FilterBar, FinanceCard, FormGroup, Input, Page, PageHeader, Spinner } from '../../src/ui/kit';
 import { Grid, useBreakpoint } from '../../src/ui/layout';
 import DataTable from '../../src/ui/DataTable';
-import { formatMoney } from '../../../shared/currency';
+import { formatMoney, formatRecordMoney, moneyOf, recordCurrency } from '../../../shared/currency';
 
 /* Port of client/src/pages/Reports.jsx: date-range / animal-tag filters,
    the headline figures as finance cards, then one table card per record
@@ -60,7 +60,7 @@ export default function ReportsScreen() {
     section('HEALTH RECORDS', data.health, ['Tag ID', 'Disease', 'Treatment', 'Medicine', 'Vet', 'Check Date', 'Next Check', 'Status', 'Notes'], ['tag_id', 'disease', 'treatment', 'medicine', 'vet_name', 'check_date', 'next_check_date', 'status', 'notes']);
     section('BREEDING RECORDS', data.breeding, ['Tag ID', 'Breeding Date', 'Pregnancy Status', 'Expected Birth', 'Birth Date', 'Newborn Count', 'Newborn Details', 'Notes'], ['tag_id', 'breeding_date', 'pregnancy_status', 'expected_birth_date', 'birth_date', 'newborn_count', 'newborn_details', 'notes']);
     section('PRODUCTION RECORDS', data.production, ['Type', 'Tag ID', 'Quantity', 'Unit', 'Date', 'Notes'], ['production_type', 'tag_id', 'quantity', 'unit', 'production_date', 'notes']);
-    section('FINANCE RECORDS', data.finance, ['Type', 'Category', 'Amount', 'Date', 'Description'], ['type', 'category', 'amount', 'date', 'description']);
+    section('FINANCE RECORDS', data.finance.map((r) => ({ ...r, currency: recordCurrency(r) })), ['Type', 'Category', 'Amount', 'Currency', 'Date', 'Description'], ['type', 'category', 'amount', 'currency', 'date', 'description']);
     try {
       if (!(await shareCsv(lines.join('\n'), 'full_farm_report_' + new Date().toISOString().split('T')[0] + '.csv'))) { showToast(t('reports.sharingUnavailable'), 'error'); return; }
       showToast(t('reportsPage.fullReportExported'), 'success');
@@ -81,8 +81,8 @@ export default function ReportsScreen() {
 
   const count = (list, pred) => list.filter(pred).length;
   const sumOf = (list, pred, field) => list.filter(pred).reduce((s, r) => s + (Number(r[field]) || 0), 0);
-  const income = sumOf(data.finance, (r) => r.type === 'Income', 'amount');
-  const expense = sumOf(data.finance, (r) => r.type === 'Expense', 'amount');
+  const income = data.finance.filter((r) => r.type === 'Income').reduce((s, r) => s + moneyOf(r), 0);
+  const expense = data.finance.filter((r) => r.type === 'Expense').reduce((s, r) => s + moneyOf(r), 0);
   const net = income - expense;
   const prod = (type) => sumOf(data.production, (p) => p.production_type === type, 'quantity');
   const now = new Date();
@@ -138,7 +138,7 @@ export default function ReportsScreen() {
     ] },
     { title: t('tables.finance_records.singular'), icon: 'coins', rows: fFinance, columns: [
       { key: 'type', label: t('tables.finance_records.fields.type'), strong: true }, { key: 'category', label: t('tables.finance_records.fields.category') },
-      { key: 'amount', label: t('tables.finance_records.fields.amount'), render: (r) => formatMoney(r.amount) },
+      { key: 'amount', label: t('tables.finance_records.fields.amount'), render: (r) => formatRecordMoney(r) },
       { key: 'date', label: t('tables.finance_records.fields.date'), render: (r) => fmtDate(r.date) }, { key: 'description', label: t('tables.finance_records.fields.description'), render: (r) => (r.description || '—').substring(0, 50) },
     ] },
   ];

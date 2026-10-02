@@ -1,7 +1,7 @@
 import { SCHEMAS, SYNCED_TABLES } from '../lib/shared';
 
 export const DB_NAME = 'livestockpro.db';
-const DATABASE_VERSION = 1;
+const DATABASE_VERSION = 2;
 
 /* Fields known to hold numbers, so their SQLite column gets NUMERIC affinity
    (matters for correct ORDER BY / range comparisons — SQLite is otherwise
@@ -36,6 +36,26 @@ export async function migrateDbIfNeeded(db) {
 
   await db.execAsync('PRAGMA journal_mode = WAL;');
 
+  if (version < 1) {
+    await createSchema(db);
+    version = 1;
+  }
+
+  /* v2: finance and feeding records carry the currency they were recorded
+     in. A fresh install already got the column from SCHEMAS above. */
+  if (version < 2) {
+    for (const table of ['finance_records', 'feeding_records']) {
+      const cols = await db.getAllAsync(`PRAGMA table_info(${table})`);
+      if (!cols.some((c) => c.name === 'currency')) await db.execAsync(`ALTER TABLE ${table} ADD COLUMN currency TEXT;`);
+    }
+    version = 2;
+  }
+
+  await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION};`);
+}
+
+/* The v1 schema: one table per synced collection plus the sync bookkeeping. */
+async function createSchema(db) {
   for (const table of SYNCED_TABLES) {
     await db.execAsync(createTableSql(table));
     await db.execAsync(`CREATE INDEX IF NOT EXISTS idx_${table}_user_updated ON ${table} (user_id, updated_at);`);
@@ -63,8 +83,6 @@ export async function migrateDbIfNeeded(db) {
       trigger_at TEXT
     );
   `);
-
-  await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION};`);
 }
 
 /* Lets a sign-out flow check whether anything is still waiting to reach the

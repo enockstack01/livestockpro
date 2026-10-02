@@ -166,7 +166,8 @@
         "cost": "Kosten",
         "feeding_date": "Fütterungsdatum",
         "animal_group": "Tiergruppe",
-        "notes": "Notizen"
+        "notes": "Notizen",
+        "currency": "Währung"
       }
     },
     "breeding_records": {
@@ -203,7 +204,8 @@
         "amount": "Betrag",
         "category": "Kategorie",
         "date": "Datum",
-        "description": "Beschreibung"
+        "description": "Beschreibung",
+        "currency": "Währung"
       }
     },
     "tasks": {
@@ -455,7 +457,8 @@
     "greetingMorning": "Guten Morgen, {{name}}",
     "greetingAfternoon": "Guten Tag, {{name}}",
     "greetingEvening": "Guten Abend, {{name}}",
-    "todaySubtitle": "Das passiert heute auf Ihrem Betrieb."
+    "todaySubtitle": "Das passiert heute auf Ihrem Betrieb.",
+    "sixMonths": "6 Monate"
   },
   "reportsPage": {
     "title": "Vollständiger Farmbericht",
@@ -563,7 +566,8 @@
     "selectCategory": "Kategorie auswählen",
     "descriptionPlaceholder": "Details zu dieser Transaktion...",
     "confirmDeleteMessage": "Möchten Sie diesen Finanzeintrag wirklich löschen?",
-    "amountMustBeGreaterThanZero": "Der Betrag muss größer als 0 sein."
+    "amountMustBeGreaterThanZero": "Der Betrag muss größer als 0 sein.",
+    "convertedNote": "Summen zum aktuellen Wechselkurs in {{currency}} umgerechnet."
   },
   "tasksPage": {
     "title": "Aufgaben",
@@ -831,6 +835,30 @@
       "upcomingBirths": "In den nächsten 30 Tagen werden {{count}} Geburten erwartet.",
       "sexRatio": "Die lebende Herde hat {{ratio}} Weibchen pro Männchen.",
       "taskCompletion": "{{pct}} % der Aufgaben sind erledigt; {{overdue}} sind überfällig."
+    },
+    "insightLabel": {
+      "herdHealth": "Gesunde Herde",
+      "mortality": "Sterblichkeit",
+      "recovery": "Genesungsrate",
+      "topCondition": "Häufigste Erkrankung · 90 Tage",
+      "overdueFollowUps": "Überfällige Nachkontrollen",
+      "notChecked": "Ungeprüft · 90 Tage",
+      "productionUp": "{{type}} · 30 Tage",
+      "productionDown": "{{type}} · 30 Tage",
+      "feedPerLiter": "Futterkosten pro Liter",
+      "profitMargin": "Gewinnmarge",
+      "topExpense": "Größte Ausgabe",
+      "vetPerAnimal": "Tierarztkosten pro Tier",
+      "revenuePerAnimal": "Umsatz pro Tier",
+      "upcomingBirths": "Geburten · 30 Tage",
+      "sexRatio": "Weibchen pro Männchen",
+      "taskCompletion": "Erledigte Aufgaben"
+    },
+    "part": {
+      "recovered": "Genesen",
+      "died": "Verendet",
+      "female": "Weiblich",
+      "male": "Männlich"
     }
   },
   "herdProfile": {
@@ -872,7 +900,22 @@
     "qaProduction": "Produktion erfassen",
     "qaFinance": "Einnahme / Ausgabe hinzufügen",
     "qaTask": "Aufgabe hinzufügen",
-    "qaReports": "Berichte ansehen"
+    "qaReports": "Berichte ansehen",
+    "last12Weeks": "Letzte 12 Wochen",
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "daysAgo": "vor {{count}} T",
+    "weeksAgo": "vor {{count}} W",
+    "inDays": "in {{count}} T",
+    "daysLate": "{{count}} T überfällig",
+    "alertKinds": {
+      "taskOverdue": "Überfällige Aufgaben",
+      "checkMissed": "Verpasste Kontrollen",
+      "critical": "Kritisch",
+      "treatment": "In Behandlung",
+      "checkDue": "Fällige Kontrollen",
+      "birthSoon": "Baldige Geburten"
+    }
   },
   "account": {
     "types": {

@@ -109,3 +109,44 @@ export function currencySymbol(currency = current) {
   const part = fmt.formatToParts(0).find((p) => p.type === 'currency');
   return part ? part.value : currency;
 }
+
+/* ---------- Per-record currency + conversion ----------
+   Finance and feeding records each carry the currency they were recorded
+   in (records from before that existed have none and count as the display
+   currency). Totals and charts convert every amount into the display
+   currency with the latest exchange rates (GET /api/rates, units per 1 USD),
+   which each client loads with setRates(). */
+
+let rates = null;
+
+export function setRates(next) {
+  rates = next && typeof next === 'object' ? next : null;
+}
+
+export function getRates() {
+  return rates;
+}
+
+/* `amount` recorded in `from`, expressed in `to`. Without a rate for either
+   side the amount is returned unchanged. */
+export function convert(amount, from, to = current) {
+  const n = Number(amount) || 0;
+  if (!from || from === to || !rates || !rates[from] || !rates[to]) return n;
+  return (n / rates[from]) * rates[to];
+}
+
+/* The currency a record was entered in. */
+export function recordCurrency(record) {
+  return (record && record.currency) || current;
+}
+
+/* A record's money field (amount / cost) converted to the display currency
+   — what every total and chart adds up. */
+export function moneyOf(record, field = 'amount') {
+  return convert(record && record[field], recordCurrency(record));
+}
+
+/* A record's money field formatted in its own currency, for list rows. */
+export function formatRecordMoney(record, field = 'amount', opts = {}) {
+  return formatMoney(record && record[field], { ...opts, currency: recordCurrency(record) });
+}

@@ -166,7 +166,8 @@
         "cost": "التكلفة",
         "feeding_date": "تاريخ التغذية",
         "animal_group": "مجموعة الحيوانات",
-        "notes": "ملاحظات"
+        "notes": "ملاحظات",
+        "currency": "العملة"
       }
     },
     "breeding_records": {
@@ -203,7 +204,8 @@
         "amount": "المبلغ",
         "category": "الفئة",
         "date": "التاريخ",
-        "description": "الوصف"
+        "description": "الوصف",
+        "currency": "العملة"
       }
     },
     "tasks": {
@@ -455,7 +457,8 @@
     "greetingMorning": "صباح الخير، {{name}}",
     "greetingAfternoon": "مساء الخير، {{name}}",
     "greetingEvening": "مساء الخير، {{name}}",
-    "todaySubtitle": "إليك ما يحدث في مزرعتك اليوم."
+    "todaySubtitle": "إليك ما يحدث في مزرعتك اليوم.",
+    "sixMonths": "6 أشهر"
   },
   "reportsPage": {
     "title": "التقرير الكامل للمزرعة",
@@ -563,7 +566,8 @@
     "selectCategory": "اختر الفئة",
     "descriptionPlaceholder": "تفاصيل حول هذه المعاملة...",
     "confirmDeleteMessage": "هل أنت متأكد من حذف هذا السجل المالي؟",
-    "amountMustBeGreaterThanZero": "يجب أن يكون المبلغ أكبر من 0."
+    "amountMustBeGreaterThanZero": "يجب أن يكون المبلغ أكبر من 0.",
+    "convertedNote": "الإجماليات محوّلة إلى {{currency}} بأسعار الصرف الحالية."
   },
   "tasksPage": {
     "title": "المهام",
@@ -831,6 +835,30 @@
       "upcomingBirths": "من المتوقع {{count}} ولادات خلال الثلاثين يومًا القادمة.",
       "sexRatio": "يضم القطيع الحي {{ratio}} إناث لكل ذكر.",
       "taskCompletion": "اكتملت {{pct}}% من المهام؛ و{{overdue}} متأخرة."
+    },
+    "insightLabel": {
+      "herdHealth": "قطيع سليم",
+      "mortality": "معدل النفوق",
+      "recovery": "معدل التعافي",
+      "topCondition": "أكثر حالة · 90 يوماً",
+      "overdueFollowUps": "متابعات متأخرة",
+      "notChecked": "دون فحص · 90 يوماً",
+      "productionUp": "{{type}} · 30 يوماً",
+      "productionDown": "{{type}} · 30 يوماً",
+      "feedPerLiter": "تكلفة العلف لكل لتر",
+      "profitMargin": "هامش الربح",
+      "topExpense": "أكبر مصروف",
+      "vetPerAnimal": "تكلفة بيطرية لكل حيوان",
+      "revenuePerAnimal": "الإيراد لكل حيوان",
+      "upcomingBirths": "ولادات · 30 يوماً",
+      "sexRatio": "إناث لكل ذكر",
+      "taskCompletion": "المهام المكتملة"
+    },
+    "part": {
+      "recovered": "تعافى",
+      "died": "نفق",
+      "female": "أنثى",
+      "male": "ذكر"
     }
   },
   "herdProfile": {
@@ -872,7 +900,22 @@
     "qaProduction": "تسجيل إنتاج",
     "qaFinance": "إضافة دخل / مصروف",
     "qaTask": "إضافة مهمة",
-    "qaReports": "عرض التقارير"
+    "qaReports": "عرض التقارير",
+    "last12Weeks": "آخر 12 أسبوعاً",
+    "today": "اليوم",
+    "yesterday": "أمس",
+    "daysAgo": "منذ {{count}} ي",
+    "weeksAgo": "منذ {{count}} أس",
+    "inDays": "بعد {{count}} ي",
+    "daysLate": "متأخر {{count}} ي",
+    "alertKinds": {
+      "taskOverdue": "مهام متأخرة",
+      "checkMissed": "فحوص فائتة",
+      "critical": "حرجة",
+      "treatment": "قيد العلاج",
+      "checkDue": "فحوص مستحقة",
+      "birthSoon": "ولادات قريبة"
+    }
   },
   "account": {
     "types": {

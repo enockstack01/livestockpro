@@ -7,9 +7,10 @@ import { fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
 import { useOpenAddFromUrl } from '../lib/useOpenAddFromUrl.js';
-import { formatMoney, currencySymbol } from '../../../shared/currency';
+import { formatMoney, formatRecordMoney, getCurrency, moneyOf, recordCurrency } from '../../../shared/currency';
+import MoneyInput from '../components/MoneyInput.jsx';
 
-const EMPTY_FORM = { type: 'Income', amount: '', category: '', date: '', description: '' };
+const EMPTY_FORM = { type: 'Income', amount: '', currency: '', category: '', date: '', description: '' };
 const CATEGORIES = ['Milk Sales', 'Egg Sales', 'Meat Sales', 'Animal Sales', 'Other Income', 'Feed', 'Veterinary', 'Medicine', 'Labor', 'Equipment', 'Maintenance', 'Transport', 'Other Expense'];
 
 export default function Finance() {
@@ -49,15 +50,16 @@ export default function Finance() {
   const summary = useMemo(() => {
     const now = new Date();
     const thisMonth = records.filter((f) => { const d = new Date(f.date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); });
-    const totalIncome = thisMonth.filter((f) => f.type === 'Income').reduce((s, f) => s + (f.amount || 0), 0);
-    const totalExpense = thisMonth.filter((f) => f.type === 'Expense').reduce((s, f) => s + (f.amount || 0), 0);
-    return { totalIncome, totalExpense, pl: totalIncome - totalExpense };
+    const totalIncome = thisMonth.filter((f) => f.type === 'Income').reduce((s, f) => s + moneyOf(f), 0);
+    const totalExpense = thisMonth.filter((f) => f.type === 'Expense').reduce((s, f) => s + moneyOf(f), 0);
+    const mixed = thisMonth.some((f) => recordCurrency(f) !== getCurrency());
+    return { totalIncome, totalExpense, pl: totalIncome - totalExpense, mixed };
   }, [records]);
 
-  function openAdd() { setEditingId(null); setForm({ ...EMPTY_FORM, date: new Date().toISOString().split('T')[0] }); geo.capture(); setModalOpen(true); }
+  function openAdd() { setEditingId(null); setForm({ ...EMPTY_FORM, currency: getCurrency(), date: new Date().toISOString().split('T')[0] }); geo.capture(); setModalOpen(true); }
   function openEdit(f) {
     setEditingId(f.id);
-    setForm({ type: f.type || 'Income', amount: f.amount ?? '', category: f.category || '', date: f.date || '', description: f.description || '' });
+    setForm({ type: f.type || 'Income', amount: f.amount ?? '', currency: f.currency || getCurrency(), category: f.category || '', date: f.date || '', description: f.description || '' });
     geo.reset();
     setModalOpen(true);
   }
@@ -93,8 +95,8 @@ export default function Finance() {
 
   function exportCSV() {
     if (records.length === 0) { showToast(t('records.noRecordsToExport', { label: label.toLowerCase() }), 'warning'); return; }
-    const headers = ['type', 'category', 'amount', 'date', 'description'];
-    const csv = [headers.join(',')].concat(records.map((f) => headers.map((c) => csvCell(f[c])).join(','))).join('\n');
+    const headers = ['type', 'category', 'amount', 'currency', 'date', 'description'];
+    const csv = [headers.join(',')].concat(records.map((f) => headers.map((c) => csvCell(c === 'currency' ? recordCurrency(f) : f[c])).join(','))).join('\n');
     downloadCSV(csv, 'finance_records_export.csv');
     showToast(t('records.exported', { label }), 'success');
   }
@@ -114,6 +116,7 @@ export default function Finance() {
         <div className="finance-card"><h4>{t('financePage.monthlyExpenses')}</h4><div className="amount expense">{formatMoney(summary.totalExpense)}</div></div>
         <div className="finance-card"><h4>{t('financePage.profitLoss')}</h4><div className={`amount ${summary.pl >= 0 ? 'profit' : 'loss'}`}>{formatMoney(summary.pl)}</div></div>
       </div>
+      {summary.mixed && <p className="text-muted converted-note"><i className="fas fa-arrow-right-arrow-left" /> {t('financePage.convertedNote', { currency: getCurrency() })}</p>}
 
       <div className="tabs">
         <button className={`tab-btn${tab === 'all' ? ' active' : ''}`} onClick={() => setTab('all')}>{t('common.all')}</button>
@@ -135,7 +138,7 @@ export default function Finance() {
                     <tr key={f.id}>
                       <td><span className={`badge ${f.type === 'Income' ? 'badge-green' : 'badge-red'}`}><i className={`fas ${f.type === 'Income' ? 'fa-arrow-up' : 'fa-arrow-down'}`}></i> {t(`enums.financeType.${f.type}`, f.type)}</span></td>
                       <td>{f.category ? t(`enums.financeCategory.${f.category}`, f.category) : '—'}</td>
-                      <td className={`fw-600 ${f.type === 'Income' ? 'text-green' : 'text-red'}`}>{f.type === 'Income' ? '+' : '-'}{formatMoney(f.amount)}</td>
+                      <td className={`fw-600 ${f.type === 'Income' ? 'text-green' : 'text-red'}`}>{f.type === 'Income' ? '+' : '-'}{formatRecordMoney(f)}</td>
                       <td>{fmtDate(f.date)}</td>
                       <td>{desc.substring(0, 40)}{desc.length > 40 ? '...' : ''}</td>
                       <td>
@@ -165,7 +168,7 @@ export default function Finance() {
               <option value="Income">{t('enums.financeType.Income')}</option><option value="Expense">{t('enums.financeType.Expense')}</option>
             </select>
           </div>
-          <div className="form-group"><label>{t('tables.finance_records.fields.amount')} ({currencySymbol()}) *</label><input type="number" className="form-control" placeholder="0.00" step="0.01" min="0" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></div>
+          <div className="form-group"><label>{t('tables.finance_records.fields.amount')} *</label><MoneyInput amount={form.amount} currency={form.currency || getCurrency()} onAmount={(v) => setForm({ ...form, amount: v })} onCurrency={(v) => setForm({ ...form, currency: v })} required /></div>
         </div>
         <div className="form-group">
           <label>{t('tables.finance_records.fields.category')}</label>

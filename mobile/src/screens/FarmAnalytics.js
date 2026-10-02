@@ -4,9 +4,11 @@ import { useTranslation } from 'react-i18next';
 import Icon from '../components/Icon';
 import { useTheme } from '../theme/ThemeProvider';
 import { Card, CardBody, CardHeader, EmptyState, Segmented } from '../ui/kit';
-import { Grid, useBreakpoint } from '../ui/layout';
+import { Grid } from '../ui/layout';
 import { BarChart, DonutChart, LineChart, useChartColors } from '../ui/charts';
 import { computeFarmAnalytics, AGE_BANDS, OUTCOME_GROUPS, PREGNANCY_ORDER, PRIORITY_ORDER } from '../../../shared/analytics';
+import InsightTiles from './dashboard/InsightTiles';
+import { useAccount } from '../account/AccountProvider';
 
 /* Mobile rendering of the web dashboard's "Farm Analytics & Insights"
    section (client/src/components/FarmAnalytics.jsx): same numbers (both
@@ -14,7 +16,6 @@ import { computeFarmAnalytics, AGE_BANDS, OUTCOME_GROUPS, PREGNANCY_ORDER, PRIOR
    same 6-column grid — halves and thirds side by side on wide screens,
    one card per row below 1024px. */
 
-const INSIGHT_ICON = { good: 'circle-check', warn: 'triangle-exclamation', bad: 'circle-exclamation', info: 'circle-info' };
 const barHeight = (n) => Math.max(180, n * 34 + 50);
 
 function ChartCard({ title, icon, empty, aside, children }) {
@@ -45,11 +46,12 @@ export default function FarmAnalytics({ data }) {
   const { t, i18n } = useTranslation();
   const { colors } = useTheme();
   const cc = useChartColors();
-  const { width } = useBreakpoint();
   const [months, setMonths] = useState(12);
   const enumLabel = (group, value) => t(`enums.${group}.${value}`, { defaultValue: value });
 
-  const a = useMemo(() => computeFarmAnalytics(data, { months, lang: i18n.language, enumLabel }), [data, months, i18n.language]); // eslint-disable-line react-hooks/exhaustive-deps
+  // ratesVersion / currency: re-total when exchange rates or the display currency change.
+  const { ratesVersion, account } = useAccount();
+  const a = useMemo(() => computeFarmAnalytics(data, { months, lang: i18n.language, enumLabel }), [data, months, i18n.language, ratesVersion, account?.currency]); // eslint-disable-line react-hooks/exhaustive-deps
   const { labels } = a;
   const outcomeLabels = {
     recovered: `${enumLabel('healthRecordStatus', 'Recovered')} / ${enumLabel('healthRecordStatus', 'Healthy')}`,
@@ -60,7 +62,6 @@ export default function FarmAnalytics({ data }) {
   const outcomeColors = [cc.status.good, cc.status.warning, cc.status.critical, cc.neutral];
   const ageLabels = [...AGE_BANDS.map((b) => t(`analytics.${b.key}`)), ...(a.ageUnknown ? [t('analytics.ageUnknown')] : [])];
   const ageValues = [...a.ageCounts, ...(a.ageUnknown ? [a.ageUnknown] : [])];
-  const tones = { good: '#0ca30c', warn: '#e39b00', bad: '#d03b3b', info: colors.blue };
 
   return (
     <View style={{ marginBottom: 24 }}>
@@ -79,14 +80,7 @@ export default function FarmAnalytics({ data }) {
         <CardHeader title={t('analytics.keyInsights')} icon="lightbulb" iconColor={colors.orange} />
         <CardBody>
           {a.insights.length === 0 ? <Text style={{ color: colors.textLight, fontSize: 13 }}>{t('analytics.noInsights')}</Text> : (
-            <Grid minItemWidth={width <= 480 ? 240 : 280} gap={12}>
-              {a.insights.map((ins) => (
-                <View key={ins.id} style={[styles.insight, { borderColor: colors.border, borderLeftColor: tones[ins.tone] }]}>
-                  <Icon name={INSIGHT_ICON[ins.tone]} size={15} color={tones[ins.tone]} style={{ marginTop: 1 }} />
-                  <Text style={[styles.insightText, { color: colors.text }]}>{t(`analytics.insight.${ins.key}`, ins.vars)}</Text>
-                </View>
-              ))}
-            </Grid>
+            <InsightTiles insights={a.insights} />
           )}
         </CardBody>
       </Card>
@@ -214,6 +208,4 @@ const styles = StyleSheet.create({
   headerSub: { fontSize: 13, marginTop: 2 },
   sectionTitle: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8, marginBottom: 12 },
   sectionTitleText: { fontSize: 13, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
-  insight: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, paddingVertical: 12, paddingHorizontal: 14, borderRadius: 8, borderWidth: 1, borderLeftWidth: 4 },
-  insightText: { flex: 1, fontSize: 13, lineHeight: 19 },
 });

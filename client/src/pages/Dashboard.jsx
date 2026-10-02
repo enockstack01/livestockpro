@@ -8,9 +8,9 @@ import FarmAnalytics from '../components/FarmAnalytics.jsx';
 import HerdProfile from '../components/dashboard/HerdProfile.jsx';
 import { RecentActivity, UpcomingEvents, AlertsCard, QuickActions } from '../components/dashboard/DashboardFeed.jsx';
 import { greeting } from '../../../shared/navigation';
-import { computeDashboardSummary } from '../../../shared/analytics';
+import { computeGlance } from '../../../shared/analytics';
+import { moneyOf } from '../../../shared/currency';
 import { computeAlerts, computeRecentActivity, computeUpcoming } from '../../../shared/dashboardFeed';
-import { fmtMoney } from '../../../shared/chartPalette';
 import { accountDisplayName } from '../../../shared/account';
 import { useAccount } from '../components/AccountGate.jsx';
 import '../dashboard.css';
@@ -59,25 +59,13 @@ export default function Dashboard() {
 
   const feed = useMemo(() => (data ? {
     alerts: computeAlerts(data, t),
-    recent: computeRecentActivity(data, t),
+    activity: computeRecentActivity(data, t, { lang: i18n.language }),
     upcoming: computeUpcoming(data, t, i18n.language)
   } : null), [data, t, i18n.language]);
 
   if (!data) return null;
 
-  const sum = computeDashboardSummary(data);
-  const kpis = [
-    { icon: 'fa-cow', color: 'green', label: t('dashboardPage.totalAnimals'), value: sum.totalAnimals, link: '/animals' },
-    { icon: 'fa-heart-pulse', color: 'green', label: t('dashboardPage.healthy'), value: sum.healthy, link: '/animals' },
-    { icon: 'fa-stethoscope', color: 'orange', label: t('dashboardPage.underTreatment'), value: sum.underTreatment, link: '/health' },
-    { icon: 'fa-triangle-exclamation', color: 'red', label: t('dashboardPage.criticalCases'), value: sum.critical, link: '/health' },
-    { icon: 'fa-paw', color: 'purple', label: t('dashboardPage.pregnant'), value: sum.pregnant, link: '/breeding' },
-    { icon: 'fa-egg', color: 'blue', label: t('dashboardPage.newborns'), value: sum.newborns, link: '/breeding' },
-    { icon: 'fa-list-check', color: sum.overdueTasks > 0 ? 'red' : 'orange', label: t('dashboardPage.pendingTasks'), value: sum.pendingTasks, link: '/tasks' },
-    { icon: 'fa-arrow-trend-up', color: 'green', label: t('dashboardPage.monthlyIncome'), value: fmtMoney(sum.monthIncome), link: '/finance' },
-    { icon: 'fa-arrow-trend-down', color: 'red', label: t('dashboardPage.monthlyExpenses'), value: fmtMoney(sum.monthExpense), link: '/finance' },
-    { icon: 'fa-chart-line', color: sum.profitLoss >= 0 ? 'blue' : 'red', label: t('dashboardPage.profitLoss'), value: fmtMoney(sum.profitLoss), link: '/finance' }
-  ];
+  const glance = computeGlance(data, { lang: i18n.language });
 
   return (
     <div className="dashboard-stack">
@@ -85,7 +73,7 @@ export default function Dashboard() {
         <div><h1>{greeting(t, greetName)}</h1><p>{t('dashboardPage.todaySubtitle')}</p></div>
       </div>
 
-      <HerdProfile animals={data.animals} profile={profile} kpis={kpis} onKpiClick={(link) => navigate(link)} />
+      <HerdProfile animals={data.animals} profile={profile} glance={glance} onOpen={(link) => navigate(link)} />
 
       <div className="charts-grid">
         <div className="card">
@@ -101,7 +89,7 @@ export default function Dashboard() {
       <FarmAnalytics data={data} />
 
       <div className="feed-grid">
-        <RecentActivity items={feed.recent} />
+        <RecentActivity activity={feed.activity} />
         <UpcomingEvents items={feed.upcoming} />
       </div>
       <div className="feed-grid">
@@ -121,8 +109,8 @@ function FinanceChart({ finance }) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     months.push(d.toLocaleString('default', { month: 'short' }));
     const mf = finance.filter((f) => { const fd = new Date(f.date); return fd.getMonth() === d.getMonth() && fd.getFullYear() === d.getFullYear(); });
-    incomeData.push(mf.filter((f) => f.type === 'Income').reduce((s, f) => s + (f.amount || 0), 0));
-    expenseData.push(mf.filter((f) => f.type === 'Expense').reduce((s, f) => s + (f.amount || 0), 0));
+    incomeData.push(mf.filter((f) => f.type === 'Income').reduce((s, f) => s + moneyOf(f), 0));
+    expenseData.push(mf.filter((f) => f.type === 'Expense').reduce((s, f) => s + moneyOf(f), 0));
   }
   const hasData = incomeData.some((v) => v > 0) || expenseData.some((v) => v > 0);
   const canvasRef = useCanvasChart(() => {

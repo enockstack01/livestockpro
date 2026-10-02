@@ -166,7 +166,8 @@
         "cost": "成本",
         "feeding_date": "饲喂日期",
         "animal_group": "动物群组",
-        "notes": "备注"
+        "notes": "备注",
+        "currency": "货币"
       }
     },
     "breeding_records": {
@@ -203,7 +204,8 @@
         "amount": "金额",
         "category": "类别",
         "date": "日期",
-        "description": "描述"
+        "description": "描述",
+        "currency": "货币"
       }
     },
     "tasks": {
@@ -455,7 +457,8 @@
     "greetingMorning": "早上好，{{name}}",
     "greetingAfternoon": "下午好，{{name}}",
     "greetingEvening": "晚上好，{{name}}",
-    "todaySubtitle": "以下是您农场今天的动态。"
+    "todaySubtitle": "以下是您农场今天的动态。",
+    "sixMonths": "6个月"
   },
   "reportsPage": {
     "title": "完整农场报告",
@@ -563,7 +566,8 @@
     "selectCategory": "选择类别",
     "descriptionPlaceholder": "关于此交易的详细信息...",
     "confirmDeleteMessage": "确定要删除此财务记录吗？",
-    "amountMustBeGreaterThanZero": "金额必须大于0。"
+    "amountMustBeGreaterThanZero": "金额必须大于0。",
+    "convertedNote": "合计已按当前汇率换算为 {{currency}}。"
   },
   "tasksPage": {
     "title": "任务",
@@ -831,6 +835,30 @@
       "upcomingBirths": "未来30天预计有 {{count}} 次分娩。",
       "sexRatio": "存栏畜群中每头雄性对应 {{ratio}} 头雌性。",
       "taskCompletion": "已完成 {{pct}}% 的任务；{{overdue}} 项已逾期。"
+    },
+    "insightLabel": {
+      "herdHealth": "健康牲畜",
+      "mortality": "死亡率",
+      "recovery": "康复率",
+      "topCondition": "最常见病症 · 90天",
+      "overdueFollowUps": "逾期复查",
+      "notChecked": "未检查 · 90天",
+      "productionUp": "{{type}} · 30天",
+      "productionDown": "{{type}} · 30天",
+      "feedPerLiter": "每升饲料成本",
+      "profitMargin": "利润率",
+      "topExpense": "最大支出",
+      "vetPerAnimal": "每头兽医成本",
+      "revenuePerAnimal": "每头收入",
+      "upcomingBirths": "分娩 · 未来30天",
+      "sexRatio": "雌雄比",
+      "taskCompletion": "已完成任务"
+    },
+    "part": {
+      "recovered": "已康复",
+      "died": "已死亡",
+      "female": "雌性",
+      "male": "雄性"
     }
   },
   "herdProfile": {
@@ -872,7 +900,22 @@
     "qaProduction": "记录产出",
     "qaFinance": "添加收入/支出",
     "qaTask": "添加任务",
-    "qaReports": "查看报告"
+    "qaReports": "查看报告",
+    "last12Weeks": "最近12周",
+    "today": "今天",
+    "yesterday": "昨天",
+    "daysAgo": "{{count}}天前",
+    "weeksAgo": "{{count}}周前",
+    "inDays": "{{count}}天后",
+    "daysLate": "逾期{{count}}天",
+    "alertKinds": {
+      "taskOverdue": "逾期任务",
+      "checkMissed": "错过检查",
+      "critical": "危急",
+      "treatment": "治疗中",
+      "checkDue": "待检查",
+      "birthSoon": "即将分娩"
+    }
   },
   "account": {
     "types": {

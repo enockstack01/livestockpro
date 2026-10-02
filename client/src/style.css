@@ -507,6 +507,13 @@ textarea.form-control {
   min-height: 80px;
 }
 
+.converted-note { font-size: 12px; margin: -12px 0 20px; }
+
+/* Amount + its currency in one field (components/MoneyInput.jsx). */
+.money-input { display: flex; }
+.money-input input { flex: 1; min-width: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.money-input select { width: 92px; flex-shrink: 0; margin-left: -1.5px; border-top-left-radius: 0; border-bottom-left-radius: 0; background-color: var(--bg); font-weight: 600; }
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1320,37 +1327,6 @@ table.data-table {
   background: var(--primary);
   color: var(--white);
 }
-
-.insights-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
-}
-
-.insight-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  border-left: 4px solid var(--insight-accent);
-  font-size: 13px;
-  line-height: 1.45;
-  color: var(--text);
-}
-
-.insight-card i {
-  color: var(--insight-accent);
-  font-size: 15px;
-  margin-top: 1px;
-}
-
-/* Status accents (always paired with an icon + text, never color alone). */
-.insight-good { --insight-accent: #0ca30c; }
-.insight-warn { --insight-accent: #e39b00; }
-.insight-bad { --insight-accent: #d03b3b; }
-.insight-info { --insight-accent: var(--blue); }
 
 /* ---------- Filter Bar ---------- */
 .filter-bar {

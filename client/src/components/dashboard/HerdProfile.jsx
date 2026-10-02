@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { computeHerdProfile } from '../../../../shared/dashboardFeed';
+import GlanceTiles from './GlanceTiles.jsx';
 
 /* Herd Profile — the first section of the dashboard, laid out like the
    CropManager Farm Profile and identical to the mobile app's
@@ -38,7 +39,7 @@ function HealthRing({ segments, total, pct, label, size = 170 }) {
   );
 }
 
-export default function HerdProfile({ animals, profile, kpis, onKpiClick }) {
+export default function HerdProfile({ animals, profile, glance, onOpen }) {
   const { t } = useTranslation();
   const [species, setSpecies] = useState('');
   const p = useMemo(() => computeHerdProfile(animals, species), [animals, species]);
@@ -100,17 +101,7 @@ export default function HerdProfile({ animals, profile, kpis, onKpiClick }) {
 
         <div>
           <div className="herd-profile-section">{t('herdProfile.atAGlance')}</div>
-          <div className="herd-profile-kpis">
-            {kpis.map((k) => (
-              <button key={k.label} type="button" className="herd-profile-kpi" onClick={() => onKpiClick(k.link)}>
-                <span className={`summary-icon ${k.color}`}><i className={`fas ${k.icon}`} /></span>
-                <span className="herd-profile-kpi-info">
-                  <span className="herd-profile-kpi-label">{k.label}</span>
-                  <span className="herd-profile-kpi-value">{k.value}</span>
-                </span>
-              </button>
-            ))}
-          </div>
+          <GlanceTiles g={glance} onOpen={onOpen} />
         </div>
 
         {shown.length > 0 && (

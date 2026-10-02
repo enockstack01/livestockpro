@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import DateField from './DateField';
 import { FormGroup, Input, Select } from '../ui/kit';
 import { useBreakpoint } from '../ui/layout';
+import { CURRENCIES, currencyName, getCurrency } from '../../../shared/currency';
 
 /* Renders one input per field from a config/tables.js `fields[]` list,
    already localized by the caller (RecordListScreen.js resolves `label` and
@@ -11,7 +12,7 @@ import { useBreakpoint } from '../ui/layout';
    web's .form-row, pairs short fields two per row on wide screens while
    notes/textareas always take the full width. */
 export default function RecordForm({ fields, values, onChange }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { width } = useBreakpoint();
   const twoCol = width > 1024;
 
@@ -28,7 +29,7 @@ export default function RecordForm({ fields, values, onChange }) {
         <View key={group.map((f) => f.key).join('|')} style={{ flexDirection: 'row', gap: 16 }}>
           {group.map((field) => (
             <FormGroup key={field.key} label={field.label} required={field.required} style={{ flex: 1 }}>
-              <FieldInput field={field} value={values[field.key]} onChange={(v) => onChange(field.key, v)} t={t} />
+              <FieldInput field={field} value={values[field.key]} onChange={(v) => onChange(field.key, v)} t={t} lang={i18n.language} />
             </FormGroup>
           ))}
         </View>
@@ -37,7 +38,13 @@ export default function RecordForm({ fields, values, onChange }) {
   );
 }
 
-function FieldInput({ field, value, onChange, t }) {
+function FieldInput({ field, value, onChange, t, lang }) {
+  /* Each amount is saved in the currency it was paid or received in; the
+     Settings currency is pre-selected. */
+  if (field.type === 'currency') {
+    const options = CURRENCIES.map((c) => ({ value: c.code, label: `${c.code} — ${currencyName(c.code, lang)}` }));
+    return <Select value={value || getCurrency()} options={options} onChange={onChange} placeholder={field.label} />;
+  }
   if (field.type === 'select') {
     const options = field.required ? field.options : [{ value: '', label: '—' }, ...field.options];
     return <Select value={value ?? ''} options={options} onChange={onChange} placeholder={field.label} />;
@@ -56,6 +63,6 @@ function FieldInput({ field, value, onChange, t }) {
    blank — used when opening the "Add" form. */
 export function emptyValues(fields) {
   const out = {};
-  fields.forEach((f) => { out[f.key] = f.default || ''; });
+  fields.forEach((f) => { out[f.key] = f.type === 'currency' ? getCurrency() : f.default || ''; });
   return out;
 }

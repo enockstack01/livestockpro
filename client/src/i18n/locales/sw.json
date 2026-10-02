@@ -166,7 +166,8 @@
         "cost": "Gharama",
         "feeding_date": "Tarehe ya Ulishaji",
         "animal_group": "Kikundi cha Wanyama",
-        "notes": "Maelezo"
+        "notes": "Maelezo",
+        "currency": "Sarafu"
       }
     },
     "breeding_records": {
@@ -203,7 +204,8 @@
         "amount": "Kiasi",
         "category": "Jamii",
         "date": "Tarehe",
-        "description": "Maelezo"
+        "description": "Maelezo",
+        "currency": "Sarafu"
       }
     },
     "tasks": {
@@ -455,7 +457,8 @@
     "greetingMorning": "Habari za asubuhi, {{name}}",
     "greetingAfternoon": "Habari za mchana, {{name}}",
     "greetingEvening": "Habari za jioni, {{name}}",
-    "todaySubtitle": "Haya ndiyo yanayoendelea shambani kwako leo."
+    "todaySubtitle": "Haya ndiyo yanayoendelea shambani kwako leo.",
+    "sixMonths": "Miezi 6"
   },
   "reportsPage": {
     "title": "Ripoti Kamili ya Shamba",
@@ -563,7 +566,8 @@
     "selectCategory": "Chagua kategoria",
     "descriptionPlaceholder": "Maelezo kuhusu muamala huu...",
     "confirmDeleteMessage": "Una uhakika unataka kufuta rekodi hii ya fedha?",
-    "amountMustBeGreaterThanZero": "Kiasi lazima kiwe zaidi ya 0."
+    "amountMustBeGreaterThanZero": "Kiasi lazima kiwe zaidi ya 0.",
+    "convertedNote": "Jumla zimebadilishwa kuwa {{currency}} kwa viwango vya sasa vya ubadilishaji."
   },
   "tasksPage": {
     "title": "Kazi",
@@ -831,6 +835,30 @@
       "upcomingBirths": "Uzazi {{count}} unatarajiwa katika siku 30 zijazo.",
       "sexRatio": "Mifugo hai ina majike {{ratio}} kwa kila dume.",
       "taskCompletion": "{{pct}}% ya kazi zimekamilika; {{overdue}} zimechelewa."
+    },
+    "insightLabel": {
+      "herdHealth": "Mifugo wenye afya",
+      "mortality": "Vifo",
+      "recovery": "Kiwango cha kupona",
+      "topCondition": "Ugonjwa mkuu · siku 90",
+      "overdueFollowUps": "Ufuatiliaji uliochelewa",
+      "notChecked": "Hawajakaguliwa · siku 90",
+      "productionUp": "{{type}} · siku 30",
+      "productionDown": "{{type}} · siku 30",
+      "feedPerLiter": "Gharama ya chakula kwa lita",
+      "profitMargin": "Kiwango cha faida",
+      "topExpense": "Gharama kubwa zaidi",
+      "vetPerAnimal": "Gharama ya daktari kwa mnyama",
+      "revenuePerAnimal": "Mapato kwa mnyama",
+      "upcomingBirths": "Kuzaliwa · siku 30",
+      "sexRatio": "Majike kwa kila dume",
+      "taskCompletion": "Kazi zilizokamilika"
+    },
+    "part": {
+      "recovered": "Wamepona",
+      "died": "Wamekufa",
+      "female": "Jike",
+      "male": "Dume"
     }
   },
   "herdProfile": {
@@ -872,7 +900,22 @@
     "qaProduction": "Rekodi Uzalishaji",
     "qaFinance": "Ongeza Mapato / Matumizi",
     "qaTask": "Ongeza Kazi",
-    "qaReports": "Tazama Ripoti"
+    "qaReports": "Tazama Ripoti",
+    "last12Weeks": "Wiki 12 zilizopita",
+    "today": "Leo",
+    "yesterday": "Jana",
+    "daysAgo": "siku {{count}} zilizopita",
+    "weeksAgo": "wiki {{count}} zilizopita",
+    "inDays": "baada ya siku {{count}}",
+    "daysLate": "siku {{count}} kuchelewa",
+    "alertKinds": {
+      "taskOverdue": "Kazi zilizochelewa",
+      "checkMissed": "Ukaguzi uliokosekana",
+      "critical": "Hali mbaya",
+      "treatment": "Wanatibiwa",
+      "checkDue": "Ukaguzi unakaribia",
+      "birthSoon": "Kuzaa karibuni"
+    }
   },
   "account": {
     "types": {

@@ -4,7 +4,7 @@ import { useClerk, useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
-import { setCurrency } from '../../../shared/currency';
+import { setCurrency, setRates } from '../../../shared/currency';
 import { ACCOUNT_TYPES, ACCOUNT_TYPE_ICONS } from '../../../shared/account';
 
 const AccountContext = createContext(null);
@@ -33,7 +33,9 @@ export default function AccountGate({ children }) {
 
   const refresh = useCallback(async () => {
     setChecking(true);
-    const { data, error } = await api.myAccount();
+    // Exchange rates for converting per-record currencies in totals; best effort.
+    const [{ data, error }, ratesRes] = await Promise.all([api.myAccount(), api.rates()]);
+    if (ratesRes.data) setRates(ratesRes.data.rates);
     setChecking(false);
     if (error) { setLoadError(true); return null; }
     setLoadError(false);

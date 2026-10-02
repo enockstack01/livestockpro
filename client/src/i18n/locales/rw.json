@@ -166,7 +166,8 @@
         "cost": "Igiciro",
         "feeding_date": "Itariki yo Kugaburira",
         "animal_group": "Itsinda ry'Amatungo",
-        "notes": "Ibisobanuro"
+        "notes": "Ibisobanuro",
+        "currency": "Ifaranga"
       }
     },
     "breeding_records": {
@@ -203,7 +204,8 @@
         "amount": "Umubare w'Amafaranga",
         "category": "Icyiciro",
         "date": "Itariki",
-        "description": "Ibisobanuro"
+        "description": "Ibisobanuro",
+        "currency": "Ifaranga"
       }
     },
     "tasks": {
@@ -455,7 +457,8 @@
     "greetingMorning": "Mwaramutse, {{name}}",
     "greetingAfternoon": "Mwiriwe, {{name}}",
     "greetingEvening": "Muramuke, {{name}}",
-    "todaySubtitle": "Dore ibiri kuba mu bworozi bwawe uyu munsi."
+    "todaySubtitle": "Dore ibiri kuba mu bworozi bwawe uyu munsi.",
+    "sixMonths": "Amezi 6"
   },
   "reportsPage": {
     "title": "Raporo Yuzuye y’Ubworozi",
@@ -563,7 +566,8 @@
     "selectCategory": "Hitamo icyiciro",
     "descriptionPlaceholder": "Ibisobanuro ku miyoborere y’aya mafaranga...",
     "confirmDeleteMessage": "Uremeza ko ushaka gusiba iyi nyandiko y’imari?",
-    "amountMustBeGreaterThanZero": "Umubare ugomba kuba uruta 0."
+    "amountMustBeGreaterThanZero": "Umubare ugomba kuba uruta 0.",
+    "convertedNote": "Ibiteranyo byahinduwe muri {{currency}} hakurikijwe igipimo cy’ivunjisha cy’ubu."
   },
   "tasksPage": {
     "title": "Imirimo",
@@ -831,6 +835,30 @@
       "upcomingBirths": "Imbyaro {{count}} zitegerejwe mu minsi 30 iri imbere.",
       "sexRatio": "Amatungo ariho afite ingore {{ratio}} kuri buri pfizi.",
       "taskCompletion": "{{pct}}% by’imirimo byarangiye; {{overdue}} byarengeje igihe."
+    },
+    "insightLabel": {
+      "herdHealth": "Amatungo mazima",
+      "mortality": "Impfu",
+      "recovery": "Igipimo cyo gukira",
+      "topCondition": "Indwara ya mbere · iminsi 90",
+      "overdueFollowUps": "Ikurikirana ryakererewe",
+      "notChecked": "Atasuzumwe · iminsi 90",
+      "productionUp": "{{type}} · iminsi 30",
+      "productionDown": "{{type}} · iminsi 30",
+      "feedPerLiter": "Igiciro cy’ibiryo kuri litiro",
+      "profitMargin": "Inyungu",
+      "topExpense": "Ikiguzi kinini",
+      "vetPerAnimal": "Ikiguzi cy’ubuvuzi ku itungo",
+      "revenuePerAnimal": "Amafaranga yinjiye ku itungo",
+      "upcomingBirths": "Kubyara · iminsi 30",
+      "sexRatio": "Ingore kuri buri isekurume",
+      "taskCompletion": "Imirimo yarangiye"
+    },
+    "part": {
+      "recovered": "Yakize",
+      "died": "Yapfuye",
+      "female": "Ingore",
+      "male": "Isekurume"
     }
   },
   "herdProfile": {
@@ -872,7 +900,22 @@
     "qaProduction": "Andika Umusaruro",
     "qaFinance": "Ongeramo Inyungu / Ayasohotse",
     "qaTask": "Ongeramo Umurimo",
-    "qaReports": "Reba Raporo"
+    "qaReports": "Reba Raporo",
+    "last12Weeks": "Ibyumweru 12 bishize",
+    "today": "Uyu munsi",
+    "yesterday": "Ejo hashize",
+    "daysAgo": "iminsi {{count}} ishize",
+    "weeksAgo": "ibyumweru {{count}} bishize",
+    "inDays": "mu minsi {{count}}",
+    "daysLate": "yakererewe iminsi {{count}}",
+    "alertKinds": {
+      "taskOverdue": "Imirimo yakererewe",
+      "checkMissed": "Isuzuma ryasibye",
+      "critical": "Bikomeye",
+      "treatment": "Biri kuvurwa",
+      "checkDue": "Isuzuma riri hafi",
+      "birthSoon": "Kubyara biri hafi"
+    }
   },
   "account": {
     "types": {

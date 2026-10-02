@@ -1,6 +1,6 @@
 import { isOverdueTask, todayIso } from './businessRules';
 import { fmtMoney } from './chartPalette';
-import { formatMoney } from './currency';
+import { formatMoney, moneyOf } from './currency';
 
 /* Farm Analytics & Insights — the numbers behind the dashboard's analytics
    section, shared by the web app (client/src/components/FarmAnalytics.jsx)
@@ -114,14 +114,14 @@ export function computeFarmAnalytics(data, { months = 12, lang = 'en', enumLabel
   }).filter((p) => p.total > 0);
 
   const feedingInRange = feeding.filter((f) => inRange(f.feeding_date));
-  const feedCost = buckets.map((b) => feedingInRange.filter((f) => ym(f.feeding_date) === b.key).reduce((s, f) => s + (Number(f.cost) || 0), 0));
-  const feedByType = sortedEntries(tally(feedingInRange, (f) => (f.feed_type || '').trim(), (f) => f.cost), 8);
+  const feedCost = buckets.map((b) => feedingInRange.filter((f) => ym(f.feeding_date) === b.key).reduce((s, f) => s + moneyOf(f, 'cost'), 0));
+  const feedByType = sortedEntries(tally(feedingInRange, (f) => (f.feed_type || '').trim(), (f) => moneyOf(f, 'cost')), 8);
 
   /* ---------- Finance ---------- */
   const financeInRange = finance.filter((f) => inRange(f.date));
-  const monthNet = buckets.map((b) => financeInRange.filter((f) => ym(f.date) === b.key).reduce((s, f) => s + (f.type === 'Income' ? 1 : -1) * (Number(f.amount) || 0), 0));
-  const expenseByCat = sortedEntries(tally(financeInRange.filter((f) => f.type === 'Expense'), (f) => f.category || 'Other Expense', (f) => f.amount));
-  const incomeBySrc = sortedEntries(tally(financeInRange.filter((f) => f.type === 'Income'), (f) => f.category || 'Other Income', (f) => f.amount));
+  const monthNet = buckets.map((b) => financeInRange.filter((f) => ym(f.date) === b.key).reduce((s, f) => s + (f.type === 'Income' ? 1 : -1) * moneyOf(f), 0));
+  const expenseByCat = sortedEntries(tally(financeInRange.filter((f) => f.type === 'Expense'), (f) => f.category || 'Other Expense', (f) => moneyOf(f)));
+  const incomeBySrc = sortedEntries(tally(financeInRange.filter((f) => f.type === 'Income'), (f) => f.category || 'Other Income', (f) => moneyOf(f)));
 
   /* ---------- Breeding ---------- */
   const pregnancy = PREGNANCY_ORDER.map((s) => breeding.filter((b) => b.pregnancy_status === s).length);
@@ -149,42 +149,62 @@ export function computeFarmAnalytics(data, { months = 12, lang = 'en', enumLabel
   };
 }
 
-/* Plain-language findings, as { id, tone, key, vars } — render with
-   t(`analytics.insight.${key}`, vars). Each only appears when the farm has
-   the data behind it; tone (good/warn/bad/info) drives icon + accent. */
+/* Findings, as { id, tone, key, vars, viz }. The dashboard draws each one
+   from viz — a figure, a short label (analytics.insightLabel.<key>) and a
+   small chart — and keeps the full sentence, t(`analytics.insight.${key}`,
+   vars), for hover text and screen readers. viz.kind:
+     ring   — a gauge of viz.pct (0–100)
+     meter  — a bar filled viz.value / viz.max
+     split  — a two-part bar, viz.parts = [{ key, value }]
+     trend  — an up/down arrow (viz.dir)
+     stat   — the figure alone
+   viz.figure is the headline text; viz.sub an optional short qualifier.
+   Each finding only appears when the farm has the data behind it; tone
+   (good/warn/bad/info) drives the icon and color. */
 function computeInsights({ enumLabel, animals, living, health, breeding, production, feedingInRange, financeInRange, tasks, conditionNames, rangeStart }) {
   const out = [];
   const today = todayIso();
-  const add = (id, tone, key, vars) => out.push({ id, tone, key, vars });
+  const add = (id, tone, key, vars, viz) => out.push({ id, tone, key, vars, viz });
 
   if (living.length) {
     const healthy = living.filter((a) => a.health_status === 'Healthy').length;
     const p = pct(healthy, living.length);
-    add('herdHealth', p >= 80 ? 'good' : p >= 60 ? 'warn' : 'bad', 'herdHealth', { pct: p, total: living.length });
+    add('herdHealth', p >= 80 ? 'good' : p >= 60 ? 'warn' : 'bad', 'herdHealth', { pct: p, total: living.length },
+      { kind: 'ring', pct: p, figure: `${p}%`, sub: `${healthy} / ${living.length}` });
   }
 
   const deceased = animals.length - living.length;
   if (deceased > 0) {
     const p = pct(deceased, animals.length);
-    add('mortality', p > 5 ? 'bad' : 'warn', 'mortality', { count: deceased, pct: p });
+    add('mortality', p > 5 ? 'bad' : 'warn', 'mortality', { count: deceased, pct: p },
+      { kind: 'ring', pct: p, figure: `${p}%`, sub: `${deceased} / ${animals.length}` });
   }
 
   const recovered = health.filter((h) => h.status === 'Recovered').length;
   const died = health.filter((h) => h.status === 'Deceased').length;
   if (recovered + died > 0) {
     const p = pct(recovered, recovered + died);
-    add('recovery', p >= 80 ? 'good' : p >= 50 ? 'warn' : 'bad', 'recovery', { pct: p, recovered, died });
+    add('recovery', p >= 80 ? 'good' : p >= 50 ? 'warn' : 'bad', 'recovery', { pct: p, recovered, died },
+      { kind: 'split', parts: [{ key: 'recovered', value: recovered }, { key: 'died', value: died }], figure: `${p}%` });
   }
 
   const since90 = isoDaysFromNow(-90);
-  const recent = sortedEntries(tally(health.filter((h) => (h.check_date || '') >= since90), (h) => (h.disease || '').trim().toLowerCase() || null), 1)[0];
-  if (recent && recent[1] >= 2) add('topCondition', 'warn', 'topCondition', { disease: conditionNames.get(recent[0]) || recent[0], count: recent[1] });
+  const health90 = health.filter((h) => (h.check_date || '') >= since90);
+  const recent = sortedEntries(tally(health90, (h) => (h.disease || '').trim().toLowerCase() || null), 1)[0];
+  if (recent && recent[1] >= 2) {
+    const disease = conditionNames.get(recent[0]) || recent[0];
+    add('topCondition', 'warn', 'topCondition', { disease, count: recent[1] },
+      { kind: 'meter', value: recent[1], max: health90.length, figure: String(recent[1]), sub: disease });
+  }
 
-  const overdueFollowUps = health.filter((h) => h.next_check_date && h.next_check_date < today && (h.status === 'Under Treatment' || h.status === 'Critical')).length;
-  if (overdueFollowUps > 0) add('overdueFollowUps', 'bad', 'overdueFollowUps', { count: overdueFollowUps });
+  const followUps = health.filter((h) => h.next_check_date && (h.status === 'Under Treatment' || h.status === 'Critical'));
+  const overdueFollowUps = followUps.filter((h) => h.next_check_date < today).length;
+  if (overdueFollowUps > 0) add('overdueFollowUps', 'bad', 'overdueFollowUps', { count: overdueFollowUps },
+    { kind: 'meter', value: overdueFollowUps, max: followUps.length, figure: String(overdueFollowUps), sub: `/ ${followUps.length}` });
 
   const notChecked = living.filter((a) => !a.last_check_date || a.last_check_date < since90).length;
-  if (living.length && notChecked > 0) add('notChecked', 'warn', 'notChecked', { count: notChecked });
+  if (living.length && notChecked > 0) add('notChecked', 'warn', 'notChecked', { count: notChecked },
+    { kind: 'meter', value: notChecked, max: living.length, figure: String(notChecked), sub: `/ ${living.length}` });
 
   /* Rolling 30-day windows, so a half-finished calendar month never reads as
      a drop; needs a few records in both windows to mean anything. */
@@ -201,53 +221,114 @@ function computeInsights({ enumLabel, animals, living, health, breeding, product
     const prev = total(prevRows);
     if (curRows.length >= 3 && prevRows.length >= 3 && prev > 0 && cur !== prev) {
       const change = Math.round(((cur - prev) / prev) * 100);
-      add(`prod-${type}`, change >= 0 ? 'good' : 'warn', change >= 0 ? 'productionUp' : 'productionDown', { type: enumLabel('productionType', type), pct: Math.abs(change) });
+      add(`prod-${type}`, change >= 0 ? 'good' : 'warn', change >= 0 ? 'productionUp' : 'productionDown', { type: enumLabel('productionType', type), pct: Math.abs(change) },
+        { kind: 'trend', dir: change >= 0 ? 'up' : 'down', figure: `${change >= 0 ? '+' : '−'}${Math.abs(change)}%`, sub: `${Math.round(cur).toLocaleString()} ${unit || ''}`.trim() });
     }
   });
 
-  const feedSpend = feedingInRange.reduce((s, f) => s + (Number(f.cost) || 0), 0);
+  const feedSpend = feedingInRange.reduce((s, f) => s + moneyOf(f, 'cost'), 0);
   const litres = production
     .filter((p) => p.production_type === 'Milk' && p.unit === 'liters' && ym(p.production_date) >= rangeStart)
     .reduce((s, p) => s + (Number(p.quantity) || 0), 0);
-  if (feedSpend > 0 && litres > 0) add('feedPerLiter', 'info', 'feedPerLiter', { value: formatMoney(feedSpend / litres, { decimals: 2 }) });
+  if (feedSpend > 0 && litres > 0) {
+    const value = formatMoney(feedSpend / litres, { decimals: 2 });
+    add('feedPerLiter', 'info', 'feedPerLiter', { value }, { kind: 'stat', icon: 'bottle-droplet', figure: value });
+  }
 
-  const income = financeInRange.filter((f) => f.type === 'Income').reduce((s, f) => s + (Number(f.amount) || 0), 0);
-  const expense = financeInRange.filter((f) => f.type === 'Expense').reduce((s, f) => s + (Number(f.amount) || 0), 0);
+  const income = financeInRange.filter((f) => f.type === 'Income').reduce((s, f) => s + moneyOf(f), 0);
+  const expense = financeInRange.filter((f) => f.type === 'Expense').reduce((s, f) => s + moneyOf(f), 0);
   if (income > 0) {
     const margin = Math.round(((income - expense) / income) * 100);
-    add('profitMargin', margin >= 0 ? 'good' : 'bad', 'profitMargin', { pct: margin, net: fmtMoney(income - expense) });
+    add('profitMargin', margin >= 0 ? 'good' : 'bad', 'profitMargin', { pct: margin, net: fmtMoney(income - expense) },
+      { kind: 'ring', pct: Math.max(0, Math.min(100, margin)), figure: `${margin}%`, sub: fmtMoney(income - expense) });
   }
-  const topExpense = sortedEntries(tally(financeInRange.filter((f) => f.type === 'Expense'), (f) => f.category || 'Other Expense', (f) => f.amount), 1)[0];
-  if (topExpense && expense > 0) add('topExpense', 'info', 'topExpense', { category: enumLabel('financeCategory', topExpense[0]), pct: pct(topExpense[1], expense) });
+  const topExpense = sortedEntries(tally(financeInRange.filter((f) => f.type === 'Expense'), (f) => f.category || 'Other Expense', (f) => moneyOf(f)), 1)[0];
+  if (topExpense && expense > 0) {
+    const share = pct(topExpense[1], expense);
+    const category = enumLabel('financeCategory', topExpense[0]);
+    add('topExpense', 'info', 'topExpense', { category, pct: share }, { kind: 'meter', value: share, max: 100, figure: `${share}%`, sub: category });
+  }
 
   if (living.length) {
-    const vet = financeInRange.filter((f) => f.type === 'Expense' && VET_CATEGORIES.has(f.category)).reduce((s, f) => s + (Number(f.amount) || 0), 0);
-    if (vet > 0) add('vetPerAnimal', 'info', 'vetPerAnimal', { value: fmtMoney(vet / living.length) });
-    if (income > 0) add('revenuePerAnimal', 'info', 'revenuePerAnimal', { value: fmtMoney(income / living.length) });
+    const vet = financeInRange.filter((f) => f.type === 'Expense' && VET_CATEGORIES.has(f.category)).reduce((s, f) => s + moneyOf(f), 0);
+    if (vet > 0) {
+      const value = fmtMoney(vet / living.length);
+      add('vetPerAnimal', 'info', 'vetPerAnimal', { value }, { kind: 'stat', icon: 'syringe', figure: value });
+    }
+    if (income > 0) {
+      const value = fmtMoney(income / living.length);
+      add('revenuePerAnimal', 'info', 'revenuePerAnimal', { value }, { kind: 'stat', icon: 'hand-holding-dollar', figure: value });
+    }
   }
 
   const in30 = isoDaysFromNow(30);
   const upcoming = breeding.filter((b) => !b.birth_date && b.pregnancy_status === 'Pregnant' && b.expected_birth_date && b.expected_birth_date >= today && b.expected_birth_date <= in30).length;
-  if (upcoming > 0) add('upcomingBirths', 'info', 'upcomingBirths', { count: upcoming });
+  if (upcoming > 0) add('upcomingBirths', 'info', 'upcomingBirths', { count: upcoming }, { kind: 'stat', icon: 'baby', figure: String(upcoming) });
 
   const females = living.filter((a) => a.sex === 'Female').length;
   const males = living.filter((a) => a.sex === 'Male').length;
-  if (females > 0 && males > 0) add('sexRatio', 'info', 'sexRatio', { ratio: (females / males).toFixed(1) });
+  if (females > 0 && males > 0) {
+    const ratio = (females / males).toFixed(1);
+    add('sexRatio', 'info', 'sexRatio', { ratio }, { kind: 'split', parts: [{ key: 'female', value: females }, { key: 'male', value: males }], figure: `${ratio} : 1` });
+  }
 
   if (tasks.length) {
     const done = tasks.filter((tk) => tk.status === 'Completed').length;
     const overdue = tasks.filter(isOverdueTask).length;
-    add('taskCompletion', overdue > 0 ? 'warn' : 'good', 'taskCompletion', { pct: pct(done, tasks.length), overdue });
+    const p = pct(done, tasks.length);
+    add('taskCompletion', overdue > 0 ? 'warn' : 'good', 'taskCompletion', { pct: p, overdue },
+      { kind: 'ring', pct: p, figure: `${p}%`, sub: `${done} / ${tasks.length}`, overdue });
   }
 
   return out;
 }
 
+/* "Farm at a glance": each headline number with the last `months` months
+   behind it, so the tile can show a trend instead of a lone figure.
+   Series are oldest → newest; the last point is the current month. */
+export function computeGlance({ animals = [], breeding = [], finance = [], tasks = [] }, { months = 6, lang = 'en' } = {}) {
+  const buckets = monthBuckets(months, lang);
+  const living = animals.filter((a) => a.health_status !== 'Deceased');
+  const monthSum = (type) => buckets.map((b) => finance.filter((f) => f.type === type && ym(f.date) === b.key).reduce((s, f) => s + moneyOf(f), 0));
+  const income = monthSum('Income');
+  const expense = monthSum('Expense');
+  const net = income.map((v, i) => v - expense[i]);
+  const last = months - 1;
+  const done = tasks.filter((tk) => tk.status === 'Completed').length;
+  return {
+    labels: buckets.map((b) => b.label),
+    monthNames: buckets.map((b) => new Date(b.key + '-01T00:00:00').toLocaleString(lang, { month: 'short' })),
+    animals: {
+      total: animals.length,
+      series: buckets.map((b) => animals.filter((a) => ym(a.created_at) && ym(a.created_at) <= b.key).length),
+      addedThisMonth: animals.filter((a) => ym(a.created_at) === buckets[last].key).length
+    },
+    pregnant: {
+      count: breeding.filter((b) => b.pregnancy_status === 'Pregnant').length,
+      females: living.filter((a) => a.sex === 'Female').length
+    },
+    newborns: {
+      total: breeding.filter((b) => b.birth_date).reduce((s, b) => s + (Number(b.newborn_count) || 0), 0),
+      series: buckets.map((bk) => breeding.filter((b) => b.birth_date && ym(b.birth_date) === bk.key).reduce((s, b) => s + (Number(b.newborn_count) || 0), 0))
+    },
+    tasks: {
+      pending: tasks.filter((tk) => tk.status === 'Pending').length,
+      open: tasks.filter((tk) => tk.status !== 'Completed').length,
+      done,
+      total: tasks.length,
+      overdue: tasks.filter(isOverdueTask).length
+    },
+    income: { month: income[last], series: income },
+    expense: { month: expense[last], series: expense },
+    net: { month: net[last], series: net, total: net.reduce((s, v) => s + v, 0) }
+  };
+}
+
 /* Headline numbers for the dashboard's summary cards — same on both clients. */
 export function computeDashboardSummary({ animals = [], breeding = [], finance = [], tasks = [] }) {
   const isThisMonth = (d) => ym(d) === ym(todayIso());
-  const monthIncome = finance.filter((x) => x.type === 'Income' && isThisMonth(x.date)).reduce((s, x) => s + (Number(x.amount) || 0), 0);
-  const monthExpense = finance.filter((x) => x.type === 'Expense' && isThisMonth(x.date)).reduce((s, x) => s + (Number(x.amount) || 0), 0);
+  const monthIncome = finance.filter((x) => x.type === 'Income' && isThisMonth(x.date)).reduce((s, x) => s + moneyOf(x), 0);
+  const monthExpense = finance.filter((x) => x.type === 'Expense' && isThisMonth(x.date)).reduce((s, x) => s + moneyOf(x), 0);
   return {
     totalAnimals: animals.length,
     healthy: animals.filter((x) => x.health_status === 'Healthy').length,

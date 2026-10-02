@@ -68,10 +68,11 @@ export const TABLES = {
     icon: 'wheat-awn',
     fields: [
       { key: 'feed_type', type: 'text', required: true },
+      { key: 'feeding_date', type: 'date' },
       { key: 'quantity', type: 'number' },
       { key: 'unit', type: 'select', options: FEEDING_UNITS, i18nEnum: 'feedingUnit', default: 'kg' },
       { key: 'cost', type: 'number' },
-      { key: 'feeding_date', type: 'date' },
+      { key: 'currency', type: 'currency' },
       { key: 'animal_group', type: 'text' },
       { key: 'notes', type: 'textarea' },
     ],
@@ -120,8 +121,9 @@ export const TABLES = {
     icon: 'coins',
     fields: [
       { key: 'type', type: 'select', options: FINANCE_TYPES, i18nEnum: 'financeType', required: true, default: 'Income' },
-      { key: 'amount', type: 'number', required: true },
       { key: 'category', type: 'select', options: FINANCE_CATEGORIES, i18nEnum: 'financeCategory' },
+      { key: 'amount', type: 'number', required: true },
+      { key: 'currency', type: 'currency' },
       { key: 'date', type: 'date' },
       { key: 'description', type: 'textarea' },
     ],

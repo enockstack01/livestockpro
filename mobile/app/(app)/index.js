@@ -11,9 +11,9 @@ import { useTheme } from '../../src/theme/ThemeProvider';
 import FarmAnalytics from '../../src/screens/FarmAnalytics';
 import HerdProfileCard from '../../src/screens/dashboard/HerdProfileCard';
 import { RecentActivity, UpcomingEvents, AlertsCard, QuickActions } from '../../src/screens/dashboard/DashboardFeed';
-import { computeDashboardSummary, monthBuckets, ym } from '../../../shared/analytics';
+import { computeGlance, monthBuckets, ym } from '../../../shared/analytics';
+import { moneyOf } from '../../../shared/currency';
 import { computeAlerts, computeRecentActivity, computeUpcoming } from '../../../shared/dashboardFeed';
-import { fmtMoney } from '../../../shared/chartPalette';
 import { greeting } from '../../../shared/navigation';
 import { accountDisplayName } from '../../../shared/account';
 import { useAccount } from '../../src/account/AccountProvider';
@@ -55,29 +55,17 @@ export default function DashboardScreen() {
 
   const feed = useMemo(() => (data ? {
     alerts: computeAlerts(data, t),
-    recent: computeRecentActivity(data, t),
+    activity: computeRecentActivity(data, t, { lang: i18n.language }),
     upcoming: computeUpcoming(data, t, i18n.language),
   } : null), [data, t, i18n.language]);
 
   if (!data) return <Spinner />;
 
-  const sum = computeDashboardSummary(data);
-  const kpis = [
-    { icon: 'cow', color: 'green', label: t('dashboardPage.totalAnimals'), value: sum.totalAnimals, link: '/animals' },
-    { icon: 'heart-pulse', color: 'green', label: t('dashboardPage.healthy'), value: sum.healthy, link: '/animals' },
-    { icon: 'stethoscope', color: 'orange', label: t('dashboardPage.underTreatment'), value: sum.underTreatment, link: '/health' },
-    { icon: 'triangle-exclamation', color: 'red', label: t('dashboardPage.criticalCases'), value: sum.critical, link: '/health' },
-    { icon: 'paw', color: 'purple', label: t('dashboardPage.pregnant'), value: sum.pregnant, link: '/breeding' },
-    { icon: 'egg', color: 'blue', label: t('dashboardPage.newborns'), value: sum.newborns, link: '/breeding' },
-    { icon: 'list-check', color: sum.overdueTasks > 0 ? 'red' : 'orange', label: t('dashboardPage.pendingTasks'), value: sum.pendingTasks, link: '/tasks' },
-    { icon: 'arrow-trend-up', color: 'green', label: t('dashboardPage.monthlyIncome'), value: fmtMoney(sum.monthIncome), link: '/finance' },
-    { icon: 'arrow-trend-down', color: 'red', label: t('dashboardPage.monthlyExpenses'), value: fmtMoney(sum.monthExpense), link: '/finance' },
-    { icon: 'chart-line', color: sum.profitLoss >= 0 ? 'blue' : 'red', label: t('dashboardPage.profitLoss'), value: fmtMoney(sum.profitLoss), link: '/finance' },
-  ];
+  const glance = computeGlance(data, { lang: i18n.language });
 
   // Income vs expenses, last 6 months.
   const months = monthBuckets(6, i18n.language);
-  const monthTotal = (type, key) => data.finance.filter((f) => f.type === type && ym(f.date) === key).reduce((s, f) => s + (Number(f.amount) || 0), 0);
+  const monthTotal = (type, key) => data.finance.filter((f) => f.type === type && ym(f.date) === key).reduce((s, f) => s + moneyOf(f), 0);
   const incomeSeries = months.map((m) => monthTotal('Income', m.key));
   const expenseSeries = months.map((m) => monthTotal('Expense', m.key));
   const taskCounts = ['Pending', 'In Progress', 'Completed'].map((st) => data.tasks.filter((tk) => tk.status === st).length);
@@ -87,7 +75,7 @@ export default function DashboardScreen() {
     <Page refreshing={refreshing || syncing} onRefresh={onRefresh}>
       <PageHeader title={greeting(t, name)} subtitle={t('dashboardPage.todaySubtitle')} />
 
-      <HerdProfileCard animals={data.animals} profile={profile} kpis={kpis} onKpiPress={(link) => router.replace(link)} />
+      <HerdProfileCard animals={data.animals} profile={profile} glance={glance} onOpen={(link) => router.replace(link)} />
 
       <Grid minItemWidth={340} gap={20} fillLast style={{ marginBottom: 24 }}>
         <Card>
@@ -111,7 +99,7 @@ export default function DashboardScreen() {
       <FarmAnalytics data={data} />
 
       <Grid minItemWidth={340} gap={20} style={{ marginBottom: 20 }}>
-        <RecentActivity items={feed.recent} />
+        <RecentActivity activity={feed.activity} />
         <UpcomingEvents items={feed.upcoming} />
       </Grid>
       <Grid minItemWidth={340} gap={20}>

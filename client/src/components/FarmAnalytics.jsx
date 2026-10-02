@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useCanvasChart } from '../lib/useChart.js';
 import { useChartTheme, cartesianOptions, doughnutOptions, barDataset, lineDataset } from '../lib/chartTheme.js';
 import { computeFarmAnalytics, AGE_BANDS, OUTCOME_GROUPS, PREGNANCY_ORDER, PRIORITY_ORDER } from '../../../shared/analytics';
+import InsightTiles from './dashboard/InsightTiles.jsx';
 
 /* The dashboard's "Farm Analytics & Insights" section: every collection a
    farmer records (herd, health, feeding, breeding, production, finance,
@@ -77,16 +78,7 @@ export default function FarmAnalytics({ data }) {
       <div className="card mb-24">
         <div className="card-header"><h3><i className="fas fa-lightbulb" style={{ color: 'var(--orange)', marginRight: 6 }}></i>{t('analytics.keyInsights')}</h3></div>
         <div className="card-body">
-          {insights.length === 0 ? <p className="text-muted">{t('analytics.noInsights')}</p> : (
-            <div className="insights-grid">
-              {insights.map((ins) => (
-                <div key={ins.id} className={`insight-card insight-${ins.tone}`}>
-                  <i className={`fas ${INSIGHT_ICON[ins.tone]}`}></i>
-                  <span>{t(`analytics.insight.${ins.key}`, ins.vars)}</span>
-                </div>
-              ))}
-            </div>
-          )}
+          {insights.length === 0 ? <p className="text-muted">{t('analytics.noInsights')}</p> : <InsightTiles insights={insights} />}
         </div>
       </div>
 
@@ -242,5 +234,3 @@ export default function FarmAnalytics({ data }) {
     </section>
   );
 }
-
-const INSIGHT_ICON = { good: 'fa-circle-check', warn: 'fa-triangle-exclamation', bad: 'fa-circle-exclamation', info: 'fa-circle-info' };
