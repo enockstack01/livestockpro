@@ -859,7 +859,9 @@
       "died": "Verendet",
       "female": "Weiblich",
       "male": "Männlich"
-    }
+    },
+    "incomeVsExpenses": "Einnahmen und Ausgaben",
+    "caseOutcomes": "Behandlungsergebnisse"
   },
   "herdProfile": {
     "eyebrow": "Herdenprofil · Überblick",

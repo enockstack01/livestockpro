@@ -859,7 +859,9 @@
       "died": "मृत",
       "female": "मादा",
       "male": "नर"
-    }
+    },
+    "incomeVsExpenses": "आय और व्यय",
+    "caseOutcomes": "मामलों के परिणाम"
   },
   "herdProfile": {
     "eyebrow": "पशुधन प्रोफ़ाइल · अवलोकन",

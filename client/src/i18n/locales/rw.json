@@ -859,7 +859,9 @@
       "died": "Yapfuye",
       "female": "Ingore",
       "male": "Isekurume"
-    }
+    },
+    "incomeVsExpenses": "Amafaranga yinjiye n’ayasohotse",
+    "caseOutcomes": "Uko indwara zarangiye"
   },
   "herdProfile": {
     "eyebrow": "Imiterere y’Amatungo · Incamake",

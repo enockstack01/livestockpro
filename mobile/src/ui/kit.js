@@ -63,14 +63,14 @@ export function Card({ children, style, danger }) {
   return <View style={[s.card, danger && s.cardDanger, style]}>{children}</View>;
 }
 
-export function CardHeader({ title, icon, iconColor, right, titleColor }) {
+export function CardHeader({ title, icon, iconColor, right, titleColor, compact }) {
   const s = useKitStyles();
   const { colors } = useTheme();
   return (
-    <View style={s.cardHeader}>
+    <View style={[s.cardHeader, compact && s.cardHeaderCompact]}>
       <View style={s.cardHeaderTitleRow}>
-        {icon ? <Icon name={icon} size={14} color={iconColor || colors.primary} /> : null}
-        <Text style={[s.cardHeaderTitle, titleColor && { color: titleColor }]} numberOfLines={2}>{title}</Text>
+        {icon ? <Icon name={icon} size={compact ? 12 : 14} color={iconColor || colors.primary} /> : null}
+        <Text style={[s.cardHeaderTitle, compact && s.cardHeaderTitleCompact, titleColor && { color: titleColor }]} numberOfLines={2}>{title}</Text>
       </View>
       {right}
     </View>
@@ -326,6 +326,9 @@ function makeStyles(colors, radius, shadow, shadowLg) {
     cardHeaderTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
     cardHeaderTitle: { fontSize: 15, fontWeight: '600', color: colors.text, flexShrink: 1 },
     cardBody: { padding: 20 },
+    // Half-width chart cards on phones (ui/cardGrid.js).
+    cardHeaderCompact: { paddingVertical: 10, paddingHorizontal: 12, gap: 6, flexWrap: 'wrap' },
+    cardHeaderTitleCompact: { fontSize: 12.5, fontWeight: '700' },
 
     btn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 10, paddingHorizontal: 20, borderRadius: 8 },
     btn_primary: { backgroundColor: colors.primary },

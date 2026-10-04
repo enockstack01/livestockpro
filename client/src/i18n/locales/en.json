@@ -863,7 +863,9 @@
       "died": "Died",
       "female": "Female",
       "male": "Male"
-    }
+    },
+    "incomeVsExpenses": "Income vs Expenses",
+    "caseOutcomes": "Case Outcomes"
   },
   "herdProfile": {
     "eyebrow": "Herd Profile · Overview",

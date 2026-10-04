@@ -4,15 +4,12 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useRepository } from '../../src/db/repository';
 import { useSync } from '../../src/sync/SyncProvider';
-import { Card, CardBody, CardHeader, EmptyState, Page, PageHeader, Spinner } from '../../src/ui/kit';
+import { Page, PageHeader, Spinner } from '../../src/ui/kit';
 import { Grid } from '../../src/ui/layout';
-import { BarChart, DonutChart, useChartColors } from '../../src/ui/charts';
-import { useTheme } from '../../src/theme/ThemeProvider';
 import FarmAnalytics from '../../src/screens/FarmAnalytics';
 import HerdProfileCard from '../../src/screens/dashboard/HerdProfileCard';
 import { RecentActivity, UpcomingEvents, AlertsCard, QuickActions } from '../../src/screens/dashboard/DashboardFeed';
-import { computeGlance, monthBuckets, ym } from '../../../shared/analytics';
-import { moneyOf } from '../../../shared/currency';
+import { computeGlance } from '../../../shared/analytics';
 import { computeAlerts, computeRecentActivity, computeUpcoming } from '../../../shared/dashboardFeed';
 import { greeting } from '../../../shared/navigation';
 import { accountDisplayName } from '../../../shared/account';
@@ -20,15 +17,14 @@ import { useAccount } from '../../src/account/AccountProvider';
 
 /* Dashboard, laid out like the CropManager dashboard and identical to the
    web's (client/src/pages/Dashboard.jsx): greeting, the Herd Profile card
-   (herd-health ring, "Farm at a glance" figures, herd by species), the
-   headline charts, Farm Analytics & Insights, then Recent Activity,
-   Upcoming Events, Alerts and Quick Actions. */
+   (herd-health ring, "Farm at a glance" tiles, herd by species), Farm
+   Analytics & Insights (insight tiles, then chart cards at least two per
+   row), then Recent Activity, Upcoming Events, Alerts and Quick Actions —
+   in pairs on tablets. */
 export default function DashboardScreen() {
   const { t, i18n } = useTranslation();
   const repo = useRepository();
   const router = useRouter();
-  const cc = useChartColors();
-  const { colors } = useTheme();
   const { account } = useAccount();
   const { syncing, lastSyncedAt, triggerSync } = useSync();
   const [data, setData] = useState(null);
@@ -63,12 +59,6 @@ export default function DashboardScreen() {
 
   const glance = computeGlance(data, { lang: i18n.language });
 
-  // Income vs expenses, last 6 months.
-  const months = monthBuckets(6, i18n.language);
-  const monthTotal = (type, key) => data.finance.filter((f) => f.type === type && ym(f.date) === key).reduce((s, f) => s + moneyOf(f), 0);
-  const incomeSeries = months.map((m) => monthTotal('Income', m.key));
-  const expenseSeries = months.map((m) => monthTotal('Expense', m.key));
-  const taskCounts = ['Pending', 'In Progress', 'Completed'].map((st) => data.tasks.filter((tk) => tk.status === st).length);
   const name = accountDisplayName(t, account, account?.role);
 
   return (
@@ -76,25 +66,6 @@ export default function DashboardScreen() {
       <PageHeader title={greeting(t, name)} subtitle={t('dashboardPage.todaySubtitle')} />
 
       <HerdProfileCard animals={data.animals} profile={profile} glance={glance} onOpen={(link) => router.replace(link)} />
-
-      <Grid minItemWidth={340} gap={20} fillLast style={{ marginBottom: 24 }}>
-        <Card>
-          <CardHeader title={t('dashboardPage.chartIncomeExpenses')} icon="chart-column" />
-          <CardBody>
-            {incomeSeries.every((v) => v === 0) && expenseSeries.every((v) => v === 0)
-              ? <EmptyState icon="chart-column" title={t('dashboardPage.chartNoFinanceData')} message={t('dashboardPage.chartAddFinance')} compact />
-              : <BarChart money legend labels={months.map((m) => m.label)} datasets={[{ label: t('enums.financeType.Income'), data: incomeSeries, color: cc.positive }, { label: t('enums.financeType.Expense'), data: expenseSeries, color: cc.negative }]} />}
-          </CardBody>
-        </Card>
-        <Card>
-          <CardHeader title={t('dashboardPage.chartTaskStatus')} icon="list-check" iconColor={colors.blue} />
-          <CardBody>
-            {taskCounts.every((v) => v === 0)
-              ? <EmptyState icon="clipboard-list" title={t('dashboardPage.chartNoTasksYet')} message={t('dashboardPage.chartAddTasks')} compact />
-              : <DonutChart labels={[t('enums.taskStatus.Pending'), t('enums.taskStatus.In Progress'), t('enums.taskStatus.Completed')]} data={taskCounts} colors={[cc.series[3], cc.series[0], cc.brand]} />}
-          </CardBody>
-        </Card>
-      </Grid>
 
       <FarmAnalytics data={data} />
 

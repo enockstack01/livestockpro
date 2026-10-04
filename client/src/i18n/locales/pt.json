@@ -859,7 +859,9 @@
       "died": "Mortos",
       "female": "Fêmea",
       "male": "Macho"
-    }
+    },
+    "incomeVsExpenses": "Receitas e despesas",
+    "caseOutcomes": "Desfecho dos casos"
   },
   "herdProfile": {
     "eyebrow": "Perfil do rebanho · Visão geral",

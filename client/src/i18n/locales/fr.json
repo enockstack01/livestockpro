@@ -859,7 +859,9 @@
       "died": "Morts",
       "female": "Femelle",
       "male": "Mâle"
-    }
+    },
+    "incomeVsExpenses": "Revenus et dépenses",
+    "caseOutcomes": "Issues des cas"
   },
   "herdProfile": {
     "eyebrow": "Profil du troupeau · Aperçu",

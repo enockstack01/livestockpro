@@ -859,7 +859,9 @@
       "died": "نفق",
       "female": "أنثى",
       "male": "ذكر"
-    }
+    },
+    "incomeVsExpenses": "الإيرادات والمصروفات",
+    "caseOutcomes": "نتائج الحالات"
   },
   "herdProfile": {
     "eyebrow": "ملف القطيع · نظرة عامة",

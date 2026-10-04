@@ -859,7 +859,9 @@
       "died": "已死亡",
       "female": "雌性",
       "male": "雄性"
-    }
+    },
+    "incomeVsExpenses": "收入与支出",
+    "caseOutcomes": "病例结果"
   },
   "herdProfile": {
     "eyebrow": "畜群概况 · 总览",

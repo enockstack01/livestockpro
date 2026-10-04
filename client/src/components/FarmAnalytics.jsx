@@ -4,23 +4,40 @@ import { useCanvasChart } from '../lib/useChart.js';
 import { useChartTheme, cartesianOptions, doughnutOptions, barDataset, lineDataset } from '../lib/chartTheme.js';
 import { computeFarmAnalytics, AGE_BANDS, OUTCOME_GROUPS, PREGNANCY_ORDER, PRIORITY_ORDER } from '../../../shared/analytics';
 import InsightTiles from './dashboard/InsightTiles.jsx';
+import CardGrid, { useCardSize } from './CardGrid.jsx';
 
 /* The dashboard's "Farm Analytics & Insights" section: every collection a
    farmer records (herd, health, feeding, breeding, production, finance,
    tasks) turned into charts plus plain-language insights. The numbers come
    from shared/analytics.js — the mobile app renders the very same figures. */
 
-function Chart({ build, depKey, height = 280 }) {
-  const ct = useChartTheme();
-  const { t } = useTranslation();
-  const canvasRef = useCanvasChart(() => build(ct), [depKey, ct.scheme, t]);
-  return <div className="chart-container" style={{ height }}><canvas ref={canvasRef}></canvas></div>;
+/* In a half-width card on a phone the chart gets a shorter canvas and
+   smaller type so two fit side by side. */
+function shrink(config) {
+  const o = config.options || {};
+  Object.values(o.scales || {}).forEach((sc) => { if (sc.ticks) sc.ticks.font = { size: 9 }; });
+  const legend = o.plugins && o.plugins.legend;
+  if (legend && legend.labels) { legend.labels.font = { size: 10 }; legend.labels.padding = 8; legend.labels.boxWidth = 8; legend.labels.pointStyleWidth = 8; }
+  if (o.plugins) o.plugins.valueLabels = { ...(o.plugins.valueLabels || {}), small: true };
+  return config;
 }
 
-function ChartCard({ title, icon, empty, children, aside, span = 3 }) {
+export function Chart({ build, depKey, height = 280 }) {
+  const ct = useChartTheme();
+  const { t } = useTranslation();
+  const { narrow } = useCardSize();
+  const canvasRef = useCanvasChart(() => {
+    const config = build(ct);
+    return config && narrow ? shrink(config) : config;
+  }, [depKey, ct.scheme, t, narrow]);
+  return <div className="chart-container" style={{ height: narrow ? Math.round(height * 0.82) : height }}><canvas ref={canvasRef}></canvas></div>;
+}
+
+/* `wide` is read by CardGrid: a time series that gets two columns. */
+export function ChartCard({ title, icon, empty, children, aside }) {
   const { t } = useTranslation();
   return (
-    <div className="card" style={{ gridColumn: `span ${span}` }}>
+    <div className="card chart-card">
       <div className="card-header">
         <h3>{icon && <i className={`fas ${icon}`} style={{ color: 'var(--primary)', marginRight: 6 }}></i>}{title}</h3>
         {aside}
@@ -83,7 +100,7 @@ export default function FarmAnalytics({ data }) {
       </div>
 
       <SectionTitle icon="fa-cow">{t('analytics.sectionHerd')}</SectionTitle>
-      <div className="analytics-grid">
+      <CardGrid>
         <ChartCard title={t('analytics.herdBySpecies')} icon="fa-layer-group" empty={species.length === 0}>
           <Chart height={barHeight(species.length)} depKey={JSON.stringify(species)} build={(ct) => ({
             type: 'bar',
@@ -111,18 +128,25 @@ export default function FarmAnalytics({ data }) {
             options: cartesianOptions(ct, { integer: true })
           })} />
         </ChartCard>
-        <ChartCard title={t('analytics.herdGrowth')} icon="fa-arrow-trend-up" empty={(data.animals || []).length === 0}>
+        <ChartCard title={t('analytics.pregnancyStatus')} icon="fa-paw" empty={pregnancy.every((v) => v === 0)}>
+          <Chart depKey={JSON.stringify(pregnancy)} build={(ct) => ({
+            type: 'doughnut',
+            data: { labels: PREGNANCY_ORDER.map((s) => enumLabel('pregnancyStatus', s)), datasets: [{ data: pregnancy, backgroundColor: ct.series.slice(0, 4), borderColor: ct.surface, borderWidth: 2 }] },
+            options: doughnutOptions(ct)
+          })} />
+        </ChartCard>
+        <ChartCard wide="soft" title={t('analytics.herdGrowth')} icon="fa-arrow-trend-up" empty={(data.animals || []).length === 0}>
           <Chart depKey={JSON.stringify([growth, labels])} build={(ct) => ({
             type: 'line',
             data: { labels, datasets: [lineDataset(t('analytics.registered'), growth, ct.brand, { fill: true })] },
             options: cartesianOptions(ct, { integer: true })
           })} />
         </ChartCard>
-      </div>
+      </CardGrid>
 
       <SectionTitle icon="fa-stethoscope">{t('analytics.sectionHealth')}</SectionTitle>
-      <div className="analytics-grid">
-        <ChartCard title={t('analytics.healthEvents')} icon="fa-notes-medical" empty={a.healthInRangeCount === 0}>
+      <CardGrid>
+        <ChartCard wide title={t('analytics.healthEvents')} icon="fa-notes-medical" empty={a.healthInRangeCount === 0}>
           <Chart height={300} depKey={JSON.stringify([outcomeSeries, labels])} build={(ct) => {
             const colors = [ct.status.good, ct.status.warning, ct.status.critical, ct.neutral];
             return {
@@ -132,6 +156,13 @@ export default function FarmAnalytics({ data }) {
             };
           }} />
         </ChartCard>
+        <ChartCard title={t('analytics.caseOutcomes')} icon="fa-heart-pulse" empty={a.outcomeTotals.every((v) => v === 0)}>
+          <Chart depKey={JSON.stringify(a.outcomeTotals)} build={(ct) => ({
+            type: 'doughnut',
+            data: { labels: OUTCOME_GROUPS.map((g) => outcomeLabels[g.key]), datasets: [{ data: a.outcomeTotals, backgroundColor: [ct.status.good, ct.status.warning, ct.status.critical, ct.neutral], borderColor: ct.surface, borderWidth: 2 }] },
+            options: doughnutOptions(ct)
+          })} />
+        </ChartCard>
         <ChartCard title={t('analytics.topConditions')} icon="fa-virus" empty={conditions.length === 0}>
           <Chart height={barHeight(conditions.length)} depKey={JSON.stringify(conditions)} build={(ct) => ({
             type: 'bar',
@@ -139,16 +170,16 @@ export default function FarmAnalytics({ data }) {
             options: cartesianOptions(ct, { horizontal: true, integer: true })
           })} />
         </ChartCard>
-      </div>
+      </CardGrid>
 
       <SectionTitle icon="fa-wheat-awn">{t('analytics.sectionProduction')}</SectionTitle>
-      <div className="analytics-grid">
+      <CardGrid>
         {productionPanels.length === 0 ? (
-          <ChartCard title={t('analytics.productionTrend')} icon="fa-gauge" empty span={6} />
+          <ChartCard title={t('analytics.productionTrend')} icon="fa-gauge" empty />
         ) : productionPanels.map((p) => (
           <ChartCard
             key={p.type}
-            span={6 / productionPanels.length}
+            wide="soft"
             title={t('analytics.productionOf', { type: enumLabel('productionType', p.type), unit: enumLabel('productionUnit', p.unit) })}
             icon={p.type === 'Milk' ? 'fa-bottle-droplet' : p.type === 'Eggs' ? 'fa-egg' : 'fa-drumstick-bite'}
             aside={<span className="analytics-total">{t('analytics.total')}: <strong>{Math.round(p.total).toLocaleString()}</strong></span>}
@@ -160,7 +191,7 @@ export default function FarmAnalytics({ data }) {
             })} />
           </ChartCard>
         ))}
-        <ChartCard title={t('analytics.feedCost')} icon="fa-sack-dollar" empty={feedCost.every((v) => v === 0)}>
+        <ChartCard wide="soft" title={t('analytics.feedCost')} icon="fa-sack-dollar" empty={feedCost.every((v) => v === 0)}>
           <Chart depKey={JSON.stringify([feedCost, labels])} build={(ct) => ({
             type: 'bar',
             data: { labels, datasets: [barDataset(ct, t('analytics.feedCost'), feedCost, ct.brand)] },
@@ -174,43 +205,43 @@ export default function FarmAnalytics({ data }) {
             options: cartesianOptions(ct, { horizontal: true, money: true })
           })} />
         </ChartCard>
-      </div>
+      </CardGrid>
 
       <SectionTitle icon="fa-coins">{t('analytics.sectionFinance')}</SectionTitle>
-      <div className="analytics-grid">
-        <ChartCard span={2} title={t('analytics.netCashFlow')} icon="fa-scale-balanced" empty={a.financeInRangeCount === 0}>
+      <CardGrid>
+        <ChartCard wide title={t('analytics.incomeVsExpenses')} icon="fa-chart-column" empty={a.financeInRangeCount === 0}>
+          <Chart depKey={JSON.stringify([a.monthIncome, a.monthExpense, labels])} build={(ct) => ({
+            type: 'bar',
+            data: { labels, datasets: [barDataset(ct, enumLabel('financeType', 'Income'), a.monthIncome, ct.positive), barDataset(ct, enumLabel('financeType', 'Expense'), a.monthExpense, ct.negative)] },
+            options: cartesianOptions(ct, { legend: true, money: true })
+          })} />
+        </ChartCard>
+        <ChartCard wide title={t('analytics.netCashFlow')} icon="fa-scale-balanced" empty={a.financeInRangeCount === 0}>
           <Chart depKey={JSON.stringify([monthNet, labels])} build={(ct) => ({
             type: 'bar',
             data: { labels, datasets: [{ ...barDataset(ct, t('analytics.net'), monthNet, null), backgroundColor: monthNet.map((v) => (v >= 0 ? ct.positive : ct.negative)) }] },
             options: cartesianOptions(ct, { money: true })
           })} />
         </ChartCard>
-        <ChartCard span={2} title={t('analytics.expenseByCategory')} icon="fa-receipt" empty={expenses.values.length === 0}>
+        <ChartCard title={t('analytics.expenseByCategory')} icon="fa-receipt" empty={expenses.values.length === 0}>
           <Chart height={barHeight(expenses.values.length)} depKey={JSON.stringify(expenseByCat)} build={(ct) => ({
             type: 'bar',
             data: { labels: expenses.labels, datasets: [barDataset(ct, t('analytics.expenseByCategory'), expenses.values, ct.brand)] },
             options: cartesianOptions(ct, { horizontal: true, money: true })
           })} />
         </ChartCard>
-        <ChartCard span={2} title={t('analytics.incomeBySource')} icon="fa-hand-holding-dollar" empty={income.values.length === 0}>
+        <ChartCard title={t('analytics.incomeBySource')} icon="fa-hand-holding-dollar" empty={income.values.length === 0}>
           <Chart height={barHeight(income.values.length)} depKey={JSON.stringify(incomeBySrc)} build={(ct) => ({
             type: 'bar',
             data: { labels: income.labels, datasets: [barDataset(ct, t('analytics.incomeBySource'), income.values, ct.brand)] },
             options: cartesianOptions(ct, { horizontal: true, money: true })
           })} />
         </ChartCard>
-      </div>
+      </CardGrid>
 
       <SectionTitle icon="fa-venus-mars">{t('analytics.sectionBreedingTasks')}</SectionTitle>
-      <div className="analytics-grid">
-        <ChartCard span={2} title={t('analytics.pregnancyStatus')} icon="fa-paw" empty={pregnancy.every((v) => v === 0)}>
-          <Chart depKey={JSON.stringify(pregnancy)} build={(ct) => ({
-            type: 'doughnut',
-            data: { labels: PREGNANCY_ORDER.map((s) => enumLabel('pregnancyStatus', s)), datasets: [{ data: pregnancy, backgroundColor: ct.series.slice(0, 4), borderColor: ct.surface, borderWidth: 2 }] },
-            options: doughnutOptions(ct)
-          })} />
-        </ChartCard>
-        <ChartCard span={2} title={t('analytics.births')} icon="fa-baby-carriage" empty={newbornSeries.every((v) => v === 0) && expectedSeries.every((v) => v === 0)}>
+      <CardGrid>
+        <ChartCard wide title={t('analytics.births')} icon="fa-baby-carriage" empty={newbornSeries.every((v) => v === 0) && expectedSeries.every((v) => v === 0)}>
           <Chart height={300} depKey={JSON.stringify([newbornSeries, expectedSeries, months])} build={(ct) => ({
             type: 'bar',
             data: { labels: a.birthLabels, datasets: [
@@ -220,7 +251,14 @@ export default function FarmAnalytics({ data }) {
             options: cartesianOptions(ct, { legend: true, integer: true })
           })} />
         </ChartCard>
-        <ChartCard span={2} title={t('analytics.openTasks')} icon="fa-flag" empty={a.openTasksCount === 0}>
+        <ChartCard title={t('dashboardPage.chartTaskStatus')} icon="fa-list-check" empty={a.taskStatus.every((v) => v === 0)}>
+          <Chart depKey={JSON.stringify(a.taskStatus)} build={(ct) => ({
+            type: 'doughnut',
+            data: { labels: ['Pending', 'In Progress', 'Completed'].map((st) => enumLabel('taskStatus', st)), datasets: [{ data: a.taskStatus, backgroundColor: [ct.series[3], ct.series[0], ct.brand], borderColor: ct.surface, borderWidth: 2 }] },
+            options: doughnutOptions(ct)
+          })} />
+        </ChartCard>
+        <ChartCard title={t('analytics.openTasks')} icon="fa-flag" empty={a.openTasksCount === 0}>
           <Chart height={300} depKey={JSON.stringify([overdueByPriority, onTimeByPriority])} build={(ct) => ({
             type: 'bar',
             data: { labels: PRIORITY_ORDER.map((p) => enumLabel('taskPriority', p)), datasets: [
@@ -230,7 +268,7 @@ export default function FarmAnalytics({ data }) {
             options: cartesianOptions(ct, { horizontal: true, stacked: true, legend: true, integer: true })
           })} />
         </ChartCard>
-      </div>
+      </CardGrid>
     </section>
   );
 }

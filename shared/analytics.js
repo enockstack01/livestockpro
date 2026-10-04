@@ -119,6 +119,8 @@ export function computeFarmAnalytics(data, { months = 12, lang = 'en', enumLabel
 
   /* ---------- Finance ---------- */
   const financeInRange = finance.filter((f) => inRange(f.date));
+  const monthIncome = buckets.map((b) => financeInRange.filter((f) => f.type === 'Income' && ym(f.date) === b.key).reduce((s, f) => s + moneyOf(f), 0));
+  const monthExpense = buckets.map((b) => financeInRange.filter((f) => f.type === 'Expense' && ym(f.date) === b.key).reduce((s, f) => s + moneyOf(f), 0));
   const monthNet = buckets.map((b) => financeInRange.filter((f) => ym(f.date) === b.key).reduce((s, f) => s + (f.type === 'Income' ? 1 : -1) * moneyOf(f), 0));
   const expenseByCat = sortedEntries(tally(financeInRange.filter((f) => f.type === 'Expense'), (f) => f.category || 'Other Expense', (f) => moneyOf(f)));
   const incomeBySrc = sortedEntries(tally(financeInRange.filter((f) => f.type === 'Income'), (f) => f.category || 'Other Income', (f) => moneyOf(f)));
@@ -142,7 +144,9 @@ export function computeFarmAnalytics(data, { months = 12, lang = 'en', enumLabel
     species, sexSpecies, females: sexCounts('Female'), males: sexCounts('Male'), ageCounts, ageUnknown, growth,
     healthInRangeCount: healthInRange.length, outcomeSeries, conditions,
     productionPanels, feedCost, feedByType,
-    financeInRangeCount: financeInRange.length, monthNet, expenseByCat, incomeBySrc,
+    financeInRangeCount: financeInRange.length, monthIncome, monthExpense, monthNet, expenseByCat, incomeBySrc,
+    outcomeTotals: outcomeSeries.map((series) => series.reduce((s, v) => s + v, 0)),
+    taskStatus: ['Pending', 'In Progress', 'Completed'].map((st) => tasks.filter((tk) => tk.status === st).length),
     pregnancy, birthLabels, newbornSeries, expectedSeries,
     openTasksCount: openTasks.length, overdueByPriority, onTimeByPriority,
     insights

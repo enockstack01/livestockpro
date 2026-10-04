@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Icon from '../components/Icon';
 import { useTheme } from '../theme/ThemeProvider';
 import { Card, CardBody, CardHeader, EmptyState, Segmented } from '../ui/kit';
-import { Grid } from '../ui/layout';
+import { CardGrid, useCardSize } from '../ui/cardGrid';
 import { BarChart, DonutChart, LineChart, useChartColors } from '../ui/charts';
 import { computeFarmAnalytics, AGE_BANDS, OUTCOME_GROUPS, PREGNANCY_ORDER, PRIORITY_ORDER } from '../../../shared/analytics';
 import InsightTiles from './dashboard/InsightTiles';
@@ -12,18 +12,20 @@ import { useAccount } from '../account/AccountProvider';
 
 /* Mobile rendering of the web dashboard's "Farm Analytics & Insights"
    section (client/src/components/FarmAnalytics.jsx): same numbers (both
-   come from shared/analytics.js), same sections, same card order and the
-   same 6-column grid — halves and thirds side by side on wide screens,
-   one card per row below 1024px. */
+   come from shared/analytics.js), same sections and card order, and the
+   same card grid — at least two charts per row, more on tablets; dense
+   12-month series take a whole row on phones (ui/cardGrid.js). */
 
 const barHeight = (n) => Math.max(180, n * 34 + 50);
 
+/* `wide` is read by CardGrid: a time series that gets two columns. */
 function ChartCard({ title, icon, empty, aside, children }) {
   const { t } = useTranslation();
+  const { narrow } = useCardSize();
   return (
-    <Card>
-      <CardHeader title={title} icon={icon} right={aside} />
-      <CardBody>{empty ? <EmptyState icon="chart-simple" title={t('analytics.noData')} compact /> : children}</CardBody>
+    <Card style={{ flex: 1 }}>
+      <CardHeader title={title} icon={icon} right={aside} compact={narrow} />
+      <CardBody style={narrow ? { paddingVertical: 10, paddingHorizontal: 6 } : null}>{empty ? <EmptyState icon="chart-simple" title={t('analytics.noData')} compact /> : children}</CardBody>
     </Card>
   );
 }
@@ -36,10 +38,6 @@ function SectionTitle({ icon, children }) {
       <Text style={[styles.sectionTitleText, { color: colors.textLight }]}>{children}</Text>
     </View>
   );
-}
-
-function Row({ children }) {
-  return <Grid columns={6} gap={20} style={{ marginBottom: 24 }}>{children}</Grid>;
 }
 
 export default function FarmAnalytics({ data }) {
@@ -86,118 +84,96 @@ export default function FarmAnalytics({ data }) {
       </Card>
 
       <SectionTitle icon="cow">{t('analytics.sectionHerd')}</SectionTitle>
-      <Row>
-        <View span={3}>
-          <ChartCard title={t('analytics.herdBySpecies')} icon="layer-group" empty={a.species.length === 0}>
-            <BarChart horizontal integer height={barHeight(a.species.length)} labels={a.species.map(([s]) => enumLabel('species', s))}
-              datasets={[{ label: t('analytics.animalsLabel'), data: a.species.map(([, v]) => v), color: cc.brand }]} />
-          </ChartCard>
-        </View>
-        <View span={3}>
-          <ChartCard title={t('analytics.sexBySpecies')} icon="venus-mars" empty={a.species.length === 0}>
-            <BarChart horizontal stacked integer legend height={barHeight(a.species.length) + 30} labels={a.sexSpecies.map((s) => enumLabel('species', s))}
-              datasets={[{ label: enumLabel('sex', 'Female'), data: a.females, color: cc.series[0] }, { label: enumLabel('sex', 'Male'), data: a.males, color: cc.series[1] }]} />
-          </ChartCard>
-        </View>
-        <View span={3}>
-          <ChartCard title={t('analytics.ageStructure')} icon="hourglass-half" empty={a.living.length === 0}>
-            <BarChart integer labels={ageLabels} datasets={[{ label: t('analytics.animalsLabel'), data: ageValues, colors: [...cc.ramp, cc.neutral], color: cc.ramp[2] }]} />
-          </ChartCard>
-        </View>
-        <View span={3}>
-          <ChartCard title={t('analytics.herdGrowth')} icon="arrow-trend-up" empty={(data.animals || []).length === 0}>
-            <LineChart integer labels={labels} datasets={[{ label: t('analytics.registered'), data: a.growth, color: cc.brand, fill: true }]} />
-          </ChartCard>
-        </View>
-      </Row>
+      <CardGrid>
+        <ChartCard title={t('analytics.herdBySpecies')} icon="layer-group" empty={a.species.length === 0}>
+          <BarChart horizontal integer height={barHeight(a.species.length)} labels={a.species.map(([s]) => enumLabel('species', s))}
+            datasets={[{ label: t('analytics.animalsLabel'), data: a.species.map(([, v]) => v), color: cc.brand }]} />
+        </ChartCard>
+        <ChartCard title={t('analytics.sexBySpecies')} icon="venus-mars" empty={a.species.length === 0}>
+          <BarChart horizontal stacked integer legend height={barHeight(a.species.length) + 30} labels={a.sexSpecies.map((s) => enumLabel('species', s))}
+            datasets={[{ label: enumLabel('sex', 'Female'), data: a.females, color: cc.series[0] }, { label: enumLabel('sex', 'Male'), data: a.males, color: cc.series[1] }]} />
+        </ChartCard>
+        <ChartCard title={t('analytics.ageStructure')} icon="hourglass-half" empty={a.living.length === 0}>
+          <BarChart integer labels={ageLabels} datasets={[{ label: t('analytics.animalsLabel'), data: ageValues, colors: [...cc.ramp, cc.neutral], color: cc.ramp[2] }]} />
+        </ChartCard>
+        <ChartCard title={t('analytics.pregnancyStatus')} icon="paw" empty={a.pregnancy.every((v) => v === 0)}>
+          <DonutChart labels={PREGNANCY_ORDER.map((s) => enumLabel('pregnancyStatus', s))} data={a.pregnancy} colors={cc.series.slice(0, 4)} />
+        </ChartCard>
+        <ChartCard wide="soft" title={t('analytics.herdGrowth')} icon="arrow-trend-up" empty={(data.animals || []).length === 0}>
+          <LineChart integer labels={labels} datasets={[{ label: t('analytics.registered'), data: a.growth, color: cc.brand, fill: true }]} />
+        </ChartCard>
+      </CardGrid>
 
       <SectionTitle icon="stethoscope">{t('analytics.sectionHealth')}</SectionTitle>
-      <Row>
-        <View span={3}>
-          <ChartCard title={t('analytics.healthEvents')} icon="notes-medical" empty={a.healthInRangeCount === 0}>
-            <BarChart stacked integer legend height={320} labels={labels}
-              datasets={OUTCOME_GROUPS.map((g, i) => ({ label: outcomeLabels[g.key], data: a.outcomeSeries[i], color: outcomeColors[i] }))} />
-          </ChartCard>
-        </View>
-        <View span={3}>
-          <ChartCard title={t('analytics.topConditions')} icon="virus" empty={a.conditions.length === 0}>
-            <BarChart horizontal integer height={barHeight(a.conditions.length)} labels={a.conditions.map(([k]) => k)}
-              datasets={[{ label: t('analytics.cases'), data: a.conditions.map(([, v]) => v), color: cc.brand }]} />
-          </ChartCard>
-        </View>
-      </Row>
+      <CardGrid>
+        <ChartCard wide title={t('analytics.healthEvents')} icon="notes-medical" empty={a.healthInRangeCount === 0}>
+          <BarChart stacked integer legend height={320} labels={labels}
+            datasets={OUTCOME_GROUPS.map((g, i) => ({ label: outcomeLabels[g.key], data: a.outcomeSeries[i], color: outcomeColors[i] }))} />
+        </ChartCard>
+        <ChartCard title={t('analytics.caseOutcomes')} icon="heart-pulse" empty={a.outcomeTotals.every((v) => v === 0)}>
+          <DonutChart labels={OUTCOME_GROUPS.map((g) => outcomeLabels[g.key])} data={a.outcomeTotals} colors={outcomeColors} />
+        </ChartCard>
+        <ChartCard title={t('analytics.topConditions')} icon="virus" empty={a.conditions.length === 0}>
+          <BarChart horizontal integer height={barHeight(a.conditions.length)} labels={a.conditions.map(([k]) => k)}
+            datasets={[{ label: t('analytics.cases'), data: a.conditions.map(([, v]) => v), color: cc.brand }]} />
+        </ChartCard>
+      </CardGrid>
 
       <SectionTitle icon="wheat-awn">{t('analytics.sectionProduction')}</SectionTitle>
-      <Row>
-        {a.productionPanels.length === 0 ? (
-          <View span={6}><ChartCard title={t('analytics.productionTrend')} icon="gauge" empty /></View>
-        ) : a.productionPanels.map((p) => (
-          <View key={p.type} span={6 / a.productionPanels.length}>
-            <ChartCard
-              title={t('analytics.productionOf', { type: enumLabel('productionType', p.type), unit: enumLabel('productionUnit', p.unit) })}
-              icon={p.type === 'Milk' ? 'bottle-droplet' : p.type === 'Eggs' ? 'egg' : 'drumstick-bite'}
-              aside={<Text style={{ fontSize: 12, color: colors.textLight }}>{t('analytics.total')}: <Text style={{ fontWeight: '700', color: colors.text }}>{Math.round(p.total).toLocaleString()}</Text></Text>}
-            >
-              <LineChart height={230} labels={labels} datasets={[{ label: enumLabel('productionType', p.type), data: p.series, color: cc.series[p.slot], fill: true }]} />
-            </ChartCard>
-          </View>
+      <CardGrid>
+        {a.productionPanels.length === 0 ? <ChartCard title={t('analytics.productionTrend')} icon="gauge" empty /> : null}
+        {a.productionPanels.map((p) => (
+          <ChartCard
+            key={p.type}
+            wide="soft"
+            title={t('analytics.productionOf', { type: enumLabel('productionType', p.type), unit: enumLabel('productionUnit', p.unit) })}
+            icon={p.type === 'Milk' ? 'bottle-droplet' : p.type === 'Eggs' ? 'egg' : 'drumstick-bite'}
+            aside={<Text style={{ fontSize: 12, color: colors.textLight }}>{t('analytics.total')}: <Text style={{ fontWeight: '700', color: colors.text }}>{Math.round(p.total).toLocaleString()}</Text></Text>}
+          >
+            <LineChart height={230} labels={labels} datasets={[{ label: enumLabel('productionType', p.type), data: p.series, color: cc.series[p.slot], fill: true }]} />
+          </ChartCard>
         ))}
-      </Row>
-      <Row>
-        <View span={3}>
-          <ChartCard title={t('analytics.feedCost')} icon="sack-dollar" empty={a.feedCost.every((v) => v === 0)}>
-            <BarChart money labels={labels} datasets={[{ label: t('analytics.feedCost'), data: a.feedCost, color: cc.brand }]} />
-          </ChartCard>
-        </View>
-        <View span={3}>
-          <ChartCard title={t('analytics.feedByType')} icon="wheat-awn" empty={a.feedByType.length === 0}>
-            <BarChart horizontal money height={barHeight(a.feedByType.length)} labels={a.feedByType.map(([k]) => k)}
-              datasets={[{ label: t('analytics.feedByType'), data: a.feedByType.map(([, v]) => v), color: cc.brand }]} />
-          </ChartCard>
-        </View>
-      </Row>
+        <ChartCard wide="soft" title={t('analytics.feedCost')} icon="sack-dollar" empty={a.feedCost.every((v) => v === 0)}>
+          <BarChart money labels={labels} datasets={[{ label: t('analytics.feedCost'), data: a.feedCost, color: cc.brand }]} />
+        </ChartCard>
+        <ChartCard title={t('analytics.feedByType')} icon="wheat-awn" empty={a.feedByType.length === 0}>
+          <BarChart horizontal money height={barHeight(a.feedByType.length)} labels={a.feedByType.map(([k]) => k)}
+            datasets={[{ label: t('analytics.feedByType'), data: a.feedByType.map(([, v]) => v), color: cc.brand }]} />
+        </ChartCard>
+      </CardGrid>
 
       <SectionTitle icon="coins">{t('analytics.sectionFinance')}</SectionTitle>
-      <Row>
-        <View span={2}>
-          <ChartCard title={t('analytics.netCashFlow')} icon="scale-balanced" empty={a.financeInRangeCount === 0}>
-            <BarChart money labels={labels} datasets={[{ label: t('analytics.net'), data: a.monthNet, color: cc.positive, colors: a.monthNet.map((v) => (v >= 0 ? cc.positive : cc.negative)) }]} />
-          </ChartCard>
-        </View>
-        <View span={2}>
-          <ChartCard title={t('analytics.expenseByCategory')} icon="receipt" empty={a.expenseByCat.length === 0}>
-            <BarChart horizontal money height={barHeight(a.expenseByCat.length)} labels={a.expenseByCat.map(([k]) => enumLabel('financeCategory', k))}
-              datasets={[{ label: t('analytics.expenseByCategory'), data: a.expenseByCat.map(([, v]) => v), color: cc.brand }]} />
-          </ChartCard>
-        </View>
-        <View span={2}>
-          <ChartCard title={t('analytics.incomeBySource')} icon="hand-holding-dollar" empty={a.incomeBySrc.length === 0}>
-            <BarChart horizontal money height={barHeight(a.incomeBySrc.length)} labels={a.incomeBySrc.map(([k]) => enumLabel('financeCategory', k))}
-              datasets={[{ label: t('analytics.incomeBySource'), data: a.incomeBySrc.map(([, v]) => v), color: cc.brand }]} />
-          </ChartCard>
-        </View>
-      </Row>
+      <CardGrid>
+        <ChartCard wide title={t('analytics.incomeVsExpenses')} icon="chart-column" empty={a.financeInRangeCount === 0}>
+          <BarChart money legend labels={labels} datasets={[{ label: enumLabel('financeType', 'Income'), data: a.monthIncome, color: cc.positive }, { label: enumLabel('financeType', 'Expense'), data: a.monthExpense, color: cc.negative }]} />
+        </ChartCard>
+        <ChartCard wide title={t('analytics.netCashFlow')} icon="scale-balanced" empty={a.financeInRangeCount === 0}>
+          <BarChart money labels={labels} datasets={[{ label: t('analytics.net'), data: a.monthNet, color: cc.positive, colors: a.monthNet.map((v) => (v >= 0 ? cc.positive : cc.negative)) }]} />
+        </ChartCard>
+        <ChartCard title={t('analytics.expenseByCategory')} icon="receipt" empty={a.expenseByCat.length === 0}>
+          <BarChart horizontal money height={barHeight(a.expenseByCat.length)} labels={a.expenseByCat.map(([k]) => enumLabel('financeCategory', k))}
+            datasets={[{ label: t('analytics.expenseByCategory'), data: a.expenseByCat.map(([, v]) => v), color: cc.brand }]} />
+        </ChartCard>
+        <ChartCard title={t('analytics.incomeBySource')} icon="hand-holding-dollar" empty={a.incomeBySrc.length === 0}>
+          <BarChart horizontal money height={barHeight(a.incomeBySrc.length)} labels={a.incomeBySrc.map(([k]) => enumLabel('financeCategory', k))}
+            datasets={[{ label: t('analytics.incomeBySource'), data: a.incomeBySrc.map(([, v]) => v), color: cc.brand }]} />
+        </ChartCard>
+      </CardGrid>
 
       <SectionTitle icon="venus-mars">{t('analytics.sectionBreedingTasks')}</SectionTitle>
-      <Row>
-        <View span={2}>
-          <ChartCard title={t('analytics.pregnancyStatus')} icon="paw" empty={a.pregnancy.every((v) => v === 0)}>
-            <DonutChart labels={PREGNANCY_ORDER.map((s) => enumLabel('pregnancyStatus', s))} data={a.pregnancy} colors={cc.series.slice(0, 4)} />
-          </ChartCard>
-        </View>
-        <View span={2}>
-          <ChartCard title={t('analytics.births')} icon="baby-carriage" empty={a.newbornSeries.every((v) => v === 0) && a.expectedSeries.every((v) => v === 0)}>
-            <BarChart integer legend height={300} labels={a.birthLabels}
-              datasets={[{ label: t('analytics.newborns'), data: a.newbornSeries, color: cc.series[0] }, { label: t('analytics.expectedBirths'), data: a.expectedSeries, color: cc.series[1] }]} />
-          </ChartCard>
-        </View>
-        <View span={2}>
-          <ChartCard title={t('analytics.openTasks')} icon="flag" empty={a.openTasksCount === 0}>
-            <BarChart horizontal stacked integer legend height={300} labels={PRIORITY_ORDER.map((p) => enumLabel('taskPriority', p))}
-              datasets={[{ label: t('analytics.overdue'), data: a.overdueByPriority, color: cc.status.critical }, { label: t('analytics.onSchedule'), data: a.onTimeByPriority, color: cc.series[0] }]} />
-          </ChartCard>
-        </View>
-      </Row>
+      <CardGrid>
+        <ChartCard wide title={t('analytics.births')} icon="baby-carriage" empty={a.newbornSeries.every((v) => v === 0) && a.expectedSeries.every((v) => v === 0)}>
+          <BarChart integer legend height={300} labels={a.birthLabels}
+            datasets={[{ label: t('analytics.newborns'), data: a.newbornSeries, color: cc.series[0] }, { label: t('analytics.expectedBirths'), data: a.expectedSeries, color: cc.series[1] }]} />
+        </ChartCard>
+        <ChartCard title={t('dashboardPage.chartTaskStatus')} icon="list-check" empty={a.taskStatus.every((v) => v === 0)}>
+          <DonutChart labels={['Pending', 'In Progress', 'Completed'].map((st) => enumLabel('taskStatus', st))} data={a.taskStatus} colors={[cc.series[3], cc.series[0], cc.brand]} />
+        </ChartCard>
+        <ChartCard title={t('analytics.openTasks')} icon="flag" empty={a.openTasksCount === 0}>
+          <BarChart horizontal stacked integer legend height={300} labels={PRIORITY_ORDER.map((p) => enumLabel('taskPriority', p))}
+            datasets={[{ label: t('analytics.overdue'), data: a.overdueByPriority, color: cc.status.critical }, { label: t('analytics.onSchedule'), data: a.onTimeByPriority, color: cc.series[0] }]} />
+        </ChartCard>
+      </CardGrid>
     </View>
   );
 }

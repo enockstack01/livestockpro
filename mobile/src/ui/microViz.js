@@ -138,18 +138,17 @@ export function SplitBar({ parts }) {
   );
 }
 
-/* Tile grid matching the web's .glance-grid / .insight-tiles: 2 columns on
-   phones, 3 from 640px, 4 from 1100px. A child with `wide` spans the whole
-   row, or two columns on the widest layout. */
-export function TileGrid({ children, gap = 10 }) {
+/* Tile grid matching the web's .glance-grid / .insight-tiles: as many
+   columns as fit with tiles at least minTile wide (up to six), but never
+   fewer than two. A child with `wide` spans the whole row. */
+export function TileGrid({ children, gap = 10, minTile = 150 }) {
   const [w, setW] = useState(0);
   const items = Children.toArray(children).filter(Boolean);
-  const cols = w >= 1100 ? 4 : w >= 640 ? 3 : 2;
+  const cols = Math.min(6, Math.max(2, Math.floor((w + gap) / (minTile + gap))));
   const track = (w - gap * (cols - 1)) / cols;
   const widthOf = (child) => {
     if (!child.props?.wide) return track;
-    const span = cols === 4 ? 2 : cols;
-    return track * span + gap * (span - 1);
+    return w;
   };
   return (
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap }} onLayout={(e) => setW(e.nativeEvent.layout.width)}>

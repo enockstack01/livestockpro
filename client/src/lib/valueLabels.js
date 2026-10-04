@@ -11,7 +11,7 @@ import { formatCompact, formatMoneyCompact } from '../../../shared/currency';
    Options: plugins.valueLabels = { display, money, color }. Values are
    shortened (12.4K) so they fit; tooltips still show the exact figure. */
 
-const FONT = '600 11px Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+const FONT = (px) => `600 ${px}px Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
 
 function textColor(opts) {
   if (opts.color) return opts.color;
@@ -43,7 +43,7 @@ function drawText(ctx, text, x, y, { color, align = 'center', baseline = 'middle
 
 export const valueLabelsPlugin = {
   id: 'valueLabels',
-  defaults: { display: true, money: false, color: null, surface: null },
+  defaults: { display: true, money: false, color: null, surface: null, small: false },
   afterDatasetsDraw(chart, _args, opts) {
     if (opts.display === false) return;
     const { ctx } = chart;
@@ -51,7 +51,7 @@ export const valueLabelsPlugin = {
     const ink = textColor(opts);
     const surface = opts.surface || getComputedStyle(document.documentElement).getPropertyValue('--card').trim() || '#FFFFFF';
     ctx.save();
-    ctx.font = FONT;
+    ctx.font = FONT(opts.small ? 9.5 : 11);
 
     if (chart.config.type === 'doughnut' || chart.config.type === 'pie') {
       chart.data.datasets.forEach((ds, di) => {
@@ -82,6 +82,8 @@ export const valueLabelsPlugin = {
       meta.data.forEach((el, i) => {
         const raw = ds.data[i];
         const v = Number(raw && typeof raw === 'object' ? (horizontal ? raw.x : raw.y) : raw) || 0;
+        // An empty month in a long bar series has no bar to label; its 0 would only crowd the axis.
+        if (meta.type !== 'line' && v === 0 && meta.data.length > 8) return;
         const text = fmt(v);
         const w = ctx.measureText(text).width;
 

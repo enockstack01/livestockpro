@@ -4,6 +4,7 @@ import Svg, { Circle, G, Line, Path, Rect, Text as SvgText } from 'react-native-
 import { useTheme } from '../theme/ThemeProvider';
 import { chartPalette, fmtMoney } from '../../../shared/chartPalette';
 import { formatCompact, formatMoneyCompact } from '../../../shared/currency';
+import { useCardSize } from './cardGrid';
 
 /* Native counterparts of the web dashboard's Chart.js charts (see
    client/src/lib/chartTheme.js), drawn with react-native-svg from the same
@@ -21,7 +22,7 @@ export function useChartColors() {
   return useMemo(() => chartPalette(scheme), [scheme]);
 }
 
-const FONT = 11;
+const FONT_BASE = 11;
 // SVG text defaults to a serif face in browsers; match the app's UI font.
 const FONT_FAMILY = Platform.select({ web: 'Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif', default: undefined });
 const fmtNum = (v) => (Math.abs(v) >= 1000 ? Math.round(v).toLocaleString() : String(Math.round(v * 10) / 10));
@@ -94,13 +95,13 @@ function monotonePath(pts) {
   return d;
 }
 
-function Legend({ items, cc }) {
+function Legend({ items, cc, small }) {
   return (
     <View style={styles.legend}>
       {items.map((it) => (
         <View key={it.label} style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: it.color }]} />
-          <Text style={[styles.legendText, { color: cc.text }]}>{it.label}</Text>
+          <Text style={[styles.legendText, small && { fontSize: 10 }, { color: cc.text }]}>{it.label}</Text>
         </View>
       ))}
     </View>
@@ -130,7 +131,12 @@ function useWidth() {
 
 /* Bar chart — vertical or horizontal, grouped or stacked. A dataset may
    carry `colors` (one per bar) instead of `color`. */
-export function BarChart({ labels, datasets, horizontal, stacked, money, integer, legend, height = 280 }) {
+export function BarChart({ labels, datasets, horizontal, stacked, money, integer, legend, height: fullHeight = 280 }) {
+  // Half-width cards on phones: shorter, with smaller type (ui/cardGrid.js).
+  const { narrow } = useCardSize();
+  const height = narrow ? Math.round(fullHeight * 0.82) : fullHeight;
+  const FONT = narrow ? 9 : FONT_BASE;
+  const CH = narrow ? 5.3 : 6.4;
   const cc = useChartColors();
   const [w, onLayout] = useWidth();
   const [sel, setSel] = useState(null);
@@ -146,7 +152,7 @@ export function BarChart({ labels, datasets, horizontal, stacked, money, integer
   let chart = null;
   if (w > 0 && n > 0) {
     if (!horizontal) {
-      const yLabelW = Math.max(...sc.ticks.map((v) => fmt(v).length)) * 6.4 + 10;
+      const yLabelW = Math.max(...sc.ticks.map((v) => fmt(v).length)) * CH + 10;
       const left = yLabelW, top = 8, bottom = 26, right = 4;
       const pw = w - left - right, ph = plotH - top - bottom;
       const y = (v) => top + ph - ((v - sc.min) / (sc.max - sc.min)) * ph;
@@ -185,7 +191,7 @@ export function BarChart({ labels, datasets, horizontal, stacked, money, integer
                   }
                   const x = cx - (barW * groups) / 2 + barW * di;
                   const y0 = y(0), y1 = y(v);
-                  const label = short(v);
+                  const label = v === 0 && n > 8 ? '' : short(v); // empty months in a long series stay unlabelled
                   const upright = textW(label) > barW + 4;
                   const lx = x + barW / 2;
                   return (
@@ -216,14 +222,14 @@ export function BarChart({ labels, datasets, horizontal, stacked, money, integer
         );
       }
     } else {
-      const labelW = Math.min(w * 0.36, Math.max(...labels.map((l) => String(l).length)) * 6.6 + 12);
+      const labelW = Math.min(w * 0.36, Math.max(...labels.map((l) => String(l).length)) * (CH + 0.2) + 12);
       const endLabelW = Math.max(...labels.map((_, i) => textW(short(stacked ? sums[i] : Math.max(...datasets.map((d) => d.data[i] || 0)))))) + 8;
       const left = labelW, top = 4, bottom = 24, right = Math.max(10, endLabelW);
       const pw = w - left - right, ph = plotH - top - bottom;
       const x = (v) => left + ((v - sc.min) / (sc.max - sc.min)) * pw;
       const band = ph / n;
       const barH = Math.min(30, band * 0.72);
-      const maxChars = Math.floor((labelW - 12) / 6.4);
+      const maxChars = Math.floor((labelW - 12) / CH);
       const tickEvery = Math.max(1, Math.ceil((sc.ticks.length * 52) / pw));
       chart = (
         <Svg width={w} height={plotH}>
@@ -287,13 +293,17 @@ export function BarChart({ labels, datasets, horizontal, stacked, money, integer
   return (
     <View onLayout={onLayout} style={{ minHeight: height }}>
       {chart}
-      {legend ? <Legend cc={cc} items={datasets.map((d) => ({ label: d.label, color: d.color }))} /> : null}
+      {legend ? <Legend cc={cc} small={narrow} items={datasets.map((d) => ({ label: d.label, color: d.color }))} /> : null}
     </View>
   );
 }
 
 /* Line chart with optional soft area fill. */
-export function LineChart({ labels, datasets, money, integer, legend, height = 280 }) {
+export function LineChart({ labels, datasets, money, integer, legend, height: fullHeight = 280 }) {
+  const { narrow } = useCardSize();
+  const height = narrow ? Math.round(fullHeight * 0.82) : fullHeight;
+  const FONT = narrow ? 9 : FONT_BASE;
+  const CH = narrow ? 5.3 : 6.4;
   const cc = useChartColors();
   const [w, onLayout] = useWidth();
   const [sel, setSel] = useState(null);
@@ -306,7 +316,7 @@ export function LineChart({ labels, datasets, money, integer, legend, height = 2
 
   let chart = null;
   if (w > 0 && n > 0) {
-    const yLabelW = Math.max(...sc.ticks.map((v) => fmt(v).length)) * 6.4 + 10;
+    const yLabelW = Math.max(...sc.ticks.map((v) => fmt(v).length)) * CH + 10;
     const left = yLabelW, top = 8, bottom = 26, right = 8;
     const pw = w - left - right, ph = plotH - top - bottom;
     const x = (i) => left + (n === 1 ? pw / 2 : (pw * i) / (n - 1));
@@ -362,13 +372,15 @@ export function LineChart({ labels, datasets, money, integer, legend, height = 2
   return (
     <View onLayout={onLayout} style={{ minHeight: height }}>
       {chart}
-      {legend ? <Legend cc={cc} items={datasets.map((d) => ({ label: d.label, color: d.color }))} /> : null}
+      {legend ? <Legend cc={cc} small={narrow} items={datasets.map((d) => ({ label: d.label, color: d.color }))} /> : null}
     </View>
   );
 }
 
 /* Doughnut (65% cutout) with the legend underneath. */
-export function DonutChart({ labels, data, colors, height = 280 }) {
+export function DonutChart({ labels, data, colors, height: fullHeight = 280 }) {
+  const { narrow } = useCardSize();
+  const height = narrow ? Math.round(fullHeight * 0.8) : fullHeight;
   const cc = useChartColors();
   const [w, onLayout] = useWidth();
   const [sel, setSel] = useState(null);
@@ -412,7 +424,7 @@ export function DonutChart({ labels, data, colors, height = 280 }) {
           ) : null}
         </View>
       ) : null}
-      <Legend cc={cc} items={labels.map((l, i) => ({ label: `${l}: ${formatCompact(data[i] || 0)} (${total ? Math.round(((data[i] || 0) / total) * 100) : 0}%)`, color: colors[i] }))} />
+      <Legend cc={cc} small={narrow} items={labels.map((l, i) => ({ label: `${l}: ${formatCompact(data[i] || 0)} (${total ? Math.round(((data[i] || 0) / total) * 100) : 0}%)`, color: colors[i] }))} />
     </View>
   );
 }
