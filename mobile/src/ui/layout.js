@@ -40,17 +40,19 @@ export function Grid({ children, minItemWidth, columns, gap = 16, fillLast, fit,
       let cols = Math.max(1, Math.floor((w + gap) / (minItemWidth + gap)));
       if (columns) cols = Math.min(cols, columns);
       if (fit) cols = Math.max(1, Math.min(cols, items.length));
-      const track = (w - gap * (cols - 1)) / cols;
+      // A pixel of slack per cell: once the phone rounds widths to device
+      // pixels, cells sized to fill a row exactly can overflow and wrap.
+      const track = Math.floor((w - gap * (cols - 1)) / cols) - 1;
       widths = items.map(() => track);
       // fillLast: a short final row shares the full width instead of leaving a gap.
       const rest = items.length % cols;
       if (fillLast && rest) {
-        const wide = (w - gap * (rest - 1)) / rest;
+        const wide = Math.floor((w - gap * (rest - 1)) / rest) - 1;
         for (let i = items.length - rest; i < items.length; i++) widths[i] = wide;
       }
     } else {
       const cols = columns || 6;
-      const track = (w - gap * (cols - 1)) / cols;
+      const track = (w - gap * (cols - 1) - 1) / cols; // 1px slack, as above
       const spans = items.map((c) => {
         const span = Math.min(cols, c.props?.span || cols);
         if (w < 640) return cols;

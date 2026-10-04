@@ -140,19 +140,37 @@ export function SplitBar({ parts }) {
 
 /* Tile grid matching the web's .glance-grid / .insight-tiles: as many
    columns as fit with tiles at least minTile wide (up to six), but never
-   fewer than two. A child with `wide` spans the whole row. */
+   fewer than two. A child with `wide` spans the whole row.
+   Built as explicit rows of flex:1 cells rather than flex-wrap: tiles sized
+   to exactly fill a row can overflow it by a fraction of a pixel once the
+   phone rounds to device pixels, which wrapped every second tile onto its
+   own line (one tile per row with empty space beside it). */
 export function TileGrid({ children, gap = 10, minTile = 150 }) {
   const [w, setW] = useState(0);
   const items = Children.toArray(children).filter(Boolean);
   const cols = Math.min(6, Math.max(2, Math.floor((w + gap) / (minTile + gap))));
-  const track = (w - gap * (cols - 1)) / cols;
-  const widthOf = (child) => {
-    if (!child.props?.wide) return track;
-    return w;
-  };
+  const rows = [];
+  let row = [];
+  items.forEach((child) => {
+    if (child.props?.wide) {
+      if (row.length) rows.push(row);
+      rows.push([child]);
+      row = [];
+      return;
+    }
+    row.push(child);
+    if (row.length === cols) { rows.push(row); row = []; }
+  });
+  if (row.length) rows.push(row);
   return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap }} onLayout={(e) => setW(e.nativeEvent.layout.width)}>
-      {w > 0 && items.map((child, i) => <View key={child.key ?? i} style={{ width: widthOf(child) }}>{child}</View>)}
+    <View style={{ gap }} onLayout={(e) => setW(e.nativeEvent.layout.width)}>
+      {w > 0 && rows.map((r, ri) => (
+        <View key={ri} style={{ flexDirection: 'row', gap }}>
+          {r.map((child, i) => <View key={child.key ?? i} style={{ flex: 1, minWidth: 0 }}>{child}</View>)}
+          {/* keep a short last row's tiles at the same width as the rows above */}
+          {!r[0].props?.wide && r.length < cols ? Array.from({ length: cols - r.length }, (_, k) => <View key={`pad${k}`} style={{ flex: 1 }} />) : null}
+        </View>
+      ))}
     </View>
   );
 }

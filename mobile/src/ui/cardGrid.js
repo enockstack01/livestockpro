@@ -20,14 +20,29 @@ export function CardGrid({ children, gap, style }) {
   const items = Children.toArray(children).filter(Boolean);
   const { cols, spans, position } = layoutCards(items.map((c) => ({ wide: c.props.wide || false })), w || 1);
   const g = gap ?? (w < 600 ? 10 : 16);
-  const track = (w - g * (cols - 1)) / cols;
   const ordered = items.map((child, i) => ({ child, i })).sort((a, b) => position[a.i] - position[b.i]);
+  /* Explicit rows of flex cells (flex = span) rather than flex-wrap, so
+     sub-pixel rounding on the phone can't push a card onto its own line.
+     layoutCards' spans always add up to whole rows. */
+  const rows = [];
+  let row = [];
+  let used = 0;
+  ordered.forEach((it) => {
+    row.push(it);
+    used += spans[it.i];
+    if (used >= cols) { rows.push(row); row = []; used = 0; }
+  });
+  if (row.length) rows.push(row);
   return (
-    <View style={[{ flexDirection: 'row', flexWrap: 'wrap', gap: g, marginBottom: w < 600 ? 18 : 24 }, style]} onLayout={(e) => setW(e.nativeEvent.layout.width)}>
-      {w > 0 && ordered.map(({ child, i }) => (
-        <CardSizeContext.Provider key={child.key ?? i} value={{ cols, narrow: w < 600 && spans[i] < cols }}>
-          <View style={{ width: track * spans[i] + g * (spans[i] - 1) }}>{child}</View>
-        </CardSizeContext.Provider>
+    <View style={[{ gap: g, marginBottom: w < 600 ? 18 : 24 }, style]} onLayout={(e) => setW(e.nativeEvent.layout.width)}>
+      {w > 0 && rows.map((r, ri) => (
+        <View key={ri} style={{ flexDirection: 'row', gap: g, alignItems: 'stretch' }}>
+          {r.map(({ child, i }) => (
+            <CardSizeContext.Provider key={child.key ?? i} value={{ cols, narrow: w < 600 && spans[i] < cols }}>
+              <View style={{ flex: spans[i], flexBasis: 0, minWidth: 0 }}>{child}</View>
+            </CardSizeContext.Provider>
+          ))}
+        </View>
       ))}
     </View>
   );
