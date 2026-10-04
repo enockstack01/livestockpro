@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useChartTheme } from '../../lib/chartTheme.js';
 import { Meter, Ring, SplitBar } from './MicroViz.jsx';
+import TileGrid from './TileGrid.jsx';
 
 /* Key insights as tiles — a figure, a 2–4 word label and a small chart —
    instead of sentences. The full sentence stays as the tile's hover text
@@ -63,7 +64,7 @@ export default function InsightTiles({ insights }) {
   const { t } = useTranslation();
   const colors = useInsightColors();
   return (
-    <div className="insight-tiles">
+    <TileGrid className="insight-tiles" minTile={155}>
       {insights.map((ins) => {
         const color = colors.tone[ins.tone];
         const sentence = t(`analytics.insight.${ins.key}`, ins.vars);
@@ -86,6 +87,6 @@ export default function InsightTiles({ insights }) {
           </div>
         );
       })}
-    </div>
+    </TileGrid>
   );
 }

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useChartTheme } from '../../lib/chartTheme.js';
 import { fmtMoney } from '../../../../shared/chartPalette';
+import TileGrid from './TileGrid.jsx';
 import { MiniColumns, Meter, SeriesValues, Sparkline, SparkDot } from './MicroViz.jsx';
 import { formatCompact, formatMoneyCompact } from '../../../../shared/currency';
 
@@ -43,7 +44,7 @@ export default function GlanceTiles({ g, onOpen }) {
   const monthName = L[L.length - 1];
 
   return (
-    <div className="glance-grid">
+    <TileGrid className="glance-grid" minTile={150}>
       <Tile icon="cow" tone="green" label={t('dashboardPage.totalAnimals')} value={g.animals.total.toLocaleString()} onClick={() => onOpen('/animals')}
         badge={g.animals.addedThisMonth > 0 && <Badge tone="green" icon="arrow-up" title={monthName}>{g.animals.addedThisMonth}</Badge>}>
         {spark(g.animals.series, ct.brand, (v) => v.toLocaleString(), formatCompact)}
@@ -79,6 +80,6 @@ export default function GlanceTiles({ g, onOpen }) {
         <MiniColumns values={g.net.series} color={ct.positive} negColor={ct.negative} labels={L} fmt={fmtMoney} valueFmt={(v) => formatMoneyCompact(v)} height={48} />
         <span className="glance-axis">{g.monthNames.map((m, i) => <span key={i}>{m}</span>)}</span>
       </Tile>
-    </div>
+    </TileGrid>
   );
 }

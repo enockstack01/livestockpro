@@ -173,10 +173,11 @@
 .micro-split span { display: block; height: 100%; }
 
 /* ---------- Farm at a glance (GlanceTiles.jsx) ---------- */
-/* As many columns as fit (tiles never narrower than 150px), but never
-   fewer than two — so a phone shows two per row and wide screens fill up. */
-.glance-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(max(min(150px, calc(50% - 5px)), calc((100% - 50px) / 6)), 1fr)); }
+/* Columns are set by components/dashboard/TileGrid.jsx (at least two). */
 .glance-grid > * { min-width: 0; }
+.tiles-tight .series-row, .tiles-tight .glance-axis { font-size: 8px; letter-spacing: -0.4px; }
+.tiles-tight .glance-tile { padding: 10px 8px 8px; }
+.tiles-tight .micro-col-val { font-size: 8.5px; }
 .glance-tile {
   display: flex;
   flex-direction: column;
@@ -226,8 +227,14 @@
 .glance-axis { display: flex; justify-content: space-around; margin-top: 4px; font-size: 10px; color: var(--text-light); }
 
 /* ---------- Key insights (InsightTiles.jsx) ---------- */
-.insight-tiles { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(max(min(155px, calc(50% - 5px)), calc((100% - 50px) / 6)), 1fr)); }
 .insight-tiles > * { min-width: 0; }
+/* Narrow tiles: the figures beside a ring move under it instead of being cut off. */
+.tiles-tight .insight-tile.with-ring .insight-tile-body { flex-direction: column; align-items: flex-start; gap: 6px; }
+.tiles-tight .insight-tile-side { flex-direction: row; flex-wrap: wrap; align-items: center; }
+.tiles-tight .insight-sub { white-space: normal; }
+.tiles-tight .insight-figure small { display: block; margin: 2px 0 0; white-space: normal; }
+.tiles-tight .insight-figure { white-space: normal; font-size: 18px; }
+.tiles-tight .insight-tile { padding: 10px; }
 .insight-tile {
   display: flex;
   flex-direction: column;

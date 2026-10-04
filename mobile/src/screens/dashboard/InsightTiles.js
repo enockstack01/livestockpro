@@ -28,9 +28,9 @@ function Viz({ v, color, partColors, t }) {
   const { colors } = useTheme();
   if (v.kind === 'ring') {
     return (
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
         <Ring pct={v.pct} color={color} label={v.figure} />
-        <View style={{ gap: 6, flexShrink: 1 }}>
+        <View style={{ gap: 6, flexShrink: 1, minWidth: 52 }}>
           {v.sub ? <Text style={[styles.sub, { color: colors.textLight }]} numberOfLines={1}>{v.sub}</Text> : null}
           {v.overdue > 0 ? <View style={{ alignSelf: 'flex-start' }}><Badge tone="red" icon="clock">{v.overdue}</Badge></View> : null}
         </View>

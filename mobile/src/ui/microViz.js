@@ -57,7 +57,7 @@ export function SeriesValues({ values, fmt = String, months }) {
       </View>
       {months ? (
         <View style={{ flexDirection: 'row' }}>
-          {months.map((m, i) => <Text key={i} numberOfLines={1} style={{ flex: 1, textAlign: 'center', fontSize: 9.5, color: colors.textLight }}>{m}</Text>)}
+          {months.map((m, i) => <Text key={i} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} style={{ flex: 1, textAlign: 'center', fontSize: 9.5, color: colors.textLight }}>{m}</Text>)}
         </View>
       ) : null}
     </View>
