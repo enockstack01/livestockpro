@@ -120,21 +120,24 @@ export function RecentActivity({ activity }) {
   );
 }
 
-function EventCard({ e, onPress }) {
+/* One event per row: date badge, what and which animal, and a countdown. */
+function EventRow({ e, onPress, last }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const c = useToneColor(e.color);
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.eventCard, { borderColor: pressed ? c.fg : colors.border, backgroundColor: colors.card }]} accessibilityLabel={e.title}>
-      <View style={styles.eventTop}>
-        <View>
-          <Text style={{ fontSize: 24, fontWeight: '800', color: colors.text, lineHeight: 26 }}>{e.day}</Text>
-          <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textLight, textTransform: 'uppercase' }}>{e.month}</Text>
-        </View>
-        <Chip tone={e.color} icon={e.icon} size={28} />
+    <Pressable onPress={onPress} accessibilityLabel={e.title} style={({ pressed }) => [styles.row, !last && { borderBottomWidth: 1, borderBottomColor: colors.border }, pressed && { backgroundColor: colors.bg }]}>
+      <View style={[styles.dateBadge, { backgroundColor: c.bg }]}>
+        <Text style={{ fontSize: 16, fontWeight: '800', color: c.fg, lineHeight: 18 }}>{e.day}</Text>
+        <Text style={{ fontSize: 9, fontWeight: '700', color: c.fg, textTransform: 'uppercase' }}>{e.month}</Text>
       </View>
-      <Text style={{ fontSize: 13, fontWeight: '700', color: colors.text }} numberOfLines={1}>{e.name}</Text>
-      <Text style={{ fontSize: 11, color: colors.textLight }} numberOfLines={1}>{t(e.labelKey)}</Text>
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text }} numberOfLines={1}>{e.name}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+          <Icon name={e.icon} size={10} color={c.fg} />
+          <Text style={{ fontSize: 11.5, color: colors.textLight }} numberOfLines={1}>{t(e.labelKey)}</Text>
+        </View>
+      </View>
       <View style={[styles.countdown, { backgroundColor: c.bg }]}>
         <Text style={{ fontSize: 11, fontWeight: '700', color: c.fg }}>{e.daysLeft === 0 ? t('dashboardFeed.today') : t('dashboardFeed.inDays', { count: e.daysLeft })}</Text>
       </View>
@@ -189,9 +192,7 @@ export function UpcomingEvents({ items }) {
                 <Text style={{ fontSize: 10.5, color: colors.textLight }}>+{UPCOMING_WINDOW_DAYS}</Text>
               </View>
             </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} snapToInterval={142} decelerationRate="fast" contentContainerStyle={{ gap: 10, paddingBottom: 2 }}>
-              {items.map((e) => <EventCard key={e.id} e={e} onPress={() => go(e.link)} />)}
-            </ScrollView>
+            {items.map((e, i) => <EventRow key={e.id} e={e} last={i === items.length - 1} onPress={() => go(e.link)} />)}
           </>
         )}
       </CardBody>
@@ -256,23 +257,18 @@ export function AlertsCard({ items }) {
   );
 }
 
-function LauncherButton({ a, onPress }) {
+/* One action per row: coloured icon, the full action name, and a chevron. */
+function ActionRow({ a, onPress, last }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const c = useToneColor(a.tone);
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={t(a.fullKey)} style={({ pressed }) => [styles.launcher, pressed && { backgroundColor: colors.bg }]}>
-      {({ pressed }) => (
-        <>
-          <View style={[styles.launcherIcon, { backgroundColor: c.bg, transform: [{ scale: pressed ? 0.94 : 1 }] }]}>
-            <Icon name={a.icon} size={20} color={c.fg} />
-            {!a.noAdd ? (
-              <View style={[styles.plus, { backgroundColor: c.fg, borderColor: colors.card }]}><Icon name="plus" size={9} color="#FFFFFF" /></View>
-            ) : null}
-          </View>
-          <Text style={{ fontSize: 11.5, fontWeight: '600', color: colors.text, textAlign: 'center' }} numberOfLines={2}>{t(a.labelKey)}</Text>
-        </>
-      )}
+    <Pressable onPress={onPress} accessibilityRole="button" style={({ pressed }) => [styles.row, !last && { borderBottomWidth: 1, borderBottomColor: colors.border }, pressed && { backgroundColor: colors.bg }]}>
+      <View style={[styles.actionIcon, { backgroundColor: c.bg }]}>
+        <Icon name={a.icon} size={15} color={c.fg} />
+      </View>
+      <Text style={{ flex: 1, fontSize: 13.5, fontWeight: '600', color: colors.text }} numberOfLines={1}>{t(a.fullKey)}</Text>
+      <Icon name={a.noAdd ? 'chevron-right' : 'plus'} size={12} color={colors.textLight} />
     </Pressable>
   );
 }
@@ -281,19 +277,13 @@ export function QuickActions() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const go = useGo();
-  const [w, setW] = useState(0);
-  const cols = w >= 700 ? 8 : 4;
   return (
     <Card>
       <CardHeader title={t('dashboardFeed.quickActions')} icon="bolt" iconColor={colors.purple} />
-      <CardBody style={{ paddingVertical: 14 }}>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: 8 }} onLayout={(e) => setW(e.nativeEvent.layout.width)}>
-          {w > 0 && QUICK_ACTIONS.map((a) => (
-            <View key={a.key} style={{ width: w / cols }}>
-              <LauncherButton a={a} onPress={() => go(a.noAdd ? a.path : `${a.path}?new=1`)} />
-            </View>
-          ))}
-        </View>
+      <CardBody style={{ paddingVertical: 8 }}>
+        {QUICK_ACTIONS.map((a, i) => (
+          <ActionRow key={a.key} a={a} last={i === QUICK_ACTIONS.length - 1} onPress={() => go(a.noAdd ? a.path : `${a.path}?new=1`)} />
+        ))}
       </CardBody>
     </Card>
   );
@@ -307,12 +297,9 @@ const styles = StyleSheet.create({
   track: { position: 'absolute', left: 0, right: 0, bottom: 10, height: 2, borderRadius: 1 },
   timelineStop: { position: 'absolute', bottom: 0, width: 28, marginLeft: -14, alignItems: 'center', gap: 2 },
   timelineDot: { minWidth: 20, height: 20, paddingHorizontal: 3, borderRadius: 10, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
-  eventCard: { width: 132, gap: 2, padding: 12, borderWidth: 1, borderRadius: 12 },
-  eventTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
-  countdown: { alignSelf: 'flex-start', marginTop: 8, paddingVertical: 2, paddingHorizontal: 8, borderRadius: 999 },
+  countdown: { paddingVertical: 2, paddingHorizontal: 8, borderRadius: 999 },
+  dateBadge: { width: 42, height: 42, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  actionIcon: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   kindsBar: { paddingBottom: 12, marginBottom: 4, borderBottomWidth: 1, flexGrow: 0 },
   kind: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 12, gap: 2 },
-  launcher: { alignItems: 'center', gap: 8, paddingVertical: 10, paddingHorizontal: 2, borderRadius: 12 },
-  launcherIcon: { width: 52, height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  plus: { position: 'absolute', right: -4, bottom: -4, width: 20, height: 20, borderRadius: 10, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
 });

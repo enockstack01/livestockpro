@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { useRepository } from '../../src/db/repository';
 import { useSync } from '../../src/sync/SyncProvider';
 import { Page, PageHeader, Spinner } from '../../src/ui/kit';
-import { Grid } from '../../src/ui/layout';
 import FarmAnalytics from '../../src/screens/FarmAnalytics';
 import HerdProfileCard from '../../src/screens/dashboard/HerdProfileCard';
 import { RecentActivity, UpcomingEvents, AlertsCard, QuickActions } from '../../src/screens/dashboard/DashboardFeed';
@@ -69,14 +68,14 @@ export default function DashboardScreen() {
 
       <FarmAnalytics data={data} />
 
-      <Grid minItemWidth={340} gap={20} style={{ marginBottom: 20 }}>
+      {/* One card per row at every size: only Farm at a glance, Key Insights
+         and the analytics charts go side by side. */}
+      <View style={{ gap: 20 }}>
         <RecentActivity activity={feed.activity} />
         <UpcomingEvents items={feed.upcoming} />
-      </Grid>
-      <Grid minItemWidth={340} gap={20}>
         <AlertsCard items={feed.alerts} />
         <QuickActions />
-      </Grid>
+      </View>
       <View style={{ height: 8 }} />
     </Page>
   );
