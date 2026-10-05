@@ -973,5 +973,8 @@
     "currencyHelp": "平台上的所有金额都将以此货币显示。",
     "currencySaved": "货币已更新。",
     "currencyFailed": "无法更新货币：{{message}}"
+  },
+  "splash": {
+    "tagline": "畜牧养殖，尽在掌握"
   }
 }

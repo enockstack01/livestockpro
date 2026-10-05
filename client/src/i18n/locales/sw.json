@@ -973,5 +973,8 @@
     "currencyHelp": "Kiasi chote cha fedha kwenye jukwaa kinaonyeshwa kwa sarafu hii.",
     "currencySaved": "Sarafu imesasishwa.",
     "currencyFailed": "Imeshindwa kusasisha sarafu: {{message}}"
+  },
+  "splash": {
+    "tagline": "Ufugaji, kwa mpangilio"
   }
 }

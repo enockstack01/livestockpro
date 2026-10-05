@@ -973,5 +973,8 @@
     "currencyHelp": "Todos los importes de la plataforma se muestran en esta moneda.",
     "currencySaved": "Moneda actualizada.",
     "currencyFailed": "No se pudo actualizar la moneda: {{message}}"
+  },
+  "splash": {
+    "tagline": "Tu ganadería, bajo control"
   }
 }

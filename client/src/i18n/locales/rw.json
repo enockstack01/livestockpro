@@ -973,5 +973,8 @@
     "currencyHelp": "Amafaranga yose ku rubuga agaragazwa muri iri faranga.",
     "currencySaved": "Ifaranga ryavuguruwe.",
     "currencyFailed": "Ntibyashobotse kuvugurura ifaranga: {{message}}"
+  },
+  "splash": {
+    "tagline": "Ubworozi, bucunzwe neza"
   }
 }

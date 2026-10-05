@@ -16,6 +16,7 @@ import { AccountProvider } from '../src/account/AccountProvider';
 import { ThemeProvider, useTheme } from '../src/theme/ThemeProvider';
 import { LanguageProvider } from '../src/i18n/LanguageProvider';
 import LoadingScreen from '../src/components/LoadingScreen';
+import { SplashHost } from '../src/components/AppSplash';
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
@@ -29,22 +30,25 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <ThemeProvider>
           <LanguageProvider>
-            <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-              <Suspense fallback={<LoadingScreen />}>
-                <SQLiteProvider databaseName={DB_NAME} onInit={migrateDbIfNeeded}>
-                  <ToastProvider>
-                    <ConfirmProvider>
-                      <AccountProvider>
-                        <SyncProvider>
-                          <ThemedStatusBar />
-                          <Slot />
-                        </SyncProvider>
-                      </AccountProvider>
-                    </ConfirmProvider>
-                  </ToastProvider>
-                </SQLiteProvider>
-              </Suspense>
-            </ClerkProvider>
+            {/* Animated loading splash over everything until the first screen is ready. */}
+            <SplashHost>
+              <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+                <Suspense fallback={<LoadingScreen />}>
+                  <SQLiteProvider databaseName={DB_NAME} onInit={migrateDbIfNeeded}>
+                    <ToastProvider>
+                      <ConfirmProvider>
+                        <AccountProvider>
+                          <SyncProvider>
+                            <ThemedStatusBar />
+                            <Slot />
+                          </SyncProvider>
+                        </AccountProvider>
+                      </ConfirmProvider>
+                    </ToastProvider>
+                  </SQLiteProvider>
+                </Suspense>
+              </ClerkProvider>
+            </SplashHost>
           </LanguageProvider>
         </ThemeProvider>
       </SafeAreaProvider>

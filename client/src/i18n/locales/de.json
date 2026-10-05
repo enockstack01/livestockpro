@@ -973,5 +973,8 @@
     "currencyHelp": "Alle Geldbeträge der Plattform werden in dieser Währung angezeigt.",
     "currencySaved": "Währung aktualisiert.",
     "currencyFailed": "Währung konnte nicht aktualisiert werden: {{message}}"
+  },
+  "splash": {
+    "tagline": "Viehhaltung, im Griff"
   }
 }

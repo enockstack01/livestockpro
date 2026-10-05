@@ -973,5 +973,8 @@
     "currencyHelp": "Todos os valores da plataforma são exibidos nesta moeda.",
     "currencySaved": "Moeda atualizada.",
     "currencyFailed": "Não foi possível atualizar a moeda: {{message}}"
+  },
+  "splash": {
+    "tagline": "Sua pecuária, sob controle"
   }
 }

@@ -1,6 +1,7 @@
 import { useAuth } from '@clerk/expo';
 import { Redirect, Stack } from 'expo-router';
 import LoadingScreen from '../../src/components/LoadingScreen';
+import { SplashReadyOnMount } from '../../src/components/AppSplash';
 
 export default function AuthLayout() {
   const { isLoaded, isSignedIn } = useAuth();
@@ -8,5 +9,10 @@ export default function AuthLayout() {
   if (!isLoaded) return <LoadingScreen />;
   if (isSignedIn) return <Redirect href="/" />;
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <>
+      <SplashReadyOnMount />
+      <Stack screenOptions={{ headerShown: false }} />
+    </>
+  );
 }

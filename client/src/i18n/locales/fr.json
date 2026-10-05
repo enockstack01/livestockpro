@@ -973,5 +973,8 @@
     "currencyHelp": "Tous les montants de la plateforme sont affichés dans cette devise.",
     "currencySaved": "Devise mise à jour.",
     "currencyFailed": "Impossible de mettre à jour la devise : {{message}}"
+  },
+  "splash": {
+    "tagline": "L’élevage, bien géré"
   }
 }

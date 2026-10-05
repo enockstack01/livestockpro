@@ -1,9 +1,11 @@
+import { useEffect } from 'react';
 import { useAuth } from '@clerk/expo';
 import { Redirect, Slot } from 'expo-router';
 import LoadingScreen from '../../src/components/LoadingScreen';
 import AppShell from '../../src/ui/AppShell';
 import AccountGate from '../../src/screens/AccountGate';
 import { useAccount } from '../../src/account/AccountProvider';
+import { useSplashReady } from '../../src/components/AppSplash';
 
 /* Same frame as the web app (client/src/components/Layout.jsx): a green
    sidebar + topbar around one page at a time. Pages are flat siblings
@@ -14,6 +16,11 @@ import { useAccount } from '../../src/account/AccountProvider';
 export default function AppLayout() {
   const { isLoaded, isSignedIn } = useAuth();
   const { account, approved, loadError } = useAccount();
+  const splashReady = useSplashReady();
+  // The splash steps aside once we know which screen to show.
+  useEffect(() => {
+    if (isLoaded && (account || loadError)) splashReady();
+  }, [isLoaded, account, loadError, splashReady]);
 
   if (!isLoaded) return <LoadingScreen />;
   if (!isSignedIn) return <Redirect href="/sign-in" />;

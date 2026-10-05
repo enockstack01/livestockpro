@@ -977,5 +977,8 @@
     "currencyHelp": "All money amounts across the platform are shown in this currency.",
     "currencySaved": "Currency updated.",
     "currencyFailed": "Could not update the currency: {{message}}"
+  },
+  "splash": {
+    "tagline": "Livestock farming, managed"
   }
 }
