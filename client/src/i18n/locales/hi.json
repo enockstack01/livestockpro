@@ -858,7 +858,9 @@
       "recovered": "ठीक हुए",
       "died": "मृत",
       "female": "मादा",
-      "male": "नर"
+      "male": "नर",
+      "prev30": "पिछले 30 दिन से पहले",
+      "last30": "पिछले 30 दिन"
     },
     "incomeVsExpenses": "आय और व्यय",
     "caseOutcomes": "मामलों के परिणाम"

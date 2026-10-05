@@ -858,7 +858,9 @@
       "recovered": "Wamepona",
       "died": "Wamekufa",
       "female": "Jike",
-      "male": "Dume"
+      "male": "Dume",
+      "prev30": "Siku 30 zilizotangulia",
+      "last30": "Siku 30 zilizopita"
     },
     "incomeVsExpenses": "Mapato na Matumizi",
     "caseOutcomes": "Matokeo ya Matibabu"

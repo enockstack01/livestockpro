@@ -23,8 +23,8 @@ function ChartCard({ title, icon, empty, aside, children }) {
   const { t } = useTranslation();
   const { narrow } = useCardSize();
   return (
-    <Card style={{ flex: 1 }}>
-      <CardHeader title={title} icon={icon} right={aside} compact={narrow} />
+    <Card style={{ flex: 1, borderRadius: 14, overflow: 'hidden' }}>
+      <CardHeader title={title} icon={icon} right={aside} compact={narrow} tiled />
       <CardBody style={narrow ? { paddingVertical: 10, paddingHorizontal: 6 } : null}>{empty ? <EmptyState icon="chart-simple" title={t('analytics.noData')} compact /> : children}</CardBody>
     </Card>
   );
@@ -34,8 +34,9 @@ function SectionTitle({ icon, children }) {
   const { colors } = useTheme();
   return (
     <View style={styles.sectionTitle}>
-      <Icon name={icon} size={13} color={colors.primary} />
-      <Text style={[styles.sectionTitleText, { color: colors.textLight }]}>{children}</Text>
+      <View style={[styles.sectionIcon, { backgroundColor: colors.primaryLight }]}><Icon name={icon} size={12} color={colors.primary} /></View>
+      <Text style={[styles.sectionTitleText, { color: colors.text }]}>{children}</Text>
+      <View style={{ flex: 1, height: 1, backgroundColor: colors.border }} />
     </View>
   );
 }
@@ -182,6 +183,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, marginTop: 8, marginBottom: 16 },
   headerTitle: { fontSize: 20, fontWeight: '700' },
   headerSub: { fontSize: 13, marginTop: 2 },
-  sectionTitle: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8, marginBottom: 12 },
-  sectionTitleText: { fontSize: 13, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
+  sectionTitle: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 14, marginBottom: 12 },
+  sectionIcon: { width: 28, height: 28, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  sectionTitleText: { fontSize: 12.5, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.6 },
 });

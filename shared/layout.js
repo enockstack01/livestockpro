@@ -1,9 +1,10 @@
 /* Responsive card grid rules shared by the web dashboard (CSS grid) and the
    mobile app (flex-wrap), so both pack chart cards the same way.
 
-   Like CropManager's chart grid, cards sit side by side; here even phones
-   get at least two per row:
-     < 1000px wide  → 2 columns
+   Like CropManager's chart grid, cards sit side by side on larger screens
+   and one per row on phones:
+     < 600px wide   → 1 column
+     600–999px      → 2 columns
      1000–1499px    → 3 columns
      ≥ 1500px       → 4 columns
    A card can be:
@@ -20,6 +21,7 @@
    rows always run edge to edge. */
 
 export function gridColumns(width) {
+  if (width < 600) return 1;
   if (width >= 1500) return 4;
   if (width >= 1000) return 3;
   return 2;

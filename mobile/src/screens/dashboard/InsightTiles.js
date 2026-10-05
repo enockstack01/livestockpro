@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import { useTheme } from '../../theme/ThemeProvider';
 import { useChartColors } from '../../ui/charts';
-import { Meter, Ring, SplitBar, TileGrid } from '../../ui/microViz';
+import { Meter, MiniColumns, Ring, SplitBar, TileGrid } from '../../ui/microViz';
+import { formatCompact } from '../../../../shared/currency';
 import { Badge } from './GlanceTiles';
 
 /* Key insights as tiles — figure, short label, small chart — identical to
@@ -20,6 +21,22 @@ function Figure({ children, sub, icon, iconColor }) {
       {icon ? <Icon name={icon} size={16} color={iconColor} /> : null}
       <Text style={[styles.figure, { color: colors.text }]} numberOfLines={1}>{children}</Text>
       {sub ? <Text style={[styles.sub, { color: colors.textLight, flexShrink: 1 }]} numberOfLines={1}>{sub}</Text> : null}
+    </View>
+  );
+}
+
+/* The small column chart behind a single-figure insight: each bar with its
+   value on top and its label underneath (same as the web). */
+function Bars({ bars, color, money, decimals, t }) {
+  const { colors } = useTheme();
+  // Bar values leave out the currency symbol (the tile's figure shows it) so they fit a narrow bar.
+  const fmt = money && decimals ? (x) => (x === 0 ? '0' : String(Math.round(x * 100) / 100)) : formatCompact;
+  return (
+    <View>
+      <MiniColumns values={bars.map((b) => b.value)} color={color} height={32} valueFmt={fmt} />
+      <View style={{ flexDirection: 'row', gap: 4, marginTop: 3 }}>
+        {bars.map((b, i) => <Text key={i} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} style={{ flex: 1, textAlign: 'center', fontSize: 9, color: colors.textLight }}>{b.label || t(b.labelKey)}</Text>)}
+      </View>
     </View>
   );
 }
@@ -66,11 +83,16 @@ function Viz({ v, color, partColors, t }) {
     return (
       <View style={{ gap: 4 }}>
         <Figure icon={v.dir === 'up' ? 'arrow-trend-up' : 'arrow-trend-down'} iconColor={color}>{v.figure}</Figure>
-        {v.sub ? <Text style={[styles.sub, { color: colors.textLight }]}>{v.sub}</Text> : null}
+        {v.bars ? <Bars bars={v.bars} color={color} t={t} /> : v.sub ? <Text style={[styles.sub, { color: colors.textLight }]}>{v.sub}</Text> : null}
       </View>
     );
   }
-  return <Figure icon={v.icon} iconColor={color}>{v.figure}</Figure>;
+  return (
+    <View style={{ gap: 4 }}>
+      <Figure icon={v.icon} iconColor={color}>{v.figure}</Figure>
+      {v.bars ? <Bars bars={v.bars} color={color} money={v.money} decimals={v.decimals} t={t} /> : null}
+    </View>
+  );
 }
 
 export default function InsightTiles({ insights }) {
@@ -85,6 +107,8 @@ export default function InsightTiles({ insights }) {
         const color = tone[ins.tone];
         return (
           <View key={ins.id} accessible accessibilityLabel={t(`analytics.insight.${ins.key}`, ins.vars)} style={[styles.tile, { borderColor: colors.border, borderTopColor: color, backgroundColor: colors.card }]}>
+            {/* soft tint of the tone colour along the top, like the web tile */}
+            <View pointerEvents="none" style={[styles.tint, { backgroundColor: color }]} />
             <View style={styles.labelRow}>
               <Icon name={TONE_ICON[ins.tone]} size={12} color={color} style={{ marginTop: 1 }} />
               <Text style={[styles.label, { color: colors.textLight }]} numberOfLines={2}>{t(`analytics.insightLabel.${ins.key}`, ins.vars)}</Text>
@@ -100,7 +124,8 @@ export default function InsightTiles({ insights }) {
 }
 
 const styles = StyleSheet.create({
-  tile: { flexGrow: 1, gap: 10, padding: 12, borderWidth: 1, borderTopWidth: 3, borderRadius: 12, minHeight: 142 },
+  tile: { flexGrow: 1, gap: 10, padding: 12, borderWidth: 1, borderTopWidth: 3, borderRadius: 12, minHeight: 142, overflow: 'hidden' },
+  tint: { position: 'absolute', left: 0, right: 0, top: 0, height: 44, opacity: 0.05 },
   labelRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 6, minHeight: 30 },
   label: { flex: 1, fontSize: 11.5, fontWeight: '600', lineHeight: 15 },
   figure: { fontSize: 20, fontWeight: '800', letterSpacing: -0.3 },

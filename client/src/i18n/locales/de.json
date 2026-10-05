@@ -858,7 +858,9 @@
       "recovered": "Genesen",
       "died": "Verendet",
       "female": "Weiblich",
-      "male": "Männlich"
+      "male": "Männlich",
+      "prev30": "Vorige 30 T",
+      "last30": "Letzte 30 T"
     },
     "incomeVsExpenses": "Einnahmen und Ausgaben",
     "caseOutcomes": "Behandlungsergebnisse"

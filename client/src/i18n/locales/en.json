@@ -862,7 +862,9 @@
       "recovered": "Recovered",
       "died": "Died",
       "female": "Female",
-      "male": "Male"
+      "male": "Male",
+      "prev30": "Prev. 30d",
+      "last30": "Last 30d"
     },
     "incomeVsExpenses": "Income vs Expenses",
     "caseOutcomes": "Case Outcomes"

@@ -858,7 +858,9 @@
       "recovered": "已康复",
       "died": "已死亡",
       "female": "雌性",
-      "male": "雄性"
+      "male": "雄性",
+      "prev30": "前30天",
+      "last30": "近30天"
     },
     "incomeVsExpenses": "收入与支出",
     "caseOutcomes": "病例结果"

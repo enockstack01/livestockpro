@@ -858,7 +858,9 @@
       "recovered": "Recuperados",
       "died": "Mortos",
       "female": "Fêmea",
-      "male": "Macho"
+      "male": "Macho",
+      "prev30": "30 d anteriores",
+      "last30": "Últimos 30 d"
     },
     "incomeVsExpenses": "Receitas e despesas",
     "caseOutcomes": "Desfecho dos casos"

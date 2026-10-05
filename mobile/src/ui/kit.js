@@ -63,13 +63,16 @@ export function Card({ children, style, danger }) {
   return <View style={[s.card, danger && s.cardDanger, style]}>{children}</View>;
 }
 
-export function CardHeader({ title, icon, iconColor, right, titleColor, compact }) {
+export function CardHeader({ title, icon, iconColor, right, titleColor, compact, tiled }) {
   const s = useKitStyles();
   const { colors } = useTheme();
   return (
     <View style={[s.cardHeader, compact && s.cardHeaderCompact]}>
       <View style={s.cardHeaderTitleRow}>
-        {icon ? <Icon name={icon} size={compact ? 12 : 14} color={iconColor || colors.primary} /> : null}
+        {icon && tiled ? (
+          // Chart cards: the icon on a tinted tile, like the web's .chart-card header.
+          <View style={[s.cardHeaderIconTile, { backgroundColor: colors.primaryLight }]}><Icon name={icon} size={compact ? 11 : 12} color={iconColor || colors.primary} /></View>
+        ) : icon ? <Icon name={icon} size={compact ? 12 : 14} color={iconColor || colors.primary} /> : null}
         <Text style={[s.cardHeaderTitle, compact && s.cardHeaderTitleCompact, titleColor && { color: titleColor }]} numberOfLines={2}>{title}</Text>
       </View>
       {right}
@@ -327,6 +330,7 @@ function makeStyles(colors, radius, shadow, shadowLg) {
     cardHeaderTitle: { fontSize: 15, fontWeight: '600', color: colors.text, flexShrink: 1 },
     cardBody: { padding: 20 },
     // Half-width chart cards on phones (ui/cardGrid.js).
+    cardHeaderIconTile: { width: 26, height: 26, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
     cardHeaderCompact: { paddingVertical: 10, paddingHorizontal: 12, gap: 6, flexWrap: 'wrap' },
     cardHeaderTitleCompact: { fontSize: 12.5, fontWeight: '700' },
 

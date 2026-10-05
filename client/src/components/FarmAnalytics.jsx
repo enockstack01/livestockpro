@@ -50,7 +50,7 @@ export function ChartCard({ title, icon, empty, children, aside }) {
 }
 
 function SectionTitle({ icon, children }) {
-  return <h2 className="analytics-section-title"><i className={`fas ${icon}`}></i> {children}</h2>;
+  return <h2 className="analytics-section-title"><span className="section-icon"><i className={`fas ${icon}`}></i></span><span>{children}</span></h2>;
 }
 
 const barHeight = (n) => Math.max(180, n * 34 + 50);

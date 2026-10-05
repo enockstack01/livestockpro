@@ -858,7 +858,9 @@
       "recovered": "Yakize",
       "died": "Yapfuye",
       "female": "Ingore",
-      "male": "Isekurume"
+      "male": "Isekurume",
+      "prev30": "Iminsi 30 ibanza",
+      "last30": "Iminsi 30 ishize"
     },
     "incomeVsExpenses": "Amafaranga yinjiye n’ayasohotse",
     "caseOutcomes": "Uko indwara zarangiye"

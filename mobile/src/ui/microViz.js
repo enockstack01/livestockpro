@@ -91,7 +91,7 @@ export function MiniColumns({ values, color, negColor, height = 40, valueFmt = S
                 ...(neg ? { top: zero, borderBottomLeftRadius: 4, borderBottomRightRadius: 4 } : { bottom: height - zero, borderTopLeftRadius: 4, borderTopRightRadius: 4 }),
               }}
             />
-            <Text numberOfLines={1} style={{ position: 'absolute', left: -8, right: -8, textAlign: 'center', fontSize: 9.5, fontWeight: '700', color: colors.text, ...(neg ? { top: zero + h + 2 } : { bottom: height - zero + h + 2 }) }}>{valueFmt(v)}</Text>
+            <Text style={{ position: 'absolute', left: '50%', width: 52, marginLeft: -26, textAlign: 'center', fontSize: 9, fontWeight: '700', color: colors.text, ...(neg ? { top: zero + h + 2 } : { bottom: height - zero + h + 2 }) }}>{valueFmt(v)}</Text>
           </View>
         );
       })}

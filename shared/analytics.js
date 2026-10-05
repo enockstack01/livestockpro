@@ -137,7 +137,7 @@ export function computeFarmAnalytics(data, { months = 12, lang = 'en', enumLabel
   const overdueByPriority = PRIORITY_ORDER.map((p) => openTasks.filter((tk) => (tk.priority || 'Medium') === p && isOverdueTask(tk)).length);
   const onTimeByPriority = PRIORITY_ORDER.map((p) => openTasks.filter((tk) => (tk.priority || 'Medium') === p && !isOverdueTask(tk)).length);
 
-  const insights = computeInsights({ enumLabel, animals, living, health, breeding, production, feedingInRange, financeInRange, tasks, conditionNames, rangeStart });
+  const insights = computeInsights({ enumLabel, animals, living, health, breeding, production, feeding, finance, feedingInRange, financeInRange, tasks, conditionNames, rangeStart, lang });
 
   return {
     labels, living,
@@ -165,10 +165,15 @@ export function computeFarmAnalytics(data, { months = 12, lang = 'en', enumLabel
    viz.figure is the headline text; viz.sub an optional short qualifier.
    Each finding only appears when the farm has the data behind it; tone
    (good/warn/bad/info) drives the icon and color. */
-function computeInsights({ enumLabel, animals, living, health, breeding, production, feedingInRange, financeInRange, tasks, conditionNames, rangeStart }) {
+function computeInsights({ enumLabel, animals, living, health, breeding, production, feeding, finance, feedingInRange, financeInRange, tasks, conditionNames, rangeStart, lang }) {
   const out = [];
   const today = todayIso();
   const add = (id, tone, key, vars, viz) => out.push({ id, tone, key, vars, viz });
+  /* Small column charts behind single-figure insights (viz.bars):
+     [{ label | labelKey, value }], drawn with their values. */
+  const lastSix = monthBuckets(6, lang).map((b) => ({ key: b.key, label: new Date(b.key + '-01T00:00:00').toLocaleString(lang, { month: 'short' }) }));
+  const perMonth = (fn) => lastSix.map((m) => ({ label: m.label, value: fn(m.key) }));
+  const sumFinance = (key, pred) => finance.filter((f) => ym(f.date) === key && pred(f)).reduce((s, f) => s + moneyOf(f), 0);
 
   if (living.length) {
     const healthy = living.filter((a) => a.health_status === 'Healthy').length;
@@ -226,7 +231,8 @@ function computeInsights({ enumLabel, animals, living, health, breeding, product
     if (curRows.length >= 3 && prevRows.length >= 3 && prev > 0 && cur !== prev) {
       const change = Math.round(((cur - prev) / prev) * 100);
       add(`prod-${type}`, change >= 0 ? 'good' : 'warn', change >= 0 ? 'productionUp' : 'productionDown', { type: enumLabel('productionType', type), pct: Math.abs(change) },
-        { kind: 'trend', dir: change >= 0 ? 'up' : 'down', figure: `${change >= 0 ? '+' : '−'}${Math.abs(change)}%`, sub: `${Math.round(cur).toLocaleString()} ${unit || ''}`.trim() });
+        { kind: 'trend', dir: change >= 0 ? 'up' : 'down', figure: `${change >= 0 ? '+' : '−'}${Math.abs(change)}%`, sub: unit || '',
+          bars: [{ labelKey: 'analytics.part.prev30', value: Math.round(prev) }, { labelKey: 'analytics.part.last30', value: Math.round(cur) }] });
     }
   });
 
@@ -236,7 +242,10 @@ function computeInsights({ enumLabel, animals, living, health, breeding, product
     .reduce((s, p) => s + (Number(p.quantity) || 0), 0);
   if (feedSpend > 0 && litres > 0) {
     const value = formatMoney(feedSpend / litres, { decimals: 2 });
-    add('feedPerLiter', 'info', 'feedPerLiter', { value }, { kind: 'stat', icon: 'bottle-droplet', figure: value });
+    const milkByMonth = (key) => production.filter((p) => p.production_type === 'Milk' && p.unit === 'liters' && ym(p.production_date) === key).reduce((s, p) => s + (Number(p.quantity) || 0), 0);
+    const feedByMonth = (key) => feeding.filter((f) => ym(f.feeding_date) === key).reduce((s, f) => s + moneyOf(f, 'cost'), 0);
+    add('feedPerLiter', 'info', 'feedPerLiter', { value }, { kind: 'stat', icon: 'bottle-droplet', figure: value, money: true, decimals: 2,
+      bars: perMonth((k) => { const l = milkByMonth(k); return l > 0 ? Math.round((feedByMonth(k) / l) * 100) / 100 : 0; }) });
   }
 
   const income = financeInRange.filter((f) => f.type === 'Income').reduce((s, f) => s + moneyOf(f), 0);
@@ -257,17 +266,28 @@ function computeInsights({ enumLabel, animals, living, health, breeding, product
     const vet = financeInRange.filter((f) => f.type === 'Expense' && VET_CATEGORIES.has(f.category)).reduce((s, f) => s + moneyOf(f), 0);
     if (vet > 0) {
       const value = fmtMoney(vet / living.length);
-      add('vetPerAnimal', 'info', 'vetPerAnimal', { value }, { kind: 'stat', icon: 'syringe', figure: value });
+      add('vetPerAnimal', 'info', 'vetPerAnimal', { value }, { kind: 'stat', icon: 'syringe', figure: value, money: true,
+        bars: perMonth((k) => Math.round(sumFinance(k, (f) => f.type === 'Expense' && VET_CATEGORIES.has(f.category)) / living.length)) });
     }
     if (income > 0) {
       const value = fmtMoney(income / living.length);
-      add('revenuePerAnimal', 'info', 'revenuePerAnimal', { value }, { kind: 'stat', icon: 'hand-holding-dollar', figure: value });
+      add('revenuePerAnimal', 'info', 'revenuePerAnimal', { value }, { kind: 'stat', icon: 'hand-holding-dollar', figure: value, money: true,
+        bars: perMonth((k) => Math.round(sumFinance(k, (f) => f.type === 'Income') / living.length)) });
     }
   }
 
   const in30 = isoDaysFromNow(30);
   const upcoming = breeding.filter((b) => !b.birth_date && b.pregnancy_status === 'Pregnant' && b.expected_birth_date && b.expected_birth_date >= today && b.expected_birth_date <= in30).length;
-  if (upcoming > 0) add('upcomingBirths', 'info', 'upcomingBirths', { count: upcoming }, { kind: 'stat', icon: 'baby', figure: String(upcoming) });
+  if (upcoming > 0) {
+    // Expected births per week over the next four weeks.
+    const weeks = [0, 1, 2, 3].map((w) => {
+      const from = isoDaysFromNow(w * 7);
+      const to = w === 3 ? in30 : isoDaysFromNow(w * 7 + 7);
+      const value = breeding.filter((b) => !b.birth_date && b.pregnancy_status === 'Pregnant' && b.expected_birth_date && b.expected_birth_date >= from && (w === 3 ? b.expected_birth_date <= to : b.expected_birth_date < to)).length;
+      return { label: new Date(from + 'T00:00:00').toLocaleDateString(lang, { day: 'numeric', month: 'short' }), value };
+    });
+    add('upcomingBirths', 'info', 'upcomingBirths', { count: upcoming }, { kind: 'stat', icon: 'baby', figure: String(upcoming), bars: weeks });
+  }
 
   const females = living.filter((a) => a.sex === 'Female').length;
   const males = living.filter((a) => a.sex === 'Male').length;

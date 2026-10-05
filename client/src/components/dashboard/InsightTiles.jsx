@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useChartTheme } from '../../lib/chartTheme.js';
-import { Meter, Ring, SplitBar } from './MicroViz.jsx';
+import { Meter, MiniColumns, Ring, SplitBar } from './MicroViz.jsx';
+import { formatCompact, formatMoney, formatMoneyCompact } from '../../../../shared/currency';
 import TileGrid from './TileGrid.jsx';
 
 /* Key insights as tiles — a figure, a 2–4 word label and a small chart —
@@ -18,6 +19,18 @@ export function useInsightColors() {
     tone: { good: ct.status.good, warn: ct.status.warning, bad: ct.status.critical, info: ct.series[0] },
     parts: { recovered: ct.status.good, died: ct.neutral, female: ct.series[4], male: ct.series[0] }
   };
+}
+
+/* The small column chart behind a single-figure insight: each bar with its
+   value on top and its label underneath. */
+function Bars({ bars, color, money, decimals, t }) {
+  const fmt = money ? (v) => (v === 0 ? '0' : decimals ? formatMoney(v, { decimals }) : formatMoneyCompact(v)) : formatCompact;
+  return (
+    <div className="insight-bars">
+      <MiniColumns values={bars.map((b) => b.value)} color={color} labels={bars.map((b) => b.label || t(b.labelKey))} fmt={fmt} valueFmt={fmt} height={34} />
+      <span className="glance-axis">{bars.map((b, i) => <span key={i}>{b.label || t(b.labelKey)}</span>)}</span>
+    </div>
+  );
 }
 
 function Viz({ ins, color, colors, t }) {
@@ -49,13 +62,14 @@ function Viz({ ins, color, colors, t }) {
     return (
       <div className="insight-tile-stack">
         <div className="insight-figure"><i className={`fas fa-arrow-${v.dir === 'up' ? 'trend-up' : 'trend-down'}`} style={{ color, marginRight: 6 }} />{v.figure}</div>
-        {v.sub && <div className="insight-sub">{v.sub}</div>}
+        {v.bars ? <Bars bars={v.bars} color={color} t={t} /> : v.sub && <div className="insight-sub">{v.sub}</div>}
       </div>
     );
   }
   return (
     <div className="insight-tile-stack">
       <div className="insight-figure">{v.icon && <i className={`fas fa-${v.icon}`} style={{ color, marginRight: 8, fontSize: '0.8em' }} />}{v.figure}</div>
+      {v.bars && <Bars bars={v.bars} color={color} money={v.money} decimals={v.decimals} t={t} />}
     </div>
   );
 }
