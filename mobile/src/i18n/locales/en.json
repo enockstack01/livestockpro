@@ -52,7 +52,7 @@
     "couldNotSignIn": "Could not sign you in.",
     "couldNotCreateAccount": "Could not create your account.",
     "somethingWentWrong": "Something went wrong.",
-    "verificationIncomplete": "Verification incomplete — check the code and try again.",
+    "verificationIncomplete": "Verification incomplete, check the code and try again.",
     "invalidCode": "Invalid code.",
     "signInDidNotComplete": "Sign-in did not complete. Please try again.",
     "mfaNotSupported": "This account requires a verification method not yet supported in the app. Please sign in on the web instead.",
@@ -66,7 +66,8 @@
     "resetPassword": "Reset password",
     "backToSignIn": "Back to sign in",
     "couldNotSendResetCode": "Could not send the reset code.",
-    "couldNotResetPassword": "Could not reset your password."
+    "couldNotResetPassword": "Could not reset your password.",
+    "googleMissingInfo": "Your Google account needs a few more details to finish signing up ({{fields}}). Please sign up with email instead."
   },
   "settings": {
     "farmProfile": "Farm Profile",
@@ -111,23 +112,23 @@
     "syncing": "Syncing…",
     "syncIssue": "Sync issue",
     "lastSynced": "Last synced {{time}}",
-    "notSyncedYet": "Not synced yet — tap to sync",
+    "notSyncedYet": "Not synced yet, tap to sync",
     "recordsFailed_one": "{{count}} record failed to sync",
     "recordsFailed_other": "{{count}} records failed to sync"
   },
   "geo": {
     "capturing": "Capturing device location...",
-    "denied": "Location permission denied — this record will save without coordinates.",
-    "error": "Couldn't get device location — this record will save without coordinates.",
+    "denied": "Location permission denied, this record will save without coordinates.",
+    "error": "Couldn't get device location, this record will save without coordinates.",
     "unsupported": "This device does not support location capture.",
     "captured": "Location captured ({{lat}}, {{lng}})",
     "tapToRetry": " Tap to retry."
   },
   "confirmDialogs": {
     "signOutTitle": "Sign out?",
-    "signOutMessage": "You can sign back in any time — your data stays synced to your account.",
+    "signOutMessage": "You can sign back in any time, your data stays synced to your account.",
     "signOutConfirm": "Sign out",
-    "signOutSyncPending": "Some changes haven't finished syncing yet. Connect to the internet and try again — signing out now could lose them.",
+    "signOutSyncPending": "Some changes haven't finished syncing yet. Connect to the internet and try again, signing out now could lose them.",
     "deleteRecordTitle": "Delete this {{item}}?",
     "cannotBeUndone": "This cannot be undone."
   },

@@ -556,7 +556,7 @@ export default function AdminDashboard() {
                   <div className="filter-bar" style={{ marginBottom: 0 }}>
                     <select className="form-control" style={{ minWidth: 280 }} value={grantUserId} onChange={(e) => setGrantUserId(e.target.value)}>
                       <option value="">{t('adminDashboard.selectUserToPromote')}</option>
-                      {promotableUsers.map((u) => <option key={u.id} value={u.id}>{u.email}{u.farmName ? ` — ${u.farmName}` : ''}</option>)}
+                      {promotableUsers.map((u) => <option key={u.id} value={u.id}>{u.email}{u.farmName ? ` (${u.farmName})` : ''}</option>)}
                     </select>
                     <button className="btn btn-primary" disabled={!grantUserId} onClick={grantAdmin}>
                       <i className="fas fa-shield"></i> {t('adminDashboard.grantAdmin')}

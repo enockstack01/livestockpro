@@ -186,7 +186,7 @@ export default function Settings() {
             <div className="form-group">
               <label>{t('account.currency')}</label>
               <select className="form-control" value={account.currency || 'USD'} disabled={savingCurrency} onChange={(e) => changeCurrency(e.target.value)}>
-                {CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.code} — {currencyName(c.code, language)}</option>)}
+                {CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.code} ({currencyName(c.code, language)})</option>)}
               </select>
             </div>
             <p className="text-muted" style={{ fontSize: 13 }}>{t('account.currencyHelp')}</p>

@@ -86,9 +86,9 @@ const DATE_FIELD = {
   breeding_records: 'breeding_date', production_records: 'production_date', finance_records: 'date', tasks: 'due_date'
 };
 const TITLE_FIELD = {
-  animals: (d) => d.tag_id || d.name, health_records: (d) => (d.tag_id || '—') + (d.disease ? ` — ${d.disease}` : ''),
+  animals: (d) => d.tag_id || d.name, health_records: (d) => (d.tag_id || '—') + (d.disease ? `: ${d.disease}` : ''),
   feeding_records: (d) => d.feed_type, breeding_records: (d) => d.tag_id,
-  production_records: (d) => (d.tag_id ? `${d.tag_id} — ` : '') + (d.production_type || ''),
+  production_records: (d) => (d.tag_id ? `${d.tag_id}: ` : '') + (d.production_type || ''),
   finance_records: (d) => (d.category || d.type || 'Transaction'), tasks: (d) => d.title
 };
 
@@ -431,7 +431,7 @@ async function computeOneHealthAlerts(db) {
         zoonotic: entry.zoonotic,
         severity: entry.severity,
         confidence,
-        title: `${entry.disease} ${confidence === 'confirmed' ? 'confirmed' : confidence === 'suspected' ? 'suspected' : 'reported'} — ${farmLabel(r.user_id)}`,
+        title: `${entry.disease} ${confidence === 'confirmed' ? 'confirmed' : confidence === 'suspected' ? 'suspected' : 'reported'}: ${farmLabel(r.user_id)}`,
         description: `${entry.disease}${entry.zoonotic ? ' (zoonotic)' : ''} matched on a health record${r.district ? ` in ${r.district}` : ''}.`,
         farms: [farmLabel(r.user_id)],
         count: 1,
@@ -458,7 +458,7 @@ async function computeOneHealthAlerts(db) {
       zoonotic: false,
       severity: bumpSeverity('high', items.length - 2),
       confidence: 'confirmed',
-      title: `Mortality cluster — ${farmLabel(userId)}`,
+      title: `Mortality cluster: ${farmLabel(userId)}`,
       description: `${items.length} deaths recorded at this farm in the last 7 days.`,
       farms: [farmLabel(userId)],
       count: items.length,
@@ -482,7 +482,7 @@ async function computeOneHealthAlerts(db) {
       zoonotic: false,
       severity: bumpSeverity('medium', items.length - 3),
       confidence: 'confirmed',
-      title: `Critical health cluster — ${farmLabel(userId)}`,
+      title: `Critical health cluster: ${farmLabel(userId)}`,
       description: `${items.length} animals/records marked Critical at this farm in the last 7 days.`,
       farms: [farmLabel(userId)],
       count: items.length,

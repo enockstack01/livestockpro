@@ -33,12 +33,16 @@ export default function Login() {
 
           {!isLoaded ? null : (
             <>
-              <div style={{ display: showSignUp ? 'none' : 'block' }}>
-                <SignIn routing="virtual" appearance={appearance} />
-              </div>
-              <div style={{ display: showSignUp ? 'block' : 'none' }}>
-                <SignUp routing="virtual" appearance={appearance} />
-              </div>
+              {/* Hash routing (not virtual) so Google's redirect back to
+                  /#/sso-callback is picked up and finished here: an existing
+                  account is signed in, a new one is created automatically, and
+                  either way the user lands on the dashboard. Only one form is
+                  mounted at a time so the callback has a single owner. */}
+              {showSignUp ? (
+                <SignUp routing="hash" appearance={appearance} forceRedirectUrl="/dashboard" signInForceRedirectUrl="/dashboard" />
+              ) : (
+                <SignIn routing="hash" appearance={appearance} forceRedirectUrl="/dashboard" signUpForceRedirectUrl="/dashboard" />
+              )}
               <p className="subtitle" style={{ marginTop: 16, textAlign: 'center' }}>
                 {showSignUp ? t('auth.alreadyHaveAccount') : t('auth.dontHaveAccount')}
                 <a href="#" onClick={(e) => { e.preventDefault(); setShowSignUp((v) => !v); }}>

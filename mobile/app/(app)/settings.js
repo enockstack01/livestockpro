@@ -189,7 +189,7 @@ export default function SettingsScreen() {
             <Muted style={{ marginBottom: 16 }}>{rtlRestartNeeded ? t('settings.rtlRestartNotice') : t('settings.languageHelp')}</Muted>
             <FormGroup label={t('account.currency')}>
               <Select value={account?.currency || 'USD'} onChange={changeCurrency} placeholder={t('account.currency')}
-                options={CURRENCIES.map((c) => ({ value: c.code, label: `${c.code} — ${currencyName(c.code, language)}` }))} />
+                options={CURRENCIES.map((c) => ({ value: c.code, label: `${c.code} (${currencyName(c.code, language)})` }))} />
             </FormGroup>
             <Muted>{savingCurrency ? t('settings.saving') : t('account.currencyHelp')}</Muted>
           </CardBody>

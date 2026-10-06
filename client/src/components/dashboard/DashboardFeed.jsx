@@ -143,7 +143,7 @@ export function AlertsCard({ items }) {
           </div>
           <div className="feed-rows">
             {shown.map((a) => (
-              <button key={a.id} type="button" className="feed-row" onClick={() => navigate(a.link)} title={`${a.title} — ${a.sub}`}>
+              <button key={a.id} type="button" className="feed-row" onClick={() => navigate(a.link)} title={`${a.title}, ${a.sub}`}>
                 <span className={`feed-chip tone-${a.color}`}><i className={`fas fa-${a.icon}`} /></span>
                 <span className="feed-row-main">
                   <span className="feed-row-name">{a.name}</span>

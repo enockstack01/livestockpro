@@ -52,7 +52,7 @@
     "couldNotSignIn": "No se pudo iniciar sesión.",
     "couldNotCreateAccount": "No se pudo crear tu cuenta.",
     "somethingWentWrong": "Algo salió mal.",
-    "verificationIncomplete": "Verificación incompleta — revisa el código e inténtalo de nuevo.",
+    "verificationIncomplete": "Verificación incompleta, revisa el código e inténtalo de nuevo.",
     "invalidCode": "Código inválido.",
     "signInDidNotComplete": "El inicio de sesión no se completó. Inténtalo de nuevo.",
     "mfaNotSupported": "Esta cuenta requiere un método de verificación que aún no es compatible con la app. Inicia sesión en la web.",
@@ -66,7 +66,8 @@
     "resetPassword": "Restablecer contraseña",
     "backToSignIn": "Volver a iniciar sesión",
     "couldNotSendResetCode": "No se pudo enviar el código.",
-    "couldNotResetPassword": "No se pudo restablecer tu contraseña."
+    "couldNotResetPassword": "No se pudo restablecer tu contraseña.",
+    "googleMissingInfo": "Tu cuenta de Google necesita algunos datos más para completar el registro ({{fields}}). Regístrate con tu correo electrónico."
   },
   "settings": {
     "farmProfile": "Perfil de la Granja",
@@ -111,23 +112,23 @@
     "syncing": "Sincronizando…",
     "syncIssue": "Problema de sincronización",
     "lastSynced": "Última sincronización {{time}}",
-    "notSyncedYet": "Aún no sincronizado — toca para sincronizar",
+    "notSyncedYet": "Aún no sincronizado, toca para sincronizar",
     "recordsFailed_one": "{{count}} registro no se pudo sincronizar",
     "recordsFailed_other": "{{count}} registros no se pudieron sincronizar"
   },
   "geo": {
     "capturing": "Capturando ubicación del dispositivo...",
-    "denied": "Permiso de ubicación denegado — este registro se guardará sin coordenadas.",
-    "error": "No se pudo obtener la ubicación del dispositivo — este registro se guardará sin coordenadas.",
+    "denied": "Permiso de ubicación denegado, este registro se guardará sin coordenadas.",
+    "error": "No se pudo obtener la ubicación del dispositivo, este registro se guardará sin coordenadas.",
     "unsupported": "Este dispositivo no admite la captura de ubicación.",
     "captured": "Ubicación capturada ({{lat}}, {{lng}})",
     "tapToRetry": " Toca para reintentar."
   },
   "confirmDialogs": {
     "signOutTitle": "¿Cerrar sesión?",
-    "signOutMessage": "Puedes volver a iniciar sesión en cualquier momento — tus datos permanecen sincronizados con tu cuenta.",
+    "signOutMessage": "Puedes volver a iniciar sesión en cualquier momento, tus datos permanecen sincronizados con tu cuenta.",
     "signOutConfirm": "Cerrar sesión",
-    "signOutSyncPending": "Algunos cambios aún no se han sincronizado. Conéctate a internet e inténtalo de nuevo — cerrar sesión ahora podría perderlos.",
+    "signOutSyncPending": "Algunos cambios aún no se han sincronizado. Conéctate a internet e inténtalo de nuevo, cerrar sesión ahora podría perderlos.",
     "deleteRecordTitle": "¿Eliminar este/a {{item}}?",
     "cannotBeUndone": "Esta acción no se puede deshacer."
   },

@@ -42,7 +42,7 @@ function FieldInput({ field, value, onChange, t, lang }) {
   /* Each amount is saved in the currency it was paid or received in; the
      Settings currency is pre-selected. */
   if (field.type === 'currency') {
-    const options = CURRENCIES.map((c) => ({ value: c.code, label: `${c.code} — ${currencyName(c.code, lang)}` }));
+    const options = CURRENCIES.map((c) => ({ value: c.code, label: `${c.code} (${currencyName(c.code, lang)})` }));
     return <Select value={value || getCurrency()} options={options} onChange={onChange} placeholder={field.label} />;
   }
   if (field.type === 'select') {

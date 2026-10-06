@@ -52,7 +52,7 @@
     "couldNotSignIn": "Imeshindikana kukuingiza.",
     "couldNotCreateAccount": "Imeshindikana kuunda akaunti yako.",
     "somethingWentWrong": "Hitilafu imetokea.",
-    "verificationIncomplete": "Uthibitisho haujakamilika — angalia msimbo na ujaribu tena.",
+    "verificationIncomplete": "Uthibitisho haujakamilika, angalia msimbo na ujaribu tena.",
     "invalidCode": "Msimbo si sahihi.",
     "signInDidNotComplete": "Kuingia hakukukamilika. Tafadhali jaribu tena.",
     "mfaNotSupported": "Akaunti hii inahitaji njia ya uthibitisho ambayo bado haijaungwa mkono kwenye programu. Tafadhali ingia kwenye tovuti.",
@@ -66,7 +66,8 @@
     "resetPassword": "Weka upya nenosiri",
     "backToSignIn": "Rudi kuingia",
     "couldNotSendResetCode": "Imeshindikana kutuma msimbo.",
-    "couldNotResetPassword": "Imeshindikana kuweka upya nenosiri."
+    "couldNotResetPassword": "Imeshindikana kuweka upya nenosiri.",
+    "googleMissingInfo": "Akaunti yako ya Google inahitaji maelezo zaidi kukamilisha usajili ({{fields}}). Tafadhali jisajili kwa barua pepe."
   },
   "settings": {
     "farmProfile": "Wasifu wa Shamba",
@@ -111,23 +112,23 @@
     "syncing": "Inasawazisha…",
     "syncIssue": "Tatizo la usawazishaji",
     "lastSynced": "Ilisawazishwa mara ya mwisho {{time}}",
-    "notSyncedYet": "Bado haijasawazishwa — gusa kusawazisha",
+    "notSyncedYet": "Bado haijasawazishwa, gusa kusawazisha",
     "recordsFailed_one": "Rekodi {{count}} haikusawazishwa",
     "recordsFailed_other": "Rekodi {{count}} hazikusawazishwa"
   },
   "geo": {
     "capturing": "Inapata mahali pa kifaa...",
-    "denied": "Ruhusa ya mahali imekataliwa — rekodi hii itahifadhiwa bila kuratibu.",
-    "error": "Imeshindwa kupata mahali pa kifaa — rekodi hii itahifadhiwa bila kuratibu.",
+    "denied": "Ruhusa ya mahali imekataliwa, rekodi hii itahifadhiwa bila kuratibu.",
+    "error": "Imeshindwa kupata mahali pa kifaa, rekodi hii itahifadhiwa bila kuratibu.",
     "unsupported": "Kifaa hiki hakiwezi kupata mahali.",
     "captured": "Mahali pamepatikana ({{lat}}, {{lng}})",
     "tapToRetry": " Gusa kujaribu tena."
   },
   "confirmDialogs": {
     "signOutTitle": "Toka?",
-    "signOutMessage": "Unaweza kuingia tena wakati wowote — data yako inabaki kusawazishwa na akaunti yako.",
+    "signOutMessage": "Unaweza kuingia tena wakati wowote, data yako inabaki kusawazishwa na akaunti yako.",
     "signOutConfirm": "Toka",
-    "signOutSyncPending": "Baadhi ya mabadiliko bado hayajasawazishwa. Unganisha kwenye intaneti na ujaribu tena — kutoka sasa kunaweza kuyapoteza.",
+    "signOutSyncPending": "Baadhi ya mabadiliko bado hayajasawazishwa. Unganisha kwenye intaneti na ujaribu tena, kutoka sasa kunaweza kuyapoteza.",
     "deleteRecordTitle": "Futa {{item}} hii?",
     "cannotBeUndone": "Kitendo hiki hakiwezi kutenduliwa."
   },

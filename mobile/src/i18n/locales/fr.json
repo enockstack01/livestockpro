@@ -52,7 +52,7 @@
     "couldNotSignIn": "Impossible de vous connecter.",
     "couldNotCreateAccount": "Impossible de créer votre compte.",
     "somethingWentWrong": "Une erreur s'est produite.",
-    "verificationIncomplete": "Vérification incomplète — vérifiez le code et réessayez.",
+    "verificationIncomplete": "Vérification incomplète, vérifiez le code et réessayez.",
     "invalidCode": "Code invalide.",
     "signInDidNotComplete": "La connexion n'a pas abouti. Veuillez réessayer.",
     "mfaNotSupported": "Ce compte nécessite une méthode de vérification pas encore prise en charge dans l'application. Veuillez vous connecter sur le site web.",
@@ -66,7 +66,8 @@
     "resetPassword": "Réinitialiser le mot de passe",
     "backToSignIn": "Retour à la connexion",
     "couldNotSendResetCode": "Impossible d'envoyer le code.",
-    "couldNotResetPassword": "Impossible de réinitialiser le mot de passe."
+    "couldNotResetPassword": "Impossible de réinitialiser le mot de passe.",
+    "googleMissingInfo": "Votre compte Google nécessite quelques informations supplémentaires pour terminer l’inscription ({{fields}}). Veuillez vous inscrire avec votre e-mail."
   },
   "settings": {
     "farmProfile": "Profil de la ferme",
@@ -111,23 +112,23 @@
     "syncing": "Synchronisation…",
     "syncIssue": "Problème de synchronisation",
     "lastSynced": "Dernière synchronisation {{time}}",
-    "notSyncedYet": "Pas encore synchronisé — appuyez pour synchroniser",
+    "notSyncedYet": "Pas encore synchronisé, appuyez pour synchroniser",
     "recordsFailed_one": "{{count}} enregistrement n'a pas pu être synchronisé",
     "recordsFailed_other": "{{count}} enregistrements n'ont pas pu être synchronisés"
   },
   "geo": {
     "capturing": "Capture de la position de l'appareil...",
-    "denied": "Autorisation de localisation refusée — cet enregistrement sera sauvegardé sans coordonnées.",
-    "error": "Impossible d'obtenir la position de l'appareil — cet enregistrement sera sauvegardé sans coordonnées.",
+    "denied": "Autorisation de localisation refusée, cet enregistrement sera sauvegardé sans coordonnées.",
+    "error": "Impossible d'obtenir la position de l'appareil, cet enregistrement sera sauvegardé sans coordonnées.",
     "unsupported": "Cet appareil ne prend pas en charge la capture de position.",
     "captured": "Position capturée ({{lat}}, {{lng}})",
     "tapToRetry": " Appuyez pour réessayer."
   },
   "confirmDialogs": {
     "signOutTitle": "Se déconnecter ?",
-    "signOutMessage": "Vous pouvez vous reconnecter à tout moment — vos données restent synchronisées avec votre compte.",
+    "signOutMessage": "Vous pouvez vous reconnecter à tout moment, vos données restent synchronisées avec votre compte.",
     "signOutConfirm": "Déconnexion",
-    "signOutSyncPending": "Certaines modifications ne sont pas encore synchronisées. Connectez-vous à Internet et réessayez — se déconnecter maintenant pourrait les faire perdre.",
+    "signOutSyncPending": "Certaines modifications ne sont pas encore synchronisées. Connectez-vous à Internet et réessayez, se déconnecter maintenant pourrait les faire perdre.",
     "deleteRecordTitle": "Supprimer cet(te) {{item}} ?",
     "cannotBeUndone": "Cette action est irréversible."
   },

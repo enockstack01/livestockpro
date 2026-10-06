@@ -52,7 +52,7 @@
     "couldNotSignIn": "Ntibyakunze kukwinjiza.",
     "couldNotCreateAccount": "Ntibyakunze gufungura konti yawe.",
     "somethingWentWrong": "Hari ikibazo cyabaye.",
-    "verificationIncomplete": "Kwemeza ntibyarangiye — reba kode hanyuma ugerageze.",
+    "verificationIncomplete": "Kwemeza ntibyarangiye, reba kode hanyuma ugerageze.",
     "invalidCode": "Kode ntabwo ari yo.",
     "signInDidNotComplete": "Kwinjira ntibyarangiye. Ongera ugerageze.",
     "mfaNotSupported": "Iyi konti isaba uburyo bwo kwemeza butakiri bushobora gukoreshwa muri iyi porogaramu. Injira ukoresheje urubuga.",
@@ -66,7 +66,8 @@
     "resetPassword": "Hindura ijambo ry'ibanga",
     "backToSignIn": "Subira ku kwinjira",
     "couldNotSendResetCode": "Ntibyakunze kohereza kode.",
-    "couldNotResetPassword": "Ntibyakunze guhindura ijambo ry'ibanga."
+    "couldNotResetPassword": "Ntibyakunze guhindura ijambo ry'ibanga.",
+    "googleMissingInfo": "Konti yawe ya Google ikeneye andi makuru kugira ngo iyandikwa rirangire ({{fields}}). Iyandikishe ukoresheje imeyili."
   },
   "settings": {
     "farmProfile": "Amakuru y'Ubuhinzi",
@@ -111,23 +112,23 @@
     "syncing": "Birahuzwa…",
     "syncIssue": "Ikibazo cyo guhuza",
     "lastSynced": "Byahujwe ubwa nyuma {{time}}",
-    "notSyncedYet": "Ntibirahurizwa — kanda kugira ngo bihuzwe",
+    "notSyncedYet": "Ntibirahurizwa, kanda kugira ngo bihuzwe",
     "recordsFailed_one": "Icyanditswe {{count}} ntikyahuye",
     "recordsFailed_other": "Ibyanditswe {{count}} ntibyahuye"
   },
   "geo": {
     "capturing": "Gufata aho igikoresho kiri...",
-    "denied": "Uburenganzira bwo kumenya aho uri bwanzwe — iki cyanditswe kizabikwa kitarimo aho biherereye.",
-    "error": "Ntibyashobotse kumenya aho igikoresho kiri — iki cyanditswe kizabikwa kitarimo aho biherereye.",
+    "denied": "Uburenganzira bwo kumenya aho uri bwanzwe, iki cyanditswe kizabikwa kitarimo aho biherereye.",
+    "error": "Ntibyashobotse kumenya aho igikoresho kiri, iki cyanditswe kizabikwa kitarimo aho biherereye.",
     "unsupported": "Iki gikoresho ntigishobora kumenya aho kiri.",
     "captured": "Aho biherereye byabonetse ({{lat}}, {{lng}})",
     "tapToRetry": " Kanda kugira ngo ugerageze."
   },
   "confirmDialogs": {
     "signOutTitle": "Gusohoka?",
-    "signOutMessage": "Ushobora kwinjira ukundi igihe cyose — amakuru yawe agumana guhuzwa na konti yawe.",
+    "signOutMessage": "Ushobora kwinjira ukundi igihe cyose, amakuru yawe agumana guhuzwa na konti yawe.",
     "signOutConfirm": "Sohoka",
-    "signOutSyncPending": "Amahinduka amwe ntiraboneka guhuzwa. Huza kuri interineti hanyuma ugerageze nanone — gusohoka nonaha byashobora kuyatakaza.",
+    "signOutSyncPending": "Amahinduka amwe ntiraboneka guhuzwa. Huza kuri interineti hanyuma ugerageze nanone, gusohoka nonaha byashobora kuyatakaza.",
     "deleteRecordTitle": "Siba iki {{item}}?",
     "cannotBeUndone": "Iki gikorwa ntigishobora gusubizwa inyuma."
   },

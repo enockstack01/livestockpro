@@ -7,7 +7,7 @@ import Icon from './Icon';
 import { makeAuthStyles } from './AuthStyles';
 import { useTheme } from '../theme/ThemeProvider';
 
-/* "Continue with Google" — Clerk's useSSO()/startSSOFlow(), same flow for
+/* "Continue with Google": Clerk's useSSO()/startSSOFlow(), same flow for
    both sign-in and sign-up (Clerk creates the account automatically on
    first Google sign-in, matching how the web app's prebuilt <SignIn>/
    <SignUp> components already behave when a social connection is enabled).
@@ -24,16 +24,24 @@ export default function GoogleSignInButton({ onError }) {
   async function handlePress() {
     setBusy(true);
     try {
-      const { createdSessionId, setActive } = await startSSOFlow({
+      const { createdSessionId, setActive, signUp, authSessionResult } = await startSSOFlow({
         strategy: 'oauth_google',
-        redirectUrl: AuthSession.makeRedirectUri({ scheme: 'livestockpro', path: '/sso-callback' }),
+        // always show Google's account picker, then come straight back to the app
+        oidcPrompt: 'select_account',
+        redirectUrl: AuthSession.makeRedirectUri({ scheme: 'livestockpro', path: 'sso-callback' }),
       });
       if (createdSessionId && setActive) {
+        // An existing account is signed in; a new Google user gets an account
+        // created on the spot (startSSOFlow turns the sign-in into a sign-up).
         await setActive({ session: createdSessionId });
+        return;
       }
-      // If createdSessionId is missing, the flow needs another step (e.g. an
-      // extra verification) that Clerk's own UI would normally handle next —
-      // out of scope for this button; the user can retry or use email/password.
+      if (authSessionResult && authSessionResult.type !== 'success') return; // closed the Google window
+      if (signUp && signUp.status === 'missing_requirements') {
+        onError?.(t('auth.googleMissingInfo', { fields: (signUp.missingFields || []).join(', ') }));
+        return;
+      }
+      onError?.(t('auth.googleSignInFailed'));
     } catch (err) {
       const message = err?.errors?.[0]?.message || err?.message || t('auth.googleSignInFailed');
       onError?.(message);
