@@ -20,7 +20,8 @@ export function makeAuthStyles(colors, radius) {
     input: { borderWidth: 1.5, borderColor: colors.border, borderRadius: 8, paddingVertical: 11, paddingHorizontal: 14, fontSize: 14, color: colors.text, backgroundColor: colors.card },
     // .btn .btn-primary .btn-block
     button: { backgroundColor: colors.primary, paddingVertical: 12, borderRadius: 8, alignItems: 'center', marginTop: 4 },
-    buttonDisabled: { opacity: 0.5 },
+    // disabled stays deep green (no faded light green); the label dims instead
+    buttonDisabled: {},
     buttonText: { color: colors.white, fontWeight: '600', fontSize: 14 },
     error: { color: colors.red, fontSize: 13 },
     footerRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 16 },

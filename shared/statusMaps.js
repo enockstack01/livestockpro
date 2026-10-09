@@ -6,7 +6,7 @@
    don't look washed-out against a near-black card surface. */
 
 export const TONES = {
-  green: { bg: '#E8F5E9', fg: '#1B5E20' },
+  green: { bg: '#EDF1ED', fg: '#1B5E20' },
   orange: { bg: '#FFF8E1', fg: '#E65100' },
   red: { bg: '#FFEBEE', fg: '#D32F2F' },
   blue: { bg: '#E3F2FD', fg: '#1976D2' },
@@ -15,7 +15,7 @@ export const TONES = {
 };
 
 export const DARK_TONES = {
-  green: { bg: '#1B3A20', fg: '#81C784' },
+  green: { bg: '#1B3A20', fg: '#ECEFF1' },
   orange: { bg: '#4A3B14', fg: '#FFB74D' },
   red: { bg: '#4A1F1D', fg: '#EF5350' },
   blue: { bg: '#173A5E', fg: '#64B5F6' },

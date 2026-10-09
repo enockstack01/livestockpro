@@ -11,7 +11,7 @@ import SpatialMap from '../components/SpatialMap.jsx';
 import { ACCOUNT_TYPE_ICONS } from '../../../shared/account';
 
 const RESOURCE_LABELS = {
-  animals: { labelKey: 'tables.animals.label', icon: 'fa-cow', color: '#2E7D32' },
+  animals: { labelKey: 'tables.animals.label', icon: 'fa-cow', color: '#1B5E20' },
   health_records: { labelKey: 'healthPage.title', icon: 'fa-stethoscope', color: '#F9A825' },
   feeding_records: { labelKey: 'tables.feeding_records.singular', icon: 'fa-wheat-awn', color: '#1976D2' },
   breeding_records: { labelKey: 'tables.breeding_records.singular', icon: 'fa-venus-mars', color: '#7B1FA2' },
@@ -702,7 +702,7 @@ function RoleChart({ users }) {
   return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
 }
 
-const HEALTH_COLORS = { Healthy: '#2E7D32', 'Under Treatment': '#F9A825', Critical: '#D32F2F', Deceased: '#424242', Unspecified: '#90A4AE' };
+const HEALTH_COLORS = { Healthy: '#1B5E20', 'Under Treatment': '#F9A825', Critical: '#D32F2F', Deceased: '#424242', Unspecified: '#90A4AE' };
 
 function HealthBreakdownChart({ breakdown }) {
   const { t } = useTranslation();
@@ -722,7 +722,7 @@ function HealthBreakdownChart({ breakdown }) {
   return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
 }
 
-const SPECIES_COLORS = ['#2E7D32', '#F9A825', '#1976D2', '#7B1FA2', '#0097A7', '#D32F2F', '#5D4037', '#EF6C00', '#455A64'];
+const SPECIES_COLORS = ['#1B5E20', '#F9A825', '#1976D2', '#7B1FA2', '#0097A7', '#D32F2F', '#5D4037', '#EF6C00', '#455A64'];
 
 function SpeciesChart({ breakdown }) {
   const { t } = useTranslation();
@@ -742,7 +742,7 @@ function SpeciesChart({ breakdown }) {
   return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
 }
 
-const TASK_COLORS = { Pending: '#F9A825', 'In Progress': '#1976D2', Completed: '#2E7D32', Unspecified: '#90A4AE' };
+const TASK_COLORS = { Pending: '#F9A825', 'In Progress': '#1976D2', Completed: '#1B5E20', Unspecified: '#90A4AE' };
 
 function TaskBreakdownChart({ breakdown }) {
   const { t } = useTranslation();
@@ -769,7 +769,7 @@ function SignupTrendChart({ buckets }) {
     if (!hasData) return null;
     return {
       type: 'line',
-      data: { labels: buckets.map((b) => b.label), datasets: [{ label: t('adminDashboard.newUsers7d'), data: buckets.map((b) => b.count), borderColor: '#2E7D32', backgroundColor: 'rgba(46,125,50,0.1)', fill: true, tension: 0.4, pointRadius: 3, pointBackgroundColor: '#2E7D32' }] },
+      data: { labels: buckets.map((b) => b.label), datasets: [{ label: t('adminDashboard.newUsers7d'), data: buckets.map((b) => b.count), borderColor: '#1B5E20', backgroundColor: 'rgba(27,94,32,0.1)', fill: true, tension: 0.4, pointRadius: 3, pointBackgroundColor: '#1B5E20' }] },
       options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: { color: '#F0F0F0' } }, x: { grid: { display: false }, ticks: { font: { size: 10 } } } }, plugins: { legend: { display: false } } }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

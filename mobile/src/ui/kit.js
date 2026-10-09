@@ -94,10 +94,11 @@ export function Button({ title, icon, onPress, variant = 'primary', size, disabl
     <Pressable
       onPress={onPress ? () => { haptics.tap(); onPress(); } : undefined}
       disabled={disabled || loading}
-      style={({ pressed }) => [s.btn, s[`btn_${variant}`], size === 'sm' && s.btnSm, block && { alignSelf: 'stretch' }, (disabled || loading) && { opacity: 0.6 }, pressed && { opacity: 0.85 }, style]}
+      style={({ pressed }) => [s.btn, s[`btn_${variant}`], size === 'sm' && s.btnSm, block && { alignSelf: 'stretch' }, pressed && { opacity: 0.9 }, style]}
     >
       {loading ? <ActivityIndicator size="small" color={fg} /> : icon ? <Icon name={icon} size={size === 'sm' ? 11 : 13} color={fg} /> : null}
-      {title ? <Text style={[s.btnText, size === 'sm' && s.btnTextSm, { color: fg }]}>{title}</Text> : null}
+      {/* disabled keeps the full deep colour; only the label dims */}
+      {title ? <Text style={[s.btnText, size === 'sm' && s.btnTextSm, { color: fg }, disabled && !loading && { opacity: 0.65 }]}>{title}</Text> : null}
     </Pressable>
   );
 }

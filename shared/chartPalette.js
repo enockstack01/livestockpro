@@ -11,8 +11,8 @@ import { formatMoney } from './currency';
 
 export const CHART_PALETTE = {
   light: {
-    series: ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#4a3aa7', '#e34948'],
-    brand: '#2E7D32',
+    series: ['#2a78d6', '#eb6834', '#00897B', '#eda100', '#e87ba4', '#1B5E20', '#4a3aa7', '#e34948'],
+    brand: '#1B5E20',
     positive: '#2a78d6',
     negative: '#e34948',
     neutral: '#78909C',
@@ -23,8 +23,8 @@ export const CHART_PALETTE = {
     surface: '#FFFFFF'
   },
   dark: {
-    series: ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'],
-    brand: '#4CAF50',
+    series: ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#1B5E20', '#9085e9', '#e66767'],
+    brand: '#2E7D32',
     positive: '#3987e5',
     negative: '#e66767',
     neutral: '#90A4AE',
@@ -37,7 +37,7 @@ export const CHART_PALETTE = {
 
 /* Reserved for meaning good/bad — never reused as an ordinary series color,
    and always shown alongside a text label. */
-export const CHART_STATUS = { good: '#0ca30c', warning: '#fab219', serious: '#ec835a', critical: '#d03b3b' };
+export const CHART_STATUS = { good: '#1B5E20', warning: '#fab219', serious: '#ec835a', critical: '#d03b3b' };
 
 export function chartPalette(scheme) {
   return { scheme, status: CHART_STATUS, ...CHART_PALETTE[scheme === 'dark' ? 'dark' : 'light'] };

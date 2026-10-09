@@ -9,8 +9,9 @@
    icons on a colored surface); --card is the "page surface" color, identical
    to --white in light mode but diverges in dark mode below. */
 :root {
-  --primary: #2E7D32;
-  --primary-light: #E8F5E9;
+  --primary: #1B5E20;
+  --primary-light: #EDF1ED;
+  --primary-hover: #134A17;
   --primary-dark: #1B5E20;
   --white: #FFFFFF;
   --card: #FFFFFF;
@@ -39,9 +40,10 @@
    data-theme="dark" on <html> (see src/theme/ThemeProvider.jsx); --white
    intentionally stays literal white in both palettes (see shared/theme.js). */
 :root[data-theme='dark'] {
-  --primary: #4CAF50;
+  --primary: #2E7D32;
   --primary-light: #1B3A20;
-  --primary-dark: #A5D6A7;
+  --primary-dark: #ECEFF1;
+  --primary-hover: #1B5E20;
   --card: #1E1E1E;
   --bg: #121212;
   --text: #ECEFF1;
@@ -111,7 +113,7 @@ table {
 
 .auth-brand {
   flex: 1;
-  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+  background: #1B5E20;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -127,7 +129,7 @@ table {
   position: absolute;
   width: 500px;
   height: 500px;
-  background: rgba(255,255,255,0.05);
+  background: transparent;
   border-radius: 50%;
   top: -100px;
   right: -100px;
@@ -138,7 +140,7 @@ table {
   position: absolute;
   width: 300px;
   height: 300px;
-  background: rgba(255,255,255,0.04);
+  background: transparent;
   border-radius: 50%;
   bottom: -50px;
   left: -50px;
@@ -487,7 +489,7 @@ table {
 
 .form-control:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
+  box-shadow: 0 0 0 3px rgba(27,94,32,0.15);
 }
 
 .form-control::placeholder {
@@ -541,9 +543,9 @@ textarea.form-control {
 }
 
 .btn-primary:hover {
-  background: var(--primary-dark);
+  background: var(--primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(46,125,50,0.3);
+  box-shadow: 0 4px 12px rgba(27,94,32,0.3);
 }
 
 .btn-secondary {
@@ -632,10 +634,10 @@ textarea.form-control {
 
 .sidebar-logo i {
   font-size: 18px;
-  color: #81C784;
+  color: #FFFFFF;
 }
 
-/* Logo mark on a translucent tile, name in two tones ("Livestock" + green "Pro"). */
+/* Logo mark on a translucent tile, then the name in white. */
 .sidebar-logo-tile {
   width: 36px;
   height: 36px;
@@ -648,7 +650,8 @@ textarea.form-control {
 }
 
 .sidebar-logo-accent {
-  color: #81C784;
+  color: #FFFFFF;
+  font-weight: 800;
 }
 
 /* Features are grouped under small uppercase section labels. */
@@ -708,7 +711,7 @@ textarea.form-control {
 .nav-item.active {
   color: var(--white);
   background: rgba(255,255,255,0.12);
-  border-left-color: #66BB6A;
+  border-left-color: #FFFFFF;
 }
 
 .nav-item i {
@@ -2299,3 +2302,7 @@ table.data-table {
     height: 460px;
   }
 }
+/* Disabled buttons stay deep green (no faded light green); only the
+   label dims and the pointer changes. */
+.btn:disabled, .btn[disabled] { opacity: 1; cursor: not-allowed; }
+.btn-primary:disabled, .btn-primary[disabled] { background: var(--primary); color: rgba(255,255,255,0.7); transform: none; box-shadow: none; }

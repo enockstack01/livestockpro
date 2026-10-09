@@ -112,7 +112,7 @@ export default function HerdProfileCard({ animals, profile, glance, onOpen }) {
           <Defs>
             <LinearGradient id="herdBanner" x1="0" y1="0" x2="1" y2="1">
               <Stop offset="0" stopColor="#1B5E20" />
-              <Stop offset="1" stopColor="#2E7D32" />
+              <Stop offset="1" stopColor="#1B5E20" />
             </LinearGradient>
           </Defs>
           <Rect x="0" y="0" width="100%" height="100%" fill="url(#herdBanner)" />
@@ -173,7 +173,7 @@ export default function HerdProfileCard({ animals, profile, glance, onOpen }) {
 const styles = StyleSheet.create({
   card: { borderWidth: 1, borderRadius: 10, overflow: 'hidden', marginBottom: 24 },
   banner: { overflow: 'hidden', paddingTop: 18, paddingBottom: 16, paddingHorizontal: 20, backgroundColor: '#1B5E20' },
-  bannerCircle: { position: 'absolute', width: 180, height: 180, borderRadius: 90, backgroundColor: 'rgba(255,255,255,0.06)', top: -70, right: -50 },
+  bannerCircle: { display: 'none' },
   eyebrowRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
   eyebrow: { fontSize: 11, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: 'rgba(255,255,255,0.85)' },
   head: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 },

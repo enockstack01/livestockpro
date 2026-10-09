@@ -16,7 +16,7 @@ const daysUntil = (d) => Math.ceil((new Date(d) - new Date()) / DAY_MS);
 
 /* Status colors for the health ring (match the status badges). */
 export const HERD_STATUS = [
-  { key: 'Healthy', color: '#2E7D32' },
+  { key: 'Healthy', color: '#1B5E20' },
   { key: 'Under Treatment', color: '#F9A825' },
   { key: 'Critical', color: '#D32F2F' },
 ];

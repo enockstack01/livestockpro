@@ -24,13 +24,11 @@ export default function AuthShell({ children }) {
         <Defs>
           <LinearGradient id="authBrand" x1="0" y1="0" x2="1" y2="1">
             <Stop offset="0" stopColor="#1B5E20" />
-            <Stop offset="1" stopColor="#2E7D32" />
+            <Stop offset="1" stopColor="#1B5E20" />
           </LinearGradient>
         </Defs>
         <Rect x="0" y="0" width="100%" height="100%" fill="url(#authBrand)" />
       </Svg>
-      <View style={[styles.circle, { width: 500, height: 500, borderRadius: 250, top: -100, right: -100, backgroundColor: 'rgba(255,255,255,0.05)' }]} />
-      <View style={[styles.circle, { width: 300, height: 300, borderRadius: 150, bottom: -50, left: -50, backgroundColor: 'rgba(255,255,255,0.04)' }]} />
       <Icon name="cow" size={split ? 64 : 36} color="#FFFFFF" />
       <Text style={[styles.brandName, !split && { fontSize: 24, marginTop: 10, marginBottom: 4 }]}>{t('auth.brandName')}</Text>
       <Text style={[styles.tagline, !split && { fontSize: 13 }]}>{t('login.tagline')}</Text>

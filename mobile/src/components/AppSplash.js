@@ -72,7 +72,7 @@ export function SplashHost({ children }) {
           <Animated.View
             pointerEvents={ready ? 'none' : 'auto'}
             onLayout={() => SplashScreen.hideAsync().catch(() => {})}
-            style={[StyleSheet.absoluteFill, styles.layer, { opacity: fade, backgroundColor: dark ? '#0F1A10' : '#2E7D32' }]}
+            style={[StyleSheet.absoluteFill, styles.layer, { opacity: fade, backgroundColor: dark ? '#0F1A10' : '#1B5E20' }]}
           >
             {/* the native splash image at its native size (imageWidth 180) */}
             <Animated.View style={{ transform: [{ translateY: markY }, { scale: markScale }] }}>
@@ -80,7 +80,7 @@ export function SplashHost({ children }) {
             </Animated.View>
             <Animated.View style={[styles.words, { opacity: intro, transform: [{ translateY: textY }] }]}>
               <Animated.Text style={styles.name}>
-                Livestock<Animated.Text style={{ color: dark ? '#66BB6A' : '#C8E6C9' }}>Pro</Animated.Text>
+                Livestock<Animated.Text style={{ color: '#FFFFFF' }}>Pro</Animated.Text>
               </Animated.Text>
               <Animated.Text style={styles.tagline}>{t('splash.tagline', { defaultValue: 'Livestock farming, managed' })}</Animated.Text>
               <View style={styles.track}>

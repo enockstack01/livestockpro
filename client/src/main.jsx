@@ -19,7 +19,7 @@ const PUBLISHABLE_KEY = 'pk_test_YWJvdmUteWV0aS03MC5jbGVyay5hY2NvdW50cy5kZXYk';
 function ThemedClerkProvider({ children }) {
   const { scheme } = useTheme();
   return (
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY} appearance={{ baseTheme: scheme === 'dark' ? dark : undefined }}>
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY} appearance={{ baseTheme: scheme === 'dark' ? dark : undefined, variables: { colorPrimary: '#1B5E20' } }}>
       {children}
     </ClerkProvider>
   );

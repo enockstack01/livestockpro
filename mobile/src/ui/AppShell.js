@@ -288,8 +288,8 @@ function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInse
     <View style={[baseStyles.sidebar, { backgroundColor: colors.sidebar }]}>
       {/* Logo on a translucent tile, name in two tones. */}
       <View style={[baseStyles.sidebarHeader, { paddingTop: topInset + 14 }]}>
-        <View style={baseStyles.logoTile}><Icon name="cow" size={18} color="#81C784" /></View>
-        <Text style={baseStyles.logoText}>Livestock<Text style={{ color: '#81C784' }}>Pro</Text></Text>
+        <View style={baseStyles.logoTile}><Icon name="cow" size={18} color="#FFFFFF" /></View>
+        <Text style={baseStyles.logoText}>Livestock<Text style={{ color: '#FFFFFF', fontWeight: '800' }}>Pro</Text></Text>
         <View style={{ flex: 1 }} />
         {closable ? <Pressable onPress={onClose} hitSlop={10} accessibilityLabel="Close menu"><Icon name="xmark" size={18} color="rgba(255,255,255,0.6)" /></Pressable> : null}
       </View>
@@ -312,7 +312,7 @@ function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInse
       <View style={[baseStyles.sidebarFooter, { paddingBottom: bottomInset + 8 }]}>
         <Pressable onPress={() => { haptics.select(); triggerSync(); }} style={baseStyles.syncRow} accessibilityRole="button">
           <View style={{ width: 20, alignItems: 'center' }}>
-            <Icon name={syncing ? 'arrows-rotate' : lastError ? 'triangle-exclamation' : 'cloud'} size={12} color={lastError ? '#FFD54F' : '#81C784'} />
+            <Icon name={syncing ? 'arrows-rotate' : lastError ? 'triangle-exclamation' : 'cloud'} size={12} color={lastError ? '#FFD54F' : '#FFFFFF'} />
           </View>
           <Text style={baseStyles.syncText} numberOfLines={1}>{syncLine}{failedCount > 0 ? ` · ${t('sync.recordsFailed', { count: failedCount })}` : ''}</Text>
         </Pressable>
@@ -374,7 +374,7 @@ const baseStyles = StyleSheet.create({
   logoText: { color: '#FFFFFF', fontSize: 17, fontWeight: '700' },
   sectionLabel: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, color: 'rgba(255,255,255,0.35)', paddingTop: 16, paddingBottom: 6, paddingHorizontal: 20 },
   navItem: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11, paddingLeft: 17, paddingRight: 20, borderLeftWidth: 3, borderLeftColor: 'transparent' },
-  navItemActive: { backgroundColor: 'rgba(255,255,255,0.12)', borderLeftColor: '#66BB6A' },
+  navItemActive: { backgroundColor: 'rgba(255,255,255,0.12)', borderLeftColor: '#FFFFFF' },
   navText: { fontSize: 13, fontWeight: '500' },
   sidebarFooter: { borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', paddingTop: 6 },
   syncRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8, paddingLeft: 20, paddingRight: 20 },

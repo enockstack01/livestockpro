@@ -18,7 +18,7 @@
     "android": {
       "package": "com.livestockpro.mobile",
       "adaptiveIcon": {
-        "backgroundColor": "#E8F5E9",
+        "backgroundColor": "#1B5E20",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -40,7 +40,7 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 180,
           "resizeMode": "contain",
-          "backgroundColor": "#2E7D32",
+          "backgroundColor": "#1B5E20",
           "dark": {
             "image": "./assets/splash-icon-dark.png",
             "backgroundColor": "#0F1A10"
@@ -56,7 +56,7 @@
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
-          "color": "#2E7D32"
+          "color": "#1B5E20"
         }
       ],
       [

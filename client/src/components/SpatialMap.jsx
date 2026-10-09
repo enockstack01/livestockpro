@@ -11,7 +11,7 @@ import { useToast } from '../lib/toast.jsx';
 import { addBasemaps } from '../lib/basemaps.js';
 
 const TYPE_META = {
-  animals: { labelKey: 'tables.animals.label', color: '#2E7D32', icon: 'fa-cow' },
+  animals: { labelKey: 'tables.animals.label', color: '#1B5E20', icon: 'fa-cow' },
   health_records: { labelKey: 'healthPage.title', color: '#F9A825', icon: 'fa-stethoscope' },
   feeding_records: { labelKey: 'tables.feeding_records.singular', color: '#1976D2', icon: 'fa-wheat-awn' },
   breeding_records: { labelKey: 'tables.breeding_records.singular', color: '#7B1FA2', icon: 'fa-venus-mars' },

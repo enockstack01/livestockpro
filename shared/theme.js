@@ -8,8 +8,8 @@
    needs to keep pace with LIGHT's brand colors (primary/red/blue/purple/orange). */
 
 export const LIGHT_COLORS = {
-  primary: '#2E7D32',
-  primaryLight: '#E8F5E9',
+  primary: '#1B5E20',
+  primaryLight: '#EDF1ED',
   primaryDark: '#1B5E20',
   white: '#FFFFFF',
   bg: '#F5F7FA',
@@ -26,9 +26,9 @@ export const LIGHT_COLORS = {
 };
 
 export const DARK_COLORS = {
-  primary: '#4CAF50',
+  primary: '#2E7D32',
   primaryLight: '#1B3A20',
-  primaryDark: '#A5D6A7',
+  primaryDark: '#ECEFF1',
   white: '#FFFFFF', // stays literal white in both palettes — this is "text/icon color on a colored button", not a surface color (that's `card`), and buttons keep light text regardless of theme
   bg: '#121212',
   card: '#1E1E1E',

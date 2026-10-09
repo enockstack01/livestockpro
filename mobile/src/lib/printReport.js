@@ -30,7 +30,7 @@ export function buildReportHtml({ title, subtitle, cardRows, sections, recordsLa
   @page { margin: 14mm; }
   * { box-sizing: border-box; }
   body { font-family: Inter, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; color: #263238; margin: 0; font-size: 12px; }
-  header { border-bottom: 2px solid #2E7D32; padding-bottom: 12px; margin-bottom: 18px; }
+  header { border-bottom: 2px solid #1B5E20; padding-bottom: 12px; margin-bottom: 18px; }
   header h1 { font-size: 20px; font-weight: 800; color: #1B5E20; margin: 0 0 4px; }
   header p { color: #546E7A; margin: 0; font-size: 11px; }
   .cards { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
@@ -40,7 +40,7 @@ export function buildReportHtml({ title, subtitle, cardRows, sections, recordsLa
   section { margin-top: 18px; break-inside: auto; }
   .section-head { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E0E0E0; padding-bottom: 6px; margin-bottom: 6px; }
   .section-head h3 { font-size: 14px; margin: 0; }
-  .badge { background: #E8F5E9; color: #1B5E20; border-radius: 20px; padding: 2px 9px; font-size: 10px; font-weight: 600; }
+  .badge { background: #EDF1ED; color: #1B5E20; border-radius: 20px; padding: 2px 9px; font-size: 10px; font-weight: 600; }
   table { width: 100%; border-collapse: collapse; }
   thead { display: table-header-group; } /* repeat the header row on every printed page */
   th { background: #F5F7FA; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: .3px; color: #546E7A; padding: 6px; border-bottom: 1.5px solid #E0E0E0; }
