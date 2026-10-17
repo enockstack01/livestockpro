@@ -1082,11 +1082,13 @@
       "notifiable": "Normalmente de declaración obligatoria: comuníquelo a la oficina veterinaria del distrito.",
       "questions": "Preguntas para el veterinario",
       "gaps": "Información que ayudaría",
-      "print": "Imprimir o guardar como PDF",
+      "print": "Imprimir",
       "generated": "Generado el {{date}}",
       "animal": "Animal",
       "delete": "Eliminar informe",
-      "sharePdf": "Compartir PDF"
+      "sharePdf": "Compartir PDF",
+      "download": "Descargar PDF",
+      "downloading": "Preparando el PDF..."
     },
     "brief": {
       "title": "Resumen One Health con IA",
@@ -1120,6 +1122,52 @@
       "failed": "La solicitud a la IA falló: {{message}}",
       "busy": "Ha usado mucho la IA en esta hora. Inténtelo más tarde."
     },
-    "offline": "Necesita conexión para usar la IA."
+    "offline": "Necesita conexión para usar la IA.",
+    "pdf": {
+      "by": "por",
+      "docType": {
+        "diagnosis": "Informe de diagnóstico de enfermedades animales",
+        "advisor": "Informe de asesoría de la granja",
+        "onehealth": "Resumen de situación One Health"
+      },
+      "reportNo": "Informe n.º",
+      "generated": "Generado",
+      "preparedWith": "Preparado con LivestockPro IA",
+      "caseDetails": "Datos del caso",
+      "fields": {
+        "farm": "Granja",
+        "location": "Ubicación",
+        "tag": "N.º de identificación",
+        "name": "Nombre",
+        "species": "Especie",
+        "breed": "Raza",
+        "sex": "Sexo",
+        "age": "Edad",
+        "healthStatus": "Estado de salud",
+        "recordStatus": "Estado del registro",
+        "checkDate": "Fecha de revisión",
+        "vet": "Veterinario",
+        "reportedSigns": "Signos observados",
+        "currentTreatment": "Tratamiento actual"
+      },
+      "summary": "Resumen",
+      "vetNeeded": "Requiere veterinario",
+      "notifiable": "Enfermedad de declaración obligatoria",
+      "yes": "Sí",
+      "no": "No",
+      "condition": "Afección",
+      "likelihood": "Probabilidad",
+      "why": "Por qué",
+      "medicine": "Medicamento",
+      "action": "Acción",
+      "medNote": "Las dosis son orientativas. Siga la etiqueta del producto y la receta del veterinario, y respete el tiempo de retiro antes de vender leche, carne o huevos.",
+      "vetReview": "Revisión veterinaria",
+      "vetReviewNote": "Para el veterinario que examina al animal: confirme o corrija el diagnóstico y el tratamiento anteriores.",
+      "reviewedBy": "Revisado por",
+      "licence": "N.º de colegiado",
+      "signature": "Firma",
+      "date": "Fecha",
+      "important": "Importante:"
+    }
   }
 }

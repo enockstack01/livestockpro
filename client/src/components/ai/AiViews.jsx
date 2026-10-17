@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApi } from '../../lib/api.js';
-import { aiReportHtml } from '../../../../shared/aiReportHtml.js';
+import { useToast } from '../../lib/toast.jsx';
+import { aiReportFileName, aiReportHtml } from '../../../../shared/aiReportHtml.js';
 
 /* Whether the server has an Anthropic API key. null while loading. */
 export function useAiStatus() {
@@ -37,17 +38,61 @@ export function AiWorking({ label }) {
   );
 }
 
-/* Opens the branded printable report; the browser's print dialog saves it as a PDF. */
-export function printAiReport({ kind, report, title, subtitle, createdAt, t, lang }) {
-  const html = aiReportHtml({ kind, report, title, subtitle, createdAt, t, lang });
+/* The report options every output shares, from a saved report. */
+function reportOpts(saved, t, lang) {
+  return { kind: saved.kind, report: saved.report, title: saved.title, caseInfo: saved.input && saved.input.case, reportId: saved.id, createdAt: saved.created_at, t, lang };
+}
+
+/* Opens the branded report in its own window and the browser's print dialog. */
+export function printAiReport(saved, t, lang) {
+  const html = aiReportHtml(reportOpts(saved, t, lang));
   const win = window.open('', '_blank', 'width=900,height=1000');
   if (!win) return false;
   win.document.open();
   win.document.write(html);
   win.document.close();
   win.focus();
-  setTimeout(() => win.print(), 350);
+  setTimeout(() => win.print(), 400);
   return true;
+}
+
+/* Builds the branded report as an A4 PDF file and downloads it: the page is
+   drawn off screen, split into pages that keep sections and table rows
+   whole, and each page gets the LivestockPro · Agricoders footer and its
+   page number. */
+export async function downloadAiReport(saved, t, lang) {
+  const { default: html2pdf } = await import('html2pdf.js');
+  const opts = reportOpts(saved, t, lang);
+  const holder = document.createElement('div');
+  holder.setAttribute('aria-hidden', 'true');
+  holder.style.cssText = 'position:fixed;left:-12000px;top:0;width:182mm;background:#FFFFFF;';
+  holder.innerHTML = aiReportHtml({ ...opts, mode: 'pdf' });
+  document.body.appendChild(holder);
+  try {
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const worker = html2pdf().set({
+      margin: [14, 14, 18, 14],
+      filename: aiReportFileName(opts),
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: { scale: 2, backgroundColor: '#FFFFFF', logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
+      pagebreak: { mode: ['css', 'legacy'], avoid: ['.avoid', 'tr', '.li', 'p', '.kv', '.sec h2'] }
+    }).from(holder.querySelector('.lp-doc')).toPdf();
+    const pdf = await worker.get('pdf');
+    const pages = pdf.internal.getNumberOfPages();
+    for (let i = 1; i <= pages; i++) {
+      pdf.setPage(i);
+      pdf.setDrawColor(223, 226, 223);
+      pdf.line(14, 284, 196, 284);
+      pdf.setFontSize(8);
+      pdf.setTextColor(91, 107, 93);
+      pdf.text('LivestockPro · by Agricoders · livestockpro.agricoders.com', 14, 289);
+      pdf.text(`${i} / ${pages}`, 196, 289, { align: 'right' });
+    }
+    await worker.save();
+  } finally {
+    holder.remove();
+  }
 }
 
 const TONE = {
@@ -194,6 +239,13 @@ export function BriefView({ report: r }) {
 /* A saved report with its title, date and actions. */
 export function SavedReport({ saved, subtitle, onDelete }) {
   const { t, i18n } = useTranslation();
+  const showToast = useToast();
+  const [downloading, setDownloading] = useState(false);
+  async function download() {
+    setDownloading(true);
+    try { await downloadAiReport(saved, t, i18n.language); } catch (e) { showToast(t('ai.errors.failed', { message: e.message }), 'error'); }
+    setDownloading(false);
+  }
   const View = saved.kind === 'diagnosis' ? DiagnosisView : saved.kind === 'advisor' ? AdvisorView : BriefView;
   return (
     <div className="ai-saved">
@@ -203,8 +255,11 @@ export function SavedReport({ saved, subtitle, onDelete }) {
           <p className="ai-muted">{subtitle ? `${subtitle} · ` : ''}{t('ai.report.generated', { date: new Date(saved.created_at).toLocaleString(i18n.language) })}</p>
         </div>
         <div className="ai-saved-actions">
-          <button type="button" className="btn btn-secondary btn-sm" onClick={() => printAiReport({ kind: saved.kind, report: saved.report, title: saved.title, subtitle, createdAt: saved.created_at, t, lang: i18n.language })}>
-            <i className="fas fa-file-pdf"></i> {t('ai.report.print')}
+          <button type="button" className="btn btn-primary btn-sm" onClick={download} disabled={downloading}>
+            <i className={`fas fa-${downloading ? 'spinner fa-spin' : 'file-arrow-down'}`}></i> {downloading ? t('ai.report.downloading') : t('ai.report.download')}
+          </button>
+          <button type="button" className="btn btn-secondary btn-sm" onClick={() => printAiReport(saved, t, i18n.language)}>
+            <i className="fas fa-print"></i> {t('ai.report.print')}
           </button>
           {onDelete ? <button type="button" className="btn-icon danger" title={t('ai.report.delete')} onClick={() => onDelete(saved)}><i className="fas fa-trash"></i></button> : null}
         </div>

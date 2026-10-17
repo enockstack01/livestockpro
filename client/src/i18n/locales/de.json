@@ -1082,11 +1082,13 @@
       "notifiable": "In der Regel meldepflichtig: melden Sie es dem Veterinäramt des Bezirks.",
       "questions": "Fragen an den Tierarzt",
       "gaps": "Hilfreiche fehlende Angaben",
-      "print": "Drucken oder als PDF speichern",
+      "print": "Drucken",
       "generated": "Erstellt am {{date}}",
       "animal": "Tier",
       "delete": "Bericht löschen",
-      "sharePdf": "PDF teilen"
+      "sharePdf": "PDF teilen",
+      "download": "PDF herunterladen",
+      "downloading": "PDF wird erstellt..."
     },
     "brief": {
       "title": "KI One Health Lagebericht",
@@ -1120,6 +1122,52 @@
       "failed": "Die KI-Anfrage ist fehlgeschlagen: {{message}}",
       "busy": "Sie haben die KI in dieser Stunde oft genutzt. Bitte versuchen Sie es später erneut."
     },
-    "offline": "Für die KI ist eine Verbindung nötig."
+    "offline": "Für die KI ist eine Verbindung nötig.",
+    "pdf": {
+      "by": "von",
+      "docType": {
+        "diagnosis": "Diagnosebericht Tierkrankheit",
+        "advisor": "Bericht zur Betriebsberatung",
+        "onehealth": "One Health Lagebericht"
+      },
+      "reportNo": "Bericht Nr.",
+      "generated": "Erstellt",
+      "preparedWith": "Erstellt mit LivestockPro KI",
+      "caseDetails": "Falldaten",
+      "fields": {
+        "farm": "Betrieb",
+        "location": "Ort",
+        "tag": "Ohrmarke",
+        "name": "Name",
+        "species": "Tierart",
+        "breed": "Rasse",
+        "sex": "Geschlecht",
+        "age": "Alter",
+        "healthStatus": "Gesundheitszustand",
+        "recordStatus": "Status des Eintrags",
+        "checkDate": "Untersuchungsdatum",
+        "vet": "Tierarzt",
+        "reportedSigns": "Gemeldete Anzeichen",
+        "currentTreatment": "Aktuelle Behandlung"
+      },
+      "summary": "Zusammenfassung",
+      "vetNeeded": "Tierarzt nötig",
+      "notifiable": "Meldepflichtige Krankheit",
+      "yes": "Ja",
+      "no": "Nein",
+      "condition": "Erkrankung",
+      "likelihood": "Wahrscheinlichkeit",
+      "why": "Begründung",
+      "medicine": "Medikament",
+      "action": "Maßnahme",
+      "medNote": "Dosierungen sind nur Richtwerte. Halten Sie sich an die Packungsbeilage und die Verordnung des Tierarztes und an die Wartezeit vor dem Verkauf von Milch, Fleisch oder Eiern.",
+      "vetReview": "Tierärztliche Prüfung",
+      "vetReviewNote": "Für den untersuchenden Tierarzt: Diagnose und Behandlung oben bestätigen oder korrigieren.",
+      "reviewedBy": "Geprüft von",
+      "licence": "Approbationsnr.",
+      "signature": "Unterschrift",
+      "date": "Datum",
+      "important": "Wichtig:"
+    }
   }
 }

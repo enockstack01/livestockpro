@@ -12,6 +12,7 @@
     "@clerk/clerk-react": "^5.15.0",
     "@clerk/themes": "^2.4.57",
     "chart.js": "^4.4.1",
+    "html2pdf.js": "^0.10.2",
     "i18next": "^26.4.0",
     "leaflet": "^1.9.4",
     "leaflet.heat": "^0.2.0",

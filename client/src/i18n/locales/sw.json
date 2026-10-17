@@ -1082,11 +1082,13 @@
       "notifiable": "Kwa kawaida lazima liripotiwe: ripoti kwa ofisi ya mifugo ya wilaya.",
       "questions": "Maswali ya kumuuliza daktari",
       "gaps": "Taarifa zinazoweza kusaidia",
-      "print": "Chapisha au hifadhi kama PDF",
+      "print": "Chapisha",
       "generated": "Imetolewa {{date}}",
       "animal": "Mnyama",
       "delete": "Futa ripoti",
-      "sharePdf": "Shiriki PDF"
+      "sharePdf": "Shiriki PDF",
+      "download": "Pakua PDF",
+      "downloading": "Inaandaa PDF..."
     },
     "brief": {
       "title": "Muhtasari wa One Health wa AI",
@@ -1120,6 +1122,52 @@
       "failed": "Ombi la AI limeshindwa: {{message}}",
       "busy": "Umetumia AI sana saa hii. Tafadhali jaribu tena baadaye."
     },
-    "offline": "Unahitaji mtandao ili kutumia AI."
+    "offline": "Unahitaji mtandao ili kutumia AI.",
+    "pdf": {
+      "by": "na",
+      "docType": {
+        "diagnosis": "Ripoti ya uchunguzi wa magonjwa ya mifugo",
+        "advisor": "Ripoti ya ushauri wa shamba",
+        "onehealth": "Muhtasari wa hali ya One Health"
+      },
+      "reportNo": "Ripoti na.",
+      "generated": "Imetolewa",
+      "preparedWith": "Imeandaliwa na LivestockPro AI",
+      "caseDetails": "Maelezo ya kesi",
+      "fields": {
+        "farm": "Shamba",
+        "location": "Mahali",
+        "tag": "Namba ya utambulisho",
+        "name": "Jina",
+        "species": "Aina",
+        "breed": "Kizazi",
+        "sex": "Jinsia",
+        "age": "Umri",
+        "healthStatus": "Hali ya afya",
+        "recordStatus": "Hali ya kumbukumbu",
+        "checkDate": "Tarehe ya ukaguzi",
+        "vet": "Daktari",
+        "reportedSigns": "Dalili zilizoripotiwa",
+        "currentTreatment": "Matibabu ya sasa"
+      },
+      "summary": "Muhtasari",
+      "vetNeeded": "Anahitajika daktari",
+      "notifiable": "Ugonjwa wa kuripotiwa",
+      "yes": "Ndiyo",
+      "no": "Hapana",
+      "condition": "Ugonjwa",
+      "likelihood": "Uwezekano",
+      "why": "Kwa nini",
+      "medicine": "Dawa",
+      "action": "Hatua",
+      "medNote": "Vipimo ni mwongozo tu. Fuata maelekezo ya dawa na agizo la daktari, na zingatia muda wa kusubiri kabla ya kuuza maziwa, nyama au mayai.",
+      "vetReview": "Ukaguzi wa daktari wa mifugo",
+      "vetReviewNote": "Kwa daktari anayemchunguza mnyama: thibitisha au sahihisha utambuzi na matibabu hapo juu.",
+      "reviewedBy": "Imekaguliwa na",
+      "licence": "Namba ya leseni",
+      "signature": "Sahihi",
+      "date": "Tarehe",
+      "important": "Muhimu:"
+    }
   }
 }

@@ -1082,11 +1082,13 @@
       "notifiable": "Généralement à déclaration obligatoire : signalez-le au service vétérinaire du district.",
       "questions": "Questions à poser au vétérinaire",
       "gaps": "Informations utiles manquantes",
-      "print": "Imprimer ou enregistrer en PDF",
+      "print": "Imprimer",
       "generated": "Généré le {{date}}",
       "animal": "Animal",
       "delete": "Supprimer le rapport",
-      "sharePdf": "Partager le PDF"
+      "sharePdf": "Partager le PDF",
+      "download": "Télécharger le PDF",
+      "downloading": "Préparation du PDF..."
     },
     "brief": {
       "title": "Synthèse One Health par IA",
@@ -1120,6 +1122,52 @@
       "failed": "La demande à l'IA a échoué : {{message}}",
       "busy": "Vous avez beaucoup utilisé l'IA cette heure-ci. Réessayez plus tard."
     },
-    "offline": "Une connexion est nécessaire pour utiliser l'IA."
+    "offline": "Une connexion est nécessaire pour utiliser l'IA.",
+    "pdf": {
+      "by": "par",
+      "docType": {
+        "diagnosis": "Rapport de diagnostic des maladies animales",
+        "advisor": "Rapport de conseils agricoles",
+        "onehealth": "Synthèse de situation One Health"
+      },
+      "reportNo": "Rapport n°",
+      "generated": "Généré le",
+      "preparedWith": "Préparé avec LivestockPro IA",
+      "caseDetails": "Détails du cas",
+      "fields": {
+        "farm": "Ferme",
+        "location": "Lieu",
+        "tag": "N° d'identification",
+        "name": "Nom",
+        "species": "Espèce",
+        "breed": "Race",
+        "sex": "Sexe",
+        "age": "Âge",
+        "healthStatus": "État de santé",
+        "recordStatus": "Statut du dossier",
+        "checkDate": "Date du contrôle",
+        "vet": "Vétérinaire",
+        "reportedSigns": "Signes signalés",
+        "currentTreatment": "Traitement en cours"
+      },
+      "summary": "Résumé",
+      "vetNeeded": "Vétérinaire nécessaire",
+      "notifiable": "Maladie à déclaration obligatoire",
+      "yes": "Oui",
+      "no": "Non",
+      "condition": "Affection",
+      "likelihood": "Probabilité",
+      "why": "Pourquoi",
+      "medicine": "Médicament",
+      "action": "Action",
+      "medNote": "Les doses sont indicatives. Suivez l'étiquette du produit et l'ordonnance du vétérinaire, et respectez le délai d'attente avant de vendre le lait, la viande ou les œufs.",
+      "vetReview": "Avis vétérinaire",
+      "vetReviewNote": "Pour le vétérinaire qui examine l'animal : confirmez ou corrigez le diagnostic et le traitement ci-dessus.",
+      "reviewedBy": "Vérifié par",
+      "licence": "N° d'agrément",
+      "signature": "Signature",
+      "date": "Date",
+      "important": "Important :"
+    }
   }
 }

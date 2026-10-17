@@ -1082,11 +1082,13 @@
       "notifiable": "Normalmente de notificação obrigatória: comunique aos serviços veterinários do distrito.",
       "questions": "Perguntas para o veterinário",
       "gaps": "Informação que ajudaria",
-      "print": "Imprimir ou guardar em PDF",
+      "print": "Imprimir",
       "generated": "Gerado em {{date}}",
       "animal": "Animal",
       "delete": "Eliminar relatório",
-      "sharePdf": "Partilhar PDF"
+      "sharePdf": "Partilhar PDF",
+      "download": "Transferir PDF",
+      "downloading": "A preparar o PDF..."
     },
     "brief": {
       "title": "Resumo One Health por IA",
@@ -1120,6 +1122,52 @@
       "failed": "O pedido à IA falhou: {{message}}",
       "busy": "Usou muito a IA nesta hora. Tente novamente mais tarde."
     },
-    "offline": "Precisa de ligação à internet para usar a IA."
+    "offline": "Precisa de ligação à internet para usar a IA.",
+    "pdf": {
+      "by": "por",
+      "docType": {
+        "diagnosis": "Relatório de diagnóstico de doenças animais",
+        "advisor": "Relatório de conselhos da fazenda",
+        "onehealth": "Resumo de situação One Health"
+      },
+      "reportNo": "Relatório n.º",
+      "generated": "Gerado",
+      "preparedWith": "Preparado com LivestockPro IA",
+      "caseDetails": "Dados do caso",
+      "fields": {
+        "farm": "Fazenda",
+        "location": "Local",
+        "tag": "N.º de identificação",
+        "name": "Nome",
+        "species": "Espécie",
+        "breed": "Raça",
+        "sex": "Sexo",
+        "age": "Idade",
+        "healthStatus": "Estado de saúde",
+        "recordStatus": "Estado do registo",
+        "checkDate": "Data da consulta",
+        "vet": "Veterinário",
+        "reportedSigns": "Sinais relatados",
+        "currentTreatment": "Tratamento atual"
+      },
+      "summary": "Resumo",
+      "vetNeeded": "Precisa de veterinário",
+      "notifiable": "Doença de notificação obrigatória",
+      "yes": "Sim",
+      "no": "Não",
+      "condition": "Doença",
+      "likelihood": "Probabilidade",
+      "why": "Porquê",
+      "medicine": "Medicamento",
+      "action": "Ação",
+      "medNote": "As doses são apenas orientativas. Siga o rótulo do produto e a receita do veterinário, e respeite o intervalo de segurança antes de vender leite, carne ou ovos.",
+      "vetReview": "Revisão veterinária",
+      "vetReviewNote": "Para o veterinário que examina o animal: confirme ou corrija o diagnóstico e o tratamento acima.",
+      "reviewedBy": "Revisto por",
+      "licence": "N.º de licença",
+      "signature": "Assinatura",
+      "date": "Data",
+      "important": "Importante:"
+    }
   }
 }

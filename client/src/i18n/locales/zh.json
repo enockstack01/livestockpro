@@ -1082,11 +1082,13 @@
       "notifiable": "通常需要上报：请报告区兽医办公室。",
       "questions": "可以问兽医的问题",
       "gaps": "有帮助的补充信息",
-      "print": "打印或保存为 PDF",
+      "print": "打印",
       "generated": "生成于 {{date}}",
       "animal": "牲畜",
       "delete": "删除报告",
-      "sharePdf": "分享 PDF"
+      "sharePdf": "分享 PDF",
+      "download": "下载 PDF",
+      "downloading": "正在生成 PDF..."
     },
     "brief": {
       "title": "AI One Health 简报",
@@ -1120,6 +1122,52 @@
       "failed": "AI 请求失败：{{message}}",
       "busy": "您这一小时内使用 AI 的次数较多，请稍后再试。"
     },
-    "offline": "使用 AI 需要网络连接。"
+    "offline": "使用 AI 需要网络连接。",
+    "pdf": {
+      "by": "出品",
+      "docType": {
+        "diagnosis": "动物疾病诊断报告",
+        "advisor": "农场建议报告",
+        "onehealth": "One Health 态势简报"
+      },
+      "reportNo": "报告编号",
+      "generated": "生成时间",
+      "preparedWith": "由 LivestockPro AI 生成",
+      "caseDetails": "病例信息",
+      "fields": {
+        "farm": "农场",
+        "location": "地点",
+        "tag": "耳标号",
+        "name": "名称",
+        "species": "物种",
+        "breed": "品种",
+        "sex": "性别",
+        "age": "年龄",
+        "healthStatus": "健康状况",
+        "recordStatus": "记录状态",
+        "checkDate": "检查日期",
+        "vet": "兽医",
+        "reportedSigns": "报告的症状",
+        "currentTreatment": "当前治疗"
+      },
+      "summary": "概述",
+      "vetNeeded": "需要兽医",
+      "notifiable": "需上报的疫病",
+      "yes": "是",
+      "no": "否",
+      "condition": "疾病",
+      "likelihood": "可能性",
+      "why": "依据",
+      "medicine": "药物",
+      "action": "行动",
+      "medNote": "剂量仅供参考。请遵循产品说明和兽医处方，并在出售奶、肉或蛋之前遵守休药期。",
+      "vetReview": "兽医审核",
+      "vetReviewNote": "供检查该牲畜的兽医填写：确认或更正上述诊断和治疗。",
+      "reviewedBy": "审核人",
+      "licence": "执业证号",
+      "signature": "签名",
+      "date": "日期",
+      "important": "重要："
+    }
   }
 }

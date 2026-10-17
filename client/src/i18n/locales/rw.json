@@ -1082,11 +1082,13 @@
       "notifiable": "Ubusanzwe igomba kumenyeshwa: bimenyeshe ibiro by'ubuvuzi bw'amatungo by'akarere.",
       "questions": "Ibibazo byo kubaza muganga",
       "gaps": "Amakuru yafasha",
-      "print": "Capa cyangwa ubike nka PDF",
+      "print": "Capa",
       "generated": "Yakozwe {{date}}",
       "animal": "Itungo",
       "delete": "Siba raporo",
-      "sharePdf": "Sangiza PDF"
+      "sharePdf": "Sangiza PDF",
+      "download": "Kuramo PDF",
+      "downloading": "Gutegura PDF..."
     },
     "brief": {
       "title": "Incamake ya One Health ya AI",
@@ -1120,6 +1122,52 @@
       "failed": "Gusaba AI byanze: {{message}}",
       "busy": "Wakoresheje AI cyane muri iyi saha. Ongera ugerageze nyuma."
     },
-    "offline": "Ukeneye interineti kugira ngo ukoreshe AI."
+    "offline": "Ukeneye interineti kugira ngo ukoreshe AI.",
+    "pdf": {
+      "by": "na",
+      "docType": {
+        "diagnosis": "Raporo y'isuzuma ry'indwara z'amatungo",
+        "advisor": "Raporo y'inama ku murima",
+        "onehealth": "Incamake y'uko One Health ihagaze"
+      },
+      "reportNo": "Raporo nimero",
+      "generated": "Yakozwe",
+      "preparedWith": "Yateguwe na LivestockPro AI",
+      "caseDetails": "Amakuru y'ikibazo",
+      "fields": {
+        "farm": "Umurima",
+        "location": "Aho uherereye",
+        "tag": "Nimero iranga",
+        "name": "Izina",
+        "species": "Ubwoko",
+        "breed": "Icyororo",
+        "sex": "Igitsina",
+        "age": "Imyaka",
+        "healthStatus": "Uko ubuzima buhagaze",
+        "recordStatus": "Uko inyandiko ihagaze",
+        "checkDate": "Itariki y'isuzuma",
+        "vet": "Muganga",
+        "reportedSigns": "Ibimenyetso byavuzwe",
+        "currentTreatment": "Ubuvuzi buriho"
+      },
+      "summary": "Incamake",
+      "vetNeeded": "Hakenewe muganga",
+      "notifiable": "Indwara igomba kumenyeshwa",
+      "yes": "Yego",
+      "no": "Oya",
+      "condition": "Indwara",
+      "likelihood": "Amahirwe",
+      "why": "Impamvu",
+      "medicine": "Umuti",
+      "action": "Igikorwa",
+      "medNote": "Ibipimo ni inama gusa. Kurikiza amabwiriza ari ku muti n'ayo muganga yanditse, kandi wubahirize igihe cyo gutegereza mbere yo kugurisha amata, inyama cyangwa amagi.",
+      "vetReview": "Isuzuma rya muganga w'amatungo",
+      "vetReviewNote": "Ku muganga usuzuma itungo: emeza cyangwa ukosore isuzuma n'ubuvuzi biri hejuru.",
+      "reviewedBy": "Byasuzumwe na",
+      "licence": "Nimero y'uruhushya",
+      "signature": "Umukono",
+      "date": "Itariki",
+      "important": "Icyitonderwa:"
+    }
   }
 }

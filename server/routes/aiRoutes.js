@@ -303,6 +303,23 @@ router.post('/diagnose', async (req, res) => {
       effort: 'high'
     });
     data.disclaimer = VET_NOTICE;
+    /* What the printed report shows under "Case details". */
+    input.case = {
+      farm_name: context.farm_name,
+      location: context.location,
+      tag_id: input.tag_id,
+      name: animal ? animal.name : undefined,
+      species: animal ? animal.species : body.species || undefined,
+      breed: animal ? animal.breed : undefined,
+      sex: animal ? animal.sex : undefined,
+      age: animal ? ageOf(animal.date_of_birth) || undefined : undefined,
+      health_status: animal ? animal.health_status : undefined,
+      record_status: record ? record.status : undefined,
+      check_date: record ? record.check_date : undefined,
+      vet_name: record ? record.vet_name : undefined,
+      reported_signs: [record && record.disease, symptoms].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i).join('. ') || undefined,
+      current_treatment: record ? [record.treatment, record.medicine].filter(Boolean).join(', ') || undefined : undefined
+    };
     const title = data.title || `Diagnosis: ${input.tag_id || 'animal'}`;
     const saved = await saveReport(userId, 'diagnosis', title, input, data, language);
     res.status(201).json({ data: saved, error: null });

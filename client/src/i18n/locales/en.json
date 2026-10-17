@@ -1086,11 +1086,13 @@
       "notifiable": "Usually notifiable: report it to the district veterinary office.",
       "questions": "Questions to ask the vet",
       "gaps": "Information that would help",
-      "print": "Print or save as PDF",
+      "print": "Print",
       "generated": "Generated {{date}}",
       "animal": "Animal",
       "delete": "Delete report",
-      "sharePdf": "Share PDF"
+      "sharePdf": "Share PDF",
+      "download": "Download PDF",
+      "downloading": "Preparing PDF..."
     },
     "brief": {
       "title": "AI One Health briefing",
@@ -1124,6 +1126,52 @@
       "failed": "The AI request failed: {{message}}",
       "busy": "You have used the AI a lot this hour. Please try again later."
     },
-    "offline": "You need a connection to use the AI."
+    "offline": "You need a connection to use the AI.",
+    "pdf": {
+      "by": "by",
+      "docType": {
+        "diagnosis": "Animal disease diagnosis report",
+        "advisor": "Farm advice report",
+        "onehealth": "One Health situation briefing"
+      },
+      "reportNo": "Report no.",
+      "generated": "Generated",
+      "preparedWith": "Prepared with LivestockPro AI",
+      "caseDetails": "Case details",
+      "fields": {
+        "farm": "Farm",
+        "location": "Location",
+        "tag": "Tag ID",
+        "name": "Name",
+        "species": "Species",
+        "breed": "Breed",
+        "sex": "Sex",
+        "age": "Age",
+        "healthStatus": "Health status",
+        "recordStatus": "Record status",
+        "checkDate": "Check date",
+        "vet": "Vet",
+        "reportedSigns": "Reported signs",
+        "currentTreatment": "Current treatment"
+      },
+      "summary": "Summary",
+      "vetNeeded": "Vet needed",
+      "notifiable": "Notifiable disease",
+      "yes": "Yes",
+      "no": "No",
+      "condition": "Condition",
+      "likelihood": "Likelihood",
+      "why": "Why",
+      "medicine": "Medicine",
+      "action": "Action",
+      "medNote": "Doses are guidance only. Follow the product label and your vet's prescription, and keep to the withdrawal period before selling milk, meat or eggs.",
+      "vetReview": "Veterinary review",
+      "vetReviewNote": "For the veterinarian who examines the animal: confirm or correct the diagnosis and treatment above.",
+      "reviewedBy": "Reviewed by",
+      "licence": "Licence no.",
+      "signature": "Signature",
+      "date": "Date",
+      "important": "Important:"
+    }
   }
 }

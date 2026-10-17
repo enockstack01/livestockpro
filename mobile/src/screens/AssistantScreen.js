@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import { File, Paths } from 'expo-file-system';
 import Icon from '../components/Icon';
 import { useApi } from '../api/client';
 import { useRepository } from '../db/repository';
@@ -11,7 +12,7 @@ import { useToast } from '../lib/toast';
 import { printHtml } from '../lib/printReport';
 import { useTheme } from '../theme/ThemeProvider';
 import { Button, Card, CardBody, CardHeader, EmptyState, FormGroup, Input, Muted, Page, PageHeader, Select, Tabs } from '../ui/kit';
-import { aiReportHtml } from '../../../shared/aiReportHtml';
+import { aiReportFileName, aiReportHtml } from '../../../shared/aiReportHtml';
 
 /* Mobile twin of client/src/pages/Assistant.jsx: Ask LivestockPro, the farm
    advisor, AI diagnosis and saved reports. AI runs on the server, so these
@@ -221,16 +222,26 @@ export function SavedReport({ saved, subtitle, onDelete }) {
   const { t, i18n } = useTranslation();
   const { colors } = useTheme();
   const showToast = useToast();
-  const html = () => aiReportHtml({ kind: saved.kind, report: saved.report, title: saved.title, subtitle, createdAt: saved.created_at, t, lang: i18n.language });
+  const [downloading, setDownloading] = useState(false);
+  const opts = { kind: saved.kind, report: saved.report, title: saved.title, caseInfo: saved.input && saved.input.case, reportId: saved.id, createdAt: saved.created_at, t, lang: i18n.language };
+  const html = () => aiReportHtml(opts);
 
   async function print() {
     try { await printHtml(html()); } catch (e) { showToast(e.message, 'error'); }
   }
-  async function share() {
+  /* Renders the branded report to an A4 PDF, names it like
+     "LivestockPro-diagnosis-LP-001-2026-10-17.pdf" and opens the share sheet
+     (Save to Files or Downloads, WhatsApp, email). */
+  async function download() {
+    setDownloading(true);
     try {
-      const { uri } = await Print.printToFileAsync({ html: html() });
-      await Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: saved.title, UTI: 'com.adobe.pdf' });
+      const { uri } = await Print.printToFileAsync({ html: html(), width: 595, height: 842 });
+      const dest = new File(Paths.cache, aiReportFileName(opts));
+      if (dest.exists) dest.delete();
+      new File(uri).copy(dest);
+      await Sharing.shareAsync(dest.uri, { mimeType: 'application/pdf', dialogTitle: saved.title, UTI: 'com.adobe.pdf' });
     } catch (e) { showToast(e.message, 'error'); }
+    setDownloading(false);
   }
 
   const View_ = saved.kind === 'diagnosis' ? DiagnosisView : saved.kind === 'advisor' ? AdvisorView : BriefView;
@@ -239,8 +250,8 @@ export function SavedReport({ saved, subtitle, onDelete }) {
       <Text style={[styles.reportTitle, { color: colors.primaryDark }]}>{saved.title}</Text>
       <Muted style={{ marginBottom: 10 }}>{subtitle ? `${subtitle} · ` : ''}{t('ai.report.generated', { date: new Date(saved.created_at).toLocaleString(i18n.language) })}</Muted>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 6 }}>
+        {Platform.OS !== 'web' ? <Button title={downloading ? t('ai.report.downloading') : t('ai.report.download')} icon="file-arrow-down" size="sm" onPress={download} loading={downloading} disabled={downloading} /> : null}
         <Button title={t('ai.report.print')} icon="print" variant="secondary" size="sm" onPress={print} />
-        {Platform.OS !== 'web' ? <Button title={t('ai.report.sharePdf')} icon="file-pdf" variant="secondary" size="sm" onPress={share} /> : null}
         {onDelete ? <Button title={t('ai.report.delete')} icon="trash" variant="secondary" size="sm" onPress={() => onDelete(saved)} /> : null}
       </View>
       <View_ r={saved.report || {}} />
