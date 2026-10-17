@@ -71,7 +71,7 @@ export function CardHeader({ title, icon, iconColor, right, titleColor, compact,
       <View style={s.cardHeaderTitleRow}>
         {icon && tiled ? (
           // Chart cards: the icon on a tinted tile, like the web's .chart-card header.
-          <View style={[s.cardHeaderIconTile, { backgroundColor: colors.primaryLight }]}><Icon name={icon} size={compact ? 11 : 12} color={iconColor || colors.primary} /></View>
+          <View style={[s.cardHeaderIconTile, { backgroundColor: iconColor || colors.leaf }]}><Icon name={icon} size={compact ? 11 : 12} color={iconColor === colors.orange ? colors.text : "#FFFFFF"} /></View>
         ) : icon ? <Icon name={icon} size={compact ? 12 : 14} color={iconColor || colors.primary} /> : null}
         <Text style={[s.cardHeaderTitle, compact && s.cardHeaderTitleCompact, titleColor && { color: titleColor }]} numberOfLines={2}>{title}</Text>
       </View>
@@ -118,8 +118,7 @@ export function IconButton({ icon, onPress, danger, label }) {
 export function SummaryCard({ icon, color = 'green', value, label, onPress }) {
   const s = useKitStyles();
   const tint = useTint(color);
-  const { colors } = useTheme();
-  const fg = color === 'green' ? colors.primary : colors[color] || tint.fg;
+  const fg = tint.fg;
   const { width } = useBreakpoint();
   const compact = width <= 768; // style.css shrinks .summary-card at ≤768px
   const Wrapper = onPress ? Pressable : View;

@@ -5,6 +5,7 @@ import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { useCanvasChart } from '../lib/useChart.js';
 import { fmtDate } from '../lib/badges.jsx';
+import { OneHealthBriefCard } from '../components/ai/AiViews.jsx';
 import OneHealthMap from '../components/OneHealthMap.jsx';
 
 const SEVERITY_BADGE = { critical: 'badge-red', high: 'badge-orange', medium: 'badge-blue', low: 'badge-gray' };
@@ -121,6 +122,7 @@ export default function OneHealth() {
         <div className="empty-state" style={{ padding: '60px 20px' }}><i className="fas fa-spinner fa-spin"></i><h3>{t('oneHealth.scanning')}</h3></div>
       ) : (
         <div className="admin-fade-in">
+          <OneHealthBriefCard />
 
           <div className="card mb-24">
             <button

@@ -7,6 +7,7 @@ router.use(requireAuth);
 
 const COLLECTIONS = [
   'profiles',
+  'ai_reports',
   'animals',
   'health_records',
   'feeding_records',

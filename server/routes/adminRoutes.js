@@ -513,7 +513,7 @@ async function computeOneHealthAlerts(db) {
       zoonotic: false,
       severity: bumpSeverity('medium', farmSet.size - 3),
       confidence: 'reported',
-      title: `Possible outbreak cluster — "${label}" in ${district}`,
+      title: `Possible outbreak cluster: "${label}" in ${district}`,
       description: `"${label}" reported across ${farmSet.size} different farms in ${district} within the last 14 days.`,
       farms: [...farmSet].map(farmLabel),
       count: items.length,
@@ -620,7 +620,7 @@ router.delete('/users/:id', async (req, res) => {
       return res.status(403).json({ error: { message: 'Only a super admin can delete an admin account.' } });
     }
     const db = getDb();
-    await Promise.all(['profiles', 'push_tokens', 'accounts', ...RESOURCE_COLLECTIONS].map((name) => db.collection(name).deleteMany({ user_id: targetId })));
+    await Promise.all(['profiles', 'push_tokens', 'accounts', 'ai_reports', ...RESOURCE_COLLECTIONS].map((name) => db.collection(name).deleteMany({ user_id: targetId })));
     await clerkClient.users.deleteUser(targetId);
     forgetApproval(targetId);
     res.json({ data: {}, error: null });
@@ -630,3 +630,5 @@ router.delete('/users/:id', async (req, res) => {
 });
 
 module.exports = router;
+/* Reused by the AI One Health briefing (aiRoutes.js). */
+module.exports.computeOneHealthAlerts = computeOneHealthAlerts;

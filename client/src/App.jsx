@@ -15,6 +15,7 @@ import Reports from './pages/Reports.jsx';
 import Settings from './pages/Settings.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
 import OneHealth from './pages/OneHealth.jsx';
+import Assistant from './pages/Assistant.jsx';
 
 function RequireAuth({ children }) {
   const { isLoaded, isSignedIn } = useAuth();
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/finance" element={<Finance />} />
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/assistant" element={<Assistant />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/onehealth" element={<OneHealth />} />

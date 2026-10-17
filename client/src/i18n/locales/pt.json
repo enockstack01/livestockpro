@@ -47,7 +47,8 @@
       "analytics": "Análises",
       "administration": "Administração",
       "system": "Sistema"
-    }
+    },
+    "assistant": "Assistente IA"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -340,7 +341,7 @@
     "activeAlerts": "Alertas Ativos"
   },
   "login": {
-    "tagline": "Simplifique as operações da sua fazenda. Acompanhe animais, saúde, reprodução, alimentação, produção e finanças, tudo em um só lugar.",
+    "tagline": "Conheça o seu rebanho, proteja a sua saúde, aumente o seu valor",
     "welcomeTitle": "Bem-vindo",
     "welcomeSubtitle": "Faça login no seu painel de gestão da fazenda"
   },
@@ -976,6 +977,149 @@
     "currencyFailed": "Não foi possível atualizar a moeda: {{message}}"
   },
   "splash": {
-    "tagline": "Sua pecuária, sob controle"
+    "tagline": "Conheça o seu rebanho, proteja a sua saúde, aumente o seu valor"
+  },
+  "brand": {
+    "tagline": "Conheça o seu rebanho, proteja a sua saúde, aumente o seu valor",
+    "byline": "LivestockPro · por Agricoders"
+  },
+  "ai": {
+    "title": "Assistente IA",
+    "subtitle": "Relatórios de diagnóstico, conselhos para a fazenda e respostas a partir dos seus registos",
+    "notConfigured": "A IA ainda não está configurada neste servidor. Um administrador precisa de adicionar a chave API da Anthropic.",
+    "vetNotice": "A IA do LivestockPro apoia, e não substitui, um veterinário qualificado. Confirme sempre um diagnóstico e qualquer medicamento sujeito a receita com um veterinário.",
+    "poweredBy": "LivestockPro IA · com tecnologia Claude",
+    "working": "A pensar...",
+    "back": "Voltar",
+    "tabs": {
+      "ask": "Pergunte ao LivestockPro",
+      "advisor": "Consultor da fazenda",
+      "diagnose": "Diagnosticar",
+      "reports": "Relatórios guardados"
+    },
+    "ask": {
+      "placeholder": "Pergunte sobre o rebanho, a saúde, o dinheiro ou a produção",
+      "send": "Enviar",
+      "empty": "Pergunte o que quiser sobre a sua fazenda. Por exemplo:",
+      "examples": [
+        "Que animais precisam de atenção esta semana?",
+        "Como mudou a produção de leite nos últimos 3 meses?",
+        "Em que gastámos mais dinheiro este mês?",
+        "Que partos estão previstos para breve?"
+      ],
+      "clear": "Nova conversa",
+      "you": "Você",
+      "assistant": "LivestockPro"
+    },
+    "advisor": {
+      "title": "Consultor da fazenda",
+      "intro": "Uma leitura simples de todos os registos da sua fazenda: o que está a correr bem, o que fazer primeiro e os riscos a acumular.",
+      "run": "Obter conselhos",
+      "refresh": "Atualizar conselhos",
+      "working": "A ler os registos da fazenda...",
+      "priorities": "O que fazer primeiro",
+      "strengths": "O que está a correr bem",
+      "risks": "Riscos a vigiar",
+      "figures": "Números principais",
+      "when": {
+        "today": "Hoje",
+        "this_week": "Esta semana",
+        "this_month": "Este mês"
+      },
+      "openFull": "Ver todos os conselhos"
+    },
+    "diagnose": {
+      "title": "Diagnóstico por IA",
+      "intro": "Descreva o que observa. O LivestockPro lê os registos do animal e escreve um relatório de diagnóstico e tratamento que pode imprimir ou guardar em PDF.",
+      "animal": "Animal",
+      "chooseAnimal": "Escolha um animal (opcional)",
+      "species": "Espécie",
+      "speciesHint": "Por exemplo: bovino, cabra, galinha",
+      "symptoms": "Sintomas e o que observou",
+      "symptomsHint": "Por exemplo: sem comer há 2 dias, febre alta, gânglios inchados, tosse",
+      "run": "Escrever o relatório",
+      "again": "Novo diagnóstico",
+      "working": "A ler os registos e a escrever o relatório...",
+      "fromRecord": "Diagnosticar com IA",
+      "previous": "Relatórios anteriores deste registo",
+      "needInput": "Descreva primeiro os sintomas."
+    },
+    "report": {
+      "urgency": "Urgência",
+      "urgencyLevels": {
+        "emergency": "Emergência",
+        "urgent": "Urgente",
+        "soon": "Tratar em breve",
+        "routine": "Rotina"
+      },
+      "seeVet": "Chame um veterinário",
+      "seeVetNo": "A visita do veterinário não é urgente",
+      "likely": "Doenças prováveis",
+      "likelihood": {
+        "high": "Alta",
+        "medium": "Média",
+        "low": "Baixa"
+      },
+      "cause": "Causa provável",
+      "treatment": "Passos do tratamento",
+      "medications": "Medicamentos",
+      "purpose": "Para que serve",
+      "howToGive": "Como administrar",
+      "dose": "Dose",
+      "withdrawal": "Intervalo de segurança",
+      "prescription": "Apenas com receita",
+      "care": "Cuidados de apoio",
+      "isolation": "Isolamento",
+      "prevention": "Prevenção",
+      "warning": "Chame um veterinário imediatamente se",
+      "zoonotic": "Risco para as pessoas",
+      "zoonoticLevels": {
+        "none": "Nenhum",
+        "low": "Baixo",
+        "medium": "Médio",
+        "high": "Alto"
+      },
+      "notifiable": "Normalmente de notificação obrigatória: comunique aos serviços veterinários do distrito.",
+      "questions": "Perguntas para o veterinário",
+      "gaps": "Informação que ajudaria",
+      "print": "Imprimir ou guardar em PDF",
+      "generated": "Gerado em {{date}}",
+      "animal": "Animal",
+      "delete": "Eliminar relatório",
+      "sharePdf": "Partilhar PDF"
+    },
+    "brief": {
+      "title": "Resumo One Health por IA",
+      "intro": "Um resumo da situação para os serviços veterinários e de saúde pública, escrito a partir dos alertas ativos.",
+      "run": "Escrever resumo",
+      "refresh": "Atualizar resumo",
+      "working": "A ler os alertas...",
+      "actions": "Ações prioritárias",
+      "hotspots": "Focos",
+      "zoonotic": "Risco para as pessoas",
+      "farmerMessage": "Mensagem para os criadores",
+      "who": "Quem",
+      "why": "Porquê",
+      "urgency": {
+        "immediate": "Imediato",
+        "this_week": "Esta semana",
+        "monitor": "Vigiar"
+      },
+      "copy": "Copiar mensagem",
+      "copied": "Mensagem copiada"
+    },
+    "reports": {
+      "empty": "Ainda não há relatórios guardados.",
+      "kinds": {
+        "diagnosis": "Diagnóstico",
+        "advisor": "Conselhos da fazenda",
+        "onehealth": "Resumo One Health"
+      }
+    },
+    "errors": {
+      "failed": "O pedido à IA falhou: {{message}}",
+      "busy": "Usou muito a IA nesta hora. Tente novamente mais tarde."
+    },
+    "offline": "Precisa de ligação à internet para usar a IA."
   }
 }

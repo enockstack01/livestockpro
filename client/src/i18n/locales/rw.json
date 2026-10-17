@@ -47,7 +47,8 @@
       "analytics": "Isesengura",
       "administration": "Ubuyobozi",
       "system": "Sisitemu"
-    }
+    },
+    "assistant": "Umufasha wa AI"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -340,7 +341,7 @@
     "activeAlerts": "Ibimenyetso Biriho"
   },
   "login": {
-    "tagline": "Woroshya imikorere y’ubworozi bwawe. Kurikirana amatungo, ubuzima, kororoka, kugaburira, umusaruro n’imari, byose ahantu hamwe.",
+    "tagline": "Menya amatungo yawe, rinda ubuzima bwayo, wongere agaciro kayo",
     "welcomeTitle": "Murakaza neza",
     "welcomeSubtitle": "Injira kuri dashboard yo gucunga ubworozi bwawe"
   },
@@ -976,6 +977,149 @@
     "currencyFailed": "Ntibyashobotse kuvugurura ifaranga: {{message}}"
   },
   "splash": {
-    "tagline": "Ubworozi, bucunzwe neza"
+    "tagline": "Menya amatungo yawe, rinda ubuzima bwayo, wongere agaciro kayo"
+  },
+  "brand": {
+    "tagline": "Menya amatungo yawe, rinda ubuzima bwayo, wongere agaciro kayo",
+    "byline": "LivestockPro · na Agricoders"
+  },
+  "ai": {
+    "title": "Umufasha wa AI",
+    "subtitle": "Raporo zo gusuzuma, inama ku murima n'ibisubizo bivuye mu makuru yawe",
+    "notConfigured": "AI ntirashyirwa kuri iyi seriveri. Umuyobozi agomba kongeramo urufunguzo rwa API rwa Anthropic.",
+    "vetNotice": "AI ya LivestockPro ifasha, ariko ntisimbura, umuganga w'amatungo wabigize umwuga. Buri gihe emeza isuzuma n'umuti wese wandikwa na muganga ku muganga w'amatungo.",
+    "poweredBy": "LivestockPro AI · ikoreshwa na Claude",
+    "working": "Irimo gutekereza...",
+    "back": "Subira inyuma",
+    "tabs": {
+      "ask": "Baza LivestockPro",
+      "advisor": "Umujyanama w'umurima",
+      "diagnose": "Suzuma",
+      "reports": "Raporo zabitswe"
+    },
+    "ask": {
+      "placeholder": "Baza ku matungo yawe, ubuzima, amafaranga cyangwa umusaruro",
+      "send": "Ohereza",
+      "empty": "Baza ikintu cyose ku murima wawe. Urugero:",
+      "examples": [
+        "Ni ayahe matungo akeneye kwitabwaho iki cyumweru?",
+        "Umusaruro w'amata wahindutse ute mu mezi 3 ashize?",
+        "Ni iki twakoresheje amafaranga menshi uku kwezi?",
+        "Ni ibihe byara biteganyijwe vuba?"
+      ],
+      "clear": "Ikiganiro gishya",
+      "you": "Wowe",
+      "assistant": "LivestockPro"
+    },
+    "advisor": {
+      "title": "Umujyanama w'umurima",
+      "intro": "Isesengura ryoroshye ry'amakuru yose y'umurima wawe: ibigenda neza, icyo gukora mbere n'ingorane zigenda ziyongera.",
+      "run": "Habwa inama",
+      "refresh": "Vugurura inama",
+      "working": "Irimo gusoma amakuru y'umurima...",
+      "priorities": "Icyo gukora mbere",
+      "strengths": "Ibigenda neza",
+      "risks": "Ingorane zo gukurikirana",
+      "figures": "Imibare y'ingenzi",
+      "when": {
+        "today": "Uyu munsi",
+        "this_week": "Iki cyumweru",
+        "this_month": "Uku kwezi"
+      },
+      "openFull": "Fungura inama zose"
+    },
+    "diagnose": {
+      "title": "Isuzuma rya AI",
+      "intro": "Sobanura ibyo ubona. LivestockPro isoma amakuru y'itungo ikandika raporo y'isuzuma n'ubuvuzi ushobora gucapa cyangwa kubika nka PDF.",
+      "animal": "Itungo",
+      "chooseAnimal": "Hitamo itungo (si ngombwa)",
+      "species": "Ubwoko",
+      "speciesHint": "Urugero: inka, ihene, inkoko",
+      "symptoms": "Ibimenyetso n'ibyo wabonye",
+      "symptomsHint": "Urugero: ntirya iminsi 2, umuriro mwinshi, imitsi yabyimbye, gukorora",
+      "run": "Andika raporo",
+      "again": "Isuzuma rishya",
+      "working": "Irimo gusoma amakuru no kwandika raporo...",
+      "fromRecord": "Suzuma ukoresheje AI",
+      "previous": "Raporo zabanje z'iyi nyandiko",
+      "needInput": "Banza usobanure ibimenyetso."
+    },
+    "report": {
+      "urgency": "Byihutirwa",
+      "urgencyLevels": {
+        "emergency": "Ibyago bikomeye",
+        "urgent": "Byihutirwa",
+        "soon": "Bikemure vuba",
+        "routine": "Bisanzwe"
+      },
+      "seeVet": "Hamagara umuganga w'amatungo",
+      "seeVetNo": "Gusurwa n'umuganga ntibyihutirwa",
+      "likely": "Indwara zishoboka",
+      "likelihood": {
+        "high": "Byinshi",
+        "medium": "Biringaniye",
+        "low": "Bike"
+      },
+      "cause": "Impamvu ishoboka",
+      "treatment": "Intambwe z'ubuvuzi",
+      "medications": "Imiti",
+      "purpose": "Icyo ivura",
+      "howToGive": "Uko itangwa",
+      "dose": "Igipimo",
+      "withdrawal": "Igihe cyo gutegereza",
+      "prescription": "Yandikwa na muganga gusa",
+      "care": "Kwita ku itungo",
+      "isolation": "Gutandukanya",
+      "prevention": "Kwirinda",
+      "warning": "Hamagara umuganga w'amatungo ako kanya niba",
+      "zoonotic": "Ibyago ku bantu",
+      "zoonoticLevels": {
+        "none": "Nta byo",
+        "low": "Bike",
+        "medium": "Biringaniye",
+        "high": "Byinshi"
+      },
+      "notifiable": "Ubusanzwe igomba kumenyeshwa: bimenyeshe ibiro by'ubuvuzi bw'amatungo by'akarere.",
+      "questions": "Ibibazo byo kubaza muganga",
+      "gaps": "Amakuru yafasha",
+      "print": "Capa cyangwa ubike nka PDF",
+      "generated": "Yakozwe {{date}}",
+      "animal": "Itungo",
+      "delete": "Siba raporo",
+      "sharePdf": "Sangiza PDF"
+    },
+    "brief": {
+      "title": "Incamake ya One Health ya AI",
+      "intro": "Incamake y'uko ibintu bimeze igenewe abakozi b'ubuvuzi bw'amatungo n'ubuzima rusange, yanditswe hashingiwe ku miburo iriho.",
+      "run": "Andika incamake",
+      "refresh": "Vugurura incamake",
+      "working": "Irimo gusoma imiburo...",
+      "actions": "Ibikorwa by'ibanze",
+      "hotspots": "Ahantu hari ibyago",
+      "zoonotic": "Ibyago ku bantu",
+      "farmerMessage": "Ubutumwa ku borozi",
+      "who": "Nde",
+      "why": "Kubera iki",
+      "urgency": {
+        "immediate": "Ako kanya",
+        "this_week": "Iki cyumweru",
+        "monitor": "Gukurikirana"
+      },
+      "copy": "Koporora ubutumwa",
+      "copied": "Ubutumwa bwakoporowe"
+    },
+    "reports": {
+      "empty": "Nta raporo zabitswe ziriho.",
+      "kinds": {
+        "diagnosis": "Isuzuma",
+        "advisor": "Inama ku murima",
+        "onehealth": "Incamake ya One Health"
+      }
+    },
+    "errors": {
+      "failed": "Gusaba AI byanze: {{message}}",
+      "busy": "Wakoresheje AI cyane muri iyi saha. Ongera ugerageze nyuma."
+    },
+    "offline": "Ukeneye interineti kugira ngo ukoreshe AI."
   }
 }

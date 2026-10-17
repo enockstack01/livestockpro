@@ -32,6 +32,7 @@ export default function AuthShell({ children }) {
       <Icon name="cow" size={split ? 64 : 36} color="#FFFFFF" />
       <Text style={[styles.brandName, !split && { fontSize: 24, marginTop: 10, marginBottom: 4 }]}>{t('auth.brandName')}</Text>
       <Text style={[styles.tagline, !split && { fontSize: 13 }]}>{t('login.tagline')}</Text>
+      <Text style={styles.byline}>{t('brand.byline')}</Text>
     </View>
   );
 
@@ -52,6 +53,7 @@ const styles = StyleSheet.create({
   brandBand: { paddingBottom: 28 },
   circle: { position: 'absolute' },
   brandName: { color: '#FFFFFF', fontSize: 32, fontWeight: '800', marginTop: 20, marginBottom: 12 },
+  byline: { color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 8 },
   tagline: { color: 'rgba(255,255,255,0.85)', fontSize: 16, maxWidth: 360, textAlign: 'center' },
   formSection: { flex: 1 },
 });

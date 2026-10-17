@@ -47,7 +47,8 @@
       "analytics": "分析",
       "administration": "管理",
       "system": "系统"
-    }
+    },
+    "assistant": "AI 助手"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -340,7 +341,7 @@
     "activeAlerts": "活跃警报"
   },
   "login": {
-    "tagline": "简化您的农场运营。在一个平台上跟踪动物、健康、繁育、饲喂、生产和财务。",
+    "tagline": "了解您的畜群，守护其健康，提升其价值",
     "welcomeTitle": "欢迎",
     "welcomeSubtitle": "登录您的农场管理仪表板"
   },
@@ -976,6 +977,149 @@
     "currencyFailed": "无法更新货币：{{message}}"
   },
   "splash": {
-    "tagline": "畜牧养殖，尽在掌握"
+    "tagline": "了解您的畜群，守护其健康，提升其价值"
+  },
+  "brand": {
+    "tagline": "了解您的畜群，守护其健康，提升其价值",
+    "byline": "LivestockPro · Agricoders 出品"
+  },
+  "ai": {
+    "title": "AI 助手",
+    "subtitle": "诊断报告、农场建议以及基于您自己记录的解答",
+    "notConfigured": "此服务器尚未设置 AI。管理员需要添加 Anthropic API 密钥。",
+    "vetNotice": "LivestockPro AI 辅助而不取代合格的兽医。诊断结果和任何处方药都请务必由兽医确认。",
+    "poweredBy": "LivestockPro AI · 由 Claude 提供支持",
+    "working": "正在思考...",
+    "back": "返回",
+    "tabs": {
+      "ask": "询问 LivestockPro",
+      "advisor": "农场顾问",
+      "diagnose": "诊断",
+      "reports": "已保存的报告"
+    },
+    "ask": {
+      "placeholder": "询问畜群、健康、财务或生产情况",
+      "send": "发送",
+      "empty": "询问有关您农场的任何问题。例如：",
+      "examples": [
+        "本周哪些牲畜需要关注？",
+        "过去 3 个月的产奶量有何变化？",
+        "本月我们在哪方面花钱最多？",
+        "哪些分娩即将到来？"
+      ],
+      "clear": "新对话",
+      "you": "您",
+      "assistant": "LivestockPro"
+    },
+    "advisor": {
+      "title": "农场顾问",
+      "intro": "用通俗的语言解读您农场的所有记录：哪些做得好、首先要做什么，以及正在累积的风险。",
+      "run": "获取农场建议",
+      "refresh": "刷新建议",
+      "working": "正在读取农场记录...",
+      "priorities": "首先要做的事",
+      "strengths": "做得好的方面",
+      "risks": "需关注的风险",
+      "figures": "关键数据",
+      "when": {
+        "today": "今天",
+        "this_week": "本周",
+        "this_month": "本月"
+      },
+      "openFull": "查看完整建议"
+    },
+    "diagnose": {
+      "title": "AI 诊断",
+      "intro": "描述您看到的情况。LivestockPro 会读取该牲畜的记录，撰写可打印或保存为 PDF 的诊断与治疗报告。",
+      "animal": "牲畜",
+      "chooseAnimal": "选择牲畜（可选）",
+      "species": "物种",
+      "speciesHint": "例如：牛、山羊、鸡",
+      "symptoms": "症状和您观察到的情况",
+      "symptomsHint": "例如：2 天不吃食、高烧、淋巴结肿大、咳嗽",
+      "run": "撰写报告",
+      "again": "新的诊断",
+      "working": "正在读取记录并撰写报告...",
+      "fromRecord": "用 AI 诊断",
+      "previous": "此记录的历史报告",
+      "needInput": "请先描述症状。"
+    },
+    "report": {
+      "urgency": "紧急程度",
+      "urgencyLevels": {
+        "emergency": "紧急",
+        "urgent": "急迫",
+        "soon": "尽快处理",
+        "routine": "常规"
+      },
+      "seeVet": "请联系兽医",
+      "seeVetNo": "无需紧急就医",
+      "likely": "可能的疾病",
+      "likelihood": {
+        "high": "高",
+        "medium": "中",
+        "low": "低"
+      },
+      "cause": "可能的原因",
+      "treatment": "治疗步骤",
+      "medications": "药物",
+      "purpose": "用途",
+      "howToGive": "给药方式",
+      "dose": "剂量",
+      "withdrawal": "休药期",
+      "prescription": "处方药",
+      "care": "辅助护理",
+      "isolation": "隔离",
+      "prevention": "预防",
+      "warning": "出现以下情况请立即联系兽医",
+      "zoonotic": "对人的风险",
+      "zoonoticLevels": {
+        "none": "无",
+        "low": "低",
+        "medium": "中",
+        "high": "高"
+      },
+      "notifiable": "通常需要上报：请报告区兽医办公室。",
+      "questions": "可以问兽医的问题",
+      "gaps": "有帮助的补充信息",
+      "print": "打印或保存为 PDF",
+      "generated": "生成于 {{date}}",
+      "animal": "牲畜",
+      "delete": "删除报告",
+      "sharePdf": "分享 PDF"
+    },
+    "brief": {
+      "title": "AI One Health 简报",
+      "intro": "根据当前警报，为兽医和公共卫生人员撰写的态势简报。",
+      "run": "撰写简报",
+      "refresh": "刷新简报",
+      "working": "正在读取警报...",
+      "actions": "优先行动",
+      "hotspots": "热点地区",
+      "zoonotic": "对人的风险",
+      "farmerMessage": "给养殖户的信息",
+      "who": "负责人",
+      "why": "原因",
+      "urgency": {
+        "immediate": "立即",
+        "this_week": "本周",
+        "monitor": "持续监测"
+      },
+      "copy": "复制信息",
+      "copied": "信息已复制"
+    },
+    "reports": {
+      "empty": "还没有已保存的报告。",
+      "kinds": {
+        "diagnosis": "诊断",
+        "advisor": "农场建议",
+        "onehealth": "One Health 简报"
+      }
+    },
+    "errors": {
+      "failed": "AI 请求失败：{{message}}",
+      "busy": "您这一小时内使用 AI 的次数较多，请稍后再试。"
+    },
+    "offline": "使用 AI 需要网络连接。"
   }
 }

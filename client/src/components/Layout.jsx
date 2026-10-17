@@ -189,6 +189,7 @@ function LayoutInner() {
           <button type="button" className="nav-item logout-item" onClick={() => { setSidebarOpen(false); setSignOutOpen(true); }}>
             <i className="fas fa-right-from-bracket"></i> {t('nav.signOut')}
           </button>
+          <div className="sidebar-byline">{t('brand.byline')}</div>
         </div>
       </aside>
       <div className={`sidebar-overlay${sidebarOpen ? ' show' : ''}`} onClick={() => setSidebarOpen(false)}></div>

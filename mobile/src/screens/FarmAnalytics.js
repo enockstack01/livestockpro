@@ -34,7 +34,7 @@ function SectionTitle({ icon, children }) {
   const { colors } = useTheme();
   return (
     <View style={styles.sectionTitle}>
-      <View style={[styles.sectionIcon, { backgroundColor: colors.primaryLight }]}><Icon name={icon} size={12} color={colors.primary} /></View>
+      <View style={[styles.sectionIcon, { backgroundColor: colors.leaf }]}><Icon name={icon} size={12} color="#FFFFFF" /></View>
       <Text style={[styles.sectionTitleText, { color: colors.text }]}>{children}</Text>
       <View style={{ flex: 1, height: 1, backgroundColor: colors.border }} />
     </View>

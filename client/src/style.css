@@ -9,21 +9,31 @@
    icons on a colored surface); --card is the "page surface" color, identical
    to --white in light mode but diverges in dark mode below. */
 :root {
+  /* Agricoders brand (Brand and Template Guidelines v1.0): Forest, Pine and
+     Leaf greens lead, Harvest Amber highlights, Ink text, Slate helper text,
+     Alert Red only for critical states. Light greens (Mint, Pale Sage, Dew)
+     are deliberately not used anywhere in LivestockPro. */
+  --forest: #1B5E20;
+  --pine: #14532D;
+  --leaf: #2E7D32;
+  --amber: #F9A825;
+  --ink: #1C2B1E;
+  --slate: #5B6B5D;
   --primary: #1B5E20;
-  --primary-light: #EDF1ED;
-  --primary-hover: #134A17;
+  --primary-light: #EEF0EE;
+  --primary-hover: #14532D;
   --primary-dark: #1B5E20;
   --white: #FFFFFF;
   --card: #FFFFFF;
-  --bg: #F5F7FA;
-  --text: #263238;
-  --text-light: #546E7A;
-  --placeholder: #9E9E9E;
-  --border: #E0E0E0;
+  --bg: #F5F6F5;
+  --text: #1C2B1E;
+  --text-light: #5B6B5D;
+  --placeholder: #8A948B;
+  --border: #DFE2DF;
   --orange: #F9A825;
-  --red: #D32F2F;
-  --blue: #1976D2;
-  --purple: #7B1FA2;
+  --red: #C62828;
+  --blue: #5B6B5D;
+  --purple: #14532D;
   /* Brand surface for the sidebar — deliberately NOT redefined in the dark
      palette (unlike --primary-dark, which turns pale green there for text). */
   --sidebar-bg: #1B5E20;
@@ -40,20 +50,21 @@
    data-theme="dark" on <html> (see src/theme/ThemeProvider.jsx); --white
    intentionally stays literal white in both palettes (see shared/theme.js). */
 :root[data-theme='dark'] {
+  /* Night Field background, Screen Frame cards, green as the accent. */
   --primary: #2E7D32;
-  --primary-light: #1B3A20;
-  --primary-dark: #ECEFF1;
+  --primary-light: #1F3324;
+  --primary-dark: #F1F3F1;
   --primary-hover: #1B5E20;
   --card: #1E1E1E;
-  --bg: #121212;
-  --text: #ECEFF1;
-  --text-light: #9AA7AB;
-  --placeholder: #78909C;
-  --border: #333333;
-  --orange: #FFB74D;
-  --red: #EF5350;
-  --blue: #64B5F6;
-  --purple: #BA68C8;
+  --bg: #0F1F14;
+  --text: #F1F3F1;
+  --text-light: #A9B2AA;
+  --placeholder: #7D877E;
+  --border: #2E3A31;
+  --orange: #F9A825;
+  --red: #E05252;
+  --blue: #A9B2AA;
+  --purple: #2E7D32;
 }
 
 /* ---------- Reset & Base ---------- */
@@ -68,7 +79,7 @@ html {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: Calibri, Carlito, Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
   font-size: 14px;
@@ -2108,7 +2119,7 @@ table.data-table {
 }
 
 .spatial-district-tooltip {
-  font-family: 'Inter', sans-serif;
+  font-family: Calibri, Carlito, Arial, sans-serif;
   font-weight: 700;
   font-size: 12px;
   border-radius: 6px;
@@ -2236,7 +2247,7 @@ table.data-table {
 }
 
 .spatial-popup {
-  font-family: 'Inter', sans-serif;
+  font-family: Calibri, Carlito, Arial, sans-serif;
   min-width: 180px;
   font-size: 12.5px;
 }
@@ -2276,7 +2287,7 @@ table.data-table {
 
 .leaflet-control-layers,
 .leaflet-bar {
-  font-family: 'Inter', sans-serif;
+  font-family: Calibri, Carlito, Arial, sans-serif;
   box-shadow: var(--shadow-lg) !important;
   border: none !important;
 }
@@ -2306,3 +2317,133 @@ table.data-table {
    label dims and the pointer changes. */
 .btn:disabled, .btn[disabled] { opacity: 1; cursor: not-allowed; }
 .btn-primary:disabled, .btn-primary[disabled] { background: var(--primary); color: rgba(255,255,255,0.7); transform: none; box-shadow: none; }
+
+/* ============================================================
+   Agricoders brand components
+   - Icons: white glyphs inside solid Leaf, Amber or Alert Red circles
+   - Pills: White on Forest, Ink on Amber, White on Alert Red
+   - No accent bars, coloured stripes along card edges or gradients
+   ============================================================ */
+.summary-icon.green, .summary-icon.blue, .summary-icon.purple { background: var(--leaf); color: #FFFFFF; }
+.summary-icon.orange { background: var(--amber); color: var(--ink); }
+.summary-icon.red { background: var(--red); color: #FFFFFF; }
+.summary-icon.purple { background: var(--pine); }
+.summary-icon.blue { background: var(--slate); }
+
+.badge-green { background: var(--forest); color: #FFFFFF; }
+.badge-orange { background: var(--amber); color: var(--ink); }
+.badge-red { background: var(--red); color: #FFFFFF; }
+.badge-blue, .badge-gray { background: var(--slate); color: #FFFFFF; }
+.badge-purple { background: var(--pine); color: #FFFFFF; }
+
+.nav-item.active { border-left-color: transparent; background: rgba(255,255,255,0.14); font-weight: 700; }
+.alert-item { border-left: 0 !important; }
+
+h1, .page-header h1 { color: var(--forest); }
+:root[data-theme='dark'] h1, :root[data-theme='dark'] .page-header h1 { color: var(--text); }
+a { color: var(--leaf); }
+.auth-brand { background: var(--pine); }
+
+.auth-byline { font-size: 13px; opacity: 0.75; margin-top: 10px; }
+.sidebar-byline { color: rgba(255,255,255,0.6); font-size: 11px; padding: 6px 20px 2px; }
+
+/* ============================================================
+   LivestockPro AI (Assistant page, diagnosis modal, advisor, briefing)
+   Agricoders brand: white glyphs in solid Leaf circles, solid pills,
+   Forest headings, no gradients or stripes.
+   ============================================================ */
+.ai-muted { color: var(--text-light); }
+.ai-title-icon, .ai-spark, .ai-section-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--leaf); color: #FFFFFF; border-radius: 50%;
+}
+.ai-title-icon { width: 34px; height: 34px; font-size: 15px; margin-right: 6px; vertical-align: middle; }
+.ai-spark { width: 30px; height: 30px; font-size: 13px; flex: none; }
+.ai-spark-lg { width: 56px; height: 56px; font-size: 22px; }
+.ai-section-icon { width: 24px; height: 24px; font-size: 11px; margin-right: 8px; flex: none; }
+.ai-notice { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); margin-bottom: 16px; color: var(--text); }
+.ai-notice i { color: var(--slate); margin-top: 3px; }
+.ai-notice-error i { color: var(--red); }
+.ai-working { display: flex; align-items: center; gap: 12px; padding: 22px 4px; color: var(--text-light); font-weight: 600; }
+.ai-powered { color: var(--text-light); font-size: 12px; text-align: center; margin-top: 18px; }
+.ai-disclaimer { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-top: 12px; }
+.ai-disclaimer i { color: var(--red); margin-top: 2px; }
+.btn-icon.ai { color: var(--leaf); }
+
+.ai-report { display: flex; flex-direction: column; gap: 4px; }
+.ai-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.ai-badges .badge i { margin-right: 4px; }
+.ai-summary { font-size: 15px; line-height: 1.55; color: var(--text); margin: 4px 0 6px; }
+.ai-note { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 13.5px; }
+.ai-section { margin-top: 14px; }
+.ai-section h4 { display: flex; align-items: center; font-size: 14.5px; color: var(--forest); margin: 0 0 8px; }
+:root[data-theme='dark'] .ai-section h4 { color: var(--text); }
+.ai-section p { margin: 0 0 6px; font-size: 14px; line-height: 1.5; }
+.ai-list { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.55; }
+.ai-list li { margin: 2px 0; }
+.ai-conditions { display: grid; gap: 8px; }
+.ai-condition, .ai-med, .ai-item { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; background: var(--card); }
+.ai-condition p, .ai-item p { margin: 4px 0 0; color: var(--text-light); font-size: 13.5px; }
+.ai-condition-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.ai-item { margin-bottom: 8px; }
+.ai-med { margin-bottom: 8px; }
+.ai-med dl { display: grid; grid-template-columns: minmax(110px, 30%) 1fr; gap: 4px 12px; margin: 8px 0 0; font-size: 13.5px; }
+.ai-med dt { color: var(--text-light); }
+.ai-med dd { margin: 0; }
+.ai-figures { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin: 6px 0; }
+.ai-figure { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.ai-figure span { font-size: 12px; color: var(--text-light); }
+.ai-figure strong { font-size: 18px; color: var(--text); }
+.ai-figure small { font-size: 12px; color: var(--text-light); }
+
+.ai-saved-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+.ai-saved-head h3 { margin: 0 0 2px; font-size: 17px; color: var(--forest); }
+:root[data-theme='dark'] .ai-saved-head h3 { color: var(--text); }
+.ai-saved-head p { margin: 0; font-size: 12.5px; }
+.ai-saved-actions { display: flex; gap: 6px; align-items: center; }
+
+.ai-earlier { margin-top: 16px; }
+.ai-earlier h4 { font-size: 13px; color: var(--text-light); margin: 0 0 6px; }
+.ai-earlier-row, .ai-report-row {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+  background: var(--card); border: 0; border-bottom: 1px solid var(--border);
+  padding: 10px 6px; cursor: pointer; color: var(--text); font: inherit;
+}
+.ai-earlier-row i { color: var(--leaf); }
+.ai-earlier-row span { flex: 1; }
+.ai-earlier-row small { color: var(--text-light); }
+.ai-report-row { padding: 14px 18px; }
+.ai-report-row:hover, .ai-earlier-row:hover { background: var(--bg); }
+.ai-report-row-text { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.ai-report-row-text small { color: var(--text-light); font-size: 12px; margin-top: 2px; }
+.ai-report-row > .fa-chevron-right { color: var(--text-light); font-size: 12px; }
+
+.ai-chat { display: flex; flex-direction: column; min-height: 520px; }
+.ai-chat-log { flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; max-height: 62vh; }
+.ai-chat-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 24px 8px; color: var(--text-light); }
+.ai-examples { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 640px; }
+.ai-example { border: 1px solid var(--border); background: var(--card); color: var(--text); border-radius: 999px; padding: 7px 14px; font: inherit; font-size: 13px; cursor: pointer; }
+.ai-example:hover { border-color: var(--leaf); }
+.ai-msg { max-width: 82%; display: flex; flex-direction: column; gap: 3px; }
+.ai-msg-user { align-self: flex-end; align-items: flex-end; }
+.ai-msg-who { font-size: 11.5px; color: var(--text-light); font-weight: 700; }
+.ai-msg-text { white-space: pre-wrap; line-height: 1.55; font-size: 14px; padding: 10px 14px; border-radius: 12px; }
+.ai-msg-user .ai-msg-text { background: var(--forest); color: #FFFFFF; }
+.ai-msg-assistant .ai-msg-text { background: var(--bg); border: 1px solid var(--border); color: var(--text); }
+.ai-chat-input { border-top: 1px solid var(--border); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.ai-chat-input textarea { resize: vertical; }
+.ai-chat-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+.ai-advisor-card { margin-bottom: 24px; }
+.ai-digest h4 { margin: 0 0 6px; color: var(--forest); font-size: 16px; }
+:root[data-theme='dark'] .ai-digest h4 { color: var(--text); }
+.ai-digest p { margin: 0 0 10px; line-height: 1.5; }
+.ai-digest-list { margin: 0 0 10px; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+.ai-digest-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12.5px; }
+.ai-digest-foot a { font-weight: 700; }
+
+@media (max-width: 600px) {
+  .ai-msg { max-width: 94%; }
+  .ai-med dl { grid-template-columns: 1fr; }
+  .ai-chat-log { max-height: none; }
+}

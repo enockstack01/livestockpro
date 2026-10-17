@@ -317,6 +317,7 @@ function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInse
           <Text style={baseStyles.syncText} numberOfLines={1}>{syncLine}{failedCount > 0 ? ` · ${t('sync.recordsFailed', { count: failedCount })}` : ''}</Text>
         </Pressable>
         <NavItem icon="right-from-bracket" label={t('nav.signOut')} onPress={() => { onClose(); signOut(); }} danger />
+        <Text style={baseStyles.byline}>{t('brand.byline')}</Text>
       </View>
     </View>
   );
@@ -349,7 +350,7 @@ function NotificationsPanel({ open, onClose, items, readIds, onItem, onMarkAll, 
             </View>
           ) : items.map((n) => (
             <Pressable key={n.id} onPress={() => onItem(n)} style={[baseStyles.notifItem, { borderBottomColor: colors.border, opacity: readIds.has(n.id) ? 0.55 : 1 }]}>
-              <View style={[baseStyles.notifIcon, { backgroundColor: tints[n.color] + '22' }]}><Icon name={n.icon} size={13} color={tints[n.color]} /></View>
+              <View style={[baseStyles.notifIcon, { backgroundColor: tints[n.color] || colors.primary }]}><Icon name={n.icon} size={13} color={n.color === 'orange' ? '#1C2B1E' : '#FFFFFF'} /></View>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text }} numberOfLines={2}>{n.title}</Text>
                 <Text style={{ fontSize: 11, color: colors.textLight, marginTop: 2 }} numberOfLines={1}>{n.sub}</Text>
@@ -374,8 +375,9 @@ const baseStyles = StyleSheet.create({
   logoText: { color: '#FFFFFF', fontSize: 17, fontWeight: '700' },
   sectionLabel: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, color: 'rgba(255,255,255,0.35)', paddingTop: 16, paddingBottom: 6, paddingHorizontal: 20 },
   navItem: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11, paddingLeft: 17, paddingRight: 20, borderLeftWidth: 3, borderLeftColor: 'transparent' },
-  navItemActive: { backgroundColor: 'rgba(255,255,255,0.12)', borderLeftColor: '#FFFFFF' },
+  navItemActive: { backgroundColor: 'rgba(255,255,255,0.14)', borderLeftColor: 'transparent' },
   navText: { fontSize: 13, fontWeight: '500' },
+  byline: { color: 'rgba(255,255,255,0.6)', fontSize: 11, paddingHorizontal: 20, paddingTop: 4 },
   sidebarFooter: { borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', paddingTop: 6 },
   syncRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8, paddingLeft: 20, paddingRight: 20 },
   syncText: { color: 'rgba(255,255,255,0.5)', fontSize: 11, flex: 1 },

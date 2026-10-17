@@ -11,6 +11,7 @@ import { computeAlerts, computeRecentActivity, computeUpcoming } from '../../../
 import { accountDisplayName } from '../../../shared/account';
 import { useAccount } from '../components/AccountGate.jsx';
 import '../dashboard.css';
+import { AdvisorTab } from './Assistant.jsx';
 
 /* Dashboard, laid out like CropManager's: greeting, the Herd Profile card
    (herd-health ring, "Farm at a glance" tiles, herd by species), Farm
@@ -70,6 +71,8 @@ export default function Dashboard() {
       </div>
 
       <HerdProfile animals={data.animals} profile={profile} glance={glance} onOpen={(link) => navigate(link)} />
+
+      <AdvisorTab compact />
 
       <FarmAnalytics data={data} />
 

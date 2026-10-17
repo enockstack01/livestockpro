@@ -24,7 +24,8 @@ function useGo() {
 function useToneColor(tone) {
   const { colors } = useTheme();
   const tint = useTint(tone);
-  return { fg: tone === 'green' ? colors.primary : colors[tone] || colors.blue, bg: tint.bg };
+  // solid tone fill (bg) with its white or Ink glyph colour (fg); `accent` is the fill used as a line or text colour
+  return { fg: tint.fg, bg: tint.bg, accent: tint.bg, card: colors.card };
 }
 
 function Empty({ icon, text, color }) {
@@ -134,7 +135,7 @@ function EventRow({ e, onPress, last }) {
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text }} numberOfLines={1}>{e.name}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-          <Icon name={e.icon} size={10} color={c.fg} />
+          <Icon name={e.icon} size={10} color={c.accent} />
           <Text style={{ fontSize: 11.5, color: colors.textLight }} numberOfLines={1}>{t(e.labelKey)}</Text>
         </View>
       </View>
@@ -164,7 +165,7 @@ function TimelineStop({ s }) {
   return (
     <View style={[styles.timelineStop, { left: `${(s.daysLeft / UPCOMING_WINDOW_DAYS) * 100}%` }]}>
       <Text style={{ fontSize: 10, fontWeight: '700', color: colors.text }}>{s.day}</Text>
-      <View style={[styles.timelineDot, { backgroundColor: c.fg, borderColor: colors.card }]}>
+      <View style={[styles.timelineDot, { backgroundColor: c.bg, borderColor: colors.card }]}>
         {s.count > 1 ? <Text style={{ fontSize: 10, fontWeight: '800', color: '#FFFFFF' }}>{s.count}</Text> : null}
       </View>
     </View>
@@ -205,9 +206,9 @@ function KindChip({ k, active, onPress }) {
   const { colors } = useTheme();
   const c = useToneColor(k.color);
   return (
-    <Pressable onPress={onPress} accessibilityRole="tab" accessibilityState={{ selected: active }} style={[styles.kind, { backgroundColor: c.bg, borderColor: active ? c.fg : colors.border, borderWidth: active ? 2 : 1 }]}>
+    <Pressable onPress={onPress} accessibilityRole="tab" accessibilityState={{ selected: active }} style={[styles.kind, { backgroundColor: colors.card, borderColor: active ? c.accent : colors.border, borderWidth: active ? 2 : 1 }]}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-        <Icon name={k.icon} size={12} color={c.fg} />
+        <Icon name={k.icon} size={12} color={c.accent} />
         <Text style={{ fontSize: 17, fontWeight: '800', color: colors.text }}>{k.count}</Text>
       </View>
       <Text style={{ fontSize: 10.5, fontWeight: '600', color: colors.textLight }} numberOfLines={1}>{t(`dashboardFeed.alertKinds.${k.key}`)}</Text>

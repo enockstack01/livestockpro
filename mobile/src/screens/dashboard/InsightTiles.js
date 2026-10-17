@@ -106,7 +106,7 @@ export default function InsightTiles({ insights }) {
       {insights.map((ins) => {
         const color = tone[ins.tone];
         return (
-          <View key={ins.id} accessible accessibilityLabel={t(`analytics.insight.${ins.key}`, ins.vars)} style={[styles.tile, { borderColor: colors.border, borderTopColor: color, backgroundColor: colors.card }]}>
+          <View key={ins.id} accessible accessibilityLabel={t(`analytics.insight.${ins.key}`, ins.vars)} style={[styles.tile, { borderColor: colors.border, backgroundColor: colors.card }]}>
             {/* soft tint of the tone colour along the top, like the web tile */}
             <View pointerEvents="none" style={[styles.tint, { backgroundColor: color }]} />
             <View style={styles.labelRow}>
@@ -124,7 +124,7 @@ export default function InsightTiles({ insights }) {
 }
 
 const styles = StyleSheet.create({
-  tile: { flexGrow: 1, gap: 10, padding: 12, borderWidth: 1, borderTopWidth: 3, borderRadius: 12, minHeight: 142, overflow: 'hidden' },
+  tile: { flexGrow: 1, gap: 10, padding: 12, borderWidth: 1, borderRadius: 12, minHeight: 142, overflow: 'hidden' },
   tint: { position: 'absolute', left: 0, right: 0, top: 0, height: 44, opacity: 0.05 },
   labelRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 6, minHeight: 30 },
   label: { flex: 1, fontSize: 11.5, fontWeight: '600', lineHeight: 15 },

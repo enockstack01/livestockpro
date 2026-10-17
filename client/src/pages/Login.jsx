@@ -24,6 +24,7 @@ export default function Login() {
         <div className="auth-brand-icon"><i className="fas fa-cow"></i></div>
         <h1>{t('auth.brandName')}</h1>
         <p>{t('login.tagline')}</p>
+        <p className="auth-byline">{t('brand.byline')}</p>
       </div>
 
       <div className="auth-form-section">

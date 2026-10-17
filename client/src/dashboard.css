@@ -487,3 +487,24 @@
 .insight-bars .micro-cols { margin-top: 14px; }
 .feed-card { border-radius: 14px; overflow: hidden; }
 .feed-card .card-header { background: color-mix(in srgb, var(--primary) 3%, var(--card)); }
+
+/* ---------- Agricoders brand: icon circles, pills, no stripes ---------- */
+.tone-green { --tone: var(--leaf); --tone-ink: #FFFFFF; }
+.tone-orange { --tone: var(--amber); --tone-ink: var(--ink); }
+.tone-red { --tone: var(--red); --tone-ink: #FFFFFF; }
+.tone-blue { --tone: var(--slate); --tone-ink: #FFFFFF; }
+.tone-purple { --tone: var(--pine); --tone-ink: #FFFFFF; }
+.feed-chip, .glance-icon, .launcher-icon, .section-icon,
+.event-card .feed-chip { background: var(--tone, var(--leaf)); color: var(--tone-ink, #FFFFFF); }
+.section-icon { background: var(--leaf); color: #FFFFFF; }
+.glance-badge, .event-countdown { background: var(--tone); color: var(--tone-ink); }
+.alert-badge.late { background: var(--red); color: #FFFFFF; }
+.alert-badge.soon { background: var(--slate); color: #FFFFFF; }
+.alert-kind { background: var(--card); border-color: var(--border); }
+.alert-kind i { color: var(--tone); }
+.launcher-plus { background: var(--forest); }
+.chart-card .card-header, .feed-card .card-header { background: var(--card); }
+.chart-card .card-header h3 i { background: var(--leaf); color: #FFFFFF; }
+.insight-tile { border-top: 1px solid var(--border); background: var(--card); }
+.timeline-dot { background: var(--tone, var(--leaf)); }
+.herd-profile-banner { background: var(--pine); }

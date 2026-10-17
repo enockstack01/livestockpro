@@ -47,7 +47,8 @@
       "analytics": "Uchambuzi",
       "administration": "Utawala",
       "system": "Mfumo"
-    }
+    },
+    "assistant": "Msaidizi wa AI"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -340,7 +341,7 @@
     "activeAlerts": "Tahadhari Zinazoendelea"
   },
   "login": {
-    "tagline": "Rahisisha shughuli za shamba lako. Fuatilia wanyama, afya, uzalishaji, ulishaji, mazao na fedha, yote mahali pamoja.",
+    "tagline": "Ujue mifugo yako, linda afya yake, ongeza thamani yake",
     "welcomeTitle": "Karibu",
     "welcomeSubtitle": "Ingia kwenye dashibodi yako ya usimamizi wa shamba"
   },
@@ -976,6 +977,149 @@
     "currencyFailed": "Imeshindwa kusasisha sarafu: {{message}}"
   },
   "splash": {
-    "tagline": "Ufugaji, kwa mpangilio"
+    "tagline": "Ujue mifugo yako, linda afya yake, ongeza thamani yake"
+  },
+  "brand": {
+    "tagline": "Ujue mifugo yako, linda afya yake, ongeza thamani yake",
+    "byline": "LivestockPro · na Agricoders"
+  },
+  "ai": {
+    "title": "Msaidizi wa AI",
+    "subtitle": "Ripoti za uchunguzi, ushauri wa shamba na majibu kutoka kwenye kumbukumbu zako",
+    "notConfigured": "AI bado haijawekwa kwenye seva hii. Msimamizi anahitaji kuongeza ufunguo wa API wa Anthropic.",
+    "vetNotice": "AI ya LivestockPro inasaidia, haichukui nafasi ya, daktari wa mifugo aliyehitimu. Daima thibitisha utambuzi na dawa yoyote ya agizo la daktari na daktari wa mifugo.",
+    "poweredBy": "LivestockPro AI · inaendeshwa na Claude",
+    "working": "Inafikiria...",
+    "back": "Rudi",
+    "tabs": {
+      "ask": "Uliza LivestockPro",
+      "advisor": "Mshauri wa shamba",
+      "diagnose": "Chunguza",
+      "reports": "Ripoti zilizohifadhiwa"
+    },
+    "ask": {
+      "placeholder": "Uliza kuhusu mifugo, afya, fedha au uzalishaji",
+      "send": "Tuma",
+      "empty": "Uliza chochote kuhusu shamba lako. Kwa mfano:",
+      "examples": [
+        "Ni wanyama gani wanahitaji uangalizi wiki hii?",
+        "Uzalishaji wa maziwa umebadilikaje miezi 3 iliyopita?",
+        "Tumetumia pesa nyingi zaidi kwa nini mwezi huu?",
+        "Ni uzazi gani unatarajiwa hivi karibuni?"
+      ],
+      "clear": "Mazungumzo mapya",
+      "you": "Wewe",
+      "assistant": "LivestockPro"
+    },
+    "advisor": {
+      "title": "Mshauri wa shamba",
+      "intro": "Usomaji rahisi wa kumbukumbu zote za shamba lako: kinachoenda vizuri, cha kufanya kwanza na hatari zinazoongezeka.",
+      "run": "Pata ushauri",
+      "refresh": "Sasisha ushauri",
+      "working": "Inasoma kumbukumbu za shamba...",
+      "priorities": "Cha kufanya kwanza",
+      "strengths": "Kinachoenda vizuri",
+      "risks": "Hatari za kufuatilia",
+      "figures": "Takwimu muhimu",
+      "when": {
+        "today": "Leo",
+        "this_week": "Wiki hii",
+        "this_month": "Mwezi huu"
+      },
+      "openFull": "Fungua ushauri kamili"
+    },
+    "diagnose": {
+      "title": "Uchunguzi wa AI",
+      "intro": "Eleza unachoona. LivestockPro husoma kumbukumbu za mnyama na kuandika ripoti ya uchunguzi na matibabu unayoweza kuchapisha au kuhifadhi kama PDF.",
+      "animal": "Mnyama",
+      "chooseAnimal": "Chagua mnyama (si lazima)",
+      "species": "Aina",
+      "speciesHint": "Kwa mfano: ng'ombe, mbuzi, kuku",
+      "symptoms": "Dalili na ulichogundua",
+      "symptomsHint": "Kwa mfano: hali chakula kwa siku 2, homa kali, tezi zilizovimba, kukohoa",
+      "run": "Andika ripoti",
+      "again": "Uchunguzi mpya",
+      "working": "Inasoma kumbukumbu na kuandika ripoti...",
+      "fromRecord": "Chunguza kwa AI",
+      "previous": "Ripoti za awali za kumbukumbu hii",
+      "needInput": "Eleza dalili kwanza."
+    },
+    "report": {
+      "urgency": "Uharaka",
+      "urgencyLevels": {
+        "emergency": "Dharura",
+        "urgent": "Haraka",
+        "soon": "Shughulikia hivi karibuni",
+        "routine": "Kawaida"
+      },
+      "seeVet": "Mwite daktari wa mifugo",
+      "seeVetNo": "Ziara ya daktari si ya haraka",
+      "likely": "Magonjwa yanayowezekana",
+      "likelihood": {
+        "high": "Juu",
+        "medium": "Wastani",
+        "low": "Chini"
+      },
+      "cause": "Chanzo kinachowezekana",
+      "treatment": "Hatua za matibabu",
+      "medications": "Dawa",
+      "purpose": "Inatumika kwa",
+      "howToGive": "Jinsi ya kutoa",
+      "dose": "Kipimo",
+      "withdrawal": "Muda wa kusubiri",
+      "prescription": "Kwa agizo la daktari tu",
+      "care": "Huduma ya kusaidia",
+      "isolation": "Kutenga",
+      "prevention": "Kinga",
+      "warning": "Mwite daktari wa mifugo mara moja ikiwa",
+      "zoonotic": "Hatari kwa binadamu",
+      "zoonoticLevels": {
+        "none": "Hakuna",
+        "low": "Chini",
+        "medium": "Wastani",
+        "high": "Juu"
+      },
+      "notifiable": "Kwa kawaida lazima liripotiwe: ripoti kwa ofisi ya mifugo ya wilaya.",
+      "questions": "Maswali ya kumuuliza daktari",
+      "gaps": "Taarifa zinazoweza kusaidia",
+      "print": "Chapisha au hifadhi kama PDF",
+      "generated": "Imetolewa {{date}}",
+      "animal": "Mnyama",
+      "delete": "Futa ripoti",
+      "sharePdf": "Shiriki PDF"
+    },
+    "brief": {
+      "title": "Muhtasari wa One Health wa AI",
+      "intro": "Muhtasari wa hali kwa maafisa wa mifugo na afya ya umma, ulioandikwa kutoka kwa tahadhari zilizopo.",
+      "run": "Andika muhtasari",
+      "refresh": "Sasisha muhtasari",
+      "working": "Inasoma tahadhari...",
+      "actions": "Hatua za kipaumbele",
+      "hotspots": "Maeneo hatari",
+      "zoonotic": "Hatari kwa binadamu",
+      "farmerMessage": "Ujumbe kwa wafugaji",
+      "who": "Nani",
+      "why": "Kwa nini",
+      "urgency": {
+        "immediate": "Mara moja",
+        "this_week": "Wiki hii",
+        "monitor": "Fuatilia"
+      },
+      "copy": "Nakili ujumbe",
+      "copied": "Ujumbe umenakiliwa"
+    },
+    "reports": {
+      "empty": "Bado hakuna ripoti zilizohifadhiwa.",
+      "kinds": {
+        "diagnosis": "Uchunguzi",
+        "advisor": "Ushauri wa shamba",
+        "onehealth": "Muhtasari wa One Health"
+      }
+    },
+    "errors": {
+      "failed": "Ombi la AI limeshindwa: {{message}}",
+      "busy": "Umetumia AI sana saa hii. Tafadhali jaribu tena baadaye."
+    },
+    "offline": "Unahitaji mtandao ili kutumia AI."
   }
 }

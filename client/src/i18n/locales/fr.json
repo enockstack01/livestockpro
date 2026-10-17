@@ -47,7 +47,8 @@
       "analytics": "Analyses",
       "administration": "Administration",
       "system": "Système"
-    }
+    },
+    "assistant": "Assistant IA"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -340,7 +341,7 @@
     "activeAlerts": "Alertes actives"
   },
   "login": {
-    "tagline": "Simplifiez la gestion de votre ferme. Suivez les animaux, la santé, la reproduction, l’alimentation, la production et les finances, le tout en un seul endroit.",
+    "tagline": "Connaissez votre troupeau, protégez sa santé, augmentez sa valeur",
     "welcomeTitle": "Bienvenue",
     "welcomeSubtitle": "Connectez-vous à votre tableau de bord de gestion agricole"
   },
@@ -976,6 +977,149 @@
     "currencyFailed": "Impossible de mettre à jour la devise : {{message}}"
   },
   "splash": {
-    "tagline": "L’élevage, bien géré"
+    "tagline": "Connaissez votre troupeau, protégez sa santé, augmentez sa valeur"
+  },
+  "brand": {
+    "tagline": "Connaissez votre troupeau, protégez sa santé, augmentez sa valeur",
+    "byline": "LivestockPro · par Agricoders"
+  },
+  "ai": {
+    "title": "Assistant IA",
+    "subtitle": "Rapports de diagnostic, conseils pour la ferme et réponses tirées de vos propres données",
+    "notConfigured": "L'IA n'est pas encore configurée sur ce serveur. Un administrateur doit ajouter la clé API Anthropic.",
+    "vetNotice": "L'IA de LivestockPro aide, mais ne remplace pas, un vétérinaire qualifié. Confirmez toujours un diagnostic et tout médicament sur ordonnance avec un vétérinaire.",
+    "poweredBy": "LivestockPro IA · propulsé par Claude",
+    "working": "Analyse en cours...",
+    "back": "Retour",
+    "tabs": {
+      "ask": "Demander à LivestockPro",
+      "advisor": "Conseiller agricole",
+      "diagnose": "Diagnostiquer",
+      "reports": "Rapports enregistrés"
+    },
+    "ask": {
+      "placeholder": "Posez une question sur votre troupeau, la santé, l'argent ou la production",
+      "send": "Envoyer",
+      "empty": "Posez n'importe quelle question sur votre ferme. Par exemple :",
+      "examples": [
+        "Quels animaux ont besoin d'attention cette semaine ?",
+        "Comment la production de lait a-t-elle évolué ces 3 derniers mois ?",
+        "Pour quoi avons-nous le plus dépensé ce mois-ci ?",
+        "Quelles naissances sont prévues bientôt ?"
+      ],
+      "clear": "Nouvelle conversation",
+      "you": "Vous",
+      "assistant": "LivestockPro"
+    },
+    "advisor": {
+      "title": "Conseiller agricole",
+      "intro": "Une lecture simple de toutes les données de votre ferme : ce qui va bien, ce qu'il faut faire d'abord et les risques qui s'accumulent.",
+      "run": "Obtenir des conseils",
+      "refresh": "Actualiser les conseils",
+      "working": "Lecture des données de la ferme...",
+      "priorities": "À faire en premier",
+      "strengths": "Ce qui va bien",
+      "risks": "Risques à surveiller",
+      "figures": "Chiffres clés",
+      "when": {
+        "today": "Aujourd'hui",
+        "this_week": "Cette semaine",
+        "this_month": "Ce mois-ci"
+      },
+      "openFull": "Voir tous les conseils"
+    },
+    "diagnose": {
+      "title": "Diagnostic IA",
+      "intro": "Décrivez ce que vous observez. LivestockPro lit les dossiers de l'animal et rédige un rapport de diagnostic et de traitement à imprimer ou enregistrer en PDF.",
+      "animal": "Animal",
+      "chooseAnimal": "Choisir un animal (facultatif)",
+      "species": "Espèce",
+      "speciesHint": "Par exemple : bovin, chèvre, poulet",
+      "symptoms": "Symptômes et observations",
+      "symptomsHint": "Par exemple : ne mange plus depuis 2 jours, forte fièvre, ganglions enflés, toux",
+      "run": "Rédiger le rapport",
+      "again": "Nouveau diagnostic",
+      "working": "Lecture des dossiers et rédaction du rapport...",
+      "fromRecord": "Diagnostiquer avec l'IA",
+      "previous": "Rapports précédents pour ce dossier",
+      "needInput": "Décrivez d'abord les symptômes."
+    },
+    "report": {
+      "urgency": "Urgence",
+      "urgencyLevels": {
+        "emergency": "Urgence vitale",
+        "urgent": "Urgent",
+        "soon": "À traiter bientôt",
+        "routine": "Courant"
+      },
+      "seeVet": "Appeler un vétérinaire",
+      "seeVetNo": "Visite vétérinaire non urgente",
+      "likely": "Affections probables",
+      "likelihood": {
+        "high": "Élevée",
+        "medium": "Moyenne",
+        "low": "Faible"
+      },
+      "cause": "Cause probable",
+      "treatment": "Étapes du traitement",
+      "medications": "Médicaments",
+      "purpose": "À quoi il sert",
+      "howToGive": "Comment l'administrer",
+      "dose": "Dose",
+      "withdrawal": "Délai d'attente",
+      "prescription": "Sur ordonnance",
+      "care": "Soins de soutien",
+      "isolation": "Isolement",
+      "prevention": "Prévention",
+      "warning": "Appelez un vétérinaire immédiatement si",
+      "zoonotic": "Risque pour l'homme",
+      "zoonoticLevels": {
+        "none": "Aucun",
+        "low": "Faible",
+        "medium": "Moyen",
+        "high": "Élevé"
+      },
+      "notifiable": "Généralement à déclaration obligatoire : signalez-le au service vétérinaire du district.",
+      "questions": "Questions à poser au vétérinaire",
+      "gaps": "Informations utiles manquantes",
+      "print": "Imprimer ou enregistrer en PDF",
+      "generated": "Généré le {{date}}",
+      "animal": "Animal",
+      "delete": "Supprimer le rapport",
+      "sharePdf": "Partager le PDF"
+    },
+    "brief": {
+      "title": "Synthèse One Health par IA",
+      "intro": "Une synthèse de situation pour les services vétérinaires et de santé publique, rédigée à partir des alertes en cours.",
+      "run": "Rédiger la synthèse",
+      "refresh": "Actualiser la synthèse",
+      "working": "Lecture des alertes...",
+      "actions": "Actions prioritaires",
+      "hotspots": "Foyers",
+      "zoonotic": "Risque pour l'homme",
+      "farmerMessage": "Message aux éleveurs",
+      "who": "Qui",
+      "why": "Pourquoi",
+      "urgency": {
+        "immediate": "Immédiat",
+        "this_week": "Cette semaine",
+        "monitor": "Surveiller"
+      },
+      "copy": "Copier le message",
+      "copied": "Message copié"
+    },
+    "reports": {
+      "empty": "Aucun rapport enregistré.",
+      "kinds": {
+        "diagnosis": "Diagnostic",
+        "advisor": "Conseils agricoles",
+        "onehealth": "Synthèse One Health"
+      }
+    },
+    "errors": {
+      "failed": "La demande à l'IA a échoué : {{message}}",
+      "busy": "Vous avez beaucoup utilisé l'IA cette heure-ci. Réessayez plus tard."
+    },
+    "offline": "Une connexion est nécessaire pour utiliser l'IA."
   }
 }

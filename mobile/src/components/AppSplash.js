@@ -82,7 +82,8 @@ export function SplashHost({ children }) {
               <Animated.Text style={styles.name}>
                 Livestock<Animated.Text style={{ color: '#FFFFFF' }}>Pro</Animated.Text>
               </Animated.Text>
-              <Animated.Text style={styles.tagline}>{t('splash.tagline', { defaultValue: 'Livestock farming, managed' })}</Animated.Text>
+              <Animated.Text style={styles.tagline}>{t('splash.tagline', { defaultValue: 'Know your herd, protect its health, grow its value' })}</Animated.Text>
+              <Animated.Text style={styles.byline}>{t('brand.byline', { defaultValue: 'LivestockPro · by Agricoders' })}</Animated.Text>
               <View style={styles.track}>
                 <Animated.View style={[styles.bar, { transform: [{ translateX: progress.interpolate({ inputRange: [0, 1], outputRange: [-48, 120] }) }] }]} />
               </View>
@@ -100,6 +101,7 @@ const styles = StyleSheet.create({
   words: { position: 'absolute', top: '58%', alignItems: 'center' },
   name: { color: '#FFFFFF', fontSize: 30, fontWeight: '800', letterSpacing: 0.5 },
   tagline: { color: 'rgba(255,255,255,0.78)', fontSize: 14, marginTop: 6 },
+  byline: { color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 4 },
   track: { width: 120, height: 3, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.18)', marginTop: 28, overflow: 'hidden' },
   bar: { width: 48, height: 3, borderRadius: 2, backgroundColor: '#FFFFFF' },
 });

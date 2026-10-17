@@ -16,7 +16,7 @@ import { fmtMoney } from '../../../../shared/chartPalette';
 function Tile({ icon, tone, label, value, badge, onPress, children }) {
   const { colors } = useTheme();
   const tint = useTint(tone);
-  const fg = tone === 'green' ? colors.primary : colors[tone];
+  const fg = tint.fg;
   return (
     <Pressable
       onPress={() => { haptics.tap(); onPress(); }}
@@ -38,9 +38,8 @@ function Tile({ icon, tone, label, value, badge, onPress, children }) {
 }
 
 export function Badge({ tone, icon, children }) {
-  const { colors } = useTheme();
   const tint = useTint(tone);
-  const fg = tone === 'green' ? colors.primary : colors[tone];
+  const fg = tint.fg;
   return (
     <View style={[styles.badge, { backgroundColor: tint.bg }]}>
       <Icon name={icon} size={9} color={fg} />

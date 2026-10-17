@@ -47,7 +47,8 @@
       "analytics": "Auswertungen",
       "administration": "Verwaltung",
       "system": "System"
-    }
+    },
+    "assistant": "KI-Assistent"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -340,7 +341,7 @@
     "activeAlerts": "Aktive Warnungen"
   },
   "login": {
-    "tagline": "Optimieren Sie Ihren landwirtschaftlichen Betrieb. Verfolgen Sie Tiere, Gesundheit, Zucht, Fütterung, Produktion und Finanzen, alles an einem Ort.",
+    "tagline": "Kenne deine Herde, schütze ihre Gesundheit, steigere ihren Wert",
     "welcomeTitle": "Willkommen",
     "welcomeSubtitle": "Melden Sie sich bei Ihrem Farm-Management-Dashboard an"
   },
@@ -976,6 +977,149 @@
     "currencyFailed": "Währung konnte nicht aktualisiert werden: {{message}}"
   },
   "splash": {
-    "tagline": "Viehhaltung, im Griff"
+    "tagline": "Kenne deine Herde, schütze ihre Gesundheit, steigere ihren Wert"
+  },
+  "brand": {
+    "tagline": "Kenne deine Herde, schütze ihre Gesundheit, steigere ihren Wert",
+    "byline": "LivestockPro · von Agricoders"
+  },
+  "ai": {
+    "title": "KI-Assistent",
+    "subtitle": "Diagnoseberichte, Betriebsberatung und Antworten aus Ihren eigenen Daten",
+    "notConfigured": "Die KI ist auf diesem Server noch nicht eingerichtet. Ein Administrator muss den Anthropic API-Schlüssel hinzufügen.",
+    "vetNotice": "Die KI von LivestockPro unterstützt einen qualifizierten Tierarzt, ersetzt ihn aber nicht. Lassen Sie eine Diagnose und verschreibungspflichtige Medikamente immer von einem Tierarzt bestätigen.",
+    "poweredBy": "LivestockPro KI · mit Claude",
+    "working": "Wird durchdacht...",
+    "back": "Zurück",
+    "tabs": {
+      "ask": "LivestockPro fragen",
+      "advisor": "Betriebsberater",
+      "diagnose": "Diagnose",
+      "reports": "Gespeicherte Berichte"
+    },
+    "ask": {
+      "placeholder": "Fragen Sie zu Herde, Gesundheit, Finanzen oder Produktion",
+      "send": "Senden",
+      "empty": "Fragen Sie alles über Ihren Betrieb. Zum Beispiel:",
+      "examples": [
+        "Welche Tiere brauchen diese Woche Aufmerksamkeit?",
+        "Wie hat sich die Milchleistung in den letzten 3 Monaten entwickelt?",
+        "Wofür haben wir diesen Monat am meisten ausgegeben?",
+        "Welche Geburten stehen bald an?"
+      ],
+      "clear": "Neues Gespräch",
+      "you": "Sie",
+      "assistant": "LivestockPro"
+    },
+    "advisor": {
+      "title": "Betriebsberater",
+      "intro": "Eine verständliche Auswertung aller Daten Ihres Betriebs: was gut läuft, was zuerst zu tun ist und welche Risiken entstehen.",
+      "run": "Beratung erhalten",
+      "refresh": "Beratung aktualisieren",
+      "working": "Betriebsdaten werden gelesen...",
+      "priorities": "Was zuerst zu tun ist",
+      "strengths": "Was gut läuft",
+      "risks": "Risiken im Blick",
+      "figures": "Wichtige Zahlen",
+      "when": {
+        "today": "Heute",
+        "this_week": "Diese Woche",
+        "this_month": "Diesen Monat"
+      },
+      "openFull": "Gesamte Beratung öffnen"
+    },
+    "diagnose": {
+      "title": "KI-Diagnose",
+      "intro": "Beschreiben Sie, was Sie sehen. LivestockPro liest die Daten des Tieres und schreibt einen Diagnose- und Behandlungsbericht, den Sie drucken oder als PDF speichern können.",
+      "animal": "Tier",
+      "chooseAnimal": "Tier auswählen (optional)",
+      "species": "Tierart",
+      "speciesHint": "Zum Beispiel: Rind, Ziege, Huhn",
+      "symptoms": "Symptome und Beobachtungen",
+      "symptomsHint": "Zum Beispiel: frisst seit 2 Tagen nicht, hohes Fieber, geschwollene Lymphknoten, Husten",
+      "run": "Bericht schreiben",
+      "again": "Neue Diagnose",
+      "working": "Daten werden gelesen und der Bericht geschrieben...",
+      "fromRecord": "Mit KI diagnostizieren",
+      "previous": "Frühere Berichte zu diesem Eintrag",
+      "needInput": "Beschreiben Sie zuerst die Symptome."
+    },
+    "report": {
+      "urgency": "Dringlichkeit",
+      "urgencyLevels": {
+        "emergency": "Notfall",
+        "urgent": "Dringend",
+        "soon": "Bald behandeln",
+        "routine": "Routine"
+      },
+      "seeVet": "Tierarzt rufen",
+      "seeVetNo": "Tierarztbesuch nicht dringend",
+      "likely": "Wahrscheinliche Erkrankungen",
+      "likelihood": {
+        "high": "Hoch",
+        "medium": "Mittel",
+        "low": "Niedrig"
+      },
+      "cause": "Wahrscheinliche Ursache",
+      "treatment": "Behandlungsschritte",
+      "medications": "Medikamente",
+      "purpose": "Wofür",
+      "howToGive": "Verabreichung",
+      "dose": "Dosis",
+      "withdrawal": "Wartezeit",
+      "prescription": "Verschreibungspflichtig",
+      "care": "Unterstützende Pflege",
+      "isolation": "Absonderung",
+      "prevention": "Vorbeugung",
+      "warning": "Rufen Sie sofort einen Tierarzt, wenn",
+      "zoonotic": "Risiko für Menschen",
+      "zoonoticLevels": {
+        "none": "Keines",
+        "low": "Niedrig",
+        "medium": "Mittel",
+        "high": "Hoch"
+      },
+      "notifiable": "In der Regel meldepflichtig: melden Sie es dem Veterinäramt des Bezirks.",
+      "questions": "Fragen an den Tierarzt",
+      "gaps": "Hilfreiche fehlende Angaben",
+      "print": "Drucken oder als PDF speichern",
+      "generated": "Erstellt am {{date}}",
+      "animal": "Tier",
+      "delete": "Bericht löschen",
+      "sharePdf": "PDF teilen"
+    },
+    "brief": {
+      "title": "KI One Health Lagebericht",
+      "intro": "Ein Lagebericht für Veterinär- und Gesundheitsbehörden, erstellt aus den aktuellen Warnungen.",
+      "run": "Lagebericht schreiben",
+      "refresh": "Lagebericht aktualisieren",
+      "working": "Warnungen werden gelesen...",
+      "actions": "Vorrangige Maßnahmen",
+      "hotspots": "Brennpunkte",
+      "zoonotic": "Risiko für Menschen",
+      "farmerMessage": "Nachricht an Landwirte",
+      "who": "Wer",
+      "why": "Warum",
+      "urgency": {
+        "immediate": "Sofort",
+        "this_week": "Diese Woche",
+        "monitor": "Beobachten"
+      },
+      "copy": "Nachricht kopieren",
+      "copied": "Nachricht kopiert"
+    },
+    "reports": {
+      "empty": "Noch keine gespeicherten Berichte.",
+      "kinds": {
+        "diagnosis": "Diagnose",
+        "advisor": "Betriebsberatung",
+        "onehealth": "One Health Lagebericht"
+      }
+    },
+    "errors": {
+      "failed": "Die KI-Anfrage ist fehlgeschlagen: {{message}}",
+      "busy": "Sie haben die KI in dieser Stunde oft genutzt. Bitte versuchen Sie es später erneut."
+    },
+    "offline": "Für die KI ist eine Verbindung nötig."
   }
 }

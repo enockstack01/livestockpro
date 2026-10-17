@@ -7,39 +7,57 @@
    Update LIGHT alongside style.css if the web design changes; DARK only
    needs to keep pace with LIGHT's brand colors (primary/red/blue/purple/orange). */
 
+/* Agricoders brand (Brand and Template Guidelines v1.0): Forest, Pine and
+   Leaf greens, Harvest Amber, Ink text, Slate helper text, Alert Red for
+   critical only. Light greens (Mint, Pale Sage, Dew) are not used. */
+export const BRAND = {
+  forest: '#1B5E20',
+  pine: '#14532D',
+  leaf: '#2E7D32',
+  amber: '#F9A825',
+  ink: '#1C2B1E',
+  slate: '#5B6B5D',
+  alert: '#C62828',
+  navy: '#1A237E',
+};
+
 export const LIGHT_COLORS = {
   primary: '#1B5E20',
-  primaryLight: '#EDF1ED',
+  primaryLight: '#EEF0EE',
   primaryDark: '#1B5E20',
+  leaf: '#2E7D32',
+  pine: '#14532D',
   white: '#FFFFFF',
-  bg: '#F5F7FA',
+  bg: '#F5F6F5',
   card: '#FFFFFF',
-  text: '#263238',
-  textLight: '#546E7A',
-  placeholder: '#9E9E9E',
-  border: '#E0E0E0',
+  text: '#1C2B1E',
+  textLight: '#5B6B5D',
+  placeholder: '#8A948B',
+  border: '#DFE2DF',
   orange: '#F9A825',
-  red: '#D32F2F',
-  blue: '#1976D2',
-  purple: '#7B1FA2',
+  red: '#C62828',
+  blue: '#5B6B5D',
+  purple: '#14532D',
   sidebar: '#1B5E20', // style.css --sidebar-bg: brand surface, identical in both themes
 };
 
 export const DARK_COLORS = {
   primary: '#2E7D32',
-  primaryLight: '#1B3A20',
-  primaryDark: '#ECEFF1',
-  white: '#FFFFFF', // stays literal white in both palettes — this is "text/icon color on a colored button", not a surface color (that's `card`), and buttons keep light text regardless of theme
-  bg: '#121212',
+  primaryLight: '#1F3324',
+  primaryDark: '#F1F3F1',
+  leaf: '#2E7D32',
+  pine: '#14532D',
+  white: '#FFFFFF', // text/icon colour on a coloured button, the same in both themes
+  bg: '#0F1F14',
   card: '#1E1E1E',
-  text: '#ECEFF1',
-  textLight: '#9AA7AB',
-  placeholder: '#78909C',
-  border: '#333333',
-  orange: '#FFB74D',
-  red: '#EF5350',
-  blue: '#64B5F6',
-  purple: '#BA68C8',
+  text: '#F1F3F1',
+  textLight: '#A9B2AA',
+  placeholder: '#7D877E',
+  border: '#2E3A31',
+  orange: '#F9A825',
+  red: '#E05252',
+  blue: '#A9B2AA',
+  purple: '#2E7D32',
   sidebar: '#1B5E20',
 };
 

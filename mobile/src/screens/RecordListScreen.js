@@ -223,6 +223,7 @@ export default function RecordListScreen({ config }) {
             actionsLabel={t('adminDashboard.colActions')}
             actions={(r) => (
               <>
+                {config.table === 'health_records' ? <IconButton icon="wand-magic-sparkles" label={t('ai.diagnose.fromRecord')} onPress={() => router.push({ pathname: '/assistant', params: { tab: 'diagnose', record: r.id } })} /> : null}
                 <IconButton icon="pen-to-square" label={t('common.edit')} onPress={() => openEdit(r)} />
                 <IconButton icon="trash" danger label={t('common.delete')} onPress={() => remove(r)} />
               </>

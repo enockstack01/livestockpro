@@ -6,6 +6,7 @@ import { useRepository } from '../../src/db/repository';
 import { useSync } from '../../src/sync/SyncProvider';
 import { Page, PageHeader, Spinner } from '../../src/ui/kit';
 import FarmAnalytics from '../../src/screens/FarmAnalytics';
+import { AdvisorCard } from '../../src/screens/AssistantScreen';
 import HerdProfileCard from '../../src/screens/dashboard/HerdProfileCard';
 import { RecentActivity, UpcomingEvents, AlertsCard, QuickActions } from '../../src/screens/dashboard/DashboardFeed';
 import { computeGlance } from '../../../shared/analytics';
@@ -65,6 +66,8 @@ export default function DashboardScreen() {
       <PageHeader title={greeting(t, name)} subtitle={t('dashboardPage.todaySubtitle')} />
 
       <HerdProfileCard animals={data.animals} profile={profile} glance={glance} onOpen={(link) => router.replace(link)} />
+
+      <AdvisorCard compact />
 
       <FarmAnalytics data={data} />
 

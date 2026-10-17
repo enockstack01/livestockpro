@@ -11,7 +11,7 @@ import { formatCompact, formatMoneyCompact } from '../../../shared/currency';
    Options: plugins.valueLabels = { display, money, color }. Values are
    shortened (12.4K) so they fit; tooltips still show the exact figure. */
 
-const FONT = (px) => `600 ${px}px Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
+const FONT = (px) => `700 ${px}px Calibri, Carlito, Arial, sans-serif`;
 
 function textColor(opts) {
   if (opts.color) return opts.color;
@@ -139,6 +139,7 @@ export function registerValueLabels() {
 
   /* Headroom on value axes so labels at the end of the longest bar or the
      highest point stay inside the canvas. */
+  Chart.defaults.font.family = 'Calibri, Carlito, Arial, sans-serif';
   Chart.defaults.scales.linear.grace = '18%';
   Chart.defaults.layout.padding = { top: 6, right: 12, left: 0, bottom: 0 };
 

@@ -5,22 +5,24 @@
    dark mode; DARK_TONES is mobile-only, tuned so pastel badge backgrounds
    don't look washed-out against a near-black card surface. */
 
+/* Agricoders pills: solid fills with white or Ink text (White on Forest,
+   Ink on Amber, White on Alert Red), never pale tints. */
 export const TONES = {
-  green: { bg: '#EDF1ED', fg: '#1B5E20' },
-  orange: { bg: '#FFF8E1', fg: '#E65100' },
-  red: { bg: '#FFEBEE', fg: '#D32F2F' },
-  blue: { bg: '#E3F2FD', fg: '#1976D2' },
-  purple: { bg: '#F3E5F5', fg: '#7B1FA2' },
-  gray: { bg: '#ECEFF1', fg: '#546E7A' },
+  green: { bg: '#1B5E20', fg: '#FFFFFF' },
+  orange: { bg: '#F9A825', fg: '#1C2B1E' },
+  red: { bg: '#C62828', fg: '#FFFFFF' },
+  blue: { bg: '#5B6B5D', fg: '#FFFFFF' },
+  purple: { bg: '#14532D', fg: '#FFFFFF' },
+  gray: { bg: '#5B6B5D', fg: '#FFFFFF' },
 };
 
 export const DARK_TONES = {
-  green: { bg: '#1B3A20', fg: '#ECEFF1' },
-  orange: { bg: '#4A3B14', fg: '#FFB74D' },
-  red: { bg: '#4A1F1D', fg: '#EF5350' },
-  blue: { bg: '#173A5E', fg: '#64B5F6' },
-  purple: { bg: '#3C1F52', fg: '#BA68C8' },
-  gray: { bg: '#333333', fg: '#B0BEC5' },
+  green: { bg: '#2E7D32', fg: '#FFFFFF' },
+  orange: { bg: '#F9A825', fg: '#1C2B1E' },
+  red: { bg: '#C62828', fg: '#FFFFFF' },
+  blue: { bg: '#5B6B5D', fg: '#FFFFFF' },
+  purple: { bg: '#14532D', fg: '#FFFFFF' },
+  gray: { bg: '#4A554B', fg: '#FFFFFF' },
 };
 
 export const STATUS_TONE = {

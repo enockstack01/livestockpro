@@ -29,25 +29,25 @@ export function buildReportHtml({ title, subtitle, cardRows, sections, recordsLa
 <style>
   @page { margin: 14mm; }
   * { box-sizing: border-box; }
-  body { font-family: Inter, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; color: #263238; margin: 0; font-size: 12px; }
+  body { font-family: Calibri, Carlito, Arial, sans-serif; color: #1C2B1E; margin: 0; font-size: 12px; }
   header { border-bottom: 2px solid #1B5E20; padding-bottom: 12px; margin-bottom: 18px; }
   header h1 { font-size: 20px; font-weight: 800; color: #1B5E20; margin: 0 0 4px; }
-  header p { color: #546E7A; margin: 0; font-size: 11px; }
+  header p { color: #5B6B5D; margin: 0; font-size: 11px; }
   .cards { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-  .card { flex: 1 1 22%; border: 1px solid #E0E0E0; /* 4 per row on paper: 8 cards → 4 + 4 */ border-radius: 8px; padding: 10px; text-align: center; }
-  .card h4 { font-size: 9px; color: #546E7A; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin: 0 0 4px; }
+  .card { flex: 1 1 22%; border: 1px solid #DFE2DF; /* 4 per row on paper: 8 cards → 4 + 4 */ border-radius: 8px; padding: 10px; text-align: center; }
+  .card h4 { font-size: 9px; color: #5B6B5D; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin: 0 0 4px; }
   .card .amount { font-size: 17px; font-weight: 800; }
   section { margin-top: 18px; break-inside: auto; }
-  .section-head { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E0E0E0; padding-bottom: 6px; margin-bottom: 6px; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #DFE2DF; padding-bottom: 6px; margin-bottom: 6px; }
   .section-head h3 { font-size: 14px; margin: 0; }
   .badge { background: #EDF1ED; color: #1B5E20; border-radius: 20px; padding: 2px 9px; font-size: 10px; font-weight: 600; }
   table { width: 100%; border-collapse: collapse; }
   thead { display: table-header-group; } /* repeat the header row on every printed page */
-  th { background: #F5F7FA; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: .3px; color: #546E7A; padding: 6px; border-bottom: 1.5px solid #E0E0E0; }
-  td { padding: 6px; border-bottom: 1px solid #E0E0E0; font-size: 11px; vertical-align: top; }
+  th { background: #F5F7FA; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: .3px; color: #5B6B5D; padding: 6px; border-bottom: 1.5px solid #DFE2DF; }
+  td { padding: 6px; border-bottom: 1px solid #DFE2DF; font-size: 11px; vertical-align: top; }
   tr { break-inside: avoid; }
   td.strong { font-weight: 600; }
-  .empty { color: #546E7A; font-style: italic; }
+  .empty { color: #5B6B5D; font-style: italic; }
 </style></head>
 <body><header><h1>${esc(title)}</h1><p>${esc(subtitle)}</p></header>${cards}${tables}</body></html>`;
 }

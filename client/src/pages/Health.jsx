@@ -6,6 +6,7 @@ import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import { StatusBadge, fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
+import DiagnoseModal from '../components/ai/DiagnoseModal.jsx';
 import { useOpenAddFromUrl } from '../lib/useOpenAddFromUrl.js';
 
 const EMPTY_FORM = { tag_id: '', disease: '', treatment: '', medicine: '', vet_name: '', check_date: '', next_check_date: '', status: 'Under Treatment', notes: '' };
@@ -25,6 +26,7 @@ export default function Health() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [aiRecord, setAiRecord] = useState(null);
 
   useTopbarSearch(t('records.searchPlaceholder', { label: label.toLowerCase() }), setSearch);
 
@@ -113,6 +115,7 @@ export default function Health() {
                     <td><StatusBadge status={h.status} /></td>
                     <td>
                       <div className="table-actions">
+                        <button className="btn-icon ai" title={t('ai.diagnose.fromRecord')} onClick={() => setAiRecord(h)}><i className="fas fa-wand-magic-sparkles"></i></button>
                         <button className="btn-icon" title={t('common.edit')} onClick={() => openEdit(h)}><i className="fas fa-pen-to-square"></i></button>
                         <button className="btn-icon danger" title={t('common.delete')} onClick={() => confirmDelete(h.id)}><i className="fas fa-trash"></i></button>
                       </div>
@@ -156,6 +159,7 @@ export default function Health() {
       >
         <p className="text-muted">{t('healthPage.confirmDeleteMessage')}</p>
       </Modal>
+      <DiagnoseModal record={aiRecord} onClose={() => setAiRecord(null)} />
     </>
   );
 }

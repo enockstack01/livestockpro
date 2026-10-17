@@ -29,7 +29,14 @@ records, feeding, breeding, production, finances, and tasks.
 
    CLERK_PUBLISHABLE_KEY=pk_test_...
    CLERK_SECRET_KEY=sk_test_...
+
+   # AI features (diagnosis reports, farm advisor, Ask LivestockPro, One Health briefing)
+   ANTHROPIC_API_KEY=sk-ant-...
+   # optional: ANTHROPIC_MODEL=claude-opus-5-5, AI_REQUESTS_PER_HOUR=40
    ```
+
+   Without `ANTHROPIC_API_KEY` the app runs normally and the AI features show
+   "AI is not set up yet".
 
    > If your network/DNS can't resolve `mongodb+srv://` SRV records (some
    > sandboxed or corporate networks block this), use the non-SRV standard
@@ -66,7 +73,7 @@ from the repo root, no separate static site needed:
 - **Start Command:** `npm start`
 - **Environment variables** (Render → your service → Environment): `MONGODB_URI`,
   `MONGODB_DB`, `CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, and optionally
-  `SUPER_ADMIN_EMAILS`. `.env` is git-ignored and never deployed — these must
+  `SUPER_ADMIN_EMAILS` and `ANTHROPIC_API_KEY` (turns on the AI features). `.env` is git-ignored and never deployed — these must
   be set directly in the platform's dashboard, or the server exits immediately
   on boot (`MONGODB_URI is not set`, from `server/db.js`).
 - If MongoDB Atlas is used, add the platform's outbound IPs (or `0.0.0.0/0`

@@ -24,7 +24,7 @@ async function request(getToken, path, options = {}) {
 
   if (!res.ok) {
     const message = (json && json.error && json.error.message) || `Request failed (${res.status})`;
-    return { data: null, error: { message, status: res.status } };
+    return { data: null, error: { message, status: res.status, code: json && json.error && json.error.code } };
   }
   return json || { data: null, error: null };
 }
@@ -64,6 +64,29 @@ export function useApi() {
     },
     async myRole() {
       return request(getToken, '/admin/role');
+    },
+    /* AI features (server/routes/aiRoutes.js). */
+    async aiStatus() {
+      return request(getToken, '/ai/status');
+    },
+    async aiDiagnose(body) {
+      return request(getToken, '/ai/diagnose', { method: 'POST', body: JSON.stringify(body) });
+    },
+    async aiAdvisor(body) {
+      return request(getToken, '/ai/advisor', { method: 'POST', body: JSON.stringify(body) });
+    },
+    async aiChat(body) {
+      return request(getToken, '/ai/chat', { method: 'POST', body: JSON.stringify(body) });
+    },
+    async aiOneHealthBrief(body) {
+      return request(getToken, '/ai/onehealth/brief', { method: 'POST', body: JSON.stringify(body) });
+    },
+    async aiReports(params = {}) {
+      const qs = new URLSearchParams(Object.entries(params).filter(([, v]) => v != null && v !== '')).toString();
+      return request(getToken, '/ai/reports' + (qs ? '?' + qs : ''));
+    },
+    async aiDeleteReport(id) {
+      return request(getToken, '/ai/reports/' + encodeURIComponent(id), { method: 'DELETE' });
     },
     async rates() {
       return request(getToken, '/rates');

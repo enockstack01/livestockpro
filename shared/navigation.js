@@ -32,15 +32,18 @@ export const NAV_SECTIONS = [
   },
   {
     labelKey: 'nav.sections.analytics',
-    items: [{ key: 'reports', path: '/reports', icon: 'chart-bar', labelKey: 'nav.reports' }],
+    items: [
+      { key: 'reports', path: '/reports', icon: 'chart-bar', labelKey: 'nav.reports' },
+      { key: 'assistant', path: '/assistant', icon: 'wand-magic-sparkles', labelKey: 'nav.assistant' },
+    ],
   },
   /* Web-only, and only for admin / super_admin accounts. */
   {
     labelKey: 'nav.sections.administration',
     adminOnly: true,
     items: [
-      { key: 'admin', path: '/admin', icon: 'user-shield', labelKey: 'layout.adminPanel', accent: '#FFD54F' },
-      { key: 'onehealth', path: '/onehealth', icon: 'shield-virus', labelKey: 'layout.oneHealth', accent: '#FFD54F' },
+      { key: 'admin', path: '/admin', icon: 'user-shield', labelKey: 'layout.adminPanel', accent: '#F9A825' },
+      { key: 'onehealth', path: '/onehealth', icon: 'shield-virus', labelKey: 'layout.oneHealth', accent: '#F9A825' },
     ],
   },
   {

@@ -43,7 +43,6 @@ export const CURRENCIES = [
 ];
 
 let current = DEFAULT_CURRENCY;
-const formatters = new Map();
 
 export function setCurrency(code) {
   current = /^[A-Z]{3}$/.test(code || '') ? code : DEFAULT_CURRENCY;
@@ -63,21 +62,6 @@ export function currencyName(code, language) {
   return (CURRENCIES.find((c) => c.code === code) || {}).name || code;
 }
 
-function formatterFor(currency, min, max) {
-  const key = `${currency}|${min}|${max}`;
-  if (formatters.has(key)) return formatters.get(key);
-  let fmt = null;
-  for (const currencyDisplay of ['narrowSymbol', 'symbol']) {
-    try {
-      fmt = new Intl.NumberFormat(undefined, { style: 'currency', currency, currencyDisplay, minimumFractionDigits: min, maximumFractionDigits: max });
-      fmt.format(1);
-      break;
-    } catch { fmt = null; }
-  }
-  formatters.set(key, fmt);
-  return fmt;
-}
-
 /* How many decimals the currency normally uses (0 for RWF/UGX/XOF, 2 for USD). */
 function currencyDigits(currency) {
   try {
@@ -87,27 +71,28 @@ function currencyDigits(currency) {
   }
 }
 
-/* formatMoney(1234)              -> "$1,234"
-   formatMoney(1234.5)            -> "$1,234.50" (whole amounts drop the cents)
+/* Agricoders writing rules: the dollar sign goes first ("$20"), every other
+   currency shows its code after the amount ("100,000 RWF").
+   formatMoney(1234)                    -> "$1,234"
+   formatMoney(1234.5)                  -> "$1,234.50" (whole amounts drop the cents)
    formatMoney(1234.5, { decimals: 0 }) -> "$1,235"
-   formatMoney(3, { decimals: 2 }) -> "$3.00" (never more than the currency allows) */
+   formatMoney(25000, { currency: 'RWF' }) -> "25,000 RWF" */
 export function formatMoney(value, { decimals, currency = current } = {}) {
   const n = Number(value) || 0;
   const digits = currencyDigits(currency);
   const max = decimals == null ? digits : Math.min(decimals, digits);
   const min = decimals == null ? (Number.isInteger(n) ? 0 : max) : max;
-  const fmt = formatterFor(currency, min, max);
-  if (fmt) return fmt.format(n);
-  const body = Math.abs(n).toLocaleString(undefined, { minimumFractionDigits: min, maximumFractionDigits: max });
-  return `${n < 0 ? '-' : ''}${currency} ${body}`;
+  const body = Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: min, maximumFractionDigits: max });
+  return placeCurrency(n < 0 && Number(body.replace(/,/g, '')) ? '-' : '', body, currency);
 }
 
-/* Just the symbol, for form labels like "Amount ($)". */
+function placeCurrency(sign, body, currency) {
+  return currency === 'USD' ? `${sign}$${body}` : `${sign}${body} ${currency}`;
+}
+
+/* The label used next to money inputs, such as "Amount ($)" or "Amount (RWF)". */
 export function currencySymbol(currency = current) {
-  const fmt = formatterFor(currency, 0, 0);
-  if (!fmt || !fmt.formatToParts) return currency;
-  const part = fmt.formatToParts(0).find((p) => p.type === 'currency');
-  return part ? part.value : currency;
+  return currency === 'USD' ? '$' : currency;
 }
 
 /* ---------- Per-record currency + conversion ----------
@@ -172,6 +157,5 @@ export function formatMoneyCompact(value, { currency = current } = {}) {
   const n = Number(value) || 0;
   if (Math.abs(n) < 1000) return formatMoney(Math.round(n), { decimals: 0, currency });
   const { sign, num, suffix } = compactParts(n);
-  const sym = currencySymbol(currency);
-  return `${sign}${sym}${sym.length > 1 ? ' ' : ''}${num}${suffix}`;
+  return placeCurrency(sign, `${num}${suffix}`, currency);
 }
