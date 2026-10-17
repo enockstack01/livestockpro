@@ -21,14 +21,38 @@ export const HERD_STATUS = [
   { key: 'Critical', color: '#C62828' },
 ];
 
-/* Living herd (optionally one species): health ring segments, % healthy,
-   and the herd split by species — or by breed once a species is chosen. */
-export function computeHerdProfile(animals = [], species = '') {
-  const all = animals.filter((a) => !species || (a.species || 'Other') === species);
+/* Age bands for the herd profile's age chart (months; same as analytics). */
+export const HERD_AGE_BANDS = [
+  { key: 'age0_6', max: 6 }, { key: 'age6_12', max: 12 }, { key: 'age1_2', max: 24 }, { key: 'age2_5', max: 60 }, { key: 'age5p', max: Infinity },
+];
+
+const monthKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+const ymOf = (v) => (v ? String(v).slice(0, 7) : '');
+
+/* Living herd (optionally one species), everything the Herd profile
+   overview draws, so web and mobile show exactly the same numbers:
+   - segments / healthyPct: the health ring (living animals by status)
+   - trend: herd size at the end of each of the last 12 months, with the
+     animals added, born and lost in each month
+   - month: this month's movement (added, born, lost); net is the change in
+     the recorded herd (added minus lost), since a newborn joins the herd
+     once it is registered as an animal
+   - yearChange: herd now against the end of the first month in the trend
+   - cases: health records in the last 30 days (new cases, recovered)
+   - byGroup: herd by species (or by breed once a species is picked), split
+     female / male / not recorded, with how many are healthy
+   - ages: living animals per age band (unknown when no date of birth)
+
+   An animal joins the herd on the date it was recorded (created_at) and
+   leaves when it is marked Deceased (updated_at), so the trend follows the
+   farm's own records. */
+export function computeHerdProfile(animals = [], species = '', { health = [], breeding = [], lang = 'en', months = 12 } = {}) {
+  const inScope = (a) => !species || (a.species || 'Other') === species;
+  const all = animals.filter(inScope);
   const living = all.filter((a) => a.health_status !== 'Deceased');
-  const segments = HERD_STATUS.map((s) => ({
-    ...s,
-    value: living.filter((a) => (a.health_status || 'Healthy') === s.key).length,
+  const segments = HERD_STATUS.map((st) => ({
+    ...st,
+    value: living.filter((a) => (a.health_status || 'Healthy') === st.key).length,
   }));
   const healthy = segments[0].value;
 
@@ -36,13 +60,57 @@ export function computeHerdProfile(animals = [], species = '') {
   const groups = new Map();
   living.forEach((a) => {
     const k = groupKey(a);
-    const g = groups.get(k) || { name: k, count: 0, healthy: 0, female: 0 };
+    const g = groups.get(k) || { name: k, count: 0, healthy: 0, female: 0, male: 0, unknown: 0 };
     g.count++;
     if ((a.health_status || 'Healthy') === 'Healthy') g.healthy++;
     if (a.sex === 'Female') g.female++;
+    else if (a.sex === 'Male') g.male++;
+    else g.unknown++;
     groups.set(k, g);
   });
-  const byGroup = [...groups.values()].sort((a, b) => b.count - a.count);
+  const byGroup = [...groups.values()].sort((x, y) => y.count - x.count);
+
+  /* Monthly trend. */
+  const now = new Date();
+  const buckets = [];
+  for (let i = months - 1; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    buckets.push({ key: monthKey(d), label: d.toLocaleString(lang, { month: 'short' }), labelLong: d.toLocaleString(lang, { month: 'long', year: 'numeric' }) });
+  }
+  const joined = (a) => ymOf(a.created_at || a.date_of_birth);
+  const left = (a) => (a.health_status === 'Deceased' ? ymOf(a.updated_at || a.created_at) : '');
+  const speciesByTag = new Map(animals.map((a) => [a.tag_id, a.species || 'Other']));
+  const birthsIn = (key) => breeding
+    .filter((br) => ymOf(br.birth_date) === key && (!species || speciesByTag.get(br.tag_id) === species))
+    .reduce((n, br) => n + (Number(br.newborn_count) || 1), 0);
+  const trend = buckets.map((bk) => ({
+    ...bk,
+    herd: all.filter((a) => joined(a) && joined(a) <= bk.key && !(left(a) && left(a) <= bk.key)).length,
+    added: all.filter((a) => joined(a) === bk.key).length,
+    born: birthsIn(bk.key),
+    lost: all.filter((a) => left(a) === bk.key).length,
+  }));
+  const cur = trend[trend.length - 1] || { added: 0, born: 0, lost: 0, herd: living.length };
+  const prev = trend[trend.length - 2];
+
+  /* Health records in the last 30 days. */
+  const since = new Date(Date.now() - 30 * DAY_MS).toISOString().slice(0, 10);
+  const recent = health.filter((h) => (h.check_date || '') >= since && (!species || speciesByTag.get(h.tag_id) === species));
+  const cases = {
+    total: recent.length,
+    recovered: recent.filter((h) => h.status === 'Recovered').length,
+    open: recent.filter((h) => h.status && h.status !== 'Recovered').length,
+  };
+
+  /* Ages. */
+  const ages = HERD_AGE_BANDS.map((band) => ({ ...band, value: 0 }));
+  let ageUnknown = 0;
+  living.forEach((a) => {
+    if (!a.date_of_birth) { ageUnknown++; return; }
+    const m = (now - new Date(a.date_of_birth)) / (30.44 * DAY_MS);
+    if (!Number.isFinite(m) || m < 0) { ageUnknown++; return; }
+    ages[ages.findIndex((band) => m < band.max)].value++;
+  });
 
   return {
     living: living.length,
@@ -53,6 +121,14 @@ export function computeHerdProfile(animals = [], species = '') {
     byGroup,
     maxGroup: Math.max(1, ...byGroup.map((g) => g.count)),
     speciesList: [...new Set(animals.map((a) => a.species || 'Other'))].sort(),
+    trend,
+    month: { added: cur.added, born: cur.born, lost: cur.lost, net: cur.added - cur.lost, label: cur.labelLong },
+    yearChange: living.length - ((trend[0] && trend[0].herd) || 0),
+    change: prev ? living.length - prev.herd : 0,
+    cases,
+    ages,
+    ageUnknown,
+    maxAge: Math.max(1, ...ages.map((x) => x.value)),
   };
 }
 

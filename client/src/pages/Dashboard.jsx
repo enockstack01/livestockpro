@@ -70,7 +70,7 @@ export default function Dashboard() {
         <div><h1>{greeting(t, greetName)}</h1><p>{t('dashboardPage.todaySubtitle')}</p></div>
       </div>
 
-      <HerdProfile animals={data.animals} profile={profile} glance={glance} onOpen={(link) => navigate(link)} />
+      <HerdProfile animals={data.animals} health={data.health} breeding={data.breeding} profile={profile} glance={glance} onOpen={(link) => navigate(link)} />
 
       <AdvisorTab compact />
 

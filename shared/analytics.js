@@ -323,8 +323,10 @@ export function computeGlance({ animals = [], breeding = [], finance = [], tasks
     labels: buckets.map((b) => b.label),
     monthNames: buckets.map((b) => new Date(b.key + '-01T00:00:00').toLocaleString(lang, { month: 'short' })),
     animals: {
-      total: animals.length,
-      series: buckets.map((b) => animals.filter((a) => ym(a.created_at) && ym(a.created_at) <= b.key).length),
+      /* The living herd, the same count as the Herd profile: an animal leaves
+         it when marked Deceased, so this tile and the herd banner agree. */
+      total: living.length,
+      series: buckets.map((b) => animals.filter((a) => ym(a.created_at) && ym(a.created_at) <= b.key && !(a.health_status === 'Deceased' && ym(a.updated_at || a.created_at) <= b.key)).length),
       addedThisMonth: animals.filter((a) => ym(a.created_at) === buckets[last].key).length
     },
     pregnant: {

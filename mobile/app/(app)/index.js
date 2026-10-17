@@ -65,7 +65,7 @@ export default function DashboardScreen() {
     <Page refreshing={refreshing || syncing} onRefresh={onRefresh}>
       <PageHeader title={greeting(t, name)} subtitle={t('dashboardPage.todaySubtitle')} />
 
-      <HerdProfileCard animals={data.animals} profile={profile} glance={glance} onOpen={(link) => router.replace(link)} />
+      <HerdProfileCard animals={data.animals} health={data.health} breeding={data.breeding} profile={profile} glance={glance} onOpen={(link) => router.replace(link)} />
 
       <AdvisorCard compact />
 
