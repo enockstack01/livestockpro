@@ -891,7 +891,22 @@
     "byBreed": "Herd by breed",
     "healthyOf": "{{healthy}} of {{count}} healthy",
     "more": "+ {{count}} more",
-    "empty": "Add animals to see your herd profile."
+    "empty": "Add animals to see your herd profile.",
+    "healthTitle": "Herd health",
+    "trendTitle": "Herd size, last 12 months",
+    "movementTitle": "This month",
+    "added": "Added",
+    "born": "Born",
+    "lost": "Lost",
+    "net": "Net change",
+    "cases30": "Last 30 days: {{total}} health cases, {{recovered}} recovered",
+    "female": "Female",
+    "male": "Male",
+    "unknown": "Not recorded",
+    "ageTitle": "Age structure",
+    "ageUnknown": "{{count}} without a date of birth",
+    "inYear": "{{value}} in 12 months",
+    "bornNote": "Newborns join the herd count once they are registered as animals."
   },
   "dashboardFeed": {
     "recentActivity": "Recent activity",
@@ -1132,7 +1147,10 @@
     },
     "errors": {
       "failed": "The AI request failed: {{message}}",
-      "busy": "You have used the AI a lot this hour. Please try again later."
+      "busy": "You have used the AI a lot this hour. Please try again later.",
+      "quota": "You have used today's AI allowance. It resets at {{time}}.",
+      "quotaKind": "You have used today's allowance of {{kind}}. It resets at {{time}}.",
+      "burst": "Please wait a minute before asking the AI again."
     },
     "offline": "You need a connection to use the AI.",
     "pdf": {
@@ -1180,6 +1198,17 @@
       "signature": "Signature",
       "date": "Date",
       "important": "Important:"
+    },
+    "usage": {
+      "left": "{{remaining}} of {{limit}} AI requests left today",
+      "leftKind": "{{remaining}} of {{limit}} {{kind}} left today",
+      "resets": "Resets at {{time}}",
+      "kinds": {
+        "diagnose": "AI diagnoses",
+        "advisor": "farm advice requests",
+        "chat": "questions",
+        "brief": "One Health briefings"
+      }
     }
   }
 }

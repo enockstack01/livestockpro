@@ -13,6 +13,7 @@ import { printHtml } from '../lib/printReport';
 import { useTheme } from '../theme/ThemeProvider';
 import { Button, Card, CardBody, CardHeader, EmptyState, FormGroup, Input, Muted, Page, PageHeader, Select, Tabs } from '../ui/kit';
 import { aiReportFileName, aiReportHtml } from '../../../shared/aiReportHtml';
+import { aiResetTime, getAiUsage, subscribeAiUsage } from '../../../shared/aiUsage';
 
 /* Mobile twin of client/src/pages/Assistant.jsx: Ask LivestockPro, the farm
    advisor, AI diagnosis and saved reports. AI runs on the server, so these
@@ -29,10 +30,49 @@ export function useAiStatus() {
   return configured;
 }
 
-export function aiErrorText(t, error) {
+export function useAiUsage() {
+  const api = useApi();
+  const [usage, setUsage] = useState(getAiUsage());
+  useEffect(() => {
+    const off = subscribeAiUsage(setUsage);
+    api.aiUsage();
+    return off;
+  }, [api]);
+  return usage;
+}
+
+/* "12 of 50 AI requests left today" with a small meter. */
+export function AiUsageMeter({ kind, style }) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  const usage = useAiUsage();
+  if (!usage) return null;
+  const part = kind && usage.kinds && usage.kinds[kind];
+  const remaining = part ? Math.min(part.remaining, usage.remaining) : usage.remaining;
+  const limit = part ? part.limit : usage.limit;
+  const pct = limit ? Math.round((remaining / limit) * 100) : 0;
+  const bar = remaining === 0 ? colors.red : pct <= 20 ? colors.orange : colors.leaf;
+  return (
+    <View style={[{ gap: 5 }, style]}>
+      <Text style={{ fontSize: 12, color: colors.textLight }}>{t(part ? 'ai.usage.leftKind' : 'ai.usage.left', { remaining, limit, kind: part ? t(`ai.usage.kinds.${kind}`) : '' })}</Text>
+      <View style={{ height: 6, borderRadius: 3, backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' }}>
+        <View style={{ width: `${pct}%`, height: '100%', backgroundColor: bar }} />
+      </View>
+    </View>
+  );
+}
+
+export function aiErrorText(t, error, lang) {
   if (!error) return '';
   if (error.networkError) return t('ai.offline');
   if (error.code === 'AI_NOT_CONFIGURED') return t('ai.notConfigured');
+  if (error.code === 'AI_QUOTA') {
+    const time = aiResetTime(error.usage, lang);
+    return error.kind && error.kind !== 'total'
+      ? t('ai.errors.quotaKind', { kind: t(`ai.usage.kinds.${error.kind}`), time })
+      : t('ai.errors.quota', { time });
+  }
+  if (error.code === 'AI_BURST') return t('ai.errors.burst');
   if (error.code === 'AI_LIMIT' || error.code === 'AI_BUSY') return t('ai.errors.busy');
   return t('ai.errors.failed', { message: error.message });
 }
@@ -301,7 +341,7 @@ function AskTab({ disabled }) {
     setBusy(true);
     const { data, error: err } = await api.aiChat({ messages: next, language: i18n.language });
     setBusy(false);
-    if (err) { setError(aiErrorText(t, err)); return; }
+    if (err) { setError(aiErrorText(t, err, i18n.language)); return; }
     setMessages([...next, { role: 'assistant', content: data.reply }]);
     setTimeout(() => scroll.current && scroll.current.scrollToEnd({ animated: true }), 50);
   }
@@ -366,7 +406,7 @@ export function AdvisorCard({ disabled, compact }) {
     setBusy(true);
     const { data, error } = await api.aiAdvisor({ language: i18n.language });
     setBusy(false);
-    if (error) { showToast(aiErrorText(t, error), 'error'); return; }
+    if (error) { showToast(aiErrorText(t, error, i18n.language), 'error'); return; }
     setSaved(data);
   }
 
@@ -453,7 +493,7 @@ function DiagnoseTab({ disabled, recordId }) {
     else if (species) body.species = species;
     const { data, error } = await api.aiDiagnose(body);
     setBusy(false);
-    if (error) { showToast(aiErrorText(t, error), 'error'); return; }
+    if (error) { showToast(aiErrorText(t, error, i18n.language), 'error'); return; }
     setSaved(data);
   }
 
@@ -490,6 +530,7 @@ function DiagnoseTab({ disabled, recordId }) {
               <Input multiline value={symptoms} onChangeText={setSymptoms} placeholder={t('ai.diagnose.symptomsHint')} />
             </FormGroup>
             <Note danger>{t('ai.vetNotice')}</Note>
+            <AiUsageMeter kind="diagnose" style={{ marginTop: 12 }} />
             <Button title={t('ai.diagnose.run')} icon="wand-magic-sparkles" onPress={run} disabled={disabled || !symptoms.trim()} style={{ marginTop: 14 }} block />
           </>
         )}
@@ -508,9 +549,9 @@ function ReportsTab() {
 
   const load = useCallback(async () => {
     const { data, error: err } = await api.aiReports({ limit: 60 });
-    if (err) { setError(aiErrorText(t, err)); setList([]); return; }
+    if (err) { setError(aiErrorText(t, err, i18n.language)); setList([]); return; }
     setList(data || []);
-  }, [api, t]);
+  }, [api, t, i18n.language]);
   useEffect(() => { load(); }, [load]);
 
   async function remove(r) {
@@ -564,6 +605,7 @@ export default function AssistantScreen() {
     <Page>
       <PageHeader title={t('ai.title')} subtitle={t('ai.subtitle')} />
       {configured === false ? <Notice>{t('ai.notConfigured')}</Notice> : null}
+      {configured ? <AiUsageMeter style={{ marginBottom: 14 }} /> : null}
       <Tabs items={TABS.map((k) => ({ value: k, label: t(`ai.tabs.${k}`) }))} value={tab} onChange={setTab} />
       <View style={{ height: 14 }} />
       {tab === 'ask' ? <AskTab disabled={configured === false} /> : null}

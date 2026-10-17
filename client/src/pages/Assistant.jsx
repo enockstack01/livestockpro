@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
-import { AiNotConfigured, AiWorking, SavedReport, aiErrorText, useAiStatus } from '../components/ai/AiViews.jsx';
+import { AiNotConfigured, AiUsageMeter, AiWorking, SavedReport, aiErrorText, useAiStatus } from '../components/ai/AiViews.jsx';
 
 const TABS = [
   { key: 'ask', icon: 'comments' },
@@ -27,6 +27,7 @@ export default function Assistant() {
           <h1><span className="ai-title-icon"><i className="fas fa-wand-magic-sparkles"></i></span> {t('ai.title')}</h1>
           <p>{t('ai.subtitle')}</p>
         </div>
+        {configured ? <AiUsageMeter /> : null}
       </div>
       {configured === false ? <AiNotConfigured /> : null}
       <div className="tabs">
@@ -67,7 +68,7 @@ function AskTab({ disabled }) {
     setBusy(true);
     const { data, error: err } = await api.aiChat({ messages: next, language: i18n.language });
     setBusy(false);
-    if (err) { setError(aiErrorText(t, err)); return; }
+    if (err) { setError(aiErrorText(t, err, i18n.language)); return; }
     setMessages([...next, { role: 'assistant', content: data.reply }]);
   }
 
@@ -130,7 +131,7 @@ export function AdvisorTab({ disabled, compact }) {
     setBusy(true);
     const { data, error } = await api.aiAdvisor({ language: i18n.language });
     setBusy(false);
-    if (error) { showToast(aiErrorText(t, error), 'error'); return; }
+    if (error) { showToast(aiErrorText(t, error, i18n.language), 'error'); return; }
     setSaved(data);
   }
 
@@ -205,7 +206,7 @@ function DiagnoseTab({ disabled }) {
     setBusy(true);
     const { data, error } = await api.aiDiagnose({ animal_id: animalId || undefined, species: animal ? undefined : species || undefined, symptoms, language: i18n.language });
     setBusy(false);
-    if (error) { showToast(aiErrorText(t, error), 'error'); return; }
+    if (error) { showToast(aiErrorText(t, error, i18n.language), 'error'); return; }
     setSaved(data);
   }
 

@@ -887,7 +887,22 @@
     "byBreed": "按品种划分的畜群",
     "healthyOf": "{{count}} 头中 {{healthy}} 头健康",
     "more": "+ 另外 {{count}} 项",
-    "empty": "添加动物即可查看畜群概况。"
+    "empty": "添加动物即可查看畜群概况。",
+    "healthTitle": "畜群健康",
+    "trendTitle": "畜群规模（近 12 个月）",
+    "movementTitle": "本月",
+    "added": "新增",
+    "born": "出生",
+    "lost": "损失",
+    "net": "净变化",
+    "cases30": "近 30 天：{{total}} 例健康记录，{{recovered}} 例康复",
+    "female": "母",
+    "male": "公",
+    "unknown": "未记录",
+    "ageTitle": "年龄结构",
+    "ageUnknown": "{{count}} 头无出生日期",
+    "inYear": "12 个月 {{value}}",
+    "bornNote": "新生幼畜登记为牲畜后才计入畜群。"
   },
   "dashboardFeed": {
     "recentActivity": "最近动态",
@@ -1128,7 +1143,10 @@
     },
     "errors": {
       "failed": "AI 请求失败：{{message}}",
-      "busy": "您这一小时内使用 AI 的次数较多，请稍后再试。"
+      "busy": "您这一小时内使用 AI 的次数较多，请稍后再试。",
+      "quota": "您今天的 AI 额度已用完，将于 {{time}} 重置。",
+      "quotaKind": "您今天的{{kind}}额度已用完，将于 {{time}} 重置。",
+      "burst": "请稍等一分钟再向 AI 提问。"
     },
     "offline": "使用 AI 需要网络连接。",
     "pdf": {
@@ -1176,6 +1194,17 @@
       "signature": "签名",
       "date": "日期",
       "important": "重要："
+    },
+    "usage": {
+      "left": "今天还剩 {{remaining}}/{{limit}} 次 AI 请求",
+      "leftKind": "今天还剩 {{remaining}}/{{limit}} 次{{kind}}",
+      "resets": "{{time}} 重置",
+      "kinds": {
+        "diagnose": "AI 诊断",
+        "advisor": "农场建议",
+        "chat": "提问",
+        "brief": "One Health 简报"
+      }
     }
   }
 }

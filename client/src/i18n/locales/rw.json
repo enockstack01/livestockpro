@@ -887,7 +887,22 @@
     "byBreed": "Amatungo ku bwoko bw’imbere",
     "healthyOf": "{{healthy}} kuri {{count}} bafite ubuzima",
     "more": "+ {{count}} izindi",
-    "empty": "Ongeramo amatungo kugira ngo ubone imiterere y’ubworozi bwawe."
+    "empty": "Ongeramo amatungo kugira ngo ubone imiterere y’ubworozi bwawe.",
+    "healthTitle": "Ubuzima bw'amatungo",
+    "trendTitle": "Umubare w'amatungo, amezi 12 ashize",
+    "movementTitle": "Uku kwezi",
+    "added": "Ayongewe",
+    "born": "Ayavutse",
+    "lost": "Ayapfuye",
+    "net": "Impinduka nyayo",
+    "cases30": "Iminsi 30 ishize: indwara {{total}}, {{recovered}} yakize",
+    "female": "Ingore",
+    "male": "Ingabo",
+    "unknown": "Ntibyanditswe",
+    "ageTitle": "Imyaka y'amatungo",
+    "ageUnknown": "{{count}} nta tariki y'amavuko",
+    "inYear": "{{value}} mu mezi 12",
+    "bornNote": "Ibyana bibarwa mu matungo iyo byanditswe nk'amatungo."
   },
   "dashboardFeed": {
     "recentActivity": "Ibikorwa Biheruka",
@@ -1128,7 +1143,10 @@
     },
     "errors": {
       "failed": "Gusaba AI byanze: {{message}}",
-      "busy": "Wakoresheje AI cyane muri iyi saha. Ongera ugerageze nyuma."
+      "busy": "Wakoresheje AI cyane muri iyi saha. Ongera ugerageze nyuma.",
+      "quota": "Wakoresheje AI wemerewe uyu munsi. Bisubiraho saa {{time}}.",
+      "quotaKind": "Wakoresheje {{kind}} wemerewe uyu munsi. Bisubiraho saa {{time}}.",
+      "burst": "Tegereza umunota umwe mbere yo kongera kubaza AI."
     },
     "offline": "Ukeneye interineti kugira ngo ukoreshe AI.",
     "pdf": {
@@ -1176,6 +1194,17 @@
       "signature": "Umukono",
       "date": "Itariki",
       "important": "Icyitonderwa:"
+    },
+    "usage": {
+      "left": "Ubusabe bwa AI {{remaining}} kuri {{limit}} busigaye uyu munsi",
+      "leftKind": "{{kind}} {{remaining}} kuri {{limit}} bisigaye uyu munsi",
+      "resets": "Bisubiraho saa {{time}}",
+      "kinds": {
+        "diagnose": "isuzuma rya AI",
+        "advisor": "ubusabe bw'inama",
+        "chat": "ibibazo",
+        "brief": "incamake za One Health"
+      }
     }
   }
 }

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useApi } from '../../lib/api.js';
 import { useToast } from '../../lib/toast.jsx';
 import { aiReportFileName, aiReportHtml } from '../../../../shared/aiReportHtml.js';
+import { aiResetTime, getAiUsage, subscribeAiUsage } from '../../../../shared/aiUsage';
 
 /* Whether the server has an Anthropic API key. null while loading. */
 export function useAiStatus() {
@@ -16,10 +17,47 @@ export function useAiStatus() {
   return configured;
 }
 
+/* Today's AI allowance; loads it once and follows every AI answer. */
+export function useAiUsage() {
+  const api = useApi();
+  const [usage, setUsage] = useState(getAiUsage());
+  useEffect(() => {
+    const off = subscribeAiUsage(setUsage);
+    api.aiUsage();
+    return off;
+  }, [api]);
+  return usage;
+}
+
+/* "12 of 50 AI requests left today" with a small meter. */
+export function AiUsageMeter({ kind }) {
+  const { t, i18n } = useTranslation();
+  const usage = useAiUsage();
+  if (!usage) return null;
+  const part = kind && usage.kinds && usage.kinds[kind];
+  const remaining = part ? Math.min(part.remaining, usage.remaining) : usage.remaining;
+  const limit = part ? part.limit : usage.limit;
+  const pct = limit ? Math.round((remaining / limit) * 100) : 0;
+  const tone = remaining === 0 ? 'red' : pct <= 20 ? 'amber' : 'leaf';
+  return (
+    <div className="ai-usage" title={t('ai.usage.resets', { time: aiResetTime(usage, i18n.language) })}>
+      <span className="ai-usage-text">{t(part ? 'ai.usage.leftKind' : 'ai.usage.left', { remaining, limit, kind: part ? t(`ai.usage.kinds.${kind}`) : '' })}</span>
+      <span className="ai-usage-bar"><span className={tone} style={{ width: `${pct}%` }} /></span>
+    </div>
+  );
+}
+
 /* The message to show for a failed AI call. */
-export function aiErrorText(t, error) {
+export function aiErrorText(t, error, lang) {
   if (!error) return '';
   if (error.code === 'AI_NOT_CONFIGURED') return t('ai.notConfigured');
+  if (error.code === 'AI_QUOTA') {
+    const time = aiResetTime(error.usage, lang);
+    return error.kind && error.kind !== 'total'
+      ? t('ai.errors.quotaKind', { kind: t(`ai.usage.kinds.${error.kind}`), time })
+      : t('ai.errors.quota', { time });
+  }
+  if (error.code === 'AI_BURST') return t('ai.errors.burst');
   if (error.code === 'AI_LIMIT' || error.code === 'AI_BUSY') return t('ai.errors.busy');
   return t('ai.errors.failed', { message: error.message });
 }
@@ -287,7 +325,7 @@ export function OneHealthBriefCard() {
     setError('');
     const { data, error: err } = await api.aiOneHealthBrief({ language: i18n.language });
     setBusy(false);
-    if (err) { setError(aiErrorText(t, err)); return; }
+    if (err) { setError(aiErrorText(t, err, i18n.language)); return; }
     setSaved(data);
   }
 
@@ -301,6 +339,7 @@ export function OneHealthBriefCard() {
         </button>
       </div>
       <div className="card-body">
+        <div className="ai-usage-row" style={{ marginTop: 0, marginBottom: 12 }}><AiUsageMeter kind="brief" /></div>
         {error ? <div className="ai-notice ai-notice-error"><i className="fas fa-triangle-exclamation"></i><span>{error}</span></div> : null}
         {busy ? <AiWorking label={t('ai.brief.working')} /> : saved ? <SavedReport saved={saved} /> : saved === null ? <p className="ai-muted">{t('ai.brief.intro')}</p> : null}
       </div>

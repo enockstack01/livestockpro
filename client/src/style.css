@@ -2492,3 +2492,14 @@ a { color: var(--leaf); }
 
 /* LivestockPro app icon in the sidebar header (replaces the generic glyph tile). */
 .sidebar-app-icon { width: 34px; height: 34px; border-radius: 9px; display: block; flex: none; }
+
+/* AI allowance meter: "12 of 50 AI requests left today". */
+.ai-usage { display: flex; flex-direction: column; gap: 5px; min-width: 200px; max-width: 280px; }
+.ai-usage-text { font-size: 12.5px; color: var(--text-light); }
+.ai-usage-bar { height: 6px; border-radius: 3px; background: var(--bg); border: 1px solid var(--border); overflow: hidden; }
+.ai-usage-bar span { display: block; height: 100%; border-radius: 3px; }
+.ai-usage-bar span.leaf { background: var(--leaf); }
+.ai-usage-bar span.amber { background: var(--amber); }
+.ai-usage-bar span.red { background: var(--red); }
+.ai-usage-row { margin-top: 12px; }
+.ai-usage-row .ai-usage { max-width: none; }

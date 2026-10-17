@@ -32,7 +32,14 @@ records, feeding, breeding, production, finances, and tasks.
 
    # AI features (diagnosis reports, farm advisor, Ask LivestockPro, One Health briefing)
    ANTHROPIC_API_KEY=sk-ant-...
-   # optional: ANTHROPIC_MODEL=claude-opus-5-5, AI_REQUESTS_PER_HOUR=40
+   # optional: ANTHROPIC_MODEL=claude-opus-5-5
+   # AI limits per user (defaults shown): burst and hourly ceilings, then a
+   # daily allowance per feature and overall, kept in MongoDB (ai_usage).
+   # Admins get AI_ADMIN_MULTIPLIER times the daily limits; an admin can set
+   # one account's overall limit with PATCH /api/admin/users/:id/ai-limit.
+   # AI_REQUESTS_PER_MINUTE=5  AI_REQUESTS_PER_HOUR=25
+   # AI_DAILY_LIMIT=50  AI_DAILY_DIAGNOSE=10  AI_DAILY_ADVISOR=5
+   # AI_DAILY_CHAT=40  AI_DAILY_BRIEF=10  AI_ADMIN_MULTIPLIER=3
    ```
 
    Without `ANTHROPIC_API_KEY` the app runs normally and the AI features show

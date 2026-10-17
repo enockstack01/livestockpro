@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import Modal from '../Modal.jsx';
 import { useApi } from '../../lib/api.js';
 import { useToast } from '../../lib/toast.jsx';
-import { AiNotConfigured, AiWorking, SavedReport, aiErrorText, useAiStatus } from './AiViews.jsx';
+import { AiNotConfigured, AiUsageMeter, AiWorking, SavedReport, aiErrorText, useAiStatus } from './AiViews.jsx';
 
 /* "Diagnose with AI" on a health record: the farmer adds what they see, the
    server reads the animal's records and writes a diagnosis and treatment
@@ -29,7 +29,7 @@ export default function DiagnoseModal({ record, onClose }) {
     setBusy(true);
     const { data, error } = await api.aiDiagnose({ health_record_id: record.id, symptoms, language: i18n.language });
     setBusy(false);
-    if (error) { showToast(aiErrorText(t, error), 'error'); return; }
+    if (error) { showToast(aiErrorText(t, error, i18n.language), 'error'); return; }
     setSaved(data);
     setEarlier((list) => [data, ...list]);
   }
@@ -72,6 +72,7 @@ export default function DiagnoseModal({ record, onClose }) {
             <textarea className="form-control" rows={4} value={symptoms} placeholder={t('ai.diagnose.symptomsHint')} onChange={(e) => setSymptoms(e.target.value)} />
           </div>
           <p className="ai-disclaimer"><i className="fas fa-user-doctor"></i> {t('ai.vetNotice')}</p>
+          {configured ? <div className="ai-usage-row"><AiUsageMeter kind="diagnose" /></div> : null}
           {earlier.length ? (
             <div className="ai-earlier">
               <h4>{t('ai.diagnose.previous')}</h4>

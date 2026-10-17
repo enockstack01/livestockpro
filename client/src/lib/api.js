@@ -1,5 +1,6 @@
 import { useAuth } from '@clerk/clerk-react';
 import { useMemo } from 'react';
+import { setAiUsage } from '../../../shared/aiUsage';
 
 const API_BASE = '/api';
 
@@ -24,8 +25,11 @@ async function request(getToken, path, options = {}) {
 
   if (!res.ok) {
     const message = (json && json.error && json.error.message) || `Request failed (${res.status})`;
-    return { data: null, error: { message, status: res.status, code: json && json.error && json.error.code } };
+    const err = (json && json.error) || {};
+    if (err.usage) setAiUsage(err.usage);
+    return { data: null, error: { message, status: res.status, code: err.code, kind: err.kind, usage: err.usage } };
   }
+  if (json && json.usage) setAiUsage(json.usage);
   return json || { data: null, error: null };
 }
 
@@ -68,6 +72,11 @@ export function useApi() {
     /* AI features (server/routes/aiRoutes.js). */
     async aiStatus() {
       return request(getToken, '/ai/status');
+    },
+    async aiUsage() {
+      const res = await request(getToken, '/ai/usage');
+      if (res.data) setAiUsage(res.data);
+      return res;
     },
     async aiDiagnose(body) {
       return request(getToken, '/ai/diagnose', { method: 'POST', body: JSON.stringify(body) });

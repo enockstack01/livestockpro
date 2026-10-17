@@ -887,7 +887,22 @@
     "byBreed": "Mifugo kwa mbari",
     "healthyOf": "{{healthy}} kati ya {{count}} wazima",
     "more": "+ {{count}} zaidi",
-    "empty": "Ongeza wanyama ili kuona wasifu wa mifugo yako."
+    "empty": "Ongeza wanyama ili kuona wasifu wa mifugo yako.",
+    "healthTitle": "Afya ya mifugo",
+    "trendTitle": "Idadi ya mifugo, miezi 12 iliyopita",
+    "movementTitle": "Mwezi huu",
+    "added": "Walioongezwa",
+    "born": "Waliozaliwa",
+    "lost": "Waliopotea",
+    "net": "Mabadiliko halisi",
+    "cases30": "Siku 30 zilizopita: kesi {{total}} za afya, {{recovered}} wamepona",
+    "female": "Jike",
+    "male": "Dume",
+    "unknown": "Haijarekodiwa",
+    "ageTitle": "Muundo wa umri",
+    "ageUnknown": "{{count}} bila tarehe ya kuzaliwa",
+    "inYear": "{{value}} kwa miezi 12",
+    "bornNote": "Watoto huhesabiwa kwenye mifugo baada ya kusajiliwa kama wanyama."
   },
   "dashboardFeed": {
     "recentActivity": "Shughuli za Hivi Karibuni",
@@ -1128,7 +1143,10 @@
     },
     "errors": {
       "failed": "Ombi la AI limeshindwa: {{message}}",
-      "busy": "Umetumia AI sana saa hii. Tafadhali jaribu tena baadaye."
+      "busy": "Umetumia AI sana saa hii. Tafadhali jaribu tena baadaye.",
+      "quota": "Umetumia kiwango chako cha AI cha leo. Kinaanza upya saa {{time}}.",
+      "quotaKind": "Umetumia kiwango cha leo cha {{kind}}. Kinaanza upya saa {{time}}.",
+      "burst": "Tafadhali subiri dakika moja kabla ya kuuliza AI tena."
     },
     "offline": "Unahitaji mtandao ili kutumia AI.",
     "pdf": {
@@ -1176,6 +1194,17 @@
       "signature": "Sahihi",
       "date": "Tarehe",
       "important": "Muhimu:"
+    },
+    "usage": {
+      "left": "Maombi {{remaining}} kati ya {{limit}} ya AI yamebaki leo",
+      "leftKind": "{{kind}} {{remaining}} kati ya {{limit}} yamebaki leo",
+      "resets": "Yanaanza upya saa {{time}}",
+      "kinds": {
+        "diagnose": "uchunguzi wa AI",
+        "advisor": "maombi ya ushauri",
+        "chat": "maswali",
+        "brief": "muhtasari wa One Health"
+      }
     }
   }
 }

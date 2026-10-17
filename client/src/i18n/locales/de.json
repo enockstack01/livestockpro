@@ -887,7 +887,22 @@
     "byBreed": "Herde nach Rasse",
     "healthyOf": "{{healthy}} von {{count}} gesund",
     "more": "+ {{count}} weitere",
-    "empty": "Fügen Sie Tiere hinzu, um Ihr Herdenprofil zu sehen."
+    "empty": "Fügen Sie Tiere hinzu, um Ihr Herdenprofil zu sehen.",
+    "healthTitle": "Herdengesundheit",
+    "trendTitle": "Herdengröße, letzte 12 Monate",
+    "movementTitle": "Dieser Monat",
+    "added": "Hinzugefügt",
+    "born": "Geboren",
+    "lost": "Verloren",
+    "net": "Nettoveränderung",
+    "cases30": "Letzte 30 Tage: {{total}} Gesundheitsfälle, {{recovered}} genesen",
+    "female": "Weiblich",
+    "male": "Männlich",
+    "unknown": "Nicht erfasst",
+    "ageTitle": "Altersstruktur",
+    "ageUnknown": "{{count}} ohne Geburtsdatum",
+    "inYear": "{{value}} in 12 Monaten",
+    "bornNote": "Neugeborene zählen zur Herde, sobald sie als Tiere erfasst sind."
   },
   "dashboardFeed": {
     "recentActivity": "Letzte Aktivitäten",
@@ -1128,7 +1143,10 @@
     },
     "errors": {
       "failed": "Die KI-Anfrage ist fehlgeschlagen: {{message}}",
-      "busy": "Sie haben die KI in dieser Stunde oft genutzt. Bitte versuchen Sie es später erneut."
+      "busy": "Sie haben die KI in dieser Stunde oft genutzt. Bitte versuchen Sie es später erneut.",
+      "quota": "Ihr KI-Kontingent für heute ist aufgebraucht. Es wird um {{time}} zurückgesetzt.",
+      "quotaKind": "Ihr heutiges Kontingent für {{kind}} ist aufgebraucht. Es wird um {{time}} zurückgesetzt.",
+      "burst": "Bitte warten Sie eine Minute, bevor Sie die KI erneut fragen."
     },
     "offline": "Für die KI ist eine Verbindung nötig.",
     "pdf": {
@@ -1176,6 +1194,17 @@
       "signature": "Unterschrift",
       "date": "Datum",
       "important": "Wichtig:"
+    },
+    "usage": {
+      "left": "Heute noch {{remaining}} von {{limit}} KI-Anfragen",
+      "leftKind": "Heute noch {{remaining}} von {{limit}} {{kind}}",
+      "resets": "Wird um {{time}} zurückgesetzt",
+      "kinds": {
+        "diagnose": "KI-Diagnosen",
+        "advisor": "Beratungsanfragen",
+        "chat": "Fragen",
+        "brief": "One Health Lageberichte"
+      }
     }
   }
 }

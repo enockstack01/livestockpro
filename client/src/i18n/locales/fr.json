@@ -887,7 +887,22 @@
     "byBreed": "Troupeau par race",
     "healthyOf": "{{healthy}} sur {{count}} en bonne santé",
     "more": "+ {{count}} de plus",
-    "empty": "Ajoutez des animaux pour voir le profil de votre troupeau."
+    "empty": "Ajoutez des animaux pour voir le profil de votre troupeau.",
+    "healthTitle": "Santé du troupeau",
+    "trendTitle": "Taille du troupeau, 12 derniers mois",
+    "movementTitle": "Ce mois-ci",
+    "added": "Ajoutés",
+    "born": "Nés",
+    "lost": "Perdus",
+    "net": "Variation nette",
+    "cases30": "30 derniers jours : {{total}} cas de santé, {{recovered}} guéris",
+    "female": "Femelles",
+    "male": "Mâles",
+    "unknown": "Non renseigné",
+    "ageTitle": "Pyramide des âges",
+    "ageUnknown": "{{count}} sans date de naissance",
+    "inYear": "{{value}} en 12 mois",
+    "bornNote": "Les nouveau-nés comptent dans le troupeau une fois enregistrés comme animaux."
   },
   "dashboardFeed": {
     "recentActivity": "Activité récente",
@@ -1128,7 +1143,10 @@
     },
     "errors": {
       "failed": "La demande à l'IA a échoué : {{message}}",
-      "busy": "Vous avez beaucoup utilisé l'IA cette heure-ci. Réessayez plus tard."
+      "busy": "Vous avez beaucoup utilisé l'IA cette heure-ci. Réessayez plus tard.",
+      "quota": "Vous avez utilisé votre quota IA du jour. Il se réinitialise à {{time}}.",
+      "quotaKind": "Vous avez utilisé votre quota du jour de {{kind}}. Il se réinitialise à {{time}}.",
+      "burst": "Veuillez patienter une minute avant de redemander à l'IA."
     },
     "offline": "Une connexion est nécessaire pour utiliser l'IA.",
     "pdf": {
@@ -1176,6 +1194,17 @@
       "signature": "Signature",
       "date": "Date",
       "important": "Important :"
+    },
+    "usage": {
+      "left": "{{remaining}} sur {{limit}} demandes IA restantes aujourd'hui",
+      "leftKind": "{{remaining}} sur {{limit}} {{kind}} restants aujourd'hui",
+      "resets": "Réinitialisation à {{time}}",
+      "kinds": {
+        "diagnose": "diagnostics IA",
+        "advisor": "demandes de conseils",
+        "chat": "questions",
+        "brief": "synthèses One Health"
+      }
     }
   }
 }

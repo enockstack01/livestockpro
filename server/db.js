@@ -22,7 +22,9 @@ async function ensureIndexes(database) {
     ...DATA_COLLECTIONS.map((name) => database.collection(name).createIndex({ user_id: 1, updated_at: 1 })),
     database.collection('push_tokens').createIndex({ user_id: 1, device_id: 1 }),
     database.collection('accounts').createIndex({ status: 1 }),
-    database.collection('ai_reports').createIndex({ user_id: 1, kind: 1, created_at: -1 })
+    database.collection('ai_reports').createIndex({ user_id: 1, kind: 1, created_at: -1 }),
+    database.collection('ai_usage').createIndex({ user_id: 1, day: -1 }),
+    database.collection('ai_usage').createIndex({ day: 1 })
   ]);
 }
 

@@ -6,6 +6,7 @@ const { requireAuth, requireRole } = require('../authMiddleware');
 const { requireApproved } = require('../lib/accounts');
 const { MODEL, AiError, isConfigured, ask, textOf, brandVoice, VET_NOTICE, mapApiError } = require('../lib/ai');
 const { computeOneHealthAlerts } = require('./adminRoutes');
+const { reserve, getUsage, QuotaError } = require('../lib/aiQuota');
 
 const router = express.Router();
 
@@ -18,23 +19,71 @@ router.get('/status', (req, res) => {
 
 router.use(requireApproved);
 
-/* AI calls cost money and take a while: a separate, per-user budget on top
-   of the general API limit. */
-router.use(rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: Number(process.env.AI_REQUESTS_PER_HOUR) || 40,
+/* AI rate limits, per user (server/lib/aiQuota.js has the daily quotas):
+   1. burst: a few requests a minute, so one person cannot hammer the model
+   2. hourly: a ceiling on a busy hour
+   3. daily: an allowance per feature plus an overall cap, kept in MongoDB
+   Reading saved reports and usage is not limited; only the requests that
+   call the model are. */
+const limitHandler = (code, message) => (req, res) => res.status(429).json({ error: { message, code } });
+const burst = rateLimit({
+  windowMs: 60 * 1000,
+  max: Number(process.env.AI_REQUESTS_PER_MINUTE) || 5,
   keyGenerator: (req) => req.user.id,
   standardHeaders: true,
   legacyHeaders: false,
   validate: { keyGeneratorIpFallback: false },
-  handler: (req, res) => res.status(429).json({ error: { message: 'You have used the AI a lot this hour. Please try again later.', code: 'AI_LIMIT' } })
-}));
+  handler: limitHandler('AI_BURST', 'Please wait a minute before asking the AI again.')
+});
+const hourly = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: Number(process.env.AI_REQUESTS_PER_HOUR) || 25,
+  keyGenerator: (req) => req.user.id,
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: { keyGeneratorIpFallback: false },
+  handler: limitHandler('AI_LIMIT', 'You have used the AI a lot this hour. Please try again later.')
+});
 
-function sendError(res, err) {
+/* Takes a daily slot for `kind` before the route runs; the slot is given
+   back if the request fails (sendError calls req.releaseQuota). */
+function quota(kind) {
+  return async (req, res, next) => {
+    if (!isConfigured()) return next(); // the route answers 503; nothing to count
+    try {
+      req.releaseQuota = await reserve(req.user.id, kind);
+      next();
+    } catch (err) {
+      if (err instanceof QuotaError) {
+        return res.status(429).json({ error: { message: err.message, code: err.code, kind: err.kind, usage: err.usage } });
+      }
+      res.status(500).json({ error: { message: 'Could not check your AI allowance: ' + err.message } });
+    }
+  };
+}
+const aiLimits = (kind) => [burst, hourly, quota(kind)];
+
+async function sendError(res, err, req) {
+  if (req && req.releaseQuota) await req.releaseQuota();
   const e = err instanceof AiError ? err : mapApiError(err);
   if (e.status >= 500) console.error('AI error:', e.code, e.message);
   res.status(e.status).json({ error: { message: e.message, code: e.code } });
 }
+
+/* Today's usage, sent with every AI answer so the apps can show what is left. */
+async function withUsage(req, body) {
+  try { body.usage = await getUsage(req.user.id); } catch { /* usage is optional */ }
+  return body;
+}
+
+/* GET /api/ai/usage: how much of today's AI allowance is left. */
+router.get('/usage', async (req, res) => {
+  try {
+    res.json({ data: await getUsage(req.user.id), error: null });
+  } catch (err) {
+    res.status(500).json({ error: { message: err.message } });
+  }
+});
 
 /* ---------- Reading the farm's own records ---------- */
 
@@ -190,7 +239,7 @@ router.get('/reports', async (req, res) => {
 router.get('/reports/:id', async (req, res) => {
   try {
     const doc = await reports().findOne({ _id: String(req.params.id), user_id: req.user.id }, { projection: { user_id: 0 } });
-    if (!doc) return res.status(404).json({ error: { message: 'Report not found.' } });
+    if (!doc) return sendError(res, new AiError(404, 'AI_BAD_REQUEST', 'Report not found.'), req);
     res.json({ data: clean(doc), error: null });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
@@ -246,7 +295,7 @@ const DIAGNOSIS_RULES = [
   'Never claim certainty. The report supports, and does not replace, a veterinarian.'
 ].join('\n');
 
-router.post('/diagnose', async (req, res) => {
+router.post('/diagnose', aiLimits('diagnose'), async (req, res) => {
   try {
     const userId = req.user.id;
     const body = req.body || {};
@@ -263,14 +312,14 @@ router.post('/diagnose', async (req, res) => {
         record = { id: String(body.health_record_id) };
         for (const k of fields) if (body.record[k] != null && body.record[k] !== '') record[k] = String(body.record[k]).slice(0, 2000);
       }
-      if (!record) return res.status(404).json({ error: { message: 'Health record not found.' } });
+      if (!record) return sendError(res, new AiError(404, 'AI_BAD_REQUEST', 'Health record not found.'), req);
     }
     const animalId = body.animal_id || (record && record.animal_id);
     const tagId = body.tag_id || (record && record.tag_id);
     let animal = null;
     if (animalId) [animal] = await find(userId, 'animals', { _id: String(animalId) }, { limit: 1 });
     if (!animal && tagId) [animal] = await find(userId, 'animals', { tag_id: String(tagId) }, { limit: 1 });
-    if (!record && !symptoms) return res.status(400).json({ error: { message: 'Describe the symptoms or choose a health record.' } });
+    if (!record && !symptoms) return sendError(res, new AiError(400, 'AI_BAD_REQUEST', 'Describe the symptoms or choose a health record.'), req);
 
     const historyFilter = animal ? { $or: [{ animal_id: animal.id }, { tag_id: animal.tag_id }] } : tagId ? { tag_id: String(tagId) } : null;
     const [history, breeding, context] = await Promise.all([
@@ -322,9 +371,9 @@ router.post('/diagnose', async (req, res) => {
     };
     const title = data.title || `Diagnosis: ${input.tag_id || 'animal'}`;
     const saved = await saveReport(userId, 'diagnosis', title, input, data, language);
-    res.status(201).json({ data: saved, error: null });
+    res.status(201).json(await withUsage(req, { data: saved, error: null }));
   } catch (err) {
-    sendError(res, err);
+    sendError(res, err, req);
   }
 });
 
@@ -342,13 +391,13 @@ const ADVISOR_SCHEMA = obj({
   figures: { type: 'array', items: obj({ label: str, value: str, comment: str }) }
 });
 
-router.post('/advisor', async (req, res) => {
+router.post('/advisor', aiLimits('advisor'), async (req, res) => {
   try {
     const userId = req.user.id;
     const language = String((req.body && req.body.language) || 'en');
     const snapshot = await farmSnapshot(userId);
     if (!snapshot.herd.total && !Object.keys(snapshot.finance_by_month).length) {
-      return res.status(400).json({ error: { message: 'Add some animals or records first, then ask the advisor.', code: 'AI_NO_DATA' } });
+      return sendError(res, new AiError(400, 'AI_NO_DATA', 'Add some animals or records first, then ask the advisor.'), req);
     }
     const { data } = await ask({
       system: `${brandVoice(language)}\n\nAct as a farm advisor who has just read every record on this farm. Give at most 5 priorities, ordered by what matters most, each one concrete enough to act on. Give 2 to 4 strengths and at most 4 risks. In figures, quote 3 to 6 key numbers straight from the data with a short comment. If there is little data, say what to start recording.\n\n${DATA_NOTE}`,
@@ -357,9 +406,9 @@ router.post('/advisor', async (req, res) => {
       effort: 'medium'
     });
     const saved = await saveReport(userId, 'advisor', data.headline || 'Farm advice', {}, data, language);
-    res.status(201).json({ data: saved, error: null });
+    res.status(201).json(await withUsage(req, { data: saved, error: null }));
   } catch (err) {
-    sendError(res, err);
+    sendError(res, err, req);
   }
 });
 
@@ -507,7 +556,7 @@ function echoable(content) {
 
 const MAX_TOOL_ROUNDS = 8;
 
-router.post('/chat', async (req, res) => {
+router.post('/chat', aiLimits('chat'), async (req, res) => {
   try {
     const userId = req.user.id;
     const body = req.body || {};
@@ -518,7 +567,7 @@ router.post('/chat', async (req, res) => {
       .map((m) => ({ role: m.role, content: m.content.slice(0, 6000) }));
     while (history.length && history[0].role !== 'user') history.shift();
     if (!history.length || history[history.length - 1].role !== 'user') {
-      return res.status(400).json({ error: { message: 'Ask a question first.' } });
+      return sendError(res, new AiError(400, 'AI_BAD_REQUEST', 'Ask a question first.'), req);
     }
 
     const context = await farmContext(userId);
@@ -538,7 +587,7 @@ router.post('/chat', async (req, res) => {
       if (response.stop_reason !== 'tool_use' || !uses.length || round === MAX_TOOL_ROUNDS) {
         const reply = textOf(response);
         if (!reply) throw new AiError(502, 'AI_EMPTY', 'The AI did not return an answer. Please try again.');
-        return res.json({ data: { reply }, error: null });
+        return res.json(await withUsage(req, { data: { reply }, error: null }));
       }
       messages.push({ role: 'assistant', content: echoable(response.content) });
       const results = [];
@@ -556,7 +605,7 @@ router.post('/chat', async (req, res) => {
       messages.push({ role: 'user', content: results });
     }
   } catch (err) {
-    sendError(res, err);
+    sendError(res, err, req);
   }
 });
 
@@ -572,7 +621,7 @@ const BRIEF_SCHEMA = obj({
   farmer_message: str
 });
 
-router.post('/onehealth/brief', requireRole('admin'), async (req, res) => {
+router.post('/onehealth/brief', requireRole('admin'), aiLimits('brief'), async (req, res) => {
   try {
     const language = String((req.body && req.body.language) || 'en');
     const { alerts, records } = await computeOneHealthAlerts(getDb());
@@ -588,9 +637,9 @@ router.post('/onehealth/brief', requireRole('admin'), async (req, res) => {
     });
     data.alerts_considered = list.length;
     const saved = await saveReport(req.user.id, 'onehealth', data.headline || 'One Health briefing', {}, data, language);
-    res.status(201).json({ data: saved, error: null });
+    res.status(201).json(await withUsage(req, { data: saved, error: null }));
   } catch (err) {
-    sendError(res, err);
+    sendError(res, err, req);
   }
 });
 

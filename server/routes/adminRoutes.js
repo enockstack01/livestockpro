@@ -143,6 +143,9 @@ router.get('/users', async (req, res) => {
     const sorted = list.data.slice().sort((a, b) => b.createdAt - a.createdAt);
     const accountDocs = await accounts().find({ _id: { $in: sorted.map((u) => u.id) } }).toArray();
     const accountById = new Map(accountDocs.map((a) => [a._id, a]));
+    const today = new Date().toISOString().slice(0, 10);
+    const usageDocs = await db.collection('ai_usage').find({ day: today, user_id: { $in: sorted.map((u) => u.id) } }).toArray();
+    const aiUsedById = new Map(usageDocs.map((d) => [d.user_id, d.total || 0]));
 
     const users = await Promise.all(sorted.map(async (u) => {
       const [profile, ...counts] = await Promise.all([
@@ -177,7 +180,9 @@ router.get('/users', async (req, res) => {
           notes: account.notes || '', submittedAt: account.submitted_at
         } : null,
         reviewNote: (account && account.review_note) || '',
-        reviewedAt: (account && account.reviewed_at) || null
+        reviewedAt: (account && account.reviewed_at) || null,
+        aiUsedToday: aiUsedById.get(u.id) || 0,
+        aiDailyLimit: account && Number.isFinite(account.ai_daily_limit) ? account.ai_daily_limit : null
       };
     }));
 
@@ -242,6 +247,35 @@ router.patch('/users/:id/account', async (req, res) => {
       if (target.banned) await clerkClient.users.unbanUser(targetId);
     }
     res.json({ data: { id: targetId, status }, error: null });
+  } catch (err) {
+    res.status(500).json({ error: { message: err.message } });
+  }
+});
+
+/* PATCH /api/admin/users/:id/ai-limit  { limit }  set one account's overall
+   daily AI allowance (0 switches AI off for them); { limit: null } goes back
+   to the default. Same reach rule as account review. */
+router.patch('/users/:id/ai-limit', async (req, res) => {
+  try {
+    const targetId = req.params.id;
+    const raw = req.body ? req.body.limit : undefined;
+    const limit = raw === null || raw === '' ? null : Number(raw);
+    if (limit !== null && (!Number.isInteger(limit) || limit < 0 || limit > 10000)) {
+      return res.status(400).json({ error: { message: 'The AI limit must be a whole number from 0 to 10000.' } });
+    }
+    const targetRole = await getRole(targetId);
+    if (targetRole !== 'user' && req.user.role !== 'super_admin' && targetId !== req.user.id) {
+      return res.status(403).json({ error: { message: "Only a super admin can change an admin's AI limit." } });
+    }
+    const now = new Date().toISOString();
+    await accounts().updateOne(
+      { _id: targetId },
+      limit === null
+        ? { $unset: { ai_daily_limit: '' }, $set: { updated_at: now } }
+        : { $set: { ai_daily_limit: limit, updated_at: now }, $setOnInsert: { user_id: targetId, created_at: now } },
+      { upsert: limit !== null }
+    );
+    res.json({ data: { id: targetId, aiDailyLimit: limit }, error: null });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
   }
@@ -620,7 +654,7 @@ router.delete('/users/:id', async (req, res) => {
       return res.status(403).json({ error: { message: 'Only a super admin can delete an admin account.' } });
     }
     const db = getDb();
-    await Promise.all(['profiles', 'push_tokens', 'accounts', 'ai_reports', ...RESOURCE_COLLECTIONS].map((name) => db.collection(name).deleteMany({ user_id: targetId })));
+    await Promise.all(['profiles', 'push_tokens', 'accounts', 'ai_reports', 'ai_usage', ...RESOURCE_COLLECTIONS].map((name) => db.collection(name).deleteMany({ user_id: targetId })));
     await clerkClient.users.deleteUser(targetId);
     forgetApproval(targetId);
     res.json({ data: {}, error: null });

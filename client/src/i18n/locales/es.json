@@ -887,7 +887,22 @@
     "byBreed": "Rebaño por raza",
     "healthyOf": "{{healthy}} de {{count}} sanos",
     "more": "+ {{count}} más",
-    "empty": "Añade animales para ver el perfil de tu rebaño."
+    "empty": "Añade animales para ver el perfil de tu rebaño.",
+    "healthTitle": "Salud del rebaño",
+    "trendTitle": "Tamaño del rebaño, últimos 12 meses",
+    "movementTitle": "Este mes",
+    "added": "Añadidos",
+    "born": "Nacidos",
+    "lost": "Perdidos",
+    "net": "Cambio neto",
+    "cases30": "Últimos 30 días: {{total}} casos de salud, {{recovered}} recuperados",
+    "female": "Hembras",
+    "male": "Machos",
+    "unknown": "Sin registrar",
+    "ageTitle": "Estructura de edades",
+    "ageUnknown": "{{count}} sin fecha de nacimiento",
+    "inYear": "{{value}} en 12 meses",
+    "bornNote": "Las crías cuentan en el rebaño cuando se registran como animales."
   },
   "dashboardFeed": {
     "recentActivity": "Actividad reciente",
@@ -1128,7 +1143,10 @@
     },
     "errors": {
       "failed": "La solicitud a la IA falló: {{message}}",
-      "busy": "Ha usado mucho la IA en esta hora. Inténtelo más tarde."
+      "busy": "Ha usado mucho la IA en esta hora. Inténtelo más tarde.",
+      "quota": "Ha usado su cupo de IA de hoy. Se reinicia a las {{time}}.",
+      "quotaKind": "Ha usado su cupo de hoy de {{kind}}. Se reinicia a las {{time}}.",
+      "burst": "Espere un minuto antes de volver a preguntar a la IA."
     },
     "offline": "Necesita conexión para usar la IA.",
     "pdf": {
@@ -1176,6 +1194,17 @@
       "signature": "Firma",
       "date": "Fecha",
       "important": "Importante:"
+    },
+    "usage": {
+      "left": "Quedan {{remaining}} de {{limit}} solicitudes de IA hoy",
+      "leftKind": "Quedan {{remaining}} de {{limit}} {{kind}} hoy",
+      "resets": "Se reinicia a las {{time}}",
+      "kinds": {
+        "diagnose": "diagnósticos con IA",
+        "advisor": "solicitudes de asesoría",
+        "chat": "preguntas",
+        "brief": "resúmenes One Health"
+      }
     }
   }
 }
