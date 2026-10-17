@@ -59,7 +59,7 @@
     "signIn": "Sign in",
     "signUp": "Sign up",
     "continueWithGoogle": "Continue with Google",
-    "or": "OR",
+    "or": "or",
     "dontHaveAccount": "Don't have an account? ",
     "alreadyHaveAccount": "Already have an account? ",
     "verifyItsYou": "Verify it's you",
@@ -87,7 +87,15 @@
     "backToSignIn": "Back to sign in",
     "couldNotSendResetCode": "Could not send the reset code.",
     "couldNotResetPassword": "Could not reset your password.",
-    "googleMissingInfo": "Your Google account needs a few more details to finish signing up ({{fields}}). Please sign up with email instead."
+    "googleMissingInfo": "Your Google account needs a few more details to finish signing up ({{fields}}). Please sign up with email instead.",
+    "signInTitle": "Sign in to LivestockPro",
+    "signUpTitle": "Create your LivestockPro account",
+    "signUpSubtitle": "Start recording your herd in a few minutes",
+    "points": {
+      "herd": "Every animal's health, breeding and production in one place",
+      "health": "Early warnings and AI diagnosis reports you can print",
+      "ai": "Works offline in the field, in 10 languages"
+    }
   },
   "geo": {
     "capturing": "Capturing device location...",

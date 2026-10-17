@@ -59,7 +59,7 @@
     "signIn": "Iniciar sesión",
     "signUp": "Registrarse",
     "continueWithGoogle": "Continuar con Google",
-    "or": "O",
+    "or": "o",
     "dontHaveAccount": "¿No tienes una cuenta? ",
     "alreadyHaveAccount": "¿Ya tienes una cuenta? ",
     "verifyItsYou": "Verifica que eres tú",
@@ -87,7 +87,15 @@
     "backToSignIn": "Volver a iniciar sesión",
     "couldNotSendResetCode": "No se pudo enviar el código.",
     "couldNotResetPassword": "No se pudo restablecer tu contraseña.",
-    "googleMissingInfo": "Tu cuenta de Google necesita algunos datos más para completar el registro ({{fields}}). Regístrate con tu correo electrónico."
+    "googleMissingInfo": "Tu cuenta de Google necesita algunos datos más para completar el registro ({{fields}}). Regístrate con tu correo electrónico.",
+    "signInTitle": "Inicie sesión en LivestockPro",
+    "signUpTitle": "Cree su cuenta de LivestockPro",
+    "signUpSubtitle": "Empiece a registrar su rebaño en pocos minutos",
+    "points": {
+      "herd": "La salud, reproducción y producción de cada animal en un solo lugar",
+      "health": "Alertas tempranas e informes de diagnóstico con IA para imprimir",
+      "ai": "Funciona sin conexión en el campo, en 10 idiomas"
+    }
   },
   "geo": {
     "capturing": "Capturando ubicación del dispositivo...",

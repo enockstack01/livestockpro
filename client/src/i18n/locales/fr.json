@@ -59,7 +59,7 @@
     "signIn": "Se connecter",
     "signUp": "S'inscrire",
     "continueWithGoogle": "Continuer avec Google",
-    "or": "OU",
+    "or": "ou",
     "dontHaveAccount": "Vous n'avez pas de compte ? ",
     "alreadyHaveAccount": "Vous avez déjà un compte ? ",
     "verifyItsYou": "Vérifiez que c'est bien vous",
@@ -87,7 +87,15 @@
     "backToSignIn": "Retour à la connexion",
     "couldNotSendResetCode": "Impossible d'envoyer le code.",
     "couldNotResetPassword": "Impossible de réinitialiser le mot de passe.",
-    "googleMissingInfo": "Votre compte Google nécessite quelques informations supplémentaires pour terminer l’inscription ({{fields}}). Veuillez vous inscrire avec votre e-mail."
+    "googleMissingInfo": "Votre compte Google nécessite quelques informations supplémentaires pour terminer l’inscription ({{fields}}). Veuillez vous inscrire avec votre e-mail.",
+    "signInTitle": "Se connecter à LivestockPro",
+    "signUpTitle": "Créer votre compte LivestockPro",
+    "signUpSubtitle": "Commencez à enregistrer votre troupeau en quelques minutes",
+    "points": {
+      "herd": "La santé, la reproduction et la production de chaque animal au même endroit",
+      "health": "Alertes précoces et rapports de diagnostic IA à imprimer",
+      "ai": "Fonctionne hors ligne sur le terrain, en 10 langues"
+    }
   },
   "geo": {
     "capturing": "Capture de la position de l'appareil...",

@@ -59,7 +59,7 @@
     "signIn": "Injira",
     "signUp": "Iyandikishe",
     "continueWithGoogle": "Komeza ukoresheje Google",
-    "or": "CYANGWA",
+    "or": "cyangwa",
     "dontHaveAccount": "Ntufite konti? ",
     "alreadyHaveAccount": "Usanzwe ufite konti? ",
     "verifyItsYou": "Emeza ko ari wowe",
@@ -87,7 +87,15 @@
     "backToSignIn": "Subira ku kwinjira",
     "couldNotSendResetCode": "Ntibyakunze kohereza kode.",
     "couldNotResetPassword": "Ntibyakunze guhindura ijambo ry'ibanga.",
-    "googleMissingInfo": "Konti yawe ya Google ikeneye andi makuru kugira ngo iyandikwa rirangire ({{fields}}). Iyandikishe ukoresheje imeyili."
+    "googleMissingInfo": "Konti yawe ya Google ikeneye andi makuru kugira ngo iyandikwa rirangire ({{fields}}). Iyandikishe ukoresheje imeyili.",
+    "signInTitle": "Injira muri LivestockPro",
+    "signUpTitle": "Fungura konti yawe ya LivestockPro",
+    "signUpSubtitle": "Tangira kwandika amatungo yawe mu minota mike",
+    "points": {
+      "herd": "Ubuzima, ubworozi n'umusaruro by'itungo ryose ahantu hamwe",
+      "health": "Imiburo hakiri kare na raporo z'isuzuma rya AI ushobora gucapa",
+      "ai": "Ikora nta interineti mu murima, mu ndimi 10"
+    }
   },
   "geo": {
     "capturing": "Gufata aho igikoresho kiri...",

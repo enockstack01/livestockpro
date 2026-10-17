@@ -87,7 +87,15 @@
     "backToSignIn": "返回登录",
     "couldNotSendResetCode": "无法发送验证码。",
     "couldNotResetPassword": "无法重置密码。",
-    "googleMissingInfo": "您的 Google 账户还需要补充一些信息才能完成注册（{{fields}}）。请改用电子邮件注册。"
+    "googleMissingInfo": "您的 Google 账户还需要补充一些信息才能完成注册（{{fields}}）。请改用电子邮件注册。",
+    "signInTitle": "登录 LivestockPro",
+    "signUpTitle": "创建您的 LivestockPro 账户",
+    "signUpSubtitle": "几分钟内开始记录您的畜群",
+    "points": {
+      "herd": "每头牲畜的健康、繁殖和生产集中管理",
+      "health": "早期预警和可打印的 AI 诊断报告",
+      "ai": "在田间离线可用，支持 10 种语言"
+    }
   },
   "geo": {
     "capturing": "正在获取设备位置...",

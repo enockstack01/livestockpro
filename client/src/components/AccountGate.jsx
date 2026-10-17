@@ -6,6 +6,7 @@ import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { setCurrency, setRates } from '../../../shared/currency';
 import { ACCOUNT_TYPES, ACCOUNT_TYPE_ICONS } from '../../../shared/account';
+import AuthBrand from './AuthBrand.jsx';
 
 const AccountContext = createContext(null);
 
@@ -56,18 +57,11 @@ export default function AccountGate({ children }) {
 }
 
 function GateShell({ children }) {
-  const { t } = useTranslation();
   return (
     <div className="auth-page account-gate">
-      <div className="auth-brand">
-        <div className="auth-brand-icon"><i className="fas fa-cow"></i></div>
-        <h1>{t('auth.brandName')}</h1>
-        <p>{t('login.tagline')}</p>
-        <p className="auth-byline">{t('brand.byline')}</p>
-      </div>
+      <AuthBrand />
       <div className="auth-form-section">
         <div className="auth-form-wrapper account-gate-wrapper">
-          <div className="account-gate-mark"><span className="sidebar-logo-tile"><i className="fas fa-cow"></i></span><span>Livestock<span className="accent">Pro</span></span></div>
           {children}
         </div>
       </div>

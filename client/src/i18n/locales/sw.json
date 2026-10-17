@@ -59,7 +59,7 @@
     "signIn": "Ingia",
     "signUp": "Jisajili",
     "continueWithGoogle": "Endelea na Google",
-    "or": "AU",
+    "or": "au",
     "dontHaveAccount": "Huna akaunti? ",
     "alreadyHaveAccount": "Una akaunti tayari? ",
     "verifyItsYou": "Thibitisha ni wewe",
@@ -87,7 +87,15 @@
     "backToSignIn": "Rudi kuingia",
     "couldNotSendResetCode": "Imeshindikana kutuma msimbo.",
     "couldNotResetPassword": "Imeshindikana kuweka upya nenosiri.",
-    "googleMissingInfo": "Akaunti yako ya Google inahitaji maelezo zaidi kukamilisha usajili ({{fields}}). Tafadhali jisajili kwa barua pepe."
+    "googleMissingInfo": "Akaunti yako ya Google inahitaji maelezo zaidi kukamilisha usajili ({{fields}}). Tafadhali jisajili kwa barua pepe.",
+    "signInTitle": "Ingia LivestockPro",
+    "signUpTitle": "Fungua akaunti yako ya LivestockPro",
+    "signUpSubtitle": "Anza kurekodi mifugo yako kwa dakika chache",
+    "points": {
+      "herd": "Afya, uzazi na uzalishaji wa kila mnyama mahali pamoja",
+      "health": "Tahadhari za mapema na ripoti za uchunguzi wa AI unazoweza kuchapisha",
+      "ai": "Inafanya kazi bila mtandao shambani, kwa lugha 10"
+    }
   },
   "geo": {
     "capturing": "Inapata mahali pa kifaa...",

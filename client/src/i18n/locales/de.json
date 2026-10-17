@@ -59,7 +59,7 @@
     "signIn": "Anmelden",
     "signUp": "Registrieren",
     "continueWithGoogle": "Mit Google fortfahren",
-    "or": "ODER",
+    "or": "oder",
     "dontHaveAccount": "Noch kein Konto? ",
     "alreadyHaveAccount": "Bereits ein Konto? ",
     "verifyItsYou": "Bestätige, dass du es bist",
@@ -87,7 +87,15 @@
     "backToSignIn": "Zurück zur Anmeldung",
     "couldNotSendResetCode": "Der Code konnte nicht gesendet werden.",
     "couldNotResetPassword": "Passwort konnte nicht zurückgesetzt werden.",
-    "googleMissingInfo": "Ihr Google-Konto benötigt noch einige Angaben, um die Registrierung abzuschließen ({{fields}}). Bitte registrieren Sie sich per E-Mail."
+    "googleMissingInfo": "Ihr Google-Konto benötigt noch einige Angaben, um die Registrierung abzuschließen ({{fields}}). Bitte registrieren Sie sich per E-Mail.",
+    "signInTitle": "Bei LivestockPro anmelden",
+    "signUpTitle": "Ihr LivestockPro Konto erstellen",
+    "signUpSubtitle": "Erfassen Sie Ihre Herde in wenigen Minuten",
+    "points": {
+      "herd": "Gesundheit, Zucht und Leistung jedes Tieres an einem Ort",
+      "health": "Frühwarnungen und druckbare KI-Diagnoseberichte",
+      "ai": "Funktioniert offline auf dem Feld, in 10 Sprachen"
+    }
   },
   "geo": {
     "capturing": "Gerätestandort wird ermittelt...",

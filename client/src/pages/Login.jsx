@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SignIn, SignUp, useAuth } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
+import AuthBrand from '../components/AuthBrand.jsx';
 
-// ClerkProvider's global `appearance` (see main.jsx) already sets the base
-// dark/light theme to match the app; this just hides the built-in "Sign up"/
-// "Sign in" footer link since the page already renders its own toggle below.
-const appearance = { elements: { footerAction: { display: 'none' } } };
+// ClerkProvider's global `appearance` (main.jsx) carries the brand colours and
+// font. Here the page's own title replaces Clerk's header (which would read
+// "Sign in to Livestockpro"), and the page renders its own sign in / sign up
+// toggle below, so Clerk's footer link is hidden too.
+const appearance = { elements: { header: { display: 'none' }, footerAction: { display: 'none' }, card: { padding: '28px 24px' } } };
 
 export default function Login() {
   const { t } = useTranslation();
@@ -20,17 +22,12 @@ export default function Login() {
 
   return (
     <div className="auth-page">
-      <div className="auth-brand">
-        <div className="auth-brand-icon"><i className="fas fa-cow"></i></div>
-        <h1>{t('auth.brandName')}</h1>
-        <p>{t('login.tagline')}</p>
-        <p className="auth-byline">{t('brand.byline')}</p>
-      </div>
+      <AuthBrand />
 
       <div className="auth-form-section">
         <div className="auth-form-wrapper">
-          <h2>{t('login.welcomeTitle')}</h2>
-          <p className="subtitle">{t('login.welcomeSubtitle')}</p>
+          <h1 className="auth-title">{showSignUp ? t('auth.signUpTitle') : t('auth.signInTitle')}</h1>
+          <p className="subtitle">{showSignUp ? t('auth.signUpSubtitle') : t('login.welcomeSubtitle')}</p>
 
           {!isLoaded ? null : (
             <>
