@@ -16,7 +16,7 @@ const FONT = (px) => `700 ${px}px Calibri, Carlito, Arial, sans-serif`;
 function textColor(opts) {
   if (opts.color) return opts.color;
   const css = getComputedStyle(document.documentElement).getPropertyValue('--text-light').trim();
-  return css || '#546E7A';
+  return css || '#5B6B5D';
 }
 
 function formatter(opts) {

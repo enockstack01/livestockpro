@@ -13,10 +13,10 @@ import { addBasemaps } from '../lib/basemaps.js';
 const TYPE_META = {
   animals: { labelKey: 'tables.animals.label', color: '#1B5E20', icon: 'fa-cow' },
   health_records: { labelKey: 'healthPage.title', color: '#F9A825', icon: 'fa-stethoscope' },
-  feeding_records: { labelKey: 'tables.feeding_records.singular', color: '#1976D2', icon: 'fa-wheat-awn' },
-  breeding_records: { labelKey: 'tables.breeding_records.singular', color: '#7B1FA2', icon: 'fa-venus-mars' },
-  production_records: { labelKey: 'tables.production_records.singular', color: '#0097A7', icon: 'fa-gauge' },
-  finance_records: { labelKey: 'tables.finance_records.singular', color: '#D32F2F', icon: 'fa-coins' },
+  feeding_records: { labelKey: 'tables.feeding_records.singular', color: '#B26A2E', icon: 'fa-wheat-awn' },
+  breeding_records: { labelKey: 'tables.breeding_records.singular', color: '#14532D', icon: 'fa-venus-mars' },
+  production_records: { labelKey: 'tables.production_records.singular', color: '#6B7F2A', icon: 'fa-gauge' },
+  finance_records: { labelKey: 'tables.finance_records.singular', color: '#C62828', icon: 'fa-coins' },
   tasks: { labelKey: 'tables.tasks.label', color: '#5D4037', icon: 'fa-list-check' }
 };
 const TYPE_KEYS = Object.keys(TYPE_META);
@@ -127,7 +127,7 @@ export default function SpatialMap() {
         if (cancelled) return;
 
         const districts = L.geoJSON(districtsGeo, {
-          style: { color: '#546E7A', weight: 1.5, opacity: 0.75, fill: true, fillOpacity: 0.02, dashArray: '4,3' },
+          style: { color: '#5B6B5D', weight: 1.5, opacity: 0.75, fill: true, fillOpacity: 0.02, dashArray: '4,3' },
           onEachFeature: (feature, layer) => {
             layer.bindTooltip(feature.properties.shapeName, { sticky: true, className: 'spatial-district-tooltip' });
             layer.on('mouseover', () => layer.setStyle({ weight: 3, opacity: 1, fillOpacity: 0.12 }));
@@ -307,7 +307,7 @@ export default function SpatialMap() {
           </label>
           <label className="spatial-legend-row">
             <input type="checkbox" checked={showBoundaries.districts} onChange={() => toggleBoundary('districts')} />
-            <span className="spatial-legend-swatch" style={{ background: '#546E7A' }}><i className="fas fa-draw-polygon"></i></span>
+            <span className="spatial-legend-swatch" style={{ background: '#5B6B5D' }}><i className="fas fa-draw-polygon"></i></span>
             <span className="spatial-legend-label">{t('spatialMap.districtBorders')}</span>
             <span className="spatial-legend-count">30</span>
           </label>

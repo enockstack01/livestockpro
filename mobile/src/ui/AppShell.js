@@ -312,7 +312,7 @@ function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInse
       <View style={[baseStyles.sidebarFooter, { paddingBottom: bottomInset + 8 }]}>
         <Pressable onPress={() => { haptics.select(); triggerSync(); }} style={baseStyles.syncRow} accessibilityRole="button">
           <View style={{ width: 20, alignItems: 'center' }}>
-            <Icon name={syncing ? 'arrows-rotate' : lastError ? 'triangle-exclamation' : 'cloud'} size={12} color={lastError ? '#FFD54F' : '#FFFFFF'} />
+            <Icon name={syncing ? 'arrows-rotate' : lastError ? 'triangle-exclamation' : 'cloud'} size={12} color={lastError ? '#F9A825' : '#FFFFFF'} />
           </View>
           <Text style={baseStyles.syncText} numberOfLines={1}>{syncLine}{failedCount > 0 ? ` · ${t('sync.recordsFailed', { count: failedCount })}` : ''}</Text>
         </Pressable>

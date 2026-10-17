@@ -738,11 +738,11 @@ textarea.form-control {
 }
 
 .nav-item-admin i {
-  color: #FFD54F;
+  color: #F9A825;
 }
 
 .nav-item-admin.active {
-  border-left-color: #FFD54F;
+  border-left-color: #F9A825;
 }
 
 .nav-item.logout-item {
@@ -1224,7 +1224,7 @@ table.data-table {
 
 .toast-warning {
   background: var(--orange);
-  color: #263238; /* always dark — the orange background stays a light/mid hue in both themes */
+  color: #1C2B1E; /* always dark — the orange background stays a light/mid hue in both themes */
 }
 
 .toast-info {

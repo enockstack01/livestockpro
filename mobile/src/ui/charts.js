@@ -24,7 +24,7 @@ export function useChartColors() {
 
 const FONT_BASE = 11;
 // SVG text defaults to a serif face in browsers; match the app's UI font.
-const FONT_FAMILY = Platform.select({ web: 'Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif', default: undefined });
+const FONT_FAMILY = Platform.select({ web: 'Calibri, Carlito, Arial, sans-serif', default: undefined });
 const fmtNum = (v) => (Math.abs(v) >= 1000 ? Math.round(v).toLocaleString() : String(Math.round(v * 10) / 10));
 const LABEL = 10;
 const textW = (s) => String(s).length * 5.8;

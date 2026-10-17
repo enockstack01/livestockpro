@@ -20,17 +20,17 @@ const TYPE_LABEL_KEY = { watchlist: 'oneHealth.watchlistDisease', mortality_clus
    icon wins — most acute signal first. */
 const TYPE_PRIORITY = ['mortality_cluster', 'watchlist', 'critical_cluster', 'outbreak_cluster'];
 
-const SEVERITY_COLOR = { critical: '#D32F2F', high: '#F9A825', medium: '#1976D2', low: '#90A4AE' };
-const CONFIDENCE_COLOR = { confirmed: '#D32F2F', suspected: '#F9A825', reported: '#90A4AE' };
-const TYPE_COLOR = { watchlist: '#7B1FA2', mortality_cluster: '#212121', critical_cluster: '#D32F2F', outbreak_cluster: '#F9A825' };
-const ZOONOTIC_COLOR = { yes: '#C2185B', no: '#1976D2' };
+const SEVERITY_COLOR = { critical: '#C62828', high: '#F9A825', medium: '#5B6B5D', low: '#8A948B' };
+const CONFIDENCE_COLOR = { confirmed: '#C62828', suspected: '#F9A825', reported: '#8A948B' };
+const TYPE_COLOR = { watchlist: '#14532D', mortality_cluster: '#1C2B1E', critical_cluster: '#C62828', outbreak_cluster: '#F9A825' };
+const ZOONOTIC_COLOR = { yes: '#C62828', no: '#5B6B5D' };
 
 function buildColorModes(t) {
   return {
-    severity: { label: t('oneHealthMap.severityLabel'), heatColor: SEVERITY_COLOR.critical, legend: [[t('enums.animalHealthStatus.Critical'), SEVERITY_COLOR.critical], [t('enums.taskPriority.High'), SEVERITY_COLOR.high], [t('enums.taskPriority.Medium'), SEVERITY_COLOR.medium], [t('enums.taskPriority.Low'), SEVERITY_COLOR.low]], colorOf: (p) => SEVERITY_COLOR[p.severity] || '#90A4AE', weightOf: (p) => ({ critical: 1, high: 0.75, medium: 0.5, low: 0.25 }[p.severity] || 0.25) },
-    type: { label: t('oneHealthMap.detectionMethod'), heatColor: TYPE_COLOR.critical_cluster, legend: Object.entries(TYPE_COLOR).map(([k, c]) => [t(TYPE_LABEL_KEY[k]), c]), colorOf: (p) => TYPE_COLOR[primaryType(p)] || '#546E7A', weightOf: () => 0.6 },
+    severity: { label: t('oneHealthMap.severityLabel'), heatColor: SEVERITY_COLOR.critical, legend: [[t('enums.animalHealthStatus.Critical'), SEVERITY_COLOR.critical], [t('enums.taskPriority.High'), SEVERITY_COLOR.high], [t('enums.taskPriority.Medium'), SEVERITY_COLOR.medium], [t('enums.taskPriority.Low'), SEVERITY_COLOR.low]], colorOf: (p) => SEVERITY_COLOR[p.severity] || '#8A948B', weightOf: (p) => ({ critical: 1, high: 0.75, medium: 0.5, low: 0.25 }[p.severity] || 0.25) },
+    type: { label: t('oneHealthMap.detectionMethod'), heatColor: TYPE_COLOR.critical_cluster, legend: Object.entries(TYPE_COLOR).map(([k, c]) => [t(TYPE_LABEL_KEY[k]), c]), colorOf: (p) => TYPE_COLOR[primaryType(p)] || '#5B6B5D', weightOf: () => 0.6 },
     zoonotic: { label: t('oneHealthMap.zoonoticRisk'), heatColor: ZOONOTIC_COLOR.yes, legend: [[t('oneHealth.zoonoticBadge'), ZOONOTIC_COLOR.yes], [t('oneHealthMap.notZoonotic'), ZOONOTIC_COLOR.no]], colorOf: (p) => (p.zoonotic ? ZOONOTIC_COLOR.yes : ZOONOTIC_COLOR.no), weightOf: (p) => (p.zoonotic ? 1 : 0.35) },
-    confidence: { label: t('oneHealthMap.confidence'), heatColor: CONFIDENCE_COLOR.confirmed, legend: [[t('oneHealth.confirmed'), CONFIDENCE_COLOR.confirmed], [t('oneHealth.suspected'), CONFIDENCE_COLOR.suspected], [t('oneHealth.reported'), CONFIDENCE_COLOR.reported]], colorOf: (p) => CONFIDENCE_COLOR[p.confidence] || '#90A4AE', weightOf: (p) => ({ confirmed: 1, suspected: 0.6, reported: 0.3 }[p.confidence] || 0.3) }
+    confidence: { label: t('oneHealthMap.confidence'), heatColor: CONFIDENCE_COLOR.confirmed, legend: [[t('oneHealth.confirmed'), CONFIDENCE_COLOR.confirmed], [t('oneHealth.suspected'), CONFIDENCE_COLOR.suspected], [t('oneHealth.reported'), CONFIDENCE_COLOR.reported]], colorOf: (p) => CONFIDENCE_COLOR[p.confidence] || '#8A948B', weightOf: (p) => ({ confirmed: 1, suspected: 0.6, reported: 0.3 }[p.confidence] || 0.3) }
   };
 }
 
@@ -147,7 +147,7 @@ export default function OneHealthMap() {
         if (cancelled) return;
 
         const districts = L.geoJSON(districtsGeo, {
-          style: { color: '#546E7A', weight: 1.5, opacity: 0.75, fill: true, fillOpacity: 0.02, dashArray: '4,3' },
+          style: { color: '#5B6B5D', weight: 1.5, opacity: 0.75, fill: true, fillOpacity: 0.02, dashArray: '4,3' },
           onEachFeature: (feature, layer) => {
             layer.bindTooltip(feature.properties.shapeName, { sticky: true, className: 'spatial-district-tooltip' });
             layer.on('mouseover', () => layer.setStyle({ weight: 3, opacity: 1, fillOpacity: 0.12 }));
@@ -207,7 +207,7 @@ export default function OneHealthMap() {
           (best, m) => (m.options.riskWeight > (best?.options.riskWeight ?? -1) ? m : best),
           null
         );
-        const color = worst ? worst.options.riskColor : '#546E7A';
+        const color = worst ? worst.options.riskColor : '#5B6B5D';
         return L.divIcon({ html: `<div class="spatial-cluster" style="background:${color}">${cluster.getChildCount()}</div>`, className: 'spatial-cluster-wrap', iconSize: [36, 36] });
       }
     });
@@ -310,7 +310,7 @@ export default function OneHealthMap() {
           </label>
           <label className="spatial-legend-row">
             <input type="checkbox" checked={showBoundaries.districts} onChange={() => setShowBoundaries((s) => ({ ...s, districts: !s.districts }))} />
-            <span className="spatial-legend-swatch" style={{ background: '#546E7A' }}><i className="fas fa-draw-polygon"></i></span>
+            <span className="spatial-legend-swatch" style={{ background: '#5B6B5D' }}><i className="fas fa-draw-polygon"></i></span>
             <span className="spatial-legend-label">{t('spatialMap.districtBorders')}</span>
           </label>
         </div>

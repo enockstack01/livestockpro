@@ -13,10 +13,10 @@ import { ACCOUNT_TYPE_ICONS } from '../../../shared/account';
 const RESOURCE_LABELS = {
   animals: { labelKey: 'tables.animals.label', icon: 'fa-cow', color: '#1B5E20' },
   health_records: { labelKey: 'healthPage.title', icon: 'fa-stethoscope', color: '#F9A825' },
-  feeding_records: { labelKey: 'tables.feeding_records.singular', icon: 'fa-wheat-awn', color: '#1976D2' },
-  breeding_records: { labelKey: 'tables.breeding_records.singular', icon: 'fa-venus-mars', color: '#7B1FA2' },
-  production_records: { labelKey: 'tables.production_records.singular', icon: 'fa-gauge', color: '#0097A7' },
-  finance_records: { labelKey: 'tables.finance_records.singular', icon: 'fa-coins', color: '#D32F2F' },
+  feeding_records: { labelKey: 'tables.feeding_records.singular', icon: 'fa-wheat-awn', color: '#B26A2E' },
+  breeding_records: { labelKey: 'tables.breeding_records.singular', icon: 'fa-venus-mars', color: '#14532D' },
+  production_records: { labelKey: 'tables.production_records.singular', icon: 'fa-gauge', color: '#6B7F2A' },
+  finance_records: { labelKey: 'tables.finance_records.singular', icon: 'fa-coins', color: '#C62828' },
   tasks: { labelKey: 'tables.tasks.label', icon: 'fa-list-check', color: '#5D4037' }
 };
 
@@ -667,7 +667,7 @@ function ResourceChart({ byCollection }) {
     type: 'bar',
     data: {
       labels: entries.map(([key]) => (RESOURCE_LABELS[key] ? t(RESOURCE_LABELS[key].labelKey) : key)),
-      datasets: [{ data: entries.map(([, v]) => v), backgroundColor: entries.map(([key]) => RESOURCE_LABELS[key]?.color || '#546E7A'), borderRadius: 6 }]
+      datasets: [{ data: entries.map(([, v]) => v), backgroundColor: entries.map(([key]) => RESOURCE_LABELS[key]?.color || '#5B6B5D'), borderRadius: 6 }]
     },
     options: {
       indexAxis: 'y',
@@ -692,7 +692,7 @@ function RoleChart({ users }) {
     if (total === 0) return null;
     return {
       type: 'doughnut',
-      data: { labels: [t('adminDashboard.tabUsers'), t('adminDashboard.roleAdmin') + 's', t('adminDashboard.roleSuperAdmin') + 's'], datasets: [{ data: [plain, admins, superAdmins], backgroundColor: ['#90A4AE', '#1976D2', '#7B1FA2'], borderWidth: 0, spacing: 2 }] },
+      data: { labels: [t('adminDashboard.tabUsers'), t('adminDashboard.roleAdmin') + 's', t('adminDashboard.roleSuperAdmin') + 's'], datasets: [{ data: [plain, admins, superAdmins], backgroundColor: ['#8A948B', '#B26A2E', '#14532D'], borderWidth: 0, spacing: 2 }] },
       options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true, pointStyleWidth: 10, font: { size: 12 } } } } }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -702,7 +702,7 @@ function RoleChart({ users }) {
   return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
 }
 
-const HEALTH_COLORS = { Healthy: '#1B5E20', 'Under Treatment': '#F9A825', Critical: '#D32F2F', Deceased: '#424242', Unspecified: '#90A4AE' };
+const HEALTH_COLORS = { Healthy: '#1B5E20', 'Under Treatment': '#F9A825', Critical: '#C62828', Deceased: '#1C2B1E', Unspecified: '#8A948B' };
 
 function HealthBreakdownChart({ breakdown }) {
   const { t } = useTranslation();
@@ -712,7 +712,7 @@ function HealthBreakdownChart({ breakdown }) {
     if (total === 0) return null;
     return {
       type: 'doughnut',
-      data: { labels: entries.map(([k]) => t(`enums.animalHealthStatus.${k}`, k)), datasets: [{ data: entries.map(([, v]) => v), backgroundColor: entries.map(([k]) => HEALTH_COLORS[k] || '#90A4AE'), borderWidth: 0, spacing: 2 }] },
+      data: { labels: entries.map(([k]) => t(`enums.animalHealthStatus.${k}`, k)), datasets: [{ data: entries.map(([, v]) => v), backgroundColor: entries.map(([k]) => HEALTH_COLORS[k] || '#8A948B'), borderWidth: 0, spacing: 2 }] },
       options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, pointStyleWidth: 10, font: { size: 11 } } } } }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -722,7 +722,7 @@ function HealthBreakdownChart({ breakdown }) {
   return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
 }
 
-const SPECIES_COLORS = ['#1B5E20', '#F9A825', '#1976D2', '#7B1FA2', '#0097A7', '#D32F2F', '#5D4037', '#EF6C00', '#455A64'];
+const SPECIES_COLORS = ['#1B5E20', '#F9A825', '#14532D', '#5B6B5D', '#B26A2E', '#8A948B', '#6B7F2A', '#1C2B1E', '#C9803F'];
 
 function SpeciesChart({ breakdown }) {
   const { t } = useTranslation();
@@ -742,7 +742,7 @@ function SpeciesChart({ breakdown }) {
   return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
 }
 
-const TASK_COLORS = { Pending: '#F9A825', 'In Progress': '#1976D2', Completed: '#1B5E20', Unspecified: '#90A4AE' };
+const TASK_COLORS = { Pending: '#F9A825', 'In Progress': '#5B6B5D', Completed: '#1B5E20', Unspecified: '#8A948B' };
 
 function TaskBreakdownChart({ breakdown }) {
   const { t } = useTranslation();
@@ -752,7 +752,7 @@ function TaskBreakdownChart({ breakdown }) {
     if (total === 0) return null;
     return {
       type: 'doughnut',
-      data: { labels: entries.map(([k]) => t(`enums.taskStatus.${k}`, k)), datasets: [{ data: entries.map(([, v]) => v), backgroundColor: entries.map(([k]) => TASK_COLORS[k] || '#90A4AE'), borderWidth: 0, spacing: 2 }] },
+      data: { labels: entries.map(([k]) => t(`enums.taskStatus.${k}`, k)), datasets: [{ data: entries.map(([, v]) => v), backgroundColor: entries.map(([k]) => TASK_COLORS[k] || '#8A948B'), borderWidth: 0, spacing: 2 }] },
       options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, pointStyleWidth: 10, font: { size: 11 } } } } }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

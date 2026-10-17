@@ -9,7 +9,7 @@ import { OneHealthBriefCard } from '../components/ai/AiViews.jsx';
 import OneHealthMap from '../components/OneHealthMap.jsx';
 
 const SEVERITY_BADGE = { critical: 'badge-red', high: 'badge-orange', medium: 'badge-blue', low: 'badge-gray' };
-const SEVERITY_COLOR = { critical: '#D32F2F', high: '#F9A825', medium: '#1976D2', low: '#90A4AE' };
+const SEVERITY_COLOR = { critical: '#C62828', high: '#F9A825', medium: '#5B6B5D', low: '#8A948B' };
 const TYPE_LABEL_KEY = { watchlist: 'oneHealth.watchlistDisease', mortality_cluster: 'oneHealth.mortalityCluster', critical_cluster: 'oneHealth.criticalCluster', outbreak_cluster: 'oneHealth.outbreakCluster' };
 const TYPE_ICON = { watchlist: 'fa-skull-crossbones', mortality_cluster: 'fa-cross', critical_cluster: 'fa-heart-crack', outbreak_cluster: 'fa-diagram-project' };
 const CONFIDENCE_BADGE = { confirmed: 'badge-red', suspected: 'badge-orange', reported: 'badge-gray' };
@@ -52,7 +52,7 @@ function TypeChart({ alerts }) {
     if (total === 0) return null;
     return {
       type: 'bar',
-      data: { labels: entries.map(([k]) => t(TYPE_LABEL_KEY[k])), datasets: [{ data: entries.map(([, v]) => v), backgroundColor: ['#7B1FA2', '#424242', '#D32F2F', '#F9A825'], borderRadius: 6 }] },
+      data: { labels: entries.map(([k]) => t(TYPE_LABEL_KEY[k])), datasets: [{ data: entries.map(([, v]) => v), backgroundColor: ['#14532D', '#1C2B1E', '#C62828', '#F9A825'], borderRadius: 6 }] },
       options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: { color: '#F0F0F0' } }, y: { grid: { display: false }, ticks: { font: { size: 11 } } } }, plugins: { legend: { display: false } } }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

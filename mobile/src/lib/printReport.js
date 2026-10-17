@@ -43,7 +43,7 @@ export function buildReportHtml({ title, subtitle, cardRows, sections, recordsLa
   .badge { background: #EDF1ED; color: #1B5E20; border-radius: 20px; padding: 2px 9px; font-size: 10px; font-weight: 600; }
   table { width: 100%; border-collapse: collapse; }
   thead { display: table-header-group; } /* repeat the header row on every printed page */
-  th { background: #F5F7FA; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: .3px; color: #5B6B5D; padding: 6px; border-bottom: 1.5px solid #DFE2DF; }
+  th { background: #F5F6F5; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: .3px; color: #5B6B5D; padding: 6px; border-bottom: 1.5px solid #DFE2DF; }
   td { padding: 6px; border-bottom: 1px solid #DFE2DF; font-size: 11px; vertical-align: top; }
   tr { break-inside: avoid; }
   td.strong { font-weight: 600; }

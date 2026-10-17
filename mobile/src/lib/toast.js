@@ -47,7 +47,7 @@ function ToastView({ toast, opacity }) {
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const typeColors = { success: colors.primary, error: colors.red, warning: colors.orange, info: colors.blue };
   const bg = typeColors[toast.type] || typeColors.info;
-  const fg = toast.type === 'warning' ? '#263238' : '#FFFFFF';
+  const fg = toast.type === 'warning' ? '#1C2B1E' : '#FFFFFF';
   const wide = width > 600;
 
   return (
