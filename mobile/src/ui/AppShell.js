@@ -288,8 +288,8 @@ function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInse
     <View style={[baseStyles.sidebar, { backgroundColor: colors.sidebar }]}>
       {/* Logo on a translucent tile, name in two tones. */}
       <View style={[baseStyles.sidebarHeader, { paddingTop: topInset + 14 }]}>
-        <View style={baseStyles.logoTile}><Icon name="cow" size={18} color="#FFFFFF" /></View>
-        <Text style={baseStyles.logoText}>Livestock<Text style={{ color: '#FFFFFF', fontWeight: '800' }}>Pro</Text></Text>
+        <Image source={require('../../assets/icon.png')} style={baseStyles.appIcon} />
+        <Text style={baseStyles.logoText}>LivestockPro</Text>
         <View style={{ flex: 1 }} />
         {closable ? <Pressable onPress={onClose} hitSlop={10} accessibilityLabel="Close menu"><Icon name="xmark" size={18} color="rgba(255,255,255,0.6)" /></Pressable> : null}
       </View>
@@ -371,6 +371,7 @@ const baseStyles = StyleSheet.create({
   sidebar: { flex: 1, width: SIDEBAR_W },
   drawer: { position: 'absolute', left: 0, top: 0, bottom: 0, width: SIDEBAR_W, shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 12, elevation: 12 },
   sidebarHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingBottom: 16, paddingHorizontal: 18, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)' },
+  appIcon: { width: 34, height: 34, borderRadius: 9 },
   logoTile: { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' },
   logoText: { color: '#FFFFFF', fontSize: 17, fontWeight: '700' },
   sectionLabel: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, color: 'rgba(255,255,255,0.35)', paddingTop: 16, paddingBottom: 6, paddingHorizontal: 20 },

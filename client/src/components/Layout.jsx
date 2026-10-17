@@ -167,8 +167,8 @@ function LayoutInner() {
       <aside className={`sidebar${sidebarOpen ? ' open' : ''}`}>
         <div className="sidebar-header">
           <div className="sidebar-logo">
-            <span className="sidebar-logo-tile"><i className="fas fa-cow"></i></span>
-            <span>Livestock<span className="sidebar-logo-accent">Pro</span></span>
+            <img className="sidebar-app-icon" src="/icon-192.png" alt="" width="34" height="34" />
+            <span>LivestockPro</span>
           </div>
           <button className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fas fa-xmark"></i></button>
         </div>

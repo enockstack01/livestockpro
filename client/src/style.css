@@ -2489,3 +2489,6 @@ a { color: var(--leaf); }
   .auth-form-section { align-items: flex-start; padding: 26px 16px 32px; }
   .auth-form-wrapper .auth-title { font-size: 24px; }
 }
+
+/* LivestockPro app icon in the sidebar header (replaces the generic glyph tile). */
+.sidebar-app-icon { width: 34px; height: 34px; border-radius: 9px; display: block; flex: none; }
