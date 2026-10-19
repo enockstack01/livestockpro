@@ -21,6 +21,8 @@ export const ACCOUNT_STATUS = { NONE: 'none', PENDING: 'pending', APPROVED: 'app
 /* By default a user is called by their account type ("Farmer"); admins
    without a request on file are called by their role instead. */
 export function accountDisplayName(t, account, role) {
+  /* Organization accounts go by their organization's name. */
+  if (account && account.kind === 'organization' && account.organization && account.organization.name) return account.organization.name;
   if (account && account.accountType) return t(`account.types.${account.accountType}`);
   if (role === 'super_admin') return t('adminDashboard.roleSuperAdmin');
   if (role === 'admin') return t('adminDashboard.roleAdmin');

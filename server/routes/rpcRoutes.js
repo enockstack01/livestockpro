@@ -1,4 +1,5 @@
 const express = require('express');
+const { farmerLink, endFarmerLink } = require('../lib/orgs');
 const { getDb } = require('../db');
 const { requireAuth, clerkClient } = require('../authMiddleware');
 
@@ -9,6 +10,7 @@ const COLLECTIONS = [
   'profiles',
   'ai_reports',
   'ai_usage',
+  'notifications',
   'animals',
   'health_records',
   'feeding_records',
@@ -27,7 +29,11 @@ router.post('/:fn', async (req, res) => {
   if (fn === 'delete_user') {
     try {
       const db = getDb();
+      const link = await farmerLink(req.user.id);
+      if (link) await endFarmerLink(req.user.id, link.org._id, 'left', req.user.id);
+      await db.collection('organization_members').updateMany({ user_id: req.user.id, status: 'active' }, { $set: { status: 'removed', removed_at: new Date().toISOString() } });
       await Promise.all(COLLECTIONS.map((name) => db.collection(name).deleteMany({ user_id: req.user.id })));
+      await db.collection('farmer_stats').deleteMany({ farmer_id: req.user.id });
       await clerkClient.users.deleteUser(req.user.id);
       return res.json({ data: {}, error: null });
     } catch (err) {

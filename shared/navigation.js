@@ -64,3 +64,29 @@ export function greeting(t, name) {
   const text = t(greetingKey(), { name: name || '' });
   return name ? text : text.replace(/[\s,，،、]+$/u, '');
 }
+
+/* Sidebar for organization accounts (cooperatives, NGOs, companies,
+   government programmes): web at /organization/*, mobile at the same
+   paths. `roles` limits an item to some organization roles. */
+export const ORG_NAV_SECTIONS = [
+  { items: [{ key: 'orgDashboard', path: '/organization', icon: 'gauge-high', labelKey: 'org.nav.dashboard' }] },
+  {
+    labelKey: 'org.nav.sectionFarmers',
+    items: [
+      { key: 'orgFarmers', path: '/organization/farmers', icon: 'users', labelKey: 'org.nav.farmers' },
+      { key: 'orgLinks', path: '/organization/links', icon: 'link', labelKey: 'org.nav.links' },
+    ],
+  },
+  {
+    labelKey: 'org.nav.sectionManage',
+    items: [
+      { key: 'orgStaff', path: '/organization/staff', icon: 'user-group', labelKey: 'org.nav.staff', roles: ['org_admin'], webOnly: true },
+      { key: 'orgProfile', path: '/organization/profile', icon: 'building', labelKey: 'org.nav.profile', webOnly: true },
+      { key: 'orgActivity', path: '/organization/activity', icon: 'clock-rotate-left', labelKey: 'org.nav.activity', roles: ['org_admin'], webOnly: true },
+    ],
+  },
+  {
+    labelKey: 'nav.sections.system',
+    items: [{ key: 'settings', path: '/settings', icon: 'gear', labelKey: 'nav.settings' }],
+  },
+];

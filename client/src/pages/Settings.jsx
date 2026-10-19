@@ -9,6 +9,7 @@ import { useTheme } from '../theme/ThemeProvider.jsx';
 import Modal from '../components/Modal.jsx';
 import { useAccount } from '../components/AccountGate.jsx';
 import { accountDisplayName } from '../../../shared/account';
+import MyOrganizationCard from '../components/org/MyOrganization.jsx';
 import { CURRENCIES, currencyName } from '../../../shared/currency';
 
 export default function Settings() {
@@ -29,6 +30,8 @@ export default function Settings() {
   const [farmName, setFarmName] = useState('');
   const [location, setLocation] = useState('');
   const [phone, setPhone] = useState('');
+  const [place, setPlace] = useState({ district: '', sector: '', cell: '' });
+  const isOrgAccount = account.kind === 'organization';
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -41,6 +44,7 @@ export default function Settings() {
   const displayName = accountDisplayName(t, account, account.role);
 
   useEffect(() => {
+    if (isOrgAccount) return;
     (async () => {
       const { data } = await api.list('profiles');
       const p = (data && data[0]) || null;
@@ -48,6 +52,7 @@ export default function Settings() {
       setFarmName(p?.farm_name || '');
       setLocation(p?.location || '');
       setPhone(p?.phone || '');
+      setPlace({ district: p?.district || '', sector: p?.sector || '', cell: p?.cell || '' });
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -87,7 +92,7 @@ export default function Settings() {
 
   async function saveProfile() {
     setSaving(true);
-    const payload = { farm_name: farmName.trim(), location: location.trim(), phone: phone.trim() };
+    const payload = { farm_name: farmName.trim(), location: location.trim(), phone: phone.trim(), district: place.district.trim(), sector: place.sector.trim(), cell: place.cell.trim() };
     let result;
     if (profile) result = await api.update('profiles', profile.id, payload);
     else result = await api.insert('profiles', [payload]);
@@ -155,15 +160,21 @@ export default function Settings() {
       </div>
 
       <div className="settings-stack">
-        <div className="card">
+        {!isOrgAccount ? <MyOrganizationCard /> : null}
+        {!isOrgAccount ? <div className="card">
           <div className="card-header"><h3><i className="fas fa-tractor" style={{ color: 'var(--primary)', marginRight: 6 }}></i> {t('settings.farmProfile')}</h3></div>
           <div className="card-body">
             <div className="form-group"><label>{t('settings.farmName')}</label><input type="text" className="form-control" placeholder={t('settings.farmNamePlaceholder')} value={farmName} onChange={(e) => setFarmName(e.target.value)} /></div>
             <div className="form-group"><label>{t('settings.location')}</label><input type="text" className="form-control" placeholder={t('settings.locationPlaceholder')} value={location} onChange={(e) => setLocation(e.target.value)} /></div>
             <div className="form-group"><label>{t('settings.phoneNumber')}</label><input type="tel" className="form-control" placeholder={t('settings.phonePlaceholder')} value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
+            <div className="form-row">
+              <div className="form-group"><label>{t('org.fields.district')}</label><input type="text" className="form-control" value={place.district} onChange={(e) => setPlace((p) => ({ ...p, district: e.target.value }))} /></div>
+              <div className="form-group"><label>{t('org.fields.sector')}</label><input type="text" className="form-control" value={place.sector} onChange={(e) => setPlace((p) => ({ ...p, sector: e.target.value }))} /></div>
+              <div className="form-group"><label>{t('org.fields.cell')}</label><input type="text" className="form-control" value={place.cell} onChange={(e) => setPlace((p) => ({ ...p, cell: e.target.value }))} /></div>
+            </div>
             <button className="btn btn-primary" disabled={saving} onClick={saveProfile}><i className="fas fa-check"></i> {saving ? t('settings.saving') : t('settings.saveProfile')}</button>
           </div>
-        </div>
+        </div> : null}
 
         <div className="card">
           <div className="card-header"><h3><i className="fas fa-globe" style={{ color: 'var(--primary)', marginRight: 6 }}></i> {t('settings.preferences')}</h3></div>

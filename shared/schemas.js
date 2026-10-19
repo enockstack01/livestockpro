@@ -8,7 +8,7 @@
    this package is bundled into; server/ stays the authority, this must match it. */
 
 export const SCHEMAS = {
-  profiles: ['farm_name', 'location', 'phone', 'avatar_url'],
+  profiles: ['farm_name', 'location', 'phone', 'avatar_url', 'district', 'sector', 'cell'],
   animals: ['tag_id', 'name', 'species', 'breed', 'sex', 'date_of_birth', 'location', 'district', 'latitude', 'longitude', 'health_status', 'last_check_date', 'notes'],
   health_records: ['animal_id', 'tag_id', 'disease', 'treatment', 'medicine', 'vet_name', 'check_date', 'next_check_date', 'status', 'district', 'latitude', 'longitude', 'notes'],
   feeding_records: ['feed_type', 'quantity', 'unit', 'cost', 'currency', 'feeding_date', 'animal_group', 'district', 'latitude', 'longitude', 'notes'],

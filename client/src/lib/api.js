@@ -4,8 +4,20 @@ import { setAiUsage } from '../../../shared/aiUsage';
 
 const API_BASE = '/api';
 
+/* A random id for this browser, sent with every request so the join
+   endpoint can rate limit per device as well as per IP. */
+function deviceId() {
+  try {
+    let id = localStorage.getItem('lp_device_id');
+    if (!id) { id = (crypto.randomUUID && crypto.randomUUID()) || String(Math.random()).slice(2); localStorage.setItem('lp_device_id', id); }
+    return id;
+  } catch {
+    return '';
+  }
+}
+
 async function request(getToken, path, options = {}) {
-  let headers = { 'Content-Type': 'application/json' };
+  let headers = { 'Content-Type': 'application/json', 'X-Device-Id': deviceId() };
   try {
     const token = await getToken();
     if (token) headers.Authorization = 'Bearer ' + token;
@@ -70,6 +82,11 @@ export function useApi() {
       return request(getToken, '/admin/role');
     },
     /* AI features (server/routes/aiRoutes.js). */
+    /* Generic call for the organization API (/api/organizations, /api/join,
+       /api/me/organization, /api/admin/organizations, /api/notifications). */
+    async http(method, path, body) {
+      return request(getToken, path, { method, ...(body !== undefined ? { body: JSON.stringify(body) } : {}) });
+    },
     async aiStatus() {
       return request(getToken, '/ai/status');
     },

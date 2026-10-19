@@ -15,7 +15,9 @@ import { useSync } from '../sync/SyncProvider';
 import { useRepository } from '../db/repository';
 import { wipeLocalData, getPendingSyncCount } from '../db/schema';
 import { isOverdueTask } from '../lib/shared';
-import { NAV_SECTIONS } from '../../../shared/navigation';
+import { NAV_SECTIONS, ORG_NAV_SECTIONS } from '../../../shared/navigation';
+import { useApi } from '../api/client';
+import { ConsentRequest, useMyOrganization } from '../screens/org/MyOrganization';
 import { accountDisplayName } from '../../../shared/account';
 import { useAccount } from '../account/AccountProvider';
 import { useBreakpoint } from './layout';
@@ -35,6 +37,19 @@ const NOTIF_ORDER = { red: 0, orange: 1, blue: 2, purple: 3, green: 4 };
 const mobilePath = (item) => (item.key === 'dashboard' ? '/' : item.path);
 /* Mobile has no admin screens (the Admin Panel and One Health map are web-only). */
 const MOBILE_SECTIONS = NAV_SECTIONS.filter((s) => !s.adminOnly);
+/* Organization accounts: the mobile part of the organization area. */
+const orgSections = (role) => ORG_NAV_SECTIONS
+  .map((sec) => ({ ...sec, items: sec.items.filter((it) => !it.webOnly && (!it.roles || it.roles.includes(role))) }))
+  .filter((sec) => sec.items.length);
+
+/* Server notifications (organization approvals, limit warnings, joins), a
+   translation key plus values. */
+const SERVER_NOTIF = {
+  orgApproved: ['circle-check', 'green'], orgSuspended: ['circle-pause', 'red'], orgReactivated: ['circle-play', 'green'],
+  orgLimitChanged: ['gauge', 'blue'], orgUsage80: ['gauge-high', 'orange'], orgUsage100: ['gauge-high', 'red'],
+  farmerJoined: ['user-plus', 'green'], farmerLeft: ['user-minus', 'orange'], farmerRemoved: ['user-minus', 'orange'],
+  orgInvite: ['people-group', 'blue'], staffInvite: ['envelope-open-text', 'blue']
+};
 
 /* ---------- Page search (search box at the top of a list page) ---------- */
 /* Returns the search field element for the page to render, with a clear (×)
@@ -95,8 +110,9 @@ export function useSignOut() {
 }
 
 /* ---------- Notifications (same rules as the web topbar bell) ---------- */
-function useNotifications(t) {
+function useNotifications(t, isOrg) {
   const repo = useRepository();
+  const api = useApi();
   const { lastSyncedAt } = useSync();
   const pathname = usePathname();
   const [items, setItems] = useState([]);
@@ -104,6 +120,12 @@ function useNotifications(t) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      const res = await api.http('GET', '/notifications');
+      const server = (res.data || []).map((n) => {
+        const [icon, color] = SERVER_NOTIF[n.key] || ['bell', 'blue'];
+        return { id: 'srv-' + n.id, serverId: n.id, serverRead: Boolean(n.read_at), icon, color, title: t(`notifications.${n.key}.title`, n.vars || {}), sub: t(`notifications.${n.key}.body`, n.vars || {}), link: n.link && n.link.startsWith('/organization') && !n.link.startsWith('/organization/farmers') && n.link !== '/organization' ? '/organization' : (n.link || '/') };
+      });
+      if (isOrg) { if (!cancelled) setItems(server); return; }
       const [tasks, animals, health, breeding] = await Promise.all([
         repo.list('tasks'), repo.list('animals'), repo.list('health_records'), repo.list('breeding_records'),
       ]);
@@ -131,10 +153,10 @@ function useNotifications(t) {
         if (d <= 7 && d >= 0) out.push({ id: 'breeding-birth-' + b.id, icon: 'paw', color: 'purple', title: t('layout.notifBirthTitle', { tag: b.tag_id || '—' }), sub: d === 0 ? t('layout.notifToday') : t('layout.notifBirthInDays', { count: d }), link: '/breeding' });
       });
       out.sort((a, b) => (NOTIF_ORDER[a.color] ?? 5) - (NOTIF_ORDER[b.color] ?? 5));
-      if (!cancelled) setItems(out);
+      if (!cancelled) setItems([...server, ...out]);
     })().catch(() => {});
     return () => { cancelled = true; };
-  }, [repo, t, lastSyncedAt, pathname]);
+  }, [repo, api, t, isOrg, lastSyncedAt, pathname]);
 
   return items;
 }
@@ -170,10 +192,17 @@ export default function AppShell({ children }) {
   const pathname = usePathname();
   const { user } = useUser();
   const { account } = useAccount();
+  const api = useApi();
+  const isOrg = Boolean(account && account.kind === 'organization');
+  const home = isOrg ? '/organization' : '/';
   const [open, setOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const notifItems = useNotifications(t);
-  const { readIds, markRead, markAllRead } = useReadNotifications(user?.id);
+  const notifItems = useNotifications(t, isOrg);
+  const local = useReadNotifications(user?.id);
+  const readIds = new Set([...local.readIds, ...notifItems.filter((n) => n.serverRead).map((n) => n.id)]);
+  const markRead = (id) => { local.markRead(id); const n = notifItems.find((x) => x.id === id); if (n && n.serverId) api.http('POST', '/notifications/read', { ids: [n.serverId] }); };
+  const markAllRead = (ids) => { local.markAllRead(ids); const sids = notifItems.filter((n) => n.serverId && ids.includes(n.id)).map((n) => n.serverId); if (sids.length) api.http('POST', '/notifications/read', { ids: sids }); };
+  const myOrg = useMyOrganization(!isOrg);
   const unread = notifItems.filter((n) => !readIds.has(n.id)).length;
   const slide = useRef(new Animated.Value(-SIDEBAR_W)).current;
 
@@ -186,17 +215,17 @@ export default function AppShell({ children }) {
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
       if (open) { setOpen(false); return true; }
-      if (pathname !== '/') { router.replace('/'); return true; }
+      if (pathname !== home) { router.replace(home); return true; }
       return false;
     });
     return () => sub.remove();
-  }, [open, pathname, router]);
+  }, [open, pathname, router, home]);
 
   const go = (href) => { setOpen(false); if (href !== pathname) router.replace(href); };
 
   const initials = (accountDisplayName(t, account, account?.role)[0] || 'U').toUpperCase();
 
-  const sidebar = <Sidebar pathname={pathname} onNavigate={go} onClose={() => setOpen(false)} closable={!isTablet} topInset={insets.top} bottomInset={insets.bottom} />;
+  const sidebar = <Sidebar pathname={pathname} onNavigate={go} onClose={() => setOpen(false)} closable={!isTablet} topInset={insets.top} bottomInset={insets.bottom} sections={isOrg ? orgSections(account.organization && account.organization.role) : MOBILE_SECTIONS} isOrg={isOrg} />;
 
   return (
     <View style={[baseStyles.root, { backgroundColor: colors.bg }]}>
@@ -233,8 +262,9 @@ export default function AppShell({ children }) {
         topInset={insets.top}
         onItem={(n) => { markRead(n.id); setNotifOpen(false); go(n.link); }}
         onMarkAll={() => markAllRead(notifItems.map((n) => n.id))}
-        onViewTasks={() => { setNotifOpen(false); go('/tasks'); }}
+        onViewTasks={isOrg ? null : () => { setNotifOpen(false); go('/tasks'); }}
       />
+      {!isOrg ? <ConsentRequest mine={myOrg.data} onAnswered={myOrg.reload} /> : null}
     </View>
   );
 }
@@ -275,7 +305,7 @@ function NavItem({ icon, label, active, onPress, danger, accent }) {
   );
 }
 
-function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInset }) {
+function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInset, sections, isOrg }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const signOut = useSignOut();
@@ -296,12 +326,12 @@ function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInse
 
       {/* Features, grouped into labelled sections. */}
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 12 }}>
-        {MOBILE_SECTIONS.map((section) => (
+        {sections.map((section) => (
           <View key={section.labelKey || 'main'}>
             {section.labelKey ? <Text style={baseStyles.sectionLabel}>{t(section.labelKey)}</Text> : <View style={{ height: 8 }} />}
             {section.items.map((item) => {
               const href = mobilePath(item);
-              const active = href === '/' ? pathname === '/' : pathname.startsWith(href);
+              const active = href === '/' || href === '/organization' ? pathname === href : pathname.startsWith(href);
               return <NavItem key={item.key} icon={item.icon} label={t(item.labelKey)} active={active} onPress={() => onNavigate(href)} />;
             })}
           </View>
@@ -310,12 +340,12 @@ function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInse
 
       {/* Footer, apart from the features: offline sync status, then Sign out. */}
       <View style={[baseStyles.sidebarFooter, { paddingBottom: bottomInset + 8 }]}>
-        <Pressable onPress={() => { haptics.select(); triggerSync(); }} style={baseStyles.syncRow} accessibilityRole="button">
+        {!isOrg ? <Pressable onPress={() => { haptics.select(); triggerSync(); }} style={baseStyles.syncRow} accessibilityRole="button">
           <View style={{ width: 20, alignItems: 'center' }}>
             <Icon name={syncing ? 'arrows-rotate' : lastError ? 'triangle-exclamation' : 'cloud'} size={12} color={lastError ? '#F9A825' : '#FFFFFF'} />
           </View>
           <Text style={baseStyles.syncText} numberOfLines={1}>{syncLine}{failedCount > 0 ? ` · ${t('sync.recordsFailed', { count: failedCount })}` : ''}</Text>
-        </Pressable>
+        </Pressable> : null}
         <NavItem icon="right-from-bracket" label={t('nav.signOut')} onPress={() => { onClose(); signOut(); }} danger />
         <Text style={baseStyles.byline}>{t('brand.byline')}</Text>
       </View>
@@ -358,9 +388,9 @@ function NotificationsPanel({ open, onClose, items, readIds, onItem, onMarkAll, 
             </Pressable>
           ))}
         </ScrollView>
-        <Pressable onPress={onViewTasks} style={[baseStyles.notifFooter, { borderTopColor: colors.border }]}>
+        {onViewTasks ? <Pressable onPress={onViewTasks} style={[baseStyles.notifFooter, { borderTopColor: colors.border }]}>
           <Text style={{ fontSize: 13, fontWeight: '600', color: colors.primary }}>{t('layout.viewAllTasks')}</Text>
-        </Pressable>
+        </Pressable> : null}
       </View>
     </RNModal>
   );

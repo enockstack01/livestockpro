@@ -6,7 +6,8 @@ import { useApi } from '../lib/api.js';
 import { TopbarSearchProvider, useTopbarSearchBox } from '../lib/topbarSearch.jsx';
 import { useTheme } from '../theme/ThemeProvider.jsx';
 import { isOverdueTask } from '../../../shared/businessRules';
-import { NAV_SECTIONS } from '../../../shared/navigation';
+import { NAV_SECTIONS, ORG_NAV_SECTIONS } from '../../../shared/navigation';
+import { ConsentRequest, useMyOrganization } from './org/MyOrganization.jsx';
 import { accountDisplayName } from '../../../shared/account';
 import { useAccount } from './AccountGate.jsx';
 import Modal from './Modal.jsx';
@@ -14,13 +15,29 @@ import Modal from './Modal.jsx';
 
 const NOTIF_ORDER = { red: 0, orange: 1, blue: 2, purple: 3, green: 4 };
 
-function useNotifications(t) {
+/* Server notifications (organization approvals, farmer limit warnings,
+   joins and leaves), stored as a key plus values and shown here in the
+   user's language. */
+const SERVER_NOTIF = {
+  orgApproved: ['fa-circle-check', 'green'], orgSuspended: ['fa-circle-pause', 'red'], orgReactivated: ['fa-circle-play', 'green'],
+  orgLimitChanged: ['fa-gauge', 'blue'], orgUsage80: ['fa-gauge-high', 'orange'], orgUsage100: ['fa-gauge-high', 'red'],
+  farmerJoined: ['fa-user-plus', 'green'], farmerLeft: ['fa-user-minus', 'orange'], farmerRemoved: ['fa-user-minus', 'orange'],
+  orgInvite: ['fa-people-group', 'blue'], staffInvite: ['fa-envelope-open-text', 'blue']
+};
+
+function useNotifications(t, isOrg) {
   const api = useApi();
   const [items, setItems] = useState([]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      const serverRes = await api.http('GET', '/notifications');
+      const server = (serverRes.data || []).map((n) => {
+        const [icon, color] = SERVER_NOTIF[n.key] || ['fa-bell', 'blue'];
+        return { id: 'srv-' + n.id, serverId: n.id, serverRead: Boolean(n.read_at), icon, color, title: t(`notifications.${n.key}.title`, n.vars || {}), sub: t(`notifications.${n.key}.body`, n.vars || {}), link: n.link || '/dashboard' };
+      });
+      if (isOrg) { if (!cancelled) setItems(server); return; }
       const [r1, r2, r3, r4] = await Promise.all([
         api.list('tasks'),
         api.list('animals'),
@@ -71,11 +88,11 @@ function useNotifications(t) {
       });
 
       notifItems.sort((a, b) => (NOTIF_ORDER[a.color] ?? 5) - (NOTIF_ORDER[b.color] ?? 5));
-      if (!cancelled) setItems(notifItems);
+      if (!cancelled) setItems([...server, ...notifItems]);
     })();
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [t]);
+  }, [t, isOrg]);
 
   return items;
 }
@@ -139,13 +156,20 @@ function LayoutInner() {
   const { user } = useUser();
   const { signOut } = useClerk();
   const navigate = useNavigate();
-  const notifItems = useNotifications(t);
-  const { readIds, markRead, markAllRead } = useReadNotifications(user?.id);
+  const { account } = useAccount();
+  const isOrg = account.kind === 'organization';
+  const orgRole = account.organization && account.organization.as === 'member' ? account.organization.role : null;
+  const notifItems = useNotifications(t, isOrg);
+  const { readIds: localRead, markRead: markLocal, markAllRead: markAllLocal } = useReadNotifications(user?.id);
+  const readIds = new Set([...localRead, ...notifItems.filter((n) => n.serverRead).map((n) => n.id)]);
+  const api = useApi();
+  const markRead = (id) => { markLocal(id); const n = notifItems.find((x) => x.id === id); if (n && n.serverId) api.http('POST', '/notifications/read', { ids: [n.serverId] }); };
+  const markAllRead = (ids) => { markAllLocal(ids); const sids = notifItems.filter((n) => n.serverId && ids.includes(n.id)).map((n) => n.serverId); if (sids.length) api.http('POST', '/notifications/read', { ids: sids }); };
   const unreadCount = notifItems.filter((n) => !readIds.has(n.id)).length;
+  const myOrg = useMyOrganization();
   /* Resolved server-side (Clerk publicMetadata.role, with an env-var bootstrap
      fallback) and delivered with the account by AccountGate — this only
      drives UI, the backend re-checks on every /api/admin/* call regardless. */
-  const { account } = useAccount();
   const role = account.role || 'user';
   const isAdmin = role === 'admin' || role === 'super_admin';
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -173,11 +197,11 @@ function LayoutInner() {
           <button className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fas fa-xmark"></i></button>
         </div>
         <nav className="sidebar-nav">
-          {NAV_SECTIONS.filter((section) => !section.adminOnly || isAdmin).map((section) => (
+          {(isOrg ? ORG_NAV_SECTIONS : NAV_SECTIONS).filter((section) => !section.adminOnly || isAdmin).map((section) => (
             <div key={section.labelKey || 'main'} className="nav-section">
               {section.labelKey && <div className="nav-section-label">{t(section.labelKey)}</div>}
-              {section.items.map((item) => (
-                <NavLink key={item.key} to={item.path} className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')} onClick={() => setSidebarOpen(false)}>
+              {section.items.filter((item) => !item.roles || item.roles.includes(orgRole)).map((item) => (
+                <NavLink key={item.key} to={item.path} end={item.path === '/organization'} className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')} onClick={() => setSidebarOpen(false)}>
                   <i className={`fas fa-${item.icon}`} style={item.accent ? { color: item.accent } : undefined}></i> {t(item.labelKey)}
                 </NavLink>
               ))}
@@ -233,7 +257,7 @@ function LayoutInner() {
                   </NavLink>
                 ))}
               </div>
-              <div className="notif-footer"><NavLink to="/tasks" onClick={() => setNotifOpen(false)}>{t('layout.viewAllTasks')}</NavLink></div>
+              {!isOrg ? <div className="notif-footer"><NavLink to="/tasks" onClick={() => setNotifOpen(false)}>{t('layout.viewAllTasks')}</NavLink></div> : null}
             </div>
           </div>
           <div className="user-menu">
@@ -247,6 +271,7 @@ function LayoutInner() {
 
       <main className="main-content">
         <Outlet context={{ role, requestSignOut: () => setSignOutOpen(true) }} />
+        {!isOrg ? <ConsentRequest mine={myOrg.data} onAnswered={myOrg.reload} /> : null}
       </main>
 
       <Modal

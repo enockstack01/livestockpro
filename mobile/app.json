@@ -13,7 +13,10 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "LivestockPro tags new animal, health, feeding, breeding, production, finance, and task records with your farm's location so admins can spot regional patterns like disease clusters.",
         "NSPhotoLibraryUsageDescription": "LivestockPro needs access to your photos so you can set a profile picture."
-      }
+      },
+      "associatedDomains": [
+        "applinks:livestockpro.agricoders.com"
+      ]
     },
     "android": {
       "package": "com.livestockpro.mobile",
@@ -27,6 +30,23 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.RECORD_AUDIO"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "livestockpro.agricoders.com",
+              "pathPrefix": "/join/"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
       ]
     },
     "web": {

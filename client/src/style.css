@@ -2503,3 +2503,114 @@ a { color: var(--leaf); }
 .ai-usage-bar span.red { background: var(--red); }
 .ai-usage-row { margin-top: 12px; }
 .ai-usage-row .ai-usage { max-width: none; }
+
+/* ============================================================
+   Organizations and referral links (Agricoders brand)
+   ============================================================ */
+.org-sub { font-size: 12px; color: var(--text-light); font-weight: 400; }
+.org-two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 16px 0; }
+@media (max-width: 900px) { .org-two { grid-template-columns: minmax(0, 1fr); } }
+.page-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+/* Sign up path for organizations on the individual request form. */
+.org-register-cta { display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 12px; padding: 12px 14px; border: 1px dashed var(--leaf); border-radius: 10px; background: var(--card); color: var(--text); cursor: pointer; text-align: left; font: inherit; }
+.org-register-cta:hover { border-style: solid; }
+.org-register-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--leaf); color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.org-register-text { flex: 1; display: flex; flex-direction: column; }
+.org-register-text small { color: var(--text-light); font-size: 12.5px; }
+.org-logo-pick { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.org-logo-pick img, .org-logo-empty { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border); }
+.org-logo-empty { display: inline-flex; align-items: center; justify-content: center; color: var(--text-light); }
+
+/* Join page */
+.join-wrapper { max-width: 460px; }
+.join-loading { padding: 60px 0; text-align: center; color: var(--leaf); font-size: 26px; }
+.join-org { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
+.join-org-logo { width: 64px; height: 64px; border-radius: 14px; object-fit: cover; border: 1px solid var(--border); flex: none; }
+.join-org-mark { width: 56px; height: 56px; border-radius: 50%; background: var(--leaf); color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; flex: none; }
+.join-eyebrow { font-size: 12.5px; color: var(--text-light); font-weight: 700; }
+.join-org .auth-title { margin: 0; }
+.join-org .subtitle { margin: 2px 0 0; }
+.join-share { display: flex; gap: 10px; align-items: flex-start; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; }
+.join-share i { color: var(--leaf); margin-top: 3px; }
+.join-share p { margin: 0; font-size: 14px; line-height: 1.5; }
+.join-expiry { font-size: 13px; color: var(--text-light); margin-bottom: 16px; }
+.join-expiry i { color: var(--amber); margin-right: 4px; }
+.join-step { font-weight: 700; color: var(--forest); margin-bottom: 10px; }
+.join-check { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.45; margin: 10px 0; cursor: pointer; }
+.join-check input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--forest); flex: none; }
+.join-law { font-size: 12px; color: var(--text-light); margin: 8px 0 14px; }
+
+/* Invitations */
+.org-invite { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); text-align: left; }
+.org-invite img { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; }
+.org-invite .join-org-mark { width: 40px; height: 40px; font-size: 16px; }
+.org-invite-text { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.org-invite-text span { font-size: 12.5px; color: var(--text-light); }
+
+/* Organization banner, usage and KPIs */
+.org-banner { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--pine); color: #FFFFFF; border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; }
+.org-banner-logo { width: 60px; height: 60px; border-radius: 14px; object-fit: cover; background: #FFFFFF; }
+.org-banner-mark { width: 56px; height: 56px; border-radius: 50%; background: #FFFFFF; color: var(--pine); display: inline-flex; align-items: center; justify-content: center; font-size: 22px; }
+.org-banner-text { flex: 1; min-width: 200px; }
+.org-banner-eyebrow { font-size: 12.5px; opacity: 0.85; }
+.org-banner-text h2 { color: #FFFFFF; font-size: 22px; margin: 2px 0 6px; }
+.org-banner-side { min-width: 220px; }
+.org-usage { display: flex; flex-direction: column; gap: 6px; min-width: 220px; }
+.org-usage-text { display: flex; gap: 6px; align-items: baseline; font-size: 13px; color: var(--text-light); }
+.org-usage-text strong { font-size: 18px; color: var(--text); }
+.org-banner .org-usage-text, .org-banner .org-usage-text span, .org-banner .org-usage-text strong { color: #FFFFFF; }
+.org-usage-warn { font-size: 12px; font-weight: 700; color: var(--amber); }
+.org-usage-warn.red { color: var(--red); }
+.org-banner .org-usage-warn.red { color: #FFFFFF; }
+.org-kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.org-kpi { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); text-align: left; font: inherit; color: var(--text); }
+.org-kpi.clickable { cursor: pointer; }
+.org-kpi.clickable:hover { border-color: var(--leaf); }
+.org-kpi-icon { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #FFFFFF; font-size: 12px; margin-bottom: 4px; }
+.org-kpi-icon.leaf { background: var(--leaf); }
+.org-kpi-icon.amber { background: var(--amber); color: var(--ink); }
+.org-kpi-icon.red { background: var(--red); }
+.org-kpi-icon.slate { background: var(--slate); }
+.org-kpi-label { font-size: 12.5px; color: var(--text-light); }
+.org-kpi-value { font-size: 24px; font-weight: 700; color: var(--text); }
+.org-kpi-sub { font-size: 12px; color: var(--text-light); }
+.org-kpi-go { position: absolute; right: 14px; top: 16px; color: var(--text-light); font-size: 11px; }
+
+/* Filters */
+.org-filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; padding: 14px 16px; margin-bottom: 16px; }
+.org-filter { display: flex; flex-direction: column; gap: 4px; min-width: 140px; }
+.org-filter.grow { flex: 1; min-width: 200px; }
+.org-filter label { font-size: 12px; color: var(--text-light); font-weight: 700; }
+.org-filter-actions { display: flex; gap: 8px; }
+
+/* Links */
+.org-gen { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; }
+.org-gen .form-group { margin: 0; min-width: 220px; }
+.org-gen .form-group.grow { flex: 1; }
+.org-countdown { color: var(--forest); font-variant-numeric: tabular-nums; }
+:root[data-theme="dark"] .org-countdown { color: var(--text); }
+.org-countdown.big { font-size: 26px; font-weight: 700; }
+.org-share-url { display: flex; gap: 8px; margin: 10px 0; }
+.org-share-url .form-control { flex: 1; min-width: 0; }
+.org-share-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.org-qr { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.org-qr img { border-radius: 8px; background: #FFFFFF; }
+.org-locked { color: var(--text-light); padding: 6px 8px; }
+
+/* Admin */
+.org-detail-head { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; color: var(--text-light); font-size: 13px; margin-bottom: 8px; }
+.org-detail-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+.org-detail-title { color: var(--forest); font-size: 15px; margin: 18px 0 8px; }
+:root[data-theme="dark"] .org-detail-title { color: var(--text); }
+.org-import-result { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+.org-import-result li { display: flex; justify-content: space-between; gap: 8px; }
+.org-pager { display: flex; gap: 12px; align-items: center; justify-content: center; margin-top: 12px; }
+.org-audit-details { color: var(--text-light); font-size: 13px; }
+
+/* Gate pages: Forest titles and solid status circles with white glyphs (brand). */
+.auth-form-wrapper h2 { color: var(--forest); }
+:root[data-theme="dark"] .auth-form-wrapper h2 { color: var(--text); }
+.account-state-icon.green { background: var(--leaf); color: #FFFFFF; }
+.account-state-icon.red { background: var(--red); color: #FFFFFF; }
+.account-state-icon.orange { background: var(--amber); color: var(--ink); }

@@ -1,18 +1,8 @@
 import Constants from 'expo-constants';
-import * as Crypto from 'expo-crypto';
 import * as Notifications from 'expo-notifications';
-import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { COLORS } from '../lib/shared';
-
-async function getDeviceId() {
-  let id = await SecureStore.getItemAsync('lp_device_id');
-  if (!id) {
-    id = Crypto.randomUUID();
-    await SecureStore.setItemAsync('lp_device_id', id);
-  }
-  return id;
-}
+import { getDeviceId } from '../lib/deviceId';
 
 /* Registers this device for server-triggered event push (e.g. an animal's
    health_status flips to Critical — see server/lib/pushNotify.js). This is

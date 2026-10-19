@@ -1,7 +1,7 @@
 import { SCHEMAS, SYNCED_TABLES } from '../lib/shared';
 
 export const DB_NAME = 'livestockpro.db';
-const DATABASE_VERSION = 2;
+const DATABASE_VERSION = 3;
 
 /* Fields known to hold numbers, so their SQLite column gets NUMERIC affinity
    (matters for correct ORDER BY / range comparisons — SQLite is otherwise
@@ -49,6 +49,16 @@ export async function migrateDbIfNeeded(db) {
       if (!cols.some((c) => c.name === 'currency')) await db.execAsync(`ALTER TABLE ${table} ADD COLUMN currency TEXT;`);
     }
     version = 2;
+  }
+
+  /* v3: the farm profile gains district, sector and cell, which organization
+     dashboards filter by. */
+  if (version < 3) {
+    const cols = await db.getAllAsync('PRAGMA table_info(profiles)');
+    for (const col of ['district', 'sector', 'cell']) {
+      if (!cols.some((c) => c.name === col)) await db.execAsync(`ALTER TABLE profiles ADD COLUMN ${col} TEXT;`);
+    }
+    version = 3;
   }
 
   await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION};`);

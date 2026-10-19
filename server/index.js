@@ -13,6 +13,10 @@ const adminRoutes = require('./routes/adminRoutes');
 const accountRoutes = require('./routes/accountRoutes');
 const ratesRoutes = require('./routes/ratesRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const orgRoutes = require('./routes/orgRoutes');
+const adminOrgRoutes = require('./routes/adminOrgRoutes');
+const { join: joinRoutes, me: meOrgRoutes, notes: notificationRoutes } = require('./routes/joinRoutes');
+const { startStatsJob } = require('./lib/orgs');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -114,10 +118,28 @@ app.use(clerkMiddleware());
 
 app.use('/api/data', dataRoutes);
 app.use('/api/rpc', rpcRoutes);
+app.use('/api/admin', adminOrgRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/account', accountRoutes);
 app.use('/api/rates', ratesRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/organizations', orgRoutes);
+app.use('/api/join', joinRoutes);
+app.use('/api/me/organization', meOrgRoutes);
+app.use('/api/notifications', notificationRoutes);
+
+/* App links: referral links (https://<domain>/join/<token>) open straight in
+   the LivestockPro app when it is installed. Android checks this file against
+   the app's signing certificate; set ANDROID_CERT_SHA256 (comma separated, from
+   the Expo or Play Console credentials) to switch it on. */
+app.get('/.well-known/assetlinks.json', (req, res) => {
+  const prints = (process.env.ANDROID_CERT_SHA256 || '').split(',').map((s) => s.trim()).filter(Boolean);
+  res.json(prints.length ? [{ relation: ['delegate_permission/common.handle_all_urls'], target: { namespace: 'android_app', package_name: 'com.livestockpro.mobile', sha256_cert_fingerprints: prints } }] : []);
+});
+app.get('/.well-known/apple-app-site-association', (req, res) => {
+  const appId = process.env.IOS_APP_ID; // TEAMID.com.livestockpro.mobile
+  res.json({ applinks: { apps: [], details: appId ? [{ appID: appId, paths: ['/join/*'] }] : [] } });
+});
 
 const clientDist = path.join(__dirname, '..', 'client', 'dist');
 app.use(express.static(clientDist));
@@ -144,6 +166,7 @@ app.use((err, req, res, next) => {
 
 connect()
   .then(() => {
+    startStatsJob();
     app.listen(PORT, () => {
       console.log(`LivestockPro server running at http://localhost:${PORT}`);
     });

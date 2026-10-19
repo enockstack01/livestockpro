@@ -7,6 +7,7 @@ import { useToast } from '../lib/toast.jsx';
 import { setCurrency, setRates } from '../../../shared/currency';
 import { ACCOUNT_TYPES, ACCOUNT_TYPE_ICONS } from '../../../shared/account';
 import AuthBrand from './AuthBrand.jsx';
+import { OrgInviteScreen, OrgPendingScreen, OrgRegisterForm } from './org/OrgGate.jsx';
 
 const AccountContext = createContext(null);
 
@@ -95,14 +96,52 @@ function GateLoadError({ onRetry, checking }) {
 
 function AccountStatusScreens({ account, setAccount, refresh, checking }) {
   const { t } = useTranslation();
+  const api = useApi();
+  const { user } = useUser();
+  const navigate = useNavigate();
   const showToast = useToast();
   const signOut = useGateSignOut();
   const [editing, setEditing] = useState(false);
+  const [orgForm, setOrgForm] = useState(false);
+  const [invites, setInvites] = useState(null);
+  const [skipInvites, setSkipInvites] = useState(false);
+  const isNew = account.status === 'none' || account.kind === 'removed_member';
 
-  if (account.status === 'none' || editing) {
+  /* A new user who came from a referral link goes back to finish joining. */
+  useEffect(() => {
+    if (!isNew) return;
+    let token = '';
+    try { token = sessionStorage.getItem('lp_join_token') || ''; } catch { /* storage unavailable */ }
+    if (token) navigate(`/join/${token}`, { replace: true });
+  }, [isNew, navigate]);
+
+  /* Staff invitations sent to this email address. */
+  useEffect(() => {
+    if (!isNew) return;
+    api.http('GET', '/organizations/mine').then(({ data }) => setInvites((data && data.invites) || []));
+  }, [api, isNew]);
+
+  if (account.kind === 'organization' && account.status !== 'approved') {
     return (
       <GateShell>
-        <AccountRequestForm account={account} onSubmitted={(next) => { setEditing(false); setAccount(next); }} onSignOut={signOut} />
+        <OrgPendingScreen account={account} checking={checking} onCheck={async () => { const next = await refresh(); if (next && next.status === account.status) showToast(t('account.stillUnchanged'), 'info'); }} onSignOut={signOut} />
+      </GateShell>
+    );
+  }
+  if (isNew && invites && invites.length && !skipInvites) {
+    return <GateShell><OrgInviteScreen invites={invites} onAnswered={refresh} onSkip={() => setSkipInvites(true)} /></GateShell>;
+  }
+  if (isNew && orgForm) {
+    return (
+      <GateShell>
+        <OrgRegisterForm email={user?.primaryEmailAddress?.emailAddress || ''} defaultName={user?.fullName || ''} onDone={refresh} onBack={() => setOrgForm(false)} />
+      </GateShell>
+    );
+  }
+  if (isNew || editing) {
+    return (
+      <GateShell>
+        <AccountRequestForm account={account} onSubmitted={(next) => { setEditing(false); setAccount(next); }} onSignOut={signOut} onOrganization={() => setOrgForm(true)} />
       </GateShell>
     );
   }
@@ -158,7 +197,7 @@ function AccountStatusScreens({ account, setAccount, refresh, checking }) {
   );
 }
 
-function AccountRequestForm({ account, onSubmitted, onSignOut }) {
+function AccountRequestForm({ account, onSubmitted, onSignOut, onOrganization }) {
   const { t } = useTranslation();
   const { user } = useUser();
   const api = useApi();
@@ -197,13 +236,18 @@ function AccountRequestForm({ account, onSubmitted, onSignOut }) {
       <div className="form-group">
         <label>{t('account.accountType')} *</label>
         <div className="account-type-grid">
-          {ACCOUNT_TYPES.map((type) => (
+          {ACCOUNT_TYPES.filter((type) => type !== 'cooperative').map((type) => (
             <button type="button" key={type} className={`account-type-option${accountType === type ? ' active' : ''}`} onClick={() => setAccountType(type)}>
               <i className={`fas fa-${ACCOUNT_TYPE_ICONS[type]}`}></i>
               <span>{t(`account.types.${type}`)}</span>
             </button>
           ))}
         </div>
+        <button type="button" className="org-register-cta" onClick={onOrganization}>
+          <span className="org-register-icon"><i className="fas fa-people-group"></i></span>
+          <span className="org-register-text"><strong>{t('org.register.ctaTitle')}</strong><small>{t('org.register.ctaText')}</small></span>
+          <i className="fas fa-chevron-right"></i>
+        </button>
       </div>
 
       <div className="form-group"><label>{t('account.fullName')} *</label><input type="text" className="form-control" placeholder={t('account.fullNamePlaceholder')} value={form.full_name} onChange={set('full_name')} /></div>

@@ -17,6 +17,7 @@ import Constants from 'expo-constants';
 import { useSignOut } from '../../src/ui/AppShell';
 import { useAccount } from '../../src/account/AccountProvider';
 import { accountDisplayName } from '../../../shared/account';
+import MyOrganizationCard from '../../src/screens/org/MyOrganization';
 import { CURRENCIES, currencyName } from '../../../shared/currency';
 
 /* Settings, organized like the CropManager app (and client/src/pages/
@@ -44,6 +45,8 @@ export default function SettingsScreen() {
   const [farmName, setFarmName] = useState('');
   const [location, setLocation] = useState('');
   const [phone, setPhone] = useState('');
+  const [place, setPlace] = useState({ district: '', sector: '', cell: '' });
+  const isOrgAccount = Boolean(account && account.kind === 'organization');
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -57,6 +60,7 @@ export default function SettingsScreen() {
     setFarmName(p?.farm_name || '');
     setLocation(p?.location || '');
     setPhone(p?.phone || '');
+    setPlace({ district: p?.district || '', sector: p?.sector || '', cell: p?.cell || '' });
   }, [repo]);
   useEffect(() => { load(); }, [load]);
 
@@ -77,7 +81,7 @@ export default function SettingsScreen() {
   async function saveProfile() {
     setSaving(true);
     try {
-      const payload = { farm_name: farmName.trim(), location: location.trim(), phone: phone.trim() };
+      const payload = { farm_name: farmName.trim(), location: location.trim(), phone: phone.trim(), district: place.district.trim(), sector: place.sector.trim(), cell: place.cell.trim() };
       if (profile) await repo.update('profiles', profile.id, payload);
       else await repo.insert('profiles', payload);
       await load();
@@ -166,15 +170,19 @@ export default function SettingsScreen() {
         </View>
       </Card>
 
-        <Card>
+        {!isOrgAccount ? <MyOrganizationCard /> : null}
+        {!isOrgAccount ? <Card>
           <CardHeader title={t('settings.farmProfile')} icon="tractor" />
           <CardBody>
             <FormGroup label={t('settings.farmName')}><Input placeholder={t('settings.farmNamePlaceholder')} value={farmName} onChangeText={setFarmName} /></FormGroup>
             <FormGroup label={t('settings.location')}><Input placeholder={t('settings.locationPlaceholder')} value={location} onChangeText={setLocation} /></FormGroup>
             <FormGroup label={t('settings.phoneNumber')}><Input placeholder={t('settings.phonePlaceholder')} value={phone} onChangeText={setPhone} keyboardType="phone-pad" /></FormGroup>
+            <FormGroup label={t('org.fields.district')}><Input value={place.district} onChangeText={(v) => setPlace((p) => ({ ...p, district: v }))} /></FormGroup>
+            <FormGroup label={t('org.fields.sector')}><Input value={place.sector} onChangeText={(v) => setPlace((p) => ({ ...p, sector: v }))} /></FormGroup>
+            <FormGroup label={t('org.fields.cell')}><Input value={place.cell} onChangeText={(v) => setPlace((p) => ({ ...p, cell: v }))} /></FormGroup>
             <Button icon="check" title={saving ? t('settings.saving') : t('settings.saveProfile')} onPress={saveProfile} loading={saving} style={{ alignSelf: 'flex-start' }} />
           </CardBody>
-        </Card>
+        </Card> : null}
 
         <Card>
           <CardHeader title={t('settings.preferences')} icon="globe" />

@@ -1,6 +1,7 @@
 import { useAuth } from '@clerk/expo';
 import { useMemo } from 'react';
 import { setAiUsage } from '../../../shared/aiUsage';
+import { getDeviceId } from '../lib/deviceId';
 
 /* Absolute URL required on native (no page origin to be relative to, unlike
    client/src/lib/api.js's '/api'). Set per environment in .env / EAS build
@@ -8,7 +9,7 @@ import { setAiUsage } from '../../../shared/aiUsage';
 const API_BASE = (process.env.EXPO_PUBLIC_API_URL || '').replace(/\/$/, '') + '/api';
 
 async function request(getToken, path, options = {}) {
-  let headers = { 'Content-Type': 'application/json' };
+  let headers = { 'Content-Type': 'application/json', 'X-Device-Id': await getDeviceId() };
   try {
     const token = await getToken();
     if (token) headers.Authorization = 'Bearer ' + token;
@@ -84,6 +85,11 @@ export function useApi() {
       return request(getToken, '/admin/role');
     },
     /* AI features (server/routes/aiRoutes.js): need a connection, never cached. */
+    /* Generic call for the organization API (/api/organizations, /api/join,
+       /api/me/organization, /api/admin/organizations, /api/notifications). */
+    async http(method, path, body) {
+      return request(getToken, path, { method, ...(body !== undefined ? { body: JSON.stringify(body) } : {}) });
+    },
     async aiStatus() {
       return request(getToken, '/ai/status');
     },

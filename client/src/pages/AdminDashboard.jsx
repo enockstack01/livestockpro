@@ -8,6 +8,7 @@ import { useCanvasChart } from '../lib/useChart.js';
 import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import Modal from '../components/Modal.jsx';
 import SpatialMap from '../components/SpatialMap.jsx';
+import { AdminAudit, AdminOrganizations, AdminSettings } from '../components/admin/AdminOrganizations.jsx';
 import { ACCOUNT_TYPE_ICONS } from '../../../shared/account';
 
 const RESOURCE_LABELS = {
@@ -300,7 +301,14 @@ export default function AdminDashboard() {
             <button className={`tab-btn${tab === 'users' ? ' active' : ''}`} onClick={() => setTab('users')}><i className="fas fa-users"></i> {t('adminDashboard.tabUsers')} <span className="tab-count">{users.length}</span></button>
             <button className={`tab-btn${tab === 'admins' ? ' active' : ''}`} onClick={() => setTab('admins')}><i className="fas fa-user-shield"></i> {t('adminDashboard.tabAdmins')} <span className="tab-count">{admins.length}</span></button>
             <button className={`tab-btn${tab === 'map' ? ' active' : ''}`} onClick={() => setTab('map')}><i className="fas fa-map-location-dot"></i> {t('adminDashboard.tabMap')}</button>
+            <button className={`tab-btn${tab === 'orgs' ? ' active' : ''}`} onClick={() => setTab('orgs')}><i className="fas fa-building"></i> {t('org.admin.tabOrgs')}</button>
+            <button className={`tab-btn${tab === 'audit' ? ' active' : ''}`} onClick={() => setTab('audit')}><i className="fas fa-clock-rotate-left"></i> {t('org.admin.tabAudit')}</button>
+            <button className={`tab-btn${tab === 'settings' ? ' active' : ''}`} onClick={() => setTab('settings')}><i className="fas fa-sliders"></i> {t('org.admin.tabSettings')}</button>
           </div>
+
+          {tab === 'orgs' && <AdminOrganizations isSuper={isSuperAdmin} />}
+          {tab === 'audit' && <AdminAudit />}
+          {tab === 'settings' && <AdminSettings isSuper={isSuperAdmin} />}
 
           {tab === 'overview' && (
             <div className="admin-fade-in">

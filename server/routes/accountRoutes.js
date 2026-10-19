@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const { getDb } = require('../db');
 const { requireAuth, getRole, primaryEmail, clerkClient } = require('../authMiddleware');
 const { ACCOUNT_TYPES, CURRENCY_RE, DEFAULT_CURRENCY, accounts, getAccount, forgetApproval } = require('../lib/accounts');
+const { activeMembership, farmerLink } = require('../lib/orgs');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -15,7 +16,7 @@ function clean(value, max = 200) {
 
 /* What the clients need to decide which screen to show. Admins are always
    let in, whatever their own request says. */
-function toClient(account, role) {
+function toClient(account, role, org = null) {
   const status = role !== 'user' ? 'approved' : ((account && account.status) || 'none');
   const request = {};
   if (account) REQUEST_FIELDS.forEach((k) => { request[k] = account[k] || ''; });
@@ -27,15 +28,27 @@ function toClient(account, role) {
     reviewNote: (account && account.review_note) || '',
     submittedAt: (account && account.submitted_at) || null,
     reviewedAt: (account && account.reviewed_at) || null,
+    kind: (account && account.kind) || 'farmer',
+    organization: org,
     request
   };
+}
+
+/* The organization side of the account: the organization a member works
+   for (with their role), or the organization a farmer belongs to. */
+async function orgSummary(userId) {
+  const m = await activeMembership(userId);
+  if (m) return { as: 'member', id: m.org._id, name: m.org.name, status: m.org.status, role: m.member.role, logo: m.org.logo || null };
+  const f = await farmerLink(userId);
+  if (f) return { as: 'farmer', id: f.org._id, name: f.org.name, status: f.link.status, logo: f.org.logo || null };
+  return null;
 }
 
 /* GET /api/account — the caller's own account status. */
 router.get('/', async (req, res) => {
   try {
-    const [account, role] = await Promise.all([getAccount(req.user.id), getRole(req.user.id)]);
-    res.json({ data: toClient(account, role), error: null });
+    const [account, role, org] = await Promise.all([getAccount(req.user.id), getRole(req.user.id), orgSummary(req.user.id)]);
+    res.json({ data: toClient(account, role, org), error: null });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
   }

@@ -2,6 +2,7 @@ const express = require('express');
 const { getDb } = require('../db');
 const { requireAuth, requireRole, getRole, primaryEmail, clerkClient } = require('../authMiddleware');
 const { ACCOUNT_STATUSES, accounts, getAccount, forgetApproval } = require('../lib/accounts');
+const { farmerLink, endFarmerLink } = require('../lib/orgs');
 
 const router = express.Router();
 
@@ -654,7 +655,11 @@ router.delete('/users/:id', async (req, res) => {
       return res.status(403).json({ error: { message: 'Only a super admin can delete an admin account.' } });
     }
     const db = getDb();
-    await Promise.all(['profiles', 'push_tokens', 'accounts', 'ai_reports', 'ai_usage', ...RESOURCE_COLLECTIONS].map((name) => db.collection(name).deleteMany({ user_id: targetId })));
+    const orgLink = await farmerLink(targetId);
+    if (orgLink) await endFarmerLink(targetId, orgLink.org._id, 'removed', req.user.id);
+    await db.collection('organization_members').updateMany({ user_id: targetId, status: 'active' }, { $set: { status: 'removed', removed_at: new Date().toISOString() } });
+    await Promise.all(['profiles', 'push_tokens', 'accounts', 'ai_reports', 'ai_usage', 'notifications', ...RESOURCE_COLLECTIONS].map((name) => db.collection(name).deleteMany({ user_id: targetId })));
+    await db.collection('farmer_stats').deleteMany({ farmer_id: targetId });
     await clerkClient.users.deleteUser(targetId);
     forgetApproval(targetId);
     res.json({ data: {}, error: null });

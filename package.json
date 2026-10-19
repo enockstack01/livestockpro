@@ -8,7 +8,8 @@
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
     "build": "npm install && npm --prefix client install && npm --prefix client run build",
-    "seed:onehealth": "node scripts/seedOneHealthDemo.js"
+    "seed:onehealth": "node scripts/seedOneHealthDemo.js",
+    "migrate:organizations": "node scripts/migrateOrganizations.js"
   },
   "engines": {
     "node": ">=18.0.0"

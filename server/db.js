@@ -24,7 +24,22 @@ async function ensureIndexes(database) {
     database.collection('accounts').createIndex({ status: 1 }),
     database.collection('ai_reports').createIndex({ user_id: 1, kind: 1, created_at: -1 }),
     database.collection('ai_usage').createIndex({ user_id: 1, day: -1 }),
-    database.collection('ai_usage').createIndex({ day: 1 })
+    database.collection('ai_usage').createIndex({ day: 1 }),
+    /* Organizations and referral links (lib/orgs.js). One active organization
+       per farmer is enforced by the partial unique index. */
+    database.collection('organizations').createIndex({ name_key: 1 }, { unique: true }),
+    database.collection('organizations').createIndex({ status: 1, created_at: -1 }),
+    database.collection('organization_members').createIndex({ organization_id: 1, status: 1 }),
+    database.collection('organization_members').createIndex({ user_id: 1 }, { unique: true, partialFilterExpression: { status: 'active' } }),
+    database.collection('organization_members').createIndex({ email: 1, status: 1 }),
+    database.collection('referral_links').createIndex({ token_hash: 1 }, { unique: true }),
+    database.collection('referral_links').createIndex({ organization_id: 1, created_at: -1 }),
+    database.collection('farmer_organization').createIndex({ farmer_id: 1 }, { unique: true, partialFilterExpression: { status: { $in: ['active', 'pending_consent'] } } }),
+    database.collection('farmer_organization').createIndex({ organization_id: 1, status: 1 }),
+    database.collection('audit_logs').createIndex({ at: -1 }),
+    database.collection('audit_logs').createIndex({ organization_id: 1, at: -1 }),
+    database.collection('notifications').createIndex({ user_id: 1, created_at: -1 }),
+    database.collection('farmer_stats').createIndex({ farmer_id: 1 }, { unique: true })
   ]);
 }
 
@@ -41,4 +56,9 @@ function getDb() {
   return db;
 }
 
-module.exports = { connect, getDb };
+/* The Mongo client, for multi-document transactions (lib/orgs.js joinOrganization). */
+function getClient() {
+  return client;
+}
+
+module.exports = { connect, getDb, getClient };

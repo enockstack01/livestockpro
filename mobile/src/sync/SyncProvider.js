@@ -21,8 +21,9 @@ export function SyncProvider({ children }) {
   const { isSignedIn } = useAuth();
   /* Nothing to sync (and every data call would be refused) until an admin
      has approved the account — see src/account/AccountProvider.js. */
-  const { approved } = useAccount();
-  const enabled = isSignedIn && approved;
+  const { approved, account } = useAccount();
+  // Organization accounts keep no herd records, so they have nothing to sync.
+  const enabled = isSignedIn && approved && !(account && account.kind === 'organization');
   const [state, setState] = useState({ syncing: false, lastSyncedAt: null, lastError: null, failedCount: 0 });
   const runningRef = useRef(false);
 

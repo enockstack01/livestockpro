@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useUser } from '@clerk/expo';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +13,7 @@ import { haptics } from '../lib/haptics';
 import { useApi } from '../api/client';
 import { useAccount } from '../account/AccountProvider';
 import { ACCOUNT_TYPES, ACCOUNT_TYPE_ICONS } from '../../../shared/account';
+import { OrgInviteScreen, OrgPendingScreen, OrgRegisterCta, OrgRegisterForm } from './org/OrgGate';
 
 /* The mobile twin of the web's components/AccountGate.jsx: shown instead of
    the app until an admin approves the account — the request form first,
@@ -20,11 +21,29 @@ import { ACCOUNT_TYPES, ACCOUNT_TYPE_ICONS } from '../../../shared/account';
    brand shell as sign-in. */
 export default function AccountGate() {
   const { account, loadError, checking, refresh, setAccount } = useAccount();
+  const api = useApi();
   const [editing, setEditing] = useState(false);
+  const [orgForm, setOrgForm] = useState(false);
+  const [invites, setInvites] = useState(null);
+  const [skipInvites, setSkipInvites] = useState(false);
+  const isNew = !account || account.status === 'none' || account.kind === 'removed_member';
+
+  /* Staff invitations sent to this email address. */
+  useEffect(() => {
+    if (!isNew) return;
+    api.http('GET', '/organizations/mine').then(({ data }) => setInvites((data && data.invites) || []));
+  }, [api, isNew]);
 
   if (!account && loadError) return <LoadError onRetry={refresh} checking={checking} />;
-  if (!account || account.status === 'none' || editing) {
-    return <RequestForm account={account || { status: 'none' }} onSubmitted={(next) => { setEditing(false); setAccount(next); }} />;
+  if (account && account.kind === 'organization' && account.status !== 'approved') {
+    return <OrgPendingScreen account={account} checking={checking} onCheck={refresh} />;
+  }
+  if (isNew && invites && invites.length && !skipInvites) {
+    return <OrgInviteScreen invites={invites} onAnswered={refresh} onSkip={() => setSkipInvites(true)} />;
+  }
+  if (isNew && orgForm) return <OrgRegisterForm onDone={refresh} onBack={() => setOrgForm(false)} />;
+  if (isNew || editing) {
+    return <RequestForm account={account || { status: 'none' }} onSubmitted={(next) => { setEditing(false); setAccount(next); }} onOrganization={() => setOrgForm(true)} />;
   }
   return <StatusScreen account={account} refresh={refresh} checking={checking} onResubmit={() => setEditing(true)} />;
 }
@@ -119,7 +138,7 @@ function StatusScreen({ account, refresh, checking, onResubmit }) {
   );
 }
 
-function RequestForm({ account, onSubmitted }) {
+function RequestForm({ account, onSubmitted, onOrganization }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const { auth, gate } = useGateStyles();
@@ -161,7 +180,7 @@ function RequestForm({ account, onSubmitted }) {
 
         <FormGroup label={t('account.accountType')} required>
           <View style={gate.typeGrid}>
-            {ACCOUNT_TYPES.map((type) => {
+            {ACCOUNT_TYPES.filter((type) => type !== 'cooperative').map((type) => {
               const active = accountType === type;
               return (
                 <Pressable
@@ -169,14 +188,15 @@ function RequestForm({ account, onSubmitted }) {
                   onPress={() => { haptics.select(); setAccountType(type); }}
                   accessibilityRole="radio"
                   accessibilityState={{ selected: active }}
-                  style={[gate.typeOption, active && { borderColor: colors.primary, backgroundColor: colors.primaryLight }]}
+                  style={[gate.typeOption, active && { borderColor: colors.primary, backgroundColor: colors.primary }]}
                 >
-                  <Icon name={ACCOUNT_TYPE_ICONS[type]} size={14} color={active ? colors.primary : colors.textLight} />
-                  <Text style={[gate.typeText, active && { color: colors.primaryDark }]} numberOfLines={2}>{t(`account.types.${type}`)}</Text>
+                  <Icon name={ACCOUNT_TYPE_ICONS[type]} size={14} color={active ? '#FFFFFF' : colors.textLight} />
+                  <Text style={[gate.typeText, active && { color: '#FFFFFF' }]} numberOfLines={2}>{t(`account.types.${type}`)}</Text>
                 </Pressable>
               );
             })}
           </View>
+          {onOrganization ? <OrgRegisterCta onPress={onOrganization} /> : null}
         </FormGroup>
 
         <FormGroup label={t('account.fullName')} required><Input value={form.full_name} onChangeText={set('full_name')} placeholder={t('account.fullNamePlaceholder')} /></FormGroup>

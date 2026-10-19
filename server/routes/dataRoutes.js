@@ -3,13 +3,14 @@ const crypto = require('crypto');
 const { getDb } = require('../db');
 const { requireAuth } = require('../authMiddleware');
 const { requireApproved } = require('../lib/accounts');
+const { isOrgAccount } = require('../lib/orgs');
 const { sendPushToUser } = require('../lib/pushNotify');
 
 const router = express.Router();
 
 /* Whitelist of client-settable fields per collection reachable through the generic REST layer. */
 const SCHEMAS = {
-  profiles: ['farm_name', 'location', 'phone', 'avatar_url'],
+  profiles: ['farm_name', 'location', 'phone', 'avatar_url', 'district', 'sector', 'cell'],
   animals: ['tag_id', 'name', 'species', 'breed', 'sex', 'date_of_birth', 'location', 'district', 'latitude', 'longitude', 'health_status', 'last_check_date', 'notes'],
   health_records: ['animal_id', 'tag_id', 'disease', 'treatment', 'medicine', 'vet_name', 'check_date', 'next_check_date', 'status', 'district', 'latitude', 'longitude', 'notes'],
   feeding_records: ['feed_type', 'quantity', 'unit', 'cost', 'currency', 'feeding_date', 'animal_group', 'district', 'latitude', 'longitude', 'notes'],
@@ -55,6 +56,24 @@ function notifyCriticalChange(table, doc, userId) {
 router.use(requireAuth);
 /* Farm data is only reachable once an admin has approved the account. */
 router.use(requireApproved);
+
+/* Organization accounts are separate from farmer accounts: they read their
+   farmers' summaries through /api/organizations, never the farm data API. */
+const orgAccountCache = new Map();
+router.use(async (req, res, next) => {
+  try {
+    const hit = orgAccountCache.get(req.user.id);
+    let isOrg = hit && hit.until > Date.now() ? hit.value : null;
+    if (isOrg === null) {
+      isOrg = await isOrgAccount(req.user.id);
+      orgAccountCache.set(req.user.id, { value: isOrg, until: Date.now() + 30 * 1000 });
+    }
+    if (isOrg) return res.status(403).json({ error: { message: 'Organization accounts cannot keep farm records.', code: 'ORG_ACCOUNT' } });
+    next();
+  } catch (err) {
+    res.status(500).json({ error: { message: err.message } });
+  }
+});
 
 router.param('table', (req, res, next, table) => {
   if (!Object.prototype.hasOwnProperty.call(SCHEMAS, table)) {
