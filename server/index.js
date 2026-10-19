@@ -102,11 +102,18 @@ app.use(helmet({
     }
   }
 }));
-app.use(cors({
-  origin(origin, callback) {
-    if (!origin || ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
-    callback(new Error('Not allowed by CORS'));
-  }
+/* CORS only on the API, and the site's own origin always passes. Browsers
+   send an Origin header with the page's own module script and stylesheet
+   (`crossorigin`), so gating every request on the fixed list blanked the
+   whole site on any domain missing from it. A foreign origin now just gets
+   no CORS headers (the browser blocks the read) instead of an error. */
+const isOwnOrigin = (origin, req) => {
+  try { return new URL(origin).host === req.get('host'); } catch { return false; }
+};
+app.use('/api', cors((req, callback) => {
+  const origin = req.get('origin');
+  const allowed = !origin || ALLOWED_ORIGINS.includes(origin) || isOwnOrigin(origin, req);
+  callback(null, { origin: allowed });
 }));
 app.use(express.json({ limit: '5mb' }));
 
@@ -115,9 +122,9 @@ app.use(express.json({ limit: '5mb' }));
    single client can hammer the server. */
 app.use('/api', rateLimit({ windowMs: 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false }));
 
-/* Clerk only on the API. Running it on every request let a dev instance answer
-   the app's own script and stylesheet requests with 401 (dev-browser-missing)
-   on a new domain, which left the site blank. Nothing outside /api needs auth. */
+/* Clerk only on the API. On every request, a Clerk dev instance answered page
+   loads on a new domain with its handshake redirect (ending in 401), and
+   nothing outside /api needs auth. */
 app.use('/api', clerkMiddleware());
 
 app.use('/api/data', dataRoutes);
