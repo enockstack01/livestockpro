@@ -218,12 +218,12 @@ const CSS = `
    desktop browsers) stamp the footer and page number on every page. */
 const PAGE_FOOTER = `
   @page {
-    @bottom-left { content: "LivestockPro · by Agricoders · livestockpro.agricoders.com"; font-family: Calibri, Carlito, Arial, sans-serif; font-size: 8pt; color: #5B6B5D; }
+    @bottom-left { content: "LivestockPro · by Agricoders · livestock.agricoders.com"; font-family: Calibri, Carlito, Arial, sans-serif; font-size: 8pt; color: #5B6B5D; }
     @bottom-right { content: counter(page) " / " counter(pages); direction: ltr; font-family: Calibri, Carlito, Arial, sans-serif; font-size: 8pt; color: #5B6B5D; }
   }
 `;
 
-export const REPORT_CONTACT = 'livestockpro.agricoders.com · agricoders@gmail.com';
+export const REPORT_CONTACT = 'livestock.agricoders.com · agricoders@gmail.com';
 
 /** Suggested download name, such as "LivestockPro-diagnosis-LP-001-2026-10-17.pdf". */
 export function aiReportFileName({ kind, caseInfo, createdAt }) {

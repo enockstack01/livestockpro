@@ -844,7 +844,11 @@
       "revenuePerAnimal": "所选期间平均每头动物收入 {{value}}。",
       "upcomingBirths": "未来30天预计有 {{count}} 次分娩。",
       "sexRatio": "存栏畜群中每头雄性对应 {{ratio}} 头雌性。",
-      "taskCompletion": "已完成 {{pct}}% 的任务；{{overdue}} 项已逾期。"
+      "taskCompletion": "已完成 {{pct}}% 的任务；{{overdue}} 项已逾期。",
+      "mortality_one": "已有 1 头动物记录为死亡（占全部登记动物的 {{pct}}%）。",
+      "overdueFollowUps_one": "仍在治疗或危重的 1 头动物复查已逾期。",
+      "notChecked_one": "有 1 头动物近90天未做健康检查。",
+      "upcomingBirths_one": "未来30天预计有 1 次分娩。"
     },
     "insightLabel": {
       "herdHealth": "健康牲畜",

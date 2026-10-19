@@ -15,7 +15,7 @@
         "NSPhotoLibraryUsageDescription": "LivestockPro needs access to your photos so you can set a profile picture."
       },
       "associatedDomains": [
-        "applinks:livestockpro.agricoders.com"
+        "applinks:livestock.agricoders.com"
       ]
     },
     "android": {
@@ -38,7 +38,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "livestockpro.agricoders.com",
+              "host": "livestock.agricoders.com",
               "pathPrefix": "/join/"
             }
           ],

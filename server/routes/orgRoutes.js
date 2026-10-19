@@ -14,7 +14,7 @@ const { computeDashboard, farmerList } = require('../lib/orgDashboard');
 const router = express.Router();
 router.use(requireAuth);
 
-const APP_URL = (process.env.APP_URL || 'https://livestockpro.agricoders.com').replace(/\/$/, '');
+const APP_URL = (process.env.APP_URL || 'https://livestock.agricoders.com').replace(/\/$/, '');
 const text = (v, max = 200) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const nameKey = (name) => text(name).toLowerCase().replace(/\s+/g, ' ');
 

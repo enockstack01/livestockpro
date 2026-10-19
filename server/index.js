@@ -41,6 +41,7 @@ app.set('query parser', 'simple');
    a real vulnerability. Extra origins (e.g. a staging web deploy) can be
    added via the comma-separated ALLOWED_ORIGINS env var without a code change. */
 const DEFAULT_ORIGINS = [
+  'https://livestock.agricoders.com',
   'https://livestockpro.agricoders.com',
   'https://livestockpro.onrender.com',
   'http://localhost:5173', // client/ Vite dev server
@@ -114,7 +115,10 @@ app.use(express.json({ limit: '5mb' }));
    single client can hammer the server. */
 app.use('/api', rateLimit({ windowMs: 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false }));
 
-app.use(clerkMiddleware());
+/* Clerk only on the API. Running it on every request let a dev instance answer
+   the app's own script and stylesheet requests with 401 (dev-browser-missing)
+   on a new domain, which left the site blank. Nothing outside /api needs auth. */
+app.use('/api', clerkMiddleware());
 
 app.use('/api/data', dataRoutes);
 app.use('/api/rpc', rpcRoutes);

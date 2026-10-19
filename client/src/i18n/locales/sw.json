@@ -844,7 +844,11 @@
       "revenuePerAnimal": "Mapato ni wastani wa {{value}} kwa kila mnyama katika kipindi kilichochaguliwa.",
       "upcomingBirths": "Uzazi {{count}} unatarajiwa katika siku 30 zijazo.",
       "sexRatio": "Mifugo hai ina majike {{ratio}} kwa kila dume.",
-      "taskCompletion": "{{pct}}% ya kazi zimekamilika; {{overdue}} zimechelewa."
+      "taskCompletion": "{{pct}}% ya kazi zimekamilika; {{overdue}} zimechelewa.",
+      "mortality_one": "Mnyama 1 amerekodiwa kuwa amekufa ({{pct}}% ya wanyama wote waliosajiliwa).",
+      "overdueFollowUps_one": "Ukaguzi 1 wa ufuatiliaji umechelewa kwa mnyama ambaye bado yuko kwenye matibabu au hali mbaya.",
+      "notChecked_one": "Mnyama 1 hajafanyiwa ukaguzi wa afya katika siku 90 zilizopita.",
+      "upcomingBirths_one": "Uzazi 1 unatarajiwa katika siku 30 zijazo."
     },
     "insightLabel": {
       "herdHealth": "Mifugo wenye afya",

@@ -844,7 +844,11 @@
       "revenuePerAnimal": "Le revenu moyen est de {{value}} par animal sur la période choisie.",
       "upcomingBirths": "{{count}} naissances sont prévues dans les 30 prochains jours.",
       "sexRatio": "Le troupeau vivant compte {{ratio}} femelles pour un mâle.",
-      "taskCompletion": "{{pct}} % des tâches sont terminées ; {{overdue}} sont en retard."
+      "taskCompletion": "{{pct}} % des tâches sont terminées ; {{overdue}} sont en retard.",
+      "mortality_one": "1 animal est enregistré comme mort ({{pct}} % de tous les animaux enregistrés).",
+      "overdueFollowUps_one": "1 contrôle de suivi est en retard pour un animal encore en traitement ou en état critique.",
+      "notChecked_one": "1 animal n’a eu aucun contrôle de santé depuis 90 jours.",
+      "upcomingBirths_one": "1 naissance est prévue dans les 30 prochains jours."
     },
     "insightLabel": {
       "herdHealth": "Troupeau en bonne santé",

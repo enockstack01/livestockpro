@@ -16,7 +16,7 @@ import { orgErrorText, useTick } from '../../src/screens/org/orgShared';
 import { formatTimeLeft, timeLeft } from '../../../shared/org';
 import { JOIN_TOKEN_KEY } from '../../src/lib/joinToken';
 
-/* livestockpro://join/<token> and https://livestockpro.agricoders.com/join/<token>:
+/* livestockpro://join/<token> and https://livestock.agricoders.com/join/<token>:
    a farmer opens an organization's referral link on the phone. The link is
    checked on the server when the screen opens and again on submit. Signed
    out, the farmer signs up or in and is brought back here (the token waits

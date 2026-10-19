@@ -844,7 +844,11 @@
       "revenuePerAnimal": "Inyungu ni {{value}} ku itungo mu mpuzandengo mu gihe cyahiswemo.",
       "upcomingBirths": "Imbyaro {{count}} zitegerejwe mu minsi 30 iri imbere.",
       "sexRatio": "Amatungo ariho afite ingore {{ratio}} kuri buri pfizi.",
-      "taskCompletion": "{{pct}}% by’imirimo byarangiye; {{overdue}} byarengeje igihe."
+      "taskCompletion": "{{pct}}% by’imirimo byarangiye; {{overdue}} byarengeje igihe.",
+      "mortality_one": "Itungo 1 ryanditswe ko ryapfuye ({{pct}}% by’amatungo yose yanditswe).",
+      "overdueFollowUps_one": "Isuzuma 1 ryo gukurikirana ryarengeje igihe ku itungo rikivurwa cyangwa rirembye.",
+      "notChecked_one": "Itungo 1 ntiryasuzumwe ubuzima mu minsi 90 ishize.",
+      "upcomingBirths_one": "Imbyaro 1 itegerejwe mu minsi 30 iri imbere."
     },
     "insightLabel": {
       "herdHealth": "Amatungo mazima",

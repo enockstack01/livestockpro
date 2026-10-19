@@ -844,7 +844,11 @@
       "revenuePerAnimal": "Der Umsatz beträgt im gewählten Zeitraum durchschnittlich {{value}} pro Tier.",
       "upcomingBirths": "In den nächsten 30 Tagen werden {{count}} Geburten erwartet.",
       "sexRatio": "Die lebende Herde hat {{ratio}} Weibchen pro Männchen.",
-      "taskCompletion": "{{pct}} % der Aufgaben sind erledigt; {{overdue}} sind überfällig."
+      "taskCompletion": "{{pct}} % der Aufgaben sind erledigt; {{overdue}} sind überfällig.",
+      "mortality_one": "1 Tier ist als verendet erfasst ({{pct}} % aller registrierten Tiere).",
+      "overdueFollowUps_one": "1 Nachkontrolle ist für ein Tier in Behandlung oder in kritischem Zustand überfällig.",
+      "notChecked_one": "1 Tier hatte in den letzten 90 Tagen keine Gesundheitskontrolle.",
+      "upcomingBirths_one": "1 Geburt wird in den nächsten 30 Tagen erwartet."
     },
     "insightLabel": {
       "herdHealth": "Gesunde Herde",

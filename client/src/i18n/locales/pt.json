@@ -844,7 +844,11 @@
       "revenuePerAnimal": "A receita média é de {{value}} por animal no período selecionado.",
       "upcomingBirths": "{{count}} nascimentos são esperados nos próximos 30 dias.",
       "sexRatio": "O rebanho vivo tem {{ratio}} fêmeas para cada macho.",
-      "taskCompletion": "{{pct}}% das tarefas foram concluídas; {{overdue}} estão atrasadas."
+      "taskCompletion": "{{pct}}% das tarefas foram concluídas; {{overdue}} estão atrasadas.",
+      "mortality_one": "1 animal está registado como morto ({{pct}}% de todos os animais registados).",
+      "overdueFollowUps_one": "1 consulta de acompanhamento está atrasada para um animal ainda em tratamento ou em estado crítico.",
+      "notChecked_one": "1 animal não teve nenhum controlo de saúde nos últimos 90 dias.",
+      "upcomingBirths_one": "É esperado 1 parto nos próximos 30 dias."
     },
     "insightLabel": {
       "herdHealth": "Rebanho saudável",

@@ -124,7 +124,7 @@ export async function downloadAiReport(saved, t, lang) {
       pdf.line(14, 284, 196, 284);
       pdf.setFontSize(8);
       pdf.setTextColor(91, 107, 93);
-      pdf.text('LivestockPro · by Agricoders · livestockpro.agricoders.com', 14, 289);
+      pdf.text('LivestockPro · by Agricoders · livestock.agricoders.com', 14, 289);
       pdf.text(`${i} / ${pages}`, 196, 289, { align: 'right' });
     }
     await worker.save();

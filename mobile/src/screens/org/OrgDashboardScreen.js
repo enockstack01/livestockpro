@@ -95,7 +95,9 @@ export default function OrgDashboardScreen() {
   const org = useOrgData(api, orgId ? `/organizations/${orgId}` : null);
   const dash = useOrgData(api, orgId ? `/organizations/${orgId}/dashboard` : null);
   const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = useCallback(async () => { setRefreshing(true); await Promise.all([org.reload(), dash.reload()]); setRefreshing(false); }, [org.reload, dash.reload]);
+  const { reload: reloadOrg } = org;
+  const { reload: reloadDash } = dash;
+  const onRefresh = useCallback(async () => { setRefreshing(true); await Promise.all([reloadOrg(), reloadDash()]); setRefreshing(false); }, [reloadOrg, reloadDash]);
   const drill = (ids, label) => router.push({ pathname: '/organization/farmers', params: { ids: ids.join(','), label } });
 
   if (!org.data || !dash.data) return <Page><Spinner /></Page>;
