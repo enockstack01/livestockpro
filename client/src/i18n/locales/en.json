@@ -48,7 +48,8 @@
       "administration": "Administration",
       "system": "System"
     },
-    "assistant": "AI assistant"
+    "assistant": "AI assistant",
+    "calendar": "Calendar"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -215,7 +216,8 @@
         "category": "Category",
         "date": "Date",
         "description": "Description",
-        "currency": "Currency"
+        "currency": "Currency",
+        "tag_id": "Animal"
       }
     },
     "tasks": {
@@ -422,7 +424,10 @@
     "languageHelp": "Choose your preferred language for the app interface.",
     "typeDeleteToConfirm": "Type DELETE to confirm.",
     "signedInAs": "Signed in as {{email}}",
-    "appVersion": "LivestockPro mobile v{{version}}"
+    "appVersion": "LivestockPro mobile v{{version}}",
+    "livestockId": "Livestock ID",
+    "copyId": "Copy your Livestock ID",
+    "idCopied": "Livestock ID copied"
   },
   "dashboardPage": {
     "title": "Dashboard",
@@ -496,7 +501,20 @@
     "noRecordsMatchFilters": "No records match your current filters.",
     "recordsCount": "{{count}} records",
     "reportRefreshed": "Report refreshed.",
-    "fullReportExported": "Full report exported to CSV."
+    "fullReportExported": "Full report exported to CSV.",
+    "to": "to",
+    "animalReportTitle": "Animal report: {{tag}}",
+    "farmReportTitle": "Farm report",
+    "healthChecks": "Health checks",
+    "openCases": "Open cases",
+    "breedingEvents": "Breeding records",
+    "births": "Births",
+    "summary": "Summary",
+    "exportReport": "Export report",
+    "allAnimals": "All animals",
+    "clearFilters": "Clear filters",
+    "animalProfile": "Animal profile",
+    "nothingToReport": "Nothing to report"
   },
   "animalsPage": {
     "title": "Animals",
@@ -577,7 +595,9 @@
     "descriptionPlaceholder": "Details about this transaction...",
     "confirmDeleteMessage": "Are you sure you want to delete this finance record?",
     "amountMustBeGreaterThanZero": "Amount must be greater than 0.",
-    "convertedNote": "Totals converted to {{currency}} at current exchange rates."
+    "convertedNote": "Totals converted to {{currency}} at current exchange rates.",
+    "noAnimal": "Not for one animal",
+    "animalHint": "Link a vet bill, purchase or sale to one animal so it shows in that animal’s report."
   },
   "tasksPage": {
     "title": "Tasks",
@@ -1013,9 +1033,9 @@
   "ai": {
     "title": "AI assistant",
     "subtitle": "Diagnosis reports, farm advice and answers from your own records",
-    "notConfigured": "AI is not set up on this server yet. An administrator needs to add the Anthropic API key.",
+    "notConfigured": "AI is not set up on this server yet. An administrator needs to turn it on.",
     "vetNotice": "LivestockPro AI supports, and does not replace, a qualified veterinarian. Always confirm a diagnosis and any prescription medicine with a vet.",
-    "poweredBy": "LivestockPro AI · powered by Claude",
+    "poweredBy": "LivestockPro AI",
     "working": "Thinking it through...",
     "back": "Back",
     "tabs": {
@@ -1069,7 +1089,7 @@
       "working": "Reading the records and writing the report...",
       "fromRecord": "Diagnose with AI",
       "previous": "Earlier reports for this record",
-      "needInput": "Describe the symptoms first."
+      "needInput": "Describe the symptoms or take a photo first."
     },
     "report": {
       "urgency": "Urgency",
@@ -1197,7 +1217,8 @@
       "licence": "Licence no.",
       "signature": "Signature",
       "date": "Date",
-      "important": "Important:"
+      "important": "Important:",
+      "photos": "Photos examined"
     },
     "usage": {
       "left": "{{remaining}} of {{limit}} AI requests left today",
@@ -1209,6 +1230,20 @@
         "chat": "questions",
         "brief": "One Health briefings"
       }
+    },
+    "photo": {
+      "label": "Photos of the affected area",
+      "take": "Take photo",
+      "upload": "Upload photo",
+      "hint": "Up to {{max}} clear photos of the affected part of the body, taken in good light.",
+      "alt": "Photo {{n}}",
+      "remove": "Remove photo",
+      "unreadable": "That picture could not be read. Try another photo.",
+      "cameraTitle": "Take a photo",
+      "capture": "Capture",
+      "noCamera": "The camera could not be opened. Allow camera access in your browser, or upload a photo instead.",
+      "tip": "Hold the camera close to the affected area, in good light, and keep it steady.",
+      "defaultQuestion": "What can you see in this photo? Does this animal have a health problem, and what should I do?"
     }
   },
   "org": {
@@ -1659,6 +1694,142 @@
     "staffInvite": {
       "title": "Organization invitation",
       "body": "You have been invited to {{name}}."
+    }
+  },
+  "search": {
+    "placeholder": "Search animals, records, tasks…",
+    "clear": "Clear search",
+    "filteringPage": "Filtering {{section}} as you type",
+    "noneElsewhere": "No matches in other sections",
+    "none": "Nothing found for “{{query}}”",
+    "viewAll_one": "View {{count}}",
+    "viewAll_other": "View all {{count}}"
+  },
+  "aiAdmin": {
+    "tab": "AI",
+    "saved": "AI settings saved",
+    "status": "LivestockPro AI",
+    "on": "On",
+    "off": "Off",
+    "requestsToday": "Requests today",
+    "okFailed": "{{ok}} answered, {{failed}} failed",
+    "refusedToday": "Refused by limits today",
+    "usersToday": "Users today",
+    "tokensToday": "Tokens today",
+    "tokensSplit": "{{input}} in, {{output}} out",
+    "avgTime": "Average answer time",
+    "seconds": "{{n}} s",
+    "settingsTitle": "Model and limits",
+    "notConfigured": "AI is off: the server has no AI key. Add it to the server settings to turn AI on.",
+    "model": "Model",
+    "modelHint": "Every AI feature uses this model. Before switching, LivestockPro checks that the model can run all of them.",
+    "tier": {
+      "frontier": "newest generation",
+      "advanced": "most capable",
+      "balanced": "fast and capable",
+      "fast": "quickest, lowest cost"
+    },
+    "limit": {
+      "per_minute": "Requests per minute (per user)",
+      "per_hour": "Requests per hour (per user)",
+      "total": "Requests per day (per user)",
+      "diagnose": "Diagnoses per day",
+      "advisor": "Farm advice per day",
+      "chat": "Questions per day",
+      "brief": "One Health briefings per day",
+      "admin_multiplier": "Admin allowance multiplier"
+    },
+    "defaultValue": "Default {{n}}",
+    "testing": "Checking the model…",
+    "updatedAt": "Last changed {{date}}",
+    "last14": "Last 14 days",
+    "answered": "Answered",
+    "failed": "Failed",
+    "refused": "Refused",
+    "byFeature": "Today by feature",
+    "noUseToday": "No AI use today yet.",
+    "feature": "Feature",
+    "tokens": "Tokens",
+    "kind": {
+      "diagnose": "Diagnosis",
+      "advisor": "Farm advice",
+      "chat": "Questions",
+      "brief": "One Health briefing"
+    },
+    "refusals": "Refused requests today",
+    "noRefusals": "No requests were refused today.",
+    "reason": "Reason",
+    "requests": "Requests",
+    "users": "Users",
+    "refusal": {
+      "AI_BURST": "Too many in a minute",
+      "AI_LIMIT": "Hourly limit reached",
+      "AI_QUOTA": "Daily allowance used up"
+    },
+    "topUsers": "Most active users today",
+    "user": "User",
+    "byModel": "Last 14 days by model"
+  },
+  "exports": {
+    "export": "Export",
+    "preparing": "Preparing…",
+    "done": "{{format}} file saved",
+    "failed": "The export failed: {{message}}",
+    "formats": {
+      "pdf": "PDF",
+      "xlsx": "Excel",
+      "csv": "CSV"
+    },
+    "formatHints": {
+      "pdf": "Branded document to print or share",
+      "xlsx": "Spreadsheet, one sheet per section",
+      "csv": "Plain data for any program"
+    },
+    "fields": {
+      "district": "District",
+      "last_check_date": "Last check"
+    },
+    "recordsCount_one": "{{count}} record",
+    "recordsCount_other": "{{count}} records",
+    "farm": "Farm",
+    "generated": "Generated",
+    "filters": "Filters",
+    "page": "Page {{page}} of {{pages}}"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "subtitle": "Tasks, health checks, breeding and births on one calendar",
+    "today": "Today",
+    "previous": "Previous month",
+    "next": "Next month",
+    "show": "Show on the calendar",
+    "kinds": {
+      "task": "Tasks",
+      "overdue": "Overdue",
+      "followUp": "Follow up checks",
+      "healthCheck": "Health checks",
+      "breeding": "Breeding",
+      "birthDue": "Births due",
+      "birth": "Births",
+      "feeding": "Feeding"
+    },
+    "eventsCount_one": "{{count}} event",
+    "eventsCount_other": "{{count}} events",
+    "more_one": "{{count}} more",
+    "more_other": "{{count}} more",
+    "upcoming": "Next 30 days",
+    "nothingUpcoming": "Nothing planned for the next 30 days.",
+    "addTaskOnDay": "Add task on this day",
+    "nothingThisDay": "Nothing on this day.",
+    "events": {
+      "healthCheck": "Health check: {{tag}}",
+      "followUp": "Follow up check: {{tag}}",
+      "followUpMissed": "Missed follow up: {{tag}}",
+      "breeding": "Bred: {{tag}}",
+      "birthDue": "Birth due: {{tag}}",
+      "birth": "Birth: {{tag}}",
+      "newborns_one": "{{count}} newborn",
+      "newborns_other": "{{count}} newborns"
     }
   }
 }

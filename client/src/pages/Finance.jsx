@@ -3,14 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { useTopbarSearch } from '../lib/topbarSearch.jsx';
-import { fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
+import { fmtDate } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
+import { RecordExportMenu } from '../components/ExportMenu.jsx';
 import { useOpenAddFromUrl } from '../lib/useOpenAddFromUrl.js';
 import { formatMoney, formatRecordMoney, getCurrency, moneyOf, recordCurrency } from '../../../shared/currency';
 import MoneyInput from '../components/MoneyInput.jsx';
 
-const EMPTY_FORM = { type: 'Income', amount: '', currency: '', category: '', date: '', description: '' };
+const EMPTY_FORM = { type: 'Income', amount: '', currency: '', category: '', date: '', description: '', animal_id: '' };
 const CATEGORIES = ['Milk Sales', 'Egg Sales', 'Meat Sales', 'Animal Sales', 'Other Income', 'Feed', 'Veterinary', 'Medicine', 'Labor', 'Equipment', 'Maintenance', 'Transport', 'Other Expense'];
 
 export default function Finance() {
@@ -22,6 +23,7 @@ export default function Finance() {
   const singular = t('tables.finance_records.singular');
 
   const [records, setRecords] = useState([]);
+  const [animals, setAnimals] = useState([]);
   const [search, setSearch] = useState('');
   const [tab, setTab] = useState('all');
   const [modalOpen, setModalOpen] = useState(false);
@@ -38,6 +40,8 @@ export default function Finance() {
     setRecords(data || []);
   }
   useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  /* Animals for the optional "which animal" choice (a vet bill, a sale). */
+  useEffect(() => { api.list('animals', { order: 'tag_id.asc' }).then(({ data }) => setAnimals(data || [])); }, [api]);
   useOpenAddFromUrl(openAdd);
 
   const filtered = records.filter((f) => {
@@ -59,7 +63,7 @@ export default function Finance() {
   function openAdd() { setEditingId(null); setForm({ ...EMPTY_FORM, currency: getCurrency(), date: new Date().toISOString().split('T')[0] }); geo.capture(); setModalOpen(true); }
   function openEdit(f) {
     setEditingId(f.id);
-    setForm({ type: f.type || 'Income', amount: f.amount ?? '', currency: f.currency || getCurrency(), category: f.category || '', date: f.date || '', description: f.description || '' });
+    setForm({ type: f.type || 'Income', amount: f.amount ?? '', currency: f.currency || getCurrency(), category: f.category || '', date: f.date || '', description: f.description || '', animal_id: f.animal_id || '' });
     geo.reset();
     setModalOpen(true);
   }
@@ -68,7 +72,8 @@ export default function Finance() {
     const amount = parseFloat(form.amount) || 0;
     if (amount <= 0) { showToast(t('financePage.amountMustBeGreaterThanZero'), 'error'); return; }
     if (!form.type) { showToast(t('records.fieldRequired', { field: t('tables.finance_records.fields.type') }), 'error'); return; }
-    const payload = { ...form, amount };
+    const animal = animals.find((a) => a.id === form.animal_id);
+    const payload = { ...form, amount, animal_id: animal ? animal.id : null, tag_id: animal ? animal.tag_id : null };
     if (editingId) {
       const { error } = await api.update('finance_records', editingId, payload);
       if (error) { showToast(t('records.saveFailed', { message: error.message }), 'error'); return; }
@@ -93,20 +98,13 @@ export default function Finance() {
     await load();
   }
 
-  function exportCSV() {
-    if (records.length === 0) { showToast(t('records.noRecordsToExport', { label: label.toLowerCase() }), 'warning'); return; }
-    const headers = ['type', 'category', 'amount', 'currency', 'date', 'description'];
-    const csv = [headers.join(',')].concat(records.map((f) => headers.map((c) => csvCell(c === 'currency' ? recordCurrency(f) : f[c])).join(','))).join('\n');
-    downloadCSV(csv, 'finance_records_export.csv');
-    showToast(t('records.exported', { label }), 'success');
-  }
 
   return (
     <>
       <div className="page-header">
         <div><h1>{t('financePage.title')}</h1><p>{t('financePage.subtitle')}</p></div>
         <div className="d-flex gap-16 flex-wrap">
-          <button className="btn btn-secondary" onClick={exportCSV}><i className="fas fa-file-export"></i> {t('reports.exportCsv')}</button>
+          <RecordExportMenu table="finance_records" rows={filtered} filtersText={search} />
           <button className="btn btn-primary" onClick={openAdd}><i className="fas fa-plus"></i> {t('financePage.addRecord')}</button>
         </div>
       </div>
@@ -128,10 +126,10 @@ export default function Finance() {
         <div className="card-body" style={{ padding: 0 }}>
           <div className="table-wrapper">
             <table className="data-table">
-              <thead><tr><th>{t('tables.finance_records.fields.type')}</th><th>{t('tables.finance_records.fields.category')}</th><th>{t('tables.finance_records.fields.amount')}</th><th>{t('tables.finance_records.fields.date')}</th><th>{t('tables.finance_records.fields.description')}</th><th>{t('adminDashboard.colActions')}</th></tr></thead>
+              <thead><tr><th>{t('tables.finance_records.fields.type')}</th><th>{t('tables.finance_records.fields.category')}</th><th>{t('tables.finance_records.fields.amount')}</th><th>{t('tables.finance_records.fields.date')}</th><th>{t('tables.finance_records.fields.tag_id')}</th><th>{t('tables.finance_records.fields.description')}</th><th>{t('adminDashboard.colActions')}</th></tr></thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan={6}><div className="empty-state"><i className="fas fa-receipt"></i><h3>{t('common.noneFound', { label })}</h3><p>{t('records.emptyListWeb', { label: label.toLowerCase() })}</p></div></td></tr>
+                  <tr><td colSpan={7}><div className="empty-state"><i className="fas fa-receipt"></i><h3>{t('common.noneFound', { label })}</h3><p>{t('records.emptyListWeb', { label: label.toLowerCase() })}</p></div></td></tr>
                 ) : filtered.map((f) => {
                   const desc = f.description || '';
                   return (
@@ -140,6 +138,7 @@ export default function Finance() {
                       <td>{f.category ? t(`enums.financeCategory.${f.category}`, f.category) : '—'}</td>
                       <td className={`fw-600 ${f.type === 'Income' ? 'text-green' : 'text-red'}`}>{f.type === 'Income' ? '+' : '-'}{formatRecordMoney(f)}</td>
                       <td>{fmtDate(f.date)}</td>
+                      <td>{f.tag_id || '—'}</td>
                       <td>{desc.substring(0, 40)}{desc.length > 40 ? '...' : ''}</td>
                       <td>
                         <div className="table-actions">
@@ -178,6 +177,14 @@ export default function Finance() {
           </select>
         </div>
         <div className="form-group"><label>{t('tables.finance_records.fields.date')}</label><input type="date" className="form-control" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></div>
+        <div className="form-group">
+          <label>{t('tables.finance_records.fields.tag_id')}</label>
+          <select className="form-control" value={form.animal_id} onChange={(e) => setForm({ ...form, animal_id: e.target.value })}>
+            <option value="">{t('financePage.noAnimal')}</option>
+            {animals.map((a) => <option key={a.id} value={a.id}>{a.tag_id}{a.name ? ` · ${a.name}` : ''}</option>)}
+          </select>
+          <small className="text-muted">{t('financePage.animalHint')}</small>
+        </div>
         <div className="form-group"><label>{t('tables.finance_records.fields.description')}</label><textarea className="form-control" placeholder={t('financePage.descriptionPlaceholder')} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
       </Modal>
 

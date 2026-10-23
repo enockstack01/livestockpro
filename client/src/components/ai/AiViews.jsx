@@ -78,7 +78,8 @@ export function AiWorking({ label }) {
 
 /* The report options every output shares, from a saved report. */
 function reportOpts(saved, t, lang) {
-  return { kind: saved.kind, report: saved.report, title: saved.title, caseInfo: saved.input && saved.input.case, reportId: saved.id, createdAt: saved.created_at, t, lang };
+  const caseInfo = saved.input && (saved.input.case || saved.input.photos) ? { ...(saved.input.case || {}), photos: saved.input.photos } : undefined;
+  return { kind: saved.kind, report: saved.report, title: saved.title, caseInfo, reportId: saved.id, createdAt: saved.created_at, t, lang };
 }
 
 /* Opens the branded report in its own window and the browser's print dialog. */
@@ -154,12 +155,19 @@ function Section({ icon, title, children }) {
 
 const Bullets = ({ items }) => (items && items.length ? <ul className="ai-list">{items.map((x, i) => <li key={i}>{x}</li>)}</ul> : null);
 
-export function DiagnosisView({ report: r }) {
+export function DiagnosisView({ report: r, photos }) {
   const { t } = useTranslation();
   const tr = (k, o) => t(`ai.report.${k}`, o);
   const z = r.zoonotic || {};
   return (
     <div className="ai-report">
+      {(photos && photos.length) || r.photo_findings ? (
+        <div className="ai-photo-findings">
+          <h4><i className="fas fa-camera"></i> {t('ai.pdf.photos')}</h4>
+          {photos && photos.length ? <div className="ai-photo-strip">{photos.map((src, i) => <div className="ai-photo-thumb" key={i}><img src={src} alt={t('ai.photo.alt', { n: i + 1 })} /></div>)}</div> : null}
+          {r.photo_findings ? <p>{r.photo_findings}</p> : null}
+        </div>
+      ) : null}
       <div className="ai-badges">
         <Pill value={r.urgency}>{tr('urgency')}: {tr(`urgencyLevels.${r.urgency}`)}</Pill>
         {r.see_vet ? <Pill value="urgent"><i className="fas fa-user-doctor"></i> {tr('seeVet')}</Pill> : <Pill value="routine">{tr('seeVetNo')}</Pill>}
@@ -302,7 +310,7 @@ export function SavedReport({ saved, subtitle, onDelete }) {
           {onDelete ? <button type="button" className="btn-icon danger" title={t('ai.report.delete')} onClick={() => onDelete(saved)}><i className="fas fa-trash"></i></button> : null}
         </div>
       </div>
-      <View report={saved.report} />
+      <View report={saved.report} photos={saved.input && saved.input.photos} />
     </div>
   );
 }

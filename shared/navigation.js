@@ -28,7 +28,10 @@ export const NAV_SECTIONS = [
   },
   {
     labelKey: 'nav.sections.planning',
-    items: [{ key: 'tasks', path: '/tasks', icon: 'list-check', labelKey: 'nav.tasks' }],
+    items: [
+      { key: 'tasks', path: '/tasks', icon: 'list-check', labelKey: 'nav.tasks' },
+      { key: 'calendar', path: '/calendar', icon: 'calendar-days', labelKey: 'nav.calendar' }
+    ],
   },
   {
     labelKey: 'nav.sections.analytics',

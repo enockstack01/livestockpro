@@ -1,5 +1,6 @@
 const { getDb } = require('../db');
 const { getRole } = require('../authMiddleware');
+const { getAiSettings } = require('./aiSettings');
 
 /* Per-user AI quotas. Every AI request costs money, so each user gets a
    daily allowance per feature plus an overall daily cap, counted in MongoDB
@@ -8,24 +9,15 @@ const { getRole } = require('../authMiddleware');
    the model is called and gives it back if the call fails, so users are not
    charged for errors.
 
-   Defaults can be changed without a code change:
-     AI_DAILY_LIMIT (overall), AI_DAILY_DIAGNOSE, AI_DAILY_ADVISOR,
-     AI_DAILY_CHAT, AI_DAILY_BRIEF, AI_ADMIN_MULTIPLIER
-   and an admin can give one account its own overall limit
+   A system admin sets the limits in the admin dashboard (AI settings,
+   server/lib/aiSettings.js; environment variables give the defaults), and an admin can give one account its own overall limit
    (accounts.ai_daily_limit, PATCH /api/admin/users/:id/ai-limit). */
-
-const num = (v, d) => (Number.isFinite(Number(v)) && Number(v) >= 0 ? Number(v) : d);
 
 const KINDS = ['diagnose', 'advisor', 'chat', 'brief'];
 
-function baseLimits() {
-  return {
-    total: num(process.env.AI_DAILY_LIMIT, 50),
-    diagnose: num(process.env.AI_DAILY_DIAGNOSE, 10),
-    advisor: num(process.env.AI_DAILY_ADVISOR, 5),
-    chat: num(process.env.AI_DAILY_CHAT, 40),
-    brief: num(process.env.AI_DAILY_BRIEF, 10)
-  };
+async function baseLimits() {
+  const { limits } = await getAiSettings();
+  return { total: limits.total, diagnose: limits.diagnose, advisor: limits.advisor, chat: limits.chat, brief: limits.brief, adminMultiplier: limits.admin_multiplier };
 }
 
 const roleCache = new Map(); // userId -> { role, until }
@@ -39,11 +31,10 @@ async function roleOf(userId) {
 }
 
 async function limitsFor(userId) {
-  const limits = baseLimits();
+  const { adminMultiplier, ...limits } = await baseLimits();
   const role = await roleOf(userId);
   if (role !== 'user') {
-    const m = num(process.env.AI_ADMIN_MULTIPLIER, 3);
-    for (const k of Object.keys(limits)) limits[k] = Math.round(limits[k] * m);
+    for (const k of Object.keys(limits)) limits[k] = Math.round(limits[k] * adminMultiplier);
   }
   const account = await getDb().collection('accounts').findOne({ _id: userId }, { projection: { ai_daily_limit: 1 } });
   if (account && Number.isFinite(account.ai_daily_limit)) limits.total = Math.max(0, account.ai_daily_limit);
@@ -106,4 +97,4 @@ async function reserve(userId, kind) {
   };
 }
 
-module.exports = { KINDS, reserve, getUsage, QuotaError, baseLimits };
+module.exports = { KINDS, reserve, getUsage, QuotaError, baseLimits, dayKey };

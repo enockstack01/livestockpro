@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { useTopbarSearch } from '../lib/topbarSearch.jsx';
-import { StatusBadge, calcAge, fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
+import { StatusBadge, calcAge, fmtDate } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
+import { RecordExportMenu } from '../components/ExportMenu.jsx';
 import { animalsFromCsv } from '../../../shared/csv';
 import { useOpenAddFromUrl } from '../lib/useOpenAddFromUrl.js';
 
@@ -103,13 +104,6 @@ export default function Animals() {
     await load();
   }
 
-  function exportCSV() {
-    if (animals.length === 0) { showToast(t('records.noRecordsToExport', { label: label.toLowerCase() }), 'warning'); return; }
-    const headers = ['tag_id', 'name', 'species', 'breed', 'sex', 'date_of_birth', 'location', 'health_status', 'last_check_date', 'notes'];
-    const csv = [headers.join(',')].concat(animals.map((a) => headers.map((h) => csvCell(a[h])).join(','))).join('\n');
-    downloadCSV(csv, 'animals_export.csv');
-    showToast(t('records.exported', { label }), 'success');
-  }
 
   function handleFileChange(e) {
     const file = e.target.files[0];
@@ -140,7 +134,7 @@ export default function Animals() {
         <div><h1>{t('animalsPage.title')}</h1><p>{t('animalsPage.subtitle')}</p></div>
         <div className="d-flex gap-16 flex-wrap">
           <button className="btn btn-secondary" onClick={() => setCsvModalOpen(true)}><i className="fas fa-file-import"></i> {t('animalsPage.importCsv')}</button>
-          <button className="btn btn-secondary" onClick={exportCSV}><i className="fas fa-file-export"></i> {t('reports.exportCsv')}</button>
+          <RecordExportMenu table="animals" rows={filtered} filtersText={search} />
           <button className="btn btn-primary" onClick={openAdd}><i className="fas fa-plus"></i> {t('animalsPage.addAnimal')}</button>
         </div>
       </div>

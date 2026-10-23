@@ -4,6 +4,7 @@ const { getDb } = require('../db');
 const { requireAuth, getRole, primaryEmail, clerkClient } = require('../authMiddleware');
 const { ACCOUNT_TYPES, CURRENCY_RE, DEFAULT_CURRENCY, accounts, getAccount, forgetApproval } = require('../lib/accounts');
 const { activeMembership, farmerLink } = require('../lib/orgs');
+const { ensureLivestockId } = require('../lib/livestockId');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -16,7 +17,7 @@ function clean(value, max = 200) {
 
 /* What the clients need to decide which screen to show. Admins are always
    let in, whatever their own request says. */
-function toClient(account, role, org = null) {
+function toClient(account, role, org = null, livestockId = null) {
   const status = role !== 'user' ? 'approved' : ((account && account.status) || 'none');
   const request = {};
   if (account) REQUEST_FIELDS.forEach((k) => { request[k] = account[k] || ''; });
@@ -29,6 +30,7 @@ function toClient(account, role, org = null) {
     submittedAt: (account && account.submitted_at) || null,
     reviewedAt: (account && account.reviewed_at) || null,
     kind: (account && account.kind) || 'farmer',
+    livestockId,
     organization: org,
     request
   };
@@ -47,8 +49,8 @@ async function orgSummary(userId) {
 /* GET /api/account — the caller's own account status. */
 router.get('/', async (req, res) => {
   try {
-    const [account, role, org] = await Promise.all([getAccount(req.user.id), getRole(req.user.id), orgSummary(req.user.id)]);
-    res.json({ data: toClient(account, role, org), error: null });
+    const [account, role, org, livestockId] = await Promise.all([getAccount(req.user.id), getRole(req.user.id), orgSummary(req.user.id), ensureLivestockId(req.user.id)]);
+    res.json({ data: toClient(account, role, org, livestockId), error: null });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
   }
@@ -93,8 +95,8 @@ router.post('/request', async (req, res) => {
       });
     }
 
-    const [account, role] = await Promise.all([accounts().findOne({ _id: userId }), getRole(userId)]);
-    res.json({ data: toClient(account, role), error: null });
+    const [account, role, livestockId] = await Promise.all([accounts().findOne({ _id: userId }), getRole(userId), ensureLivestockId(userId)]);
+    res.json({ data: toClient(account, role, null, livestockId), error: null });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
   }
@@ -115,8 +117,8 @@ router.patch('/preferences', async (req, res) => {
       { upsert: true }
     );
     forgetApproval(userId);
-    const [account, role] = await Promise.all([getAccount(userId), getRole(userId)]);
-    res.json({ data: toClient(account, role), error: null });
+    const [account, role, livestockId] = await Promise.all([getAccount(userId), getRole(userId), ensureLivestockId(userId)]);
+    res.json({ data: toClient(account, role, null, livestockId), error: null });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
   }

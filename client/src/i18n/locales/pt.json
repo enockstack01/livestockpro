@@ -48,7 +48,8 @@
       "administration": "Administração",
       "system": "Sistema"
     },
-    "assistant": "Assistente IA"
+    "assistant": "Assistente IA",
+    "calendar": "Calendário"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -215,7 +216,8 @@
         "category": "Categoria",
         "date": "Data",
         "description": "Descrição",
-        "currency": "Moeda"
+        "currency": "Moeda",
+        "tag_id": "Animal"
       }
     },
     "tasks": {
@@ -422,7 +424,10 @@
     "languageHelp": "Escolha seu idioma preferido para a interface do aplicativo.",
     "typeDeleteToConfirm": "Digite DELETE para confirmar.",
     "signedInAs": "Conectado como {{email}}",
-    "appVersion": "LivestockPro Mobile v{{version}}"
+    "appVersion": "LivestockPro Mobile v{{version}}",
+    "livestockId": "ID Livestock",
+    "copyId": "Copiar o seu ID Livestock",
+    "idCopied": "ID Livestock copiado"
   },
   "dashboardPage": {
     "title": "Painel",
@@ -496,7 +501,20 @@
     "noRecordsMatchFilters": "Nenhum registro corresponde aos filtros atuais.",
     "recordsCount": "{{count}} registros",
     "reportRefreshed": "Relatório atualizado.",
-    "fullReportExported": "Relatório completo exportado para CSV."
+    "fullReportExported": "Relatório completo exportado para CSV.",
+    "to": "a",
+    "animalReportTitle": "Relatório do animal: {{tag}}",
+    "farmReportTitle": "Relatório da exploração",
+    "healthChecks": "Controlos sanitários",
+    "openCases": "Casos em aberto",
+    "breedingEvents": "Registos de reprodução",
+    "births": "Nascimentos",
+    "summary": "Resumo",
+    "exportReport": "Exportar relatório",
+    "allAnimals": "Todos os animais",
+    "clearFilters": "Limpar filtros",
+    "animalProfile": "Ficha do animal",
+    "nothingToReport": "Nada a relatar"
   },
   "animalsPage": {
     "title": "Animais",
@@ -577,7 +595,9 @@
     "descriptionPlaceholder": "Detalhes sobre esta transação...",
     "confirmDeleteMessage": "Tem certeza de que deseja excluir este registro financeiro?",
     "amountMustBeGreaterThanZero": "O valor deve ser maior que 0.",
-    "convertedNote": "Totais convertidos para {{currency}} às taxas de câmbio atuais."
+    "convertedNote": "Totais convertidos para {{currency}} às taxas de câmbio atuais.",
+    "noAnimal": "Não é de um só animal",
+    "animalHint": "Associe uma fatura veterinária, uma compra ou uma venda a um animal para que apareça no relatório desse animal."
   },
   "tasksPage": {
     "title": "Tarefas",
@@ -1013,9 +1033,9 @@
   "ai": {
     "title": "Assistente IA",
     "subtitle": "Relatórios de diagnóstico, conselhos para a fazenda e respostas a partir dos seus registos",
-    "notConfigured": "A IA ainda não está configurada neste servidor. Um administrador precisa de adicionar a chave API da Anthropic.",
+    "notConfigured": "A IA ainda não está ativada neste servidor. Um administrador tem de a ativar.",
     "vetNotice": "A IA do LivestockPro apoia, e não substitui, um veterinário qualificado. Confirme sempre um diagnóstico e qualquer medicamento sujeito a receita com um veterinário.",
-    "poweredBy": "LivestockPro IA · com tecnologia Claude",
+    "poweredBy": "LivestockPro IA",
     "working": "A pensar...",
     "back": "Voltar",
     "tabs": {
@@ -1069,7 +1089,7 @@
       "working": "A ler os registos e a escrever o relatório...",
       "fromRecord": "Diagnosticar com IA",
       "previous": "Relatórios anteriores deste registo",
-      "needInput": "Descreva primeiro os sintomas."
+      "needInput": "Descreva primeiro os sintomas ou tire uma fotografia."
     },
     "report": {
       "urgency": "Urgência",
@@ -1197,7 +1217,8 @@
       "licence": "N.º de licença",
       "signature": "Assinatura",
       "date": "Data",
-      "important": "Importante:"
+      "important": "Importante:",
+      "photos": "Fotografias examinadas"
     },
     "usage": {
       "left": "Restam {{remaining}} de {{limit}} pedidos de IA hoje",
@@ -1209,6 +1230,20 @@
         "chat": "perguntas",
         "brief": "resumos One Health"
       }
+    },
+    "photo": {
+      "label": "Fotografias da zona afetada",
+      "take": "Tirar fotografia",
+      "upload": "Carregar fotografia",
+      "hint": "Até {{max}} fotografias nítidas da parte do corpo afetada, tiradas com boa luz.",
+      "alt": "Fotografia {{n}}",
+      "remove": "Remover fotografia",
+      "unreadable": "Não foi possível ler essa imagem. Experimente outra fotografia.",
+      "cameraTitle": "Tirar uma fotografia",
+      "capture": "Capturar",
+      "noCamera": "Não foi possível abrir a câmara. Permita o acesso à câmara no navegador ou carregue uma fotografia.",
+      "tip": "Aproxime a câmara da zona afetada, com boa luz, e mantenha-a firme.",
+      "defaultQuestion": "O que vê nesta fotografia? Este animal tem um problema de saúde e o que devo fazer?"
     }
   },
   "org": {
@@ -1659,6 +1694,142 @@
     "staffInvite": {
       "title": "Convite de organização",
       "body": "Foi convidado para {{name}}."
+    }
+  },
+  "search": {
+    "placeholder": "Pesquisar animais, registos, tarefas…",
+    "clear": "Limpar pesquisa",
+    "filteringPage": "A filtrar {{section}} enquanto escreve",
+    "noneElsewhere": "Sem resultados noutras secções",
+    "none": "Nada encontrado para «{{query}}»",
+    "viewAll_one": "Ver {{count}}",
+    "viewAll_other": "Ver todos os {{count}}"
+  },
+  "aiAdmin": {
+    "tab": "IA",
+    "saved": "Definições de IA guardadas",
+    "status": "LivestockPro IA",
+    "on": "Ativada",
+    "off": "Desativada",
+    "requestsToday": "Pedidos hoje",
+    "okFailed": "{{ok}} respondidos, {{failed}} falhados",
+    "refusedToday": "Recusados pelos limites hoje",
+    "usersToday": "Utilizadores hoje",
+    "tokensToday": "Tokens hoje",
+    "tokensSplit": "{{input}} de entrada, {{output}} de saída",
+    "avgTime": "Tempo médio de resposta",
+    "seconds": "{{n}} s",
+    "settingsTitle": "Modelo e limites",
+    "notConfigured": "A IA está desativada: o servidor não tem chave de IA. Adicione-a às definições do servidor para a ativar.",
+    "model": "Modelo",
+    "modelHint": "Todas as funções de IA usam este modelo. Antes de mudar, o LivestockPro verifica se o modelo consegue executá-las todas.",
+    "tier": {
+      "frontier": "geração mais recente",
+      "advanced": "o mais capaz",
+      "balanced": "rápido e capaz",
+      "fast": "o mais rápido, menor custo"
+    },
+    "limit": {
+      "per_minute": "Pedidos por minuto (por utilizador)",
+      "per_hour": "Pedidos por hora (por utilizador)",
+      "total": "Pedidos por dia (por utilizador)",
+      "diagnose": "Diagnósticos por dia",
+      "advisor": "Conselhos para a exploração por dia",
+      "chat": "Perguntas por dia",
+      "brief": "Relatórios One Health por dia",
+      "admin_multiplier": "Multiplicador para administradores"
+    },
+    "defaultValue": "Predefinição {{n}}",
+    "testing": "A verificar o modelo…",
+    "updatedAt": "Última alteração {{date}}",
+    "last14": "Últimos 14 dias",
+    "answered": "Respondidos",
+    "failed": "Falhados",
+    "refused": "Recusados",
+    "byFeature": "Hoje por função",
+    "noUseToday": "Ainda não houve uso da IA hoje.",
+    "feature": "Função",
+    "tokens": "Tokens",
+    "kind": {
+      "diagnose": "Diagnóstico",
+      "advisor": "Conselhos para a exploração",
+      "chat": "Perguntas",
+      "brief": "Relatório One Health"
+    },
+    "refusals": "Pedidos recusados hoje",
+    "noRefusals": "Nenhum pedido foi recusado hoje.",
+    "reason": "Motivo",
+    "requests": "Pedidos",
+    "users": "Utilizadores",
+    "refusal": {
+      "AI_BURST": "Demasiados num minuto",
+      "AI_LIMIT": "Limite por hora atingido",
+      "AI_QUOTA": "Quota diária esgotada"
+    },
+    "topUsers": "Utilizadores mais ativos hoje",
+    "user": "Utilizador",
+    "byModel": "Últimos 14 dias por modelo"
+  },
+  "exports": {
+    "export": "Exportar",
+    "preparing": "A preparar…",
+    "done": "Ficheiro {{format}} guardado",
+    "failed": "A exportação falhou: {{message}}",
+    "formats": {
+      "pdf": "PDF",
+      "xlsx": "Excel",
+      "csv": "CSV"
+    },
+    "formatHints": {
+      "pdf": "Documento com a marca para imprimir ou partilhar",
+      "xlsx": "Folha de cálculo, uma folha por secção",
+      "csv": "Dados simples para qualquer programa"
+    },
+    "fields": {
+      "district": "Distrito",
+      "last_check_date": "Último controlo"
+    },
+    "recordsCount_one": "{{count}} registo",
+    "recordsCount_other": "{{count}} registos",
+    "farm": "Exploração",
+    "generated": "Gerado",
+    "filters": "Filtros",
+    "page": "Página {{page}} de {{pages}}"
+  },
+  "calendar": {
+    "title": "Calendário",
+    "subtitle": "Tarefas, controlos sanitários, reprodução e nascimentos num só calendário",
+    "today": "Hoje",
+    "previous": "Mês anterior",
+    "next": "Mês seguinte",
+    "show": "Mostrar no calendário",
+    "kinds": {
+      "task": "Tarefas",
+      "overdue": "Em atraso",
+      "followUp": "Controlos de seguimento",
+      "healthCheck": "Controlos sanitários",
+      "breeding": "Reprodução",
+      "birthDue": "Partos previstos",
+      "birth": "Nascimentos",
+      "feeding": "Alimentação"
+    },
+    "eventsCount_one": "{{count}} evento",
+    "eventsCount_other": "{{count}} eventos",
+    "more_one": "mais {{count}}",
+    "more_other": "mais {{count}}",
+    "upcoming": "Próximos 30 dias",
+    "nothingUpcoming": "Nada previsto para os próximos 30 dias.",
+    "addTaskOnDay": "Adicionar tarefa neste dia",
+    "nothingThisDay": "Nada neste dia.",
+    "events": {
+      "healthCheck": "Controlo sanitário: {{tag}}",
+      "followUp": "Controlo de seguimento: {{tag}}",
+      "followUpMissed": "Seguimento falhado: {{tag}}",
+      "breeding": "Cobrição: {{tag}}",
+      "birthDue": "Parto previsto: {{tag}}",
+      "birth": "Nascimento: {{tag}}",
+      "newborns_one": "{{count}} cria",
+      "newborns_other": "{{count}} crias"
     }
   }
 }

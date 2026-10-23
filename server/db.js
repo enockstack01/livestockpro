@@ -25,6 +25,11 @@ async function ensureIndexes(database) {
     database.collection('ai_reports').createIndex({ user_id: 1, kind: 1, created_at: -1 }),
     database.collection('ai_usage').createIndex({ user_id: 1, day: -1 }),
     database.collection('ai_usage').createIndex({ day: 1 }),
+    // Livestock IDs (server/lib/livestockId.js): one per user
+    database.collection('livestock_ids').createIndex({ user_id: 1 }, { unique: true }),
+    // AI monitor events: queried by time, removed after 90 days
+    database.collection('ai_events').createIndex({ at: 1 }, { expireAfterSeconds: 90 * 24 * 3600 }),
+    database.collection('ai_events').createIndex({ user_id: 1, at: -1 }),
     /* Organizations and referral links (lib/orgs.js). One active organization
        per farmer is enforced by the partial unique index. */
     database.collection('organizations').createIndex({ name_key: 1 }, { unique: true }),

@@ -30,9 +30,11 @@ records, feeding, breeding, production, finances, and tasks.
    CLERK_PUBLISHABLE_KEY=pk_test_...
    CLERK_SECRET_KEY=sk_test_...
 
-   # AI features (diagnosis reports, farm advisor, Ask LivestockPro, One Health briefing)
-   ANTHROPIC_API_KEY=sk-ant-...
-   # optional: ANTHROPIC_MODEL=claude-opus-5-5
+   # AI features (diagnosis reports with camera photos, farm advisor,
+   # Ask LivestockPro, One Health briefing). Never commit the key.
+   AI_API_KEY=...
+   # The model and the limits are set by a super admin in the admin
+   # dashboard (AI tab); the values below are only the starting defaults.
    # AI limits per user (defaults shown): burst and hourly ceilings, then a
    # daily allowance per feature and overall, kept in MongoDB (ai_usage).
    # Admins get AI_ADMIN_MULTIPLIER times the daily limits; an admin can set
@@ -42,7 +44,7 @@ records, feeding, breeding, production, finances, and tasks.
    # AI_DAILY_CHAT=40  AI_DAILY_BRIEF=10  AI_ADMIN_MULTIPLIER=3
    ```
 
-   Without `ANTHROPIC_API_KEY` the app runs normally and the AI features show
+   Without `AI_API_KEY` the app runs normally and the AI features show
    "AI is not set up yet".
 
    > If your network/DNS can't resolve `mongodb+srv://` SRV records (some
@@ -80,7 +82,7 @@ from the repo root, no separate static site needed:
 - **Start Command:** `npm start`
 - **Environment variables** (Render → your service → Environment): `MONGODB_URI`,
   `MONGODB_DB`, `CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, and optionally
-  `SUPER_ADMIN_EMAILS` and `ANTHROPIC_API_KEY` (turns on the AI features). `.env` is git-ignored and never deployed — these must
+  `SUPER_ADMIN_EMAILS` and `AI_API_KEY` (turns on the AI features). `.env` is git-ignored and never deployed — these must
   be set directly in the platform's dashboard, or the server exits immediately
   on boot (`MONGODB_URI is not set`, from `server/db.js`).
 - If MongoDB Atlas is used, add the platform's outbound IPs (or `0.0.0.0/0`

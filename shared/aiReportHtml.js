@@ -58,6 +58,14 @@ function caseDetails(c, t) {
   return `<div class="case avoid"><h3>${esc(t('ai.pdf.caseDetails'))}</h3><div class="kv-grid">${cells}${wide}</div></div>`;
 }
 
+/* The camera photos the diagnosis looked at, with what the AI saw in them. */
+function photosBlock(r, caseInfo) {
+  const photos = (caseInfo && Array.isArray(caseInfo.photos) ? caseInfo.photos : []).filter((p) => /^data:image\/(jpeg|png|webp);base64,/.test(p));
+  if (!photos.length && !r.photo_findings) return '';
+  const imgs = photos.length ? `<div class="ph-row">${photos.map((p) => `<img src="${p}" alt="">`).join('')}</div>` : '';
+  return { imgs, findings: r.photo_findings ? para(r.photo_findings) : '' };
+}
+
 function diagnosisBody(r, t, caseInfo) {
   const tr = (k, o) => t(`ai.report.${k}`, o);
   const yes = t('ai.pdf.yes');
@@ -83,6 +91,10 @@ function diagnosisBody(r, t, caseInfo) {
       { label: t('ai.pdf.notifiable'), value: pill(r.notifiable ? 'yes' : 'no', r.notifiable ? yes : no) }
     ]),
     caseDetails(caseInfo, t),
+    (() => {
+      const p = photosBlock(r, caseInfo);
+      return p ? `<div class="photos avoid"><h3>${esc(t('ai.pdf.photos'))}</h3>${p.imgs}${p.findings}</div>` : '';
+    })(),
     `<div class="summary avoid"><h3>${esc(t('ai.pdf.summary'))}</h3>${para(r.summary)}${r.see_vet_reason ? `<p class="callout"><strong>${esc(tr('seeVet'))}:</strong> ${esc(r.see_vet_reason)}</p>` : ''}</div>`,
     sections([
       { title: tr('likely'), body: conditions },
@@ -175,7 +187,10 @@ const CSS = `
   .pill-red { background: #C62828; color: #FFFFFF; }
   .pill-slate { background: #5B6B5D; color: #FFFFFF; }
   .case, .summary, .review { border: 1px solid #DFE2DF; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; }
-  .case h3, .summary h3, .review h3 { color: #1B5E20; font-size: 11.5pt; margin: 0 0 6px; }
+  .case h3, .summary h3, .review h3, .photos h3 { color: #1B5E20; font-size: 11.5pt; margin: 0 0 6px; }
+  .photos { margin: 0 0 12px; }
+  .photos .ph-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 8px; }
+  .photos .ph-row img { width: 46mm; height: 34mm; object-fit: cover; border: 1px solid #DFE2DF; border-radius: 4px; }
   .kv-grid { display: flex; flex-wrap: wrap; gap: 6px 0; }
   .kv { width: 33.33%; padding-right: 10px; }
   .kv-wide { width: 100%; }

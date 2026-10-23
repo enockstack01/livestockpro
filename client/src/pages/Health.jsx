@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { useTopbarSearch } from '../lib/topbarSearch.jsx';
-import { StatusBadge, fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
+import { StatusBadge, fmtDate } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
+import { RecordExportMenu } from '../components/ExportMenu.jsx';
 import DiagnoseModal from '../components/ai/DiagnoseModal.jsx';
 import { useOpenAddFromUrl } from '../lib/useOpenAddFromUrl.js';
 
@@ -77,20 +78,13 @@ export default function Health() {
     await load();
   }
 
-  function exportCSV() {
-    if (records.length === 0) { showToast(t('records.noRecordsToExport', { label: label.toLowerCase() }), 'warning'); return; }
-    const headers = ['tag_id', 'disease', 'treatment', 'medicine', 'vet_name', 'check_date', 'next_check_date', 'status', 'notes'];
-    const csv = headers.join(',') + '\n' + records.map((h) => headers.map((c) => csvCell(h[c])).join(',')).join('\n');
-    downloadCSV(csv, 'health_records_export.csv');
-    showToast(t('records.exported', { label }), 'success');
-  }
 
   return (
     <>
       <div className="page-header">
         <div><h1>{t('healthPage.title')}</h1><p>{t('healthPage.subtitle')}</p></div>
         <div className="d-flex gap-16 flex-wrap">
-          <button className="btn btn-secondary" onClick={exportCSV}><i className="fas fa-file-export"></i> {t('reports.exportCsv')}</button>
+          <RecordExportMenu table="health_records" rows={filtered} filtersText={search} />
           <button className="btn btn-primary" onClick={openAdd}><i className="fas fa-plus"></i> {t('healthPage.addRecord')}</button>
         </div>
       </div>

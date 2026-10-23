@@ -145,6 +145,22 @@ export default function Settings() {
         <div className="settings-header-info">
           <h3>{displayName}</h3>
           <p>{email}</p>
+          {account && account.livestockId ? (
+            <button
+              type="button"
+              className="livestock-id"
+              title={t('settings.copyId')}
+              onClick={() => {
+                navigator.clipboard.writeText(account.livestockId)
+                  .then(() => showToast(t('settings.idCopied'), 'success'))
+                  .catch(() => showToast(account.livestockId, 'info'));
+              }}
+            >
+              <span>{t('settings.livestockId')}</span>
+              <strong>{account.livestockId}</strong>
+              <i className="fas fa-copy"></i>
+            </button>
+          ) : null}
         </div>
 
         <div className="settings-header-actions">

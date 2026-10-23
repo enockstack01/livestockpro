@@ -48,7 +48,8 @@
       "administration": "Utawala",
       "system": "Mfumo"
     },
-    "assistant": "Msaidizi wa AI"
+    "assistant": "Msaidizi wa AI",
+    "calendar": "Kalenda"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -215,7 +216,8 @@
         "category": "Jamii",
         "date": "Tarehe",
         "description": "Maelezo",
-        "currency": "Sarafu"
+        "currency": "Sarafu",
+        "tag_id": "Mnyama"
       }
     },
     "tasks": {
@@ -422,7 +424,10 @@
     "languageHelp": "Chagua lugha unayopendelea kwa mwonekano wa programu.",
     "typeDeleteToConfirm": "Andika DELETE kuthibitisha.",
     "signedInAs": "Umeingia kama {{email}}",
-    "appVersion": "LivestockPro Mobile v{{version}}"
+    "appVersion": "LivestockPro Mobile v{{version}}",
+    "livestockId": "Kitambulisho cha Livestock",
+    "copyId": "Nakili Kitambulisho chako cha Livestock",
+    "idCopied": "Kitambulisho cha Livestock kimenakiliwa"
   },
   "dashboardPage": {
     "title": "Dashibodi",
@@ -496,7 +501,20 @@
     "noRecordsMatchFilters": "Hakuna rekodi zinazolingana na vichujio vyako vya sasa.",
     "recordsCount": "rekodi {{count}}",
     "reportRefreshed": "Ripoti imesasishwa.",
-    "fullReportExported": "Ripoti kamili imehamishwa kwenda CSV."
+    "fullReportExported": "Ripoti kamili imehamishwa kwenda CSV.",
+    "to": "hadi",
+    "animalReportTitle": "Ripoti ya mnyama: {{tag}}",
+    "farmReportTitle": "Ripoti ya shamba",
+    "healthChecks": "Ukaguzi wa afya",
+    "openCases": "Kesi zinazoendelea",
+    "breedingEvents": "Kumbukumbu za uzazi",
+    "births": "Vizazi",
+    "summary": "Muhtasari",
+    "exportReport": "Hamisha ripoti",
+    "allAnimals": "Wanyama wote",
+    "clearFilters": "Futa vichujio",
+    "animalProfile": "Wasifu wa mnyama",
+    "nothingToReport": "Hakuna cha kuripoti"
   },
   "animalsPage": {
     "title": "Wanyama",
@@ -577,7 +595,9 @@
     "descriptionPlaceholder": "Maelezo kuhusu muamala huu...",
     "confirmDeleteMessage": "Una uhakika unataka kufuta rekodi hii ya fedha?",
     "amountMustBeGreaterThanZero": "Kiasi lazima kiwe zaidi ya 0.",
-    "convertedNote": "Jumla zimebadilishwa kuwa {{currency}} kwa viwango vya sasa vya ubadilishaji."
+    "convertedNote": "Jumla zimebadilishwa kuwa {{currency}} kwa viwango vya sasa vya ubadilishaji.",
+    "noAnimal": "Si kwa mnyama mmoja",
+    "animalHint": "Unganisha bili ya daktari wa mifugo, ununuzi au mauzo na mnyama mmoja ili ionekane kwenye ripoti yake."
   },
   "tasksPage": {
     "title": "Kazi",
@@ -1013,9 +1033,9 @@
   "ai": {
     "title": "Msaidizi wa AI",
     "subtitle": "Ripoti za uchunguzi, ushauri wa shamba na majibu kutoka kwenye kumbukumbu zako",
-    "notConfigured": "AI bado haijawekwa kwenye seva hii. Msimamizi anahitaji kuongeza ufunguo wa API wa Anthropic.",
+    "notConfigured": "AI bado haijawashwa kwenye seva hii. Msimamizi anahitaji kuiwasha.",
     "vetNotice": "AI ya LivestockPro inasaidia, haichukui nafasi ya, daktari wa mifugo aliyehitimu. Daima thibitisha utambuzi na dawa yoyote ya agizo la daktari na daktari wa mifugo.",
-    "poweredBy": "LivestockPro AI · inaendeshwa na Claude",
+    "poweredBy": "LivestockPro AI",
     "working": "Inafikiria...",
     "back": "Rudi",
     "tabs": {
@@ -1069,7 +1089,7 @@
       "working": "Inasoma kumbukumbu na kuandika ripoti...",
       "fromRecord": "Chunguza kwa AI",
       "previous": "Ripoti za awali za kumbukumbu hii",
-      "needInput": "Eleza dalili kwanza."
+      "needInput": "Eleza dalili kwanza au piga picha."
     },
     "report": {
       "urgency": "Uharaka",
@@ -1197,7 +1217,8 @@
       "licence": "Namba ya leseni",
       "signature": "Sahihi",
       "date": "Tarehe",
-      "important": "Muhimu:"
+      "important": "Muhimu:",
+      "photos": "Picha zilizochunguzwa"
     },
     "usage": {
       "left": "Maombi {{remaining}} kati ya {{limit}} ya AI yamebaki leo",
@@ -1209,6 +1230,20 @@
         "chat": "maswali",
         "brief": "muhtasari wa One Health"
       }
+    },
+    "photo": {
+      "label": "Picha za sehemu iliyoathirika",
+      "take": "Piga picha",
+      "upload": "Pakia picha",
+      "hint": "Hadi picha {{max}} zilizo wazi za sehemu ya mwili iliyoathirika, zilizopigwa kwenye mwanga mzuri.",
+      "alt": "Picha {{n}}",
+      "remove": "Ondoa picha",
+      "unreadable": "Picha hiyo haikuweza kusomwa. Jaribu picha nyingine.",
+      "cameraTitle": "Piga picha",
+      "capture": "Piga",
+      "noCamera": "Kamera haikuweza kufunguka. Ruhusu kamera kwenye kivinjari chako, au pakia picha badala yake.",
+      "tip": "Shikilia kamera karibu na sehemu iliyoathirika, kwenye mwanga mzuri, bila kutikisika.",
+      "defaultQuestion": "Unaona nini kwenye picha hii? Je, mnyama huyu ana tatizo la afya, na nifanye nini?"
     }
   },
   "org": {
@@ -1659,6 +1694,142 @@
     "staffInvite": {
       "title": "Mwaliko wa shirika",
       "body": "Umealikwa kujiunga na {{name}}."
+    }
+  },
+  "search": {
+    "placeholder": "Tafuta wanyama, kumbukumbu, kazi…",
+    "clear": "Futa utafutaji",
+    "filteringPage": "Inachuja {{section}} unapoandika",
+    "noneElsewhere": "Hakuna matokeo katika sehemu nyingine",
+    "none": "Hakuna kilichopatikana kwa “{{query}}”",
+    "viewAll_one": "Ona {{count}}",
+    "viewAll_other": "Ona zote {{count}}"
+  },
+  "aiAdmin": {
+    "tab": "AI",
+    "saved": "Mipangilio ya AI imehifadhiwa",
+    "status": "LivestockPro AI",
+    "on": "Imewashwa",
+    "off": "Imezimwa",
+    "requestsToday": "Maombi ya leo",
+    "okFailed": "{{ok}} yamejibiwa, {{failed}} yameshindwa",
+    "refusedToday": "Yaliyokataliwa na vikomo leo",
+    "usersToday": "Watumiaji wa leo",
+    "tokensToday": "Tokeni za leo",
+    "tokensSplit": "{{input}} zilizoingia, {{output}} zilizotoka",
+    "avgTime": "Wastani wa muda wa jibu",
+    "seconds": "sekunde {{n}}",
+    "settingsTitle": "Modeli na vikomo",
+    "notConfigured": "AI imezimwa: seva haina ufunguo wa AI. Uongeze kwenye mipangilio ya seva ili kuiwasha.",
+    "model": "Modeli",
+    "modelHint": "Kila huduma ya AI hutumia modeli hii. Kabla ya kubadilisha, LivestockPro hukagua kwamba modeli inaweza kuendesha huduma zote.",
+    "tier": {
+      "frontier": "kizazi kipya kabisa",
+      "advanced": "yenye uwezo zaidi",
+      "balanced": "ya haraka na yenye uwezo",
+      "fast": "ya haraka zaidi, gharama ndogo"
+    },
+    "limit": {
+      "per_minute": "Maombi kwa dakika (kwa mtumiaji)",
+      "per_hour": "Maombi kwa saa (kwa mtumiaji)",
+      "total": "Maombi kwa siku (kwa mtumiaji)",
+      "diagnose": "Uchunguzi kwa siku",
+      "advisor": "Ushauri wa shamba kwa siku",
+      "chat": "Maswali kwa siku",
+      "brief": "Taarifa za One Health kwa siku",
+      "admin_multiplier": "Kizidishi cha wasimamizi"
+    },
+    "defaultValue": "Chaguo msingi {{n}}",
+    "testing": "Inakagua modeli…",
+    "updatedAt": "Ilibadilishwa mwisho {{date}}",
+    "last14": "Siku 14 zilizopita",
+    "answered": "Yamejibiwa",
+    "failed": "Yameshindwa",
+    "refused": "Yamekataliwa",
+    "byFeature": "Leo kwa huduma",
+    "noUseToday": "Hakuna matumizi ya AI leo bado.",
+    "feature": "Huduma",
+    "tokens": "Tokeni",
+    "kind": {
+      "diagnose": "Uchunguzi",
+      "advisor": "Ushauri wa shamba",
+      "chat": "Maswali",
+      "brief": "Taarifa ya One Health"
+    },
+    "refusals": "Maombi yaliyokataliwa leo",
+    "noRefusals": "Hakuna ombi lililokataliwa leo.",
+    "reason": "Sababu",
+    "requests": "Maombi",
+    "users": "Watumiaji",
+    "refusal": {
+      "AI_BURST": "Mengi mno kwa dakika moja",
+      "AI_LIMIT": "Kikomo cha saa kimefikiwa",
+      "AI_QUOTA": "Kiwango cha siku kimekwisha"
+    },
+    "topUsers": "Watumiaji wanaotumia zaidi leo",
+    "user": "Mtumiaji",
+    "byModel": "Siku 14 zilizopita kwa modeli"
+  },
+  "exports": {
+    "export": "Hamisha",
+    "preparing": "Inaandaa…",
+    "done": "Faili la {{format}} limehifadhiwa",
+    "failed": "Kuhamisha kumeshindwa: {{message}}",
+    "formats": {
+      "pdf": "PDF",
+      "xlsx": "Excel",
+      "csv": "CSV"
+    },
+    "formatHints": {
+      "pdf": "Hati yenye chapa ya kuchapisha au kushiriki",
+      "xlsx": "Lahajedwali, karatasi moja kwa kila sehemu",
+      "csv": "Data tupu kwa programu yoyote"
+    },
+    "fields": {
+      "district": "Wilaya",
+      "last_check_date": "Ukaguzi wa mwisho"
+    },
+    "recordsCount_one": "kumbukumbu {{count}}",
+    "recordsCount_other": "kumbukumbu {{count}}",
+    "farm": "Shamba",
+    "generated": "Imetengenezwa",
+    "filters": "Vichujio",
+    "page": "Ukurasa {{page}} kati ya {{pages}}"
+  },
+  "calendar": {
+    "title": "Kalenda",
+    "subtitle": "Kazi, ukaguzi wa afya, uzazi na vizazi kwenye kalenda moja",
+    "today": "Leo",
+    "previous": "Mwezi uliopita",
+    "next": "Mwezi ujao",
+    "show": "Onyesha kwenye kalenda",
+    "kinds": {
+      "task": "Kazi",
+      "overdue": "Zilizochelewa",
+      "followUp": "Ukaguzi wa ufuatiliaji",
+      "healthCheck": "Ukaguzi wa afya",
+      "breeding": "Uzazi",
+      "birthDue": "Kuzaa kunakotarajiwa",
+      "birth": "Vizazi",
+      "feeding": "Ulishaji"
+    },
+    "eventsCount_one": "tukio {{count}}",
+    "eventsCount_other": "matukio {{count}}",
+    "more_one": "{{count}} zaidi",
+    "more_other": "{{count}} zaidi",
+    "upcoming": "Siku 30 zijazo",
+    "nothingUpcoming": "Hakuna kilichopangwa kwa siku 30 zijazo.",
+    "addTaskOnDay": "Ongeza kazi siku hii",
+    "nothingThisDay": "Hakuna kitu siku hii.",
+    "events": {
+      "healthCheck": "Ukaguzi wa afya: {{tag}}",
+      "followUp": "Ukaguzi wa ufuatiliaji: {{tag}}",
+      "followUpMissed": "Ufuatiliaji uliokosekana: {{tag}}",
+      "breeding": "Kupandishwa: {{tag}}",
+      "birthDue": "Kuzaa kunatarajiwa: {{tag}}",
+      "birth": "Kuzaa: {{tag}}",
+      "newborns_one": "mtoto {{count}}",
+      "newborns_other": "watoto {{count}}"
     }
   }
 }

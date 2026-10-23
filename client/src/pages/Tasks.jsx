@@ -6,6 +6,7 @@ import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import { StatusBadge, PriorityBadge, fmtDate } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
+import { RecordExportMenu } from '../components/ExportMenu.jsx';
 import { isOverdueTask } from '../../../shared/businessRules';
 import { useOpenAddFromUrl } from '../lib/useOpenAddFromUrl.js';
 
@@ -54,7 +55,15 @@ export default function Tasks() {
     return matchSearch && matchFilter;
   });
 
-  function openAdd() { setEditingId(null); setForm(EMPTY_FORM); geo.capture(); setModalOpen(true); }
+  /* prefill.due: a date from the calendar (Add task on a day). When used as a
+     click handler, prefill is the click event and is ignored. */
+  function openAdd(prefill) {
+    const due = prefill && typeof prefill.due === 'string' ? prefill.due : '';
+    setEditingId(null);
+    setForm({ ...EMPTY_FORM, due_date: due });
+    geo.capture();
+    setModalOpen(true);
+  }
   function openEdit(tk) {
     setEditingId(tk.id);
     setForm({ title: tk.title || '', description: tk.description || '', due_date: tk.due_date || '', priority: tk.priority || 'Medium', status: tk.status || 'Pending' });
@@ -94,7 +103,10 @@ export default function Tasks() {
     <>
       <div className="page-header">
         <div><h1>{t('tasksPage.title')}</h1><p>{t('tasksPage.subtitle')}</p></div>
-        <button className="btn btn-primary" onClick={openAdd}><i className="fas fa-plus"></i> {t('tasksPage.addTask')}</button>
+        <div className="d-flex gap-16 flex-wrap">
+          <RecordExportMenu table="tasks" rows={filtered} filtersText={search} />
+          <button className="btn btn-primary" onClick={openAdd}><i className="fas fa-plus"></i> {t('tasksPage.addTask')}</button>
+        </div>
       </div>
 
       <div className="summary-grid">

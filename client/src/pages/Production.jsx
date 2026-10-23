@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { useTopbarSearch } from '../lib/topbarSearch.jsx';
-import { fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
+import { fmtDate } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
+import { RecordExportMenu } from '../components/ExportMenu.jsx';
 import { useOpenAddFromUrl } from '../lib/useOpenAddFromUrl.js';
 
 const EMPTY_FORM = { tag_id: '', production_type: 'Milk', quantity: '', unit: 'liters', production_date: '', notes: '' };
@@ -91,20 +92,13 @@ export default function Production() {
     await load();
   }
 
-  function exportCSV() {
-    if (records.length === 0) { showToast(t('records.noRecordsToExport', { label: label.toLowerCase() }), 'warning'); return; }
-    const headers = ['tag_id', 'production_type', 'quantity', 'unit', 'production_date', 'notes'];
-    const csv = [headers.join(',')].concat(records.map((p) => headers.map((c) => csvCell(p[c])).join(','))).join('\n');
-    downloadCSV(csv, 'production_records_export.csv');
-    showToast(t('records.exported', { label }), 'success');
-  }
 
   return (
     <>
       <div className="page-header">
         <div><h1>{t('productionPage.title')}</h1><p>{t('productionPage.subtitle')}</p></div>
         <div className="d-flex gap-16 flex-wrap">
-          <button className="btn btn-secondary" onClick={exportCSV}><i className="fas fa-file-export"></i> {t('reports.exportCsv')}</button>
+          <RecordExportMenu table="production_records" rows={filtered} filtersText={search} />
           <button className="btn btn-primary" onClick={openAdd}><i className="fas fa-plus"></i> {t('productionPage.addRecord')}</button>
         </div>
       </div>

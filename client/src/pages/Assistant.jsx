@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { AiNotConfigured, AiUsageMeter, AiWorking, SavedReport, aiErrorText, useAiStatus } from '../components/ai/AiViews.jsx';
+import PhotoPicker, { usePhotos } from '../components/ai/PhotoPicker.jsx';
 
 const TABS = [
   { key: 'ask', icon: 'comments' },
@@ -54,19 +55,25 @@ function AskTab({ disabled }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const endRef = useRef(null);
+  const photos = usePhotos();
   const examples = t('ai.ask.examples', { returnObjects: true });
 
   useEffect(() => { if (endRef.current) endRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' }); }, [messages, busy]);
 
+  /* A photo can go with a question, or on its own (then a standard question
+     about what it shows is asked). Only the latest question carries photos. */
   async function send(text) {
-    const q = (text || draft).trim();
+    const withPhotos = photos.photos.length > 0;
+    const q = (text || draft).trim() || (withPhotos ? t('ai.photo.defaultQuestion') : '');
     if (!q || busy) return;
-    const next = [...messages, { role: 'user', content: q }];
+    const extra = withPhotos ? photos.payload() : {};
+    const next = [...messages, { role: 'user', content: q, thumbs: withPhotos ? photos.photos.map((p) => p.thumb) : undefined }];
     setMessages(next);
     setDraft('');
+    photos.clear();
     setError(null);
     setBusy(true);
-    const { data, error: err } = await api.aiChat({ messages: next, language: i18n.language });
+    const { data, error: err } = await api.aiChat({ messages: next.map(({ role, content }) => ({ role, content })), language: i18n.language, images: extra.images });
     setBusy(false);
     if (err) { setError(aiErrorText(t, err, i18n.language)); return; }
     setMessages([...next, { role: 'assistant', content: data.reply }]);
@@ -88,6 +95,7 @@ function AskTab({ disabled }) {
         ) : messages.map((m, i) => (
           <div key={i} className={`ai-msg ai-msg-${m.role}`}>
             <span className="ai-msg-who">{m.role === 'user' ? t('ai.ask.you') : t('ai.ask.assistant')}</span>
+            {m.thumbs ? <div className="ai-msg-photos">{m.thumbs.map((src, j) => <img key={j} src={src} alt={t('ai.photo.alt', { n: j + 1 })} />)}</div> : null}
             <div className="ai-msg-text">{m.content}</div>
           </div>
         ))}
@@ -105,9 +113,10 @@ function AskTab({ disabled }) {
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
         />
+        <PhotoPicker state={photos} disabled={disabled || busy} compact />
         <div className="ai-chat-actions">
           {messages.length ? <button type="button" className="btn btn-secondary" onClick={() => { setMessages([]); setError(null); }}><i className="fas fa-plus"></i> {t('ai.ask.clear')}</button> : null}
-          <button type="submit" className="btn btn-primary" disabled={disabled || busy || !draft.trim()}><i className="fas fa-paper-plane"></i> {t('ai.ask.send')}</button>
+          <button type="submit" className="btn btn-primary" disabled={disabled || busy || (!draft.trim() && !photos.photos.length)}><i className="fas fa-paper-plane"></i> {t('ai.ask.send')}</button>
         </div>
       </form>
     </div>
@@ -194,6 +203,7 @@ function DiagnoseTab({ disabled }) {
   const [symptoms, setSymptoms] = useState('');
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(null);
+  const photos = usePhotos();
 
   useEffect(() => {
     api.list('animals', { order: 'tag_id.asc' }).then(({ data }) => setAnimals(data || []));
@@ -202,11 +212,12 @@ function DiagnoseTab({ disabled }) {
   const animal = animals.find((a) => a.id === animalId);
 
   async function run() {
-    if (!symptoms.trim()) { showToast(t('ai.diagnose.needInput'), 'error'); return; }
+    if (!symptoms.trim() && !photos.photos.length) { showToast(t('ai.diagnose.needInput'), 'error'); return; }
     setBusy(true);
-    const { data, error } = await api.aiDiagnose({ animal_id: animalId || undefined, species: animal ? undefined : species || undefined, symptoms, language: i18n.language });
+    const { data, error } = await api.aiDiagnose({ animal_id: animalId || undefined, species: animal ? undefined : species || undefined, symptoms, language: i18n.language, ...photos.payload() });
     setBusy(false);
     if (error) { showToast(aiErrorText(t, error, i18n.language), 'error'); return; }
+    photos.clear();
     setSaved(data);
   }
 
@@ -245,8 +256,12 @@ function DiagnoseTab({ disabled }) {
               <label>{t('ai.diagnose.symptoms')}</label>
               <textarea className="form-control" rows={5} value={symptoms} placeholder={t('ai.diagnose.symptomsHint')} onChange={(e) => setSymptoms(e.target.value)} />
             </div>
+            <div className="form-group">
+              <label>{t('ai.photo.label')}</label>
+              <PhotoPicker state={photos} disabled={disabled} />
+            </div>
             <p className="ai-disclaimer"><i className="fas fa-user-doctor"></i> {t('ai.vetNotice')}</p>
-            <button className="btn btn-primary mt-16" onClick={run} disabled={disabled || !symptoms.trim()}><i className="fas fa-wand-magic-sparkles"></i> {t('ai.diagnose.run')}</button>
+            <button className="btn btn-primary mt-16" onClick={run} disabled={disabled || (!symptoms.trim() && !photos.photos.length)}><i className="fas fa-wand-magic-sparkles"></i> {t('ai.diagnose.run')}</button>
           </>
         )}
       </div>

@@ -1,29 +1,35 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
-import { fmtDate, downloadCSV, csvCell } from '../lib/badges.jsx';
-import { formatMoney, formatRecordMoney, moneyOf, recordCurrency } from '../../../shared/currency';
+import ExportMenu, { useFarmIdentity } from '../components/ExportMenu.jsx';
+import { printDoc } from '../lib/exporters.js';
+import { buildFarmReport } from '../../../shared/farmReport.js';
 
+const TABLES = ['animals', 'health_records', 'breeding_records', 'feeding_records', 'production_records', 'finance_records', 'tasks'];
+
+/* Farm report: the whole farm, or one animal's own report (profile, then
+   only its records and totals). Sections with no records are left out;
+   tables show every value in full and export to PDF, Excel and CSV with the
+   same content (shared/farmReport.js). */
 export default function Reports() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const api = useApi();
   const showToast = useToast();
+  const [params, setParams] = useSearchParams();
 
   const [data, setData] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
-  const [animalTag, setAnimalTag] = useState('');
+  const animalId = params.get('animal') || '';
+  const setAnimalId = (id) => setParams((p) => { const n = new URLSearchParams(p); if (id) n.set('animal', id); else n.delete('animal'); return n; }, { replace: true });
 
   async function loadAll() {
-    const [r1, r2, r3, r4, r5] = await Promise.all([
-      api.list('animals'), api.list('health_records'), api.list('breeding_records'),
-      api.list('production_records'), api.list('finance_records')
-    ]);
-    setData({ animals: r1.data || [], health: r2.data || [], breeding: r3.data || [], production: r4.data || [], finance: r5.data || [] });
+    const results = await Promise.all(TABLES.map((k) => api.list(k)));
+    setData(Object.fromEntries(TABLES.map((k, i) => [k, results[i].data || []])));
   }
-
   useEffect(() => { loadAll(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleRefresh() {
@@ -33,78 +39,16 @@ export default function Reports() {
     showToast(t('reportsPage.reportRefreshed'), 'success');
   }
 
-  function exportFullReportCSV() {
-    if (!data) return;
-    const lines = [];
-    lines.push('LIVESTOCKPRO FULL FARM REPORT');
-    lines.push('Generated,' + new Date().toLocaleString());
-    lines.push('');
+  const { farmName, livestockId } = useFarmIdentity();
+  const doc = useMemo(
+    () => (data ? buildFarmReport(data, { dateFrom, dateTo, animalId }, t, { farmName, livestockId }) : null),
+    [data, dateFrom, dateTo, animalId, t, farmName, livestockId]
+  );
+  const animals = useMemo(() => (data ? [...data.animals].sort((a, b) => String(a.tag_id).localeCompare(String(b.tag_id))) : []), [data]);
 
-    lines.push(`=== ANIMALS (${data.animals.length}) ===`);
-    lines.push(['Tag ID', 'Name', 'Species', 'Breed', 'Sex', 'Date of Birth', 'Location', 'Health Status'].join(','));
-    data.animals.forEach((a) => lines.push([csvCell(a.tag_id), csvCell(a.name), csvCell(a.species), csvCell(a.breed), csvCell(a.sex), csvCell(a.date_of_birth), csvCell(a.location), csvCell(a.health_status)].join(',')));
-    lines.push('');
+  if (!data || !doc) return <div className="empty-state"><i className="fas fa-spinner fa-spin"></i><p>{t('common.loading')}</p></div>;
 
-    lines.push(`=== HEALTH RECORDS (${data.health.length}) ===`);
-    lines.push(['Tag ID', 'Disease', 'Treatment', 'Medicine', 'Vet', 'Check Date', 'Next Check', 'Status', 'Notes'].join(','));
-    data.health.forEach((h) => lines.push([csvCell(h.tag_id), csvCell(h.disease), csvCell(h.treatment), csvCell(h.medicine), csvCell(h.vet_name), csvCell(h.check_date), csvCell(h.next_check_date), csvCell(h.status), csvCell(h.notes)].join(',')));
-    lines.push('');
-
-    lines.push(`=== BREEDING RECORDS (${data.breeding.length}) ===`);
-    lines.push(['Tag ID', 'Breeding Date', 'Pregnancy Status', 'Expected Birth', 'Birth Date', 'Newborn Count', 'Newborn Details', 'Notes'].join(','));
-    data.breeding.forEach((b) => lines.push([csvCell(b.tag_id), csvCell(b.breeding_date), csvCell(b.pregnancy_status), csvCell(b.expected_birth_date), csvCell(b.birth_date), csvCell(b.newborn_count), csvCell(b.newborn_details), csvCell(b.notes)].join(',')));
-    lines.push('');
-
-    lines.push(`=== PRODUCTION RECORDS (${data.production.length}) ===`);
-    lines.push(['Type', 'Tag ID', 'Quantity', 'Unit', 'Date', 'Notes'].join(','));
-    data.production.forEach((p) => lines.push([csvCell(p.production_type), csvCell(p.tag_id), csvCell(p.quantity), csvCell(p.unit), csvCell(p.production_date), csvCell(p.notes)].join(',')));
-    lines.push('');
-
-    lines.push(`=== FINANCE RECORDS (${data.finance.length}) ===`);
-    lines.push(['Type', 'Category', 'Amount', 'Currency', 'Date', 'Description'].join(','));
-    data.finance.forEach((r) => lines.push([csvCell(r.type), csvCell(r.category), csvCell(r.amount), csvCell(recordCurrency(r)), csvCell(r.date), csvCell(r.description)].join(',')));
-
-    downloadCSV(lines.join('\n'), 'full_farm_report_' + new Date().toISOString().split('T')[0] + '.csv');
-    showToast(t('reportsPage.fullReportExported'), 'success');
-  }
-
-  if (!data) return null;
-
-  const filters = { dateFrom, dateTo, animalTag };
-  const filterByDateAndTag = (list, dateCol, tagCol) => list.filter((item) => {
-    let matchDate = true;
-    if (filters.dateFrom && item[dateCol]) matchDate = new Date(item[dateCol]) >= new Date(filters.dateFrom);
-    if (filters.dateTo && item[dateCol]) matchDate = matchDate && new Date(item[dateCol]) <= new Date(filters.dateTo);
-    const matchTag = !filters.animalTag || (item[tagCol] || '') === filters.animalTag;
-    return matchDate && matchTag;
-  });
-  const filterByDate = (list, dateCol) => list.filter((item) => {
-    let matchDate = true;
-    if (filters.dateFrom && item[dateCol]) matchDate = new Date(item[dateCol]) >= new Date(filters.dateFrom);
-    if (filters.dateTo && item[dateCol]) matchDate = matchDate && new Date(item[dateCol]) <= new Date(filters.dateTo);
-    return matchDate;
-  });
-
-  const filteredAnimals = data.animals.filter((a) => !filters.animalTag || (a.tag_id || '') === filters.animalTag);
-  const filteredHealth = filterByDateAndTag(data.health, 'check_date', 'tag_id');
-  const filteredBreeding = filterByDateAndTag(data.breeding, 'breeding_date', 'tag_id');
-  const filteredProduction = filterByDateAndTag(data.production, 'production_date', 'tag_id');
-  const filteredFinance = filterByDate(data.finance, 'date');
-
-  const totalAnimals = data.animals.length;
-  const healthyCount = data.animals.filter((a) => a.health_status === 'Healthy').length;
-  const treatmentCount = data.animals.filter((a) => a.health_status === 'Under Treatment').length;
-  const criticalCount = data.animals.filter((a) => a.health_status === 'Critical').length;
-  const pregnantCount = data.breeding.filter((b) => b.pregnancy_status === 'Pregnant').length;
-  const totalIncome = data.finance.filter((r) => r.type === 'Income').reduce((s, r) => s + moneyOf(r), 0);
-  const totalExpense = data.finance.filter((r) => r.type === 'Expense').reduce((s, r) => s + moneyOf(r), 0);
-  const netProfit = totalIncome - totalExpense;
-  const milkTotal = data.production.filter((p) => p.production_type === 'Milk').reduce((s, p) => s + (p.quantity || 0), 0);
-  const eggsTotal = data.production.filter((p) => p.production_type === 'Eggs').reduce((s, p) => s + (p.quantity || 0), 0);
-  const meatTotal = data.production.filter((p) => p.production_type === 'Meat').reduce((s, p) => s + (p.quantity || 0), 0);
-
-  const now = new Date();
-  const timestamp = now.toLocaleDateString() + ' at ' + now.toLocaleTimeString();
+  const filtered = Boolean(dateFrom || dateTo || animalId);
 
   return (
     <>
@@ -114,107 +58,95 @@ export default function Reports() {
           <button className="btn btn-secondary" onClick={handleRefresh} disabled={refreshing}>
             {refreshing ? <><i className="fas fa-spinner fa-spin"></i> {t('common.loading')}</> : <><i className="fas fa-rotate"></i> {t('common.refresh')}</>}
           </button>
-          <button className="btn btn-secondary" onClick={() => window.print()}><i className="fas fa-print"></i> {t('reportsPage.print')}</button>
-          <button className="btn btn-primary" onClick={exportFullReportCSV}><i className="fas fa-file-export"></i> {t('reports.exportCsv')}</button>
+          <button className="btn btn-secondary" onClick={() => printDoc(doc, t, i18n.language)} disabled={doc.empty}><i className="fas fa-print"></i> {t('reportsPage.print')}</button>
+          <ExportMenu primary build={() => doc} disabled={doc.empty} label={t('reportsPage.exportReport')} />
         </div>
       </div>
 
       <div className="card mb-24 no-print">
         <div className="card-body">
-          <div className="filter-bar" style={{ marginBottom: 0 }}>
+          <div className="filter-bar report-filters" style={{ marginBottom: 0 }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label style={{ marginBottom: 4 }}>{t('reportsPage.fromDate')}</label>
-              <input type="date" className="form-control" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+              <input type="date" className="form-control" value={dateFrom} max={dateTo || undefined} onChange={(e) => setDateFrom(e.target.value)} />
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label style={{ marginBottom: 4 }}>{t('reportsPage.toDate')}</label>
-              <input type="date" className="form-control" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+              <input type="date" className="form-control" value={dateTo} min={dateFrom || undefined} onChange={(e) => setDateTo(e.target.value)} />
             </div>
-            <div className="form-group" style={{ marginBottom: 0, minWidth: 160 }}>
+            <div className="form-group" style={{ marginBottom: 0, minWidth: 220 }}>
               <label style={{ marginBottom: 4 }}>{t('reportsPage.animalTag')}</label>
-              <input type="text" className="form-control" placeholder={t('reportsPage.animalTagPlaceholder')} value={animalTag} onChange={(e) => setAnimalTag(e.target.value)} />
+              <select className="form-control" value={animalId} onChange={(e) => setAnimalId(e.target.value)}>
+                <option value="">{t('reportsPage.allAnimals')}</option>
+                {animals.map((a) => <option key={a.id} value={a.id}>{a.tag_id}{a.name ? ` · ${a.name}` : ''}{a.species ? ` · ${t(`enums.species.${a.species}`, a.species)}` : ''}</option>)}
+              </select>
             </div>
-            <button className="btn btn-primary" style={{ alignSelf: 'flex-end', marginTop: 'auto' }} onClick={() => showToast(t('reportsPage.filtersApplied'), 'info')}>
-              <i className="fas fa-filter"></i> {t('reportsPage.applyFilter')}
-            </button>
+            {filtered ? (
+              <button className="btn btn-secondary" style={{ alignSelf: 'flex-end' }} onClick={() => { setDateFrom(''); setDateTo(''); setAnimalId(''); }}>
+                <i className="fas fa-xmark"></i> {t('reportsPage.clearFilters')}
+              </button>
+            ) : null}
           </div>
         </div>
       </div>
 
-      <div id="reportOutput">
-        <div className="mb-24" style={{ borderBottom: '2px solid var(--primary)', paddingBottom: 16 }}>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: 'var(--primary-dark)', marginBottom: 4 }}>{t('auth.brandName')} {t('reportsPage.title')}</h2>
-          <p className="text-muted" style={{ fontSize: 13 }}>
-            {t('reportsPage.generatedOn', { time: timestamp })}
-            {(dateFrom || dateTo || animalTag) && <> &middot; {t('reportsPage.filteredLabel')}{dateFrom && t('reportsPage.filteredFrom', { date: dateFrom })}{dateTo && t('reportsPage.filteredTo', { date: dateTo })}{animalTag && t('reportsPage.filteredTag', { tag: animalTag })}</>}
-          </p>
-        </div>
-
-        <div className="finance-summary mb-24">
-          <div className="finance-card"><h4>{t('reportsPage.totalAnimals')}</h4><div className="amount" style={{ color: 'var(--text)' }}>{totalAnimals}</div></div>
-          <div className="finance-card"><h4>{t('reports.healthy')}</h4><div className="amount income">{healthyCount}</div></div>
-          <div className="finance-card"><h4>{t('reports.underTreatment')}</h4><div className="amount expense">{treatmentCount}</div></div>
-          <div className="finance-card"><h4>{t('reports.criticalStatus')}</h4><div className="amount loss">{criticalCount}</div></div>
-          <div className="finance-card"><h4>{t('dashboardPage.pregnant')}</h4><div className="amount" style={{ color: 'var(--purple)' }}>{pregnantCount}</div></div>
-          <div className="finance-card"><h4>{t('reportsPage.totalIncome')}</h4><div className="amount income">{formatMoney(totalIncome)}</div></div>
-          <div className="finance-card"><h4>{t('reportsPage.totalExpenses')}</h4><div className="amount expense">{formatMoney(totalExpense)}</div></div>
-          <div className="finance-card"><h4>{t('reportsPage.netProfit')}</h4><div className={`amount ${netProfit >= 0 ? 'profit' : 'loss'}`}>{formatMoney(netProfit)}</div></div>
-        </div>
-
-        <div className="finance-summary mb-24">
-          <div className="finance-card"><h4>{t('reportsPage.milkProduced')}</h4><div className="amount income">{milkTotal.toFixed(1)} L</div></div>
-          <div className="finance-card"><h4>{t('reportsPage.eggsCollected')}</h4><div className="amount" style={{ color: 'var(--orange)' }}>{eggsTotal} units</div></div>
-          <div className="finance-card"><h4>{t('reportsPage.meatProduced')}</h4><div className="amount" style={{ color: 'var(--primary)' }}>{meatTotal.toFixed(1)} kg</div></div>
-        </div>
-
-        <ReportSection title={t('tables.animals.label')} icon="fa-cow" count={filteredAnimals.length}
-          headers={[t('tables.animals.fields.tag_id'), t('tables.animals.fields.name'), t('tables.animals.fields.species'), t('tables.animals.fields.breed'), t('tables.animals.fields.sex'), t('tables.animals.fields.date_of_birth'), t('tables.animals.fields.location'), t('tables.animals.fields.health_status')]}
-          rows={filteredAnimals.map((a) => [a.tag_id, a.name || '—', a.species, a.breed || '—', a.sex || '—', fmtDate(a.date_of_birth), a.location || '—', a.health_status])} />
-
-        <ReportSection title={t('healthPage.title')} icon="fa-stethoscope" count={filteredHealth.length}
-          headers={[t('tables.animals.fields.tag_id'), t('tables.health_records.fields.disease'), t('tables.health_records.fields.treatment'), t('tables.health_records.fields.medicine'), t('tables.health_records.fields.vet_name'), t('tables.health_records.fields.check_date'), t('tables.health_records.fields.next_check_date'), t('tables.health_records.fields.status')]}
-          rows={filteredHealth.map((h) => [h.tag_id || '—', h.disease || '—', h.treatment || '—', h.medicine || '—', h.vet_name || '—', fmtDate(h.check_date), fmtDate(h.next_check_date), h.status || '—'])} />
-
-        <ReportSection title={t('tables.breeding_records.singular')} icon="fa-venus-mars" count={filteredBreeding.length}
-          headers={[t('tables.animals.fields.tag_id'), t('tables.breeding_records.fields.breeding_date'), t('tables.breeding_records.fields.pregnancy_status'), t('tables.breeding_records.fields.expected_birth_date'), t('tables.breeding_records.fields.birth_date'), t('tables.breeding_records.fields.newborn_count'), t('tables.breeding_records.fields.newborn_details')]}
-          rows={filteredBreeding.map((b) => [b.tag_id || '—', fmtDate(b.breeding_date), b.pregnancy_status || '—', fmtDate(b.expected_birth_date), fmtDate(b.birth_date), b.newborn_count || '—', (b.newborn_details || '—').substring(0, 50)])} />
-
-        <ReportSection title={t('tables.production_records.singular')} icon="fa-gauge" count={filteredProduction.length}
-          headers={[t('tables.production_records.fields.production_type'), t('tables.animals.fields.tag_id'), t('tables.production_records.fields.quantity'), t('tables.production_records.fields.unit'), t('tables.production_records.fields.production_date'), t('tables.production_records.fields.notes')]}
-          rows={filteredProduction.map((p) => [p.production_type || '—', p.tag_id || '—', p.quantity || 0, p.unit || '—', fmtDate(p.production_date), (p.notes || '—').substring(0, 50)])} />
-
-        <ReportSection title={t('tables.finance_records.singular')} icon="fa-coins" count={filteredFinance.length}
-          headers={[t('tables.finance_records.fields.type'), t('tables.finance_records.fields.category'), t('tables.finance_records.fields.amount'), t('tables.finance_records.fields.date'), t('tables.finance_records.fields.description')]}
-          rows={filteredFinance.map((r) => [r.type || '—', r.category || '—', formatRecordMoney(r), fmtDate(r.date), (r.description || '—').substring(0, 50)])} />
-      </div>
+      <ReportView doc={doc} />
     </>
   );
 }
 
-function ReportSection({ title, icon, count, headers, rows }) {
+/* The report on screen: the same document the exports are made from. */
+export function ReportView({ doc }) {
   const { t } = useTranslation();
   return (
-    <div className="card mb-24">
-      <div className="card-header">
-        <h3><i className={`fas ${icon}`} style={{ marginRight: 8, color: 'var(--primary)' }}></i>{title}</h3>
-        <span className="badge badge-green">{t('reportsPage.recordsCount', { count })}</span>
+    <div id="reportOutput" className="report-view">
+      <div className="report-head">
+        <h2>{doc.title}</h2>
+        {doc.subtitle ? <p className="report-subtitle">{doc.subtitle}</p> : null}
+        <div className="report-meta">{doc.meta.map((m) => <span key={m.label}>{m.label}: <strong>{m.value}</strong></span>)}</div>
       </div>
-      <div className="card-body" style={{ padding: 0 }}>
-        {count === 0 ? (
+
+      {doc.profile ? (
+        <div className="card mb-24">
+          <div className="card-header"><h3><i className="fas fa-id-card" style={{ marginRight: 8, color: 'var(--leaf)' }}></i>{t('reportsPage.animalProfile')}</h3></div>
+          <div className="card-body report-profile">
+            {doc.profile.map((p) => <div key={p.label} className={`report-kv${p.wide ? ' wide' : ''}`}><span>{p.label}</span><strong>{p.value}</strong></div>)}
+          </div>
+        </div>
+      ) : null}
+
+      {doc.summary.length ? (
+        <div className="finance-summary mb-24 report-summary">
+          {doc.summary.map((s) => <div className="finance-card" key={s.label}><h4>{s.label}</h4><div className="amount">{s.value}</div></div>)}
+        </div>
+      ) : null}
+
+      {doc.empty ? (
+        <div className="card"><div className="card-body">
           <div className="empty-state" style={{ padding: '30px 20px' }}>
             <i className="fas fa-inbox"></i>
-            <h3>{t('reportsPage.noRecordsFound', { section: title.toLowerCase() })}</h3>
+            <h3>{t('reportsPage.nothingToReport')}</h3>
             <p>{t('reportsPage.noRecordsMatchFilters')}</p>
           </div>
-        ) : (
-          <div className="table-wrapper">
-            <table className="data-table">
-              <thead><tr>{headers.map((h) => <th key={h}>{h}</th>)}</tr></thead>
-              <tbody>{rows.map((row, i) => <tr key={i}>{row.map((cell, j) => <td key={j}>{cell}</td>)}</tr>)}</tbody>
-            </table>
+        </div></div>
+      ) : doc.sections.map((s) => (
+        <div className="card mb-24 report-section" key={s.key}>
+          <div className="card-header">
+            <h3>{s.title}</h3>
+            <span className="badge badge-green">{t('reportsPage.recordsCount', { count: s.rows.length })}</span>
           </div>
-        )}
-      </div>
+          <div className="card-body" style={{ padding: 0 }}>
+            <div className="table-wrapper">
+              <table className="data-table report-table">
+                <thead><tr>{s.columns.map((c) => <th key={c.key} className={c.type === 'number' || c.type === 'money' ? 'num' : undefined}>{c.label}</th>)}</tr></thead>
+                <tbody>{s.rows.map((row, i) => (
+                  <tr key={i}>{row.map((cell, j) => <td key={j} className={s.columns[j].type === 'number' || s.columns[j].type === 'money' ? 'num' : undefined}>{cell.text || '—'}</td>)}</tr>
+                ))}</tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import Modal from '../components/Modal.jsx';
 import SpatialMap from '../components/SpatialMap.jsx';
 import { AdminAudit, AdminOrganizations, AdminSettings } from '../components/admin/AdminOrganizations.jsx';
+import AdminAi from '../components/admin/AdminAi.jsx';
 import { ACCOUNT_TYPE_ICONS } from '../../../shared/account';
 
 const RESOURCE_LABELS = {
@@ -156,7 +157,7 @@ export default function AdminDashboard() {
   const filteredUsers = useMemo(() => {
     const q = search.toLowerCase();
     let list = users.filter((u) => {
-      const matchSearch = !q || u.email.toLowerCase().includes(q) || (u.farmName || '').toLowerCase().includes(q);
+      const matchSearch = !q || u.email.toLowerCase().includes(q) || (u.farmName || '').toLowerCase().includes(q) || (u.livestockId || '').toLowerCase().includes(q);
       const matchRole = !roleFilter || u.role === roleFilter;
       const matchStatus = !statusFilter || (statusFilter === 'banned' ? u.banned : u.accountStatus === statusFilter && !u.banned);
       return matchSearch && matchRole && matchStatus;
@@ -304,11 +305,13 @@ export default function AdminDashboard() {
             <button className={`tab-btn${tab === 'orgs' ? ' active' : ''}`} onClick={() => setTab('orgs')}><i className="fas fa-building"></i> {t('org.admin.tabOrgs')}</button>
             <button className={`tab-btn${tab === 'audit' ? ' active' : ''}`} onClick={() => setTab('audit')}><i className="fas fa-clock-rotate-left"></i> {t('org.admin.tabAudit')}</button>
             <button className={`tab-btn${tab === 'settings' ? ' active' : ''}`} onClick={() => setTab('settings')}><i className="fas fa-sliders"></i> {t('org.admin.tabSettings')}</button>
+            <button className={`tab-btn${tab === 'ai' ? ' active' : ''}`} onClick={() => setTab('ai')}><i className="fas fa-robot"></i> {t('aiAdmin.tab')}</button>
           </div>
 
           {tab === 'orgs' && <AdminOrganizations isSuper={isSuperAdmin} />}
           {tab === 'audit' && <AdminAudit />}
           {tab === 'settings' && <AdminSettings isSuper={isSuperAdmin} />}
+          {tab === 'ai' && <AdminAi isSuper={isSuperAdmin} />}
 
           {tab === 'overview' && (
             <div className="admin-fade-in">
@@ -502,7 +505,7 @@ export default function AdminDashboard() {
                           const rowBusy = busyId === u.id;
                           return (
                             <tr key={u.id}>
-                              <td className="fw-600">{u.email}{isSelf && <span className="badge badge-blue" style={{ marginLeft: 6 }}>{t('adminDashboard.you')}</span>}</td>
+                              <td className="fw-600">{u.email}{isSelf && <span className="badge badge-blue" style={{ marginLeft: 6 }}>{t('adminDashboard.you')}</span>}{u.livestockId ? <div className="livestock-id-small">{u.livestockId}</div> : null}</td>
                               <td>{u.farmName || '—'}</td>
                               <td>
                                 {canEditRole ? (

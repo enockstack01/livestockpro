@@ -48,7 +48,8 @@
       "administration": "प्रशासन",
       "system": "सिस्टम"
     },
-    "assistant": "AI सहायक"
+    "assistant": "AI सहायक",
+    "calendar": "कैलेंडर"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -215,7 +216,8 @@
         "category": "श्रेणी",
         "date": "तिथि",
         "description": "विवरण",
-        "currency": "मुद्रा"
+        "currency": "मुद्रा",
+        "tag_id": "पशु"
       }
     },
     "tasks": {
@@ -422,7 +424,10 @@
     "languageHelp": "ऐप इंटरफ़ेस के लिए अपनी पसंदीदा भाषा चुनें।",
     "typeDeleteToConfirm": "पुष्टि करने के लिए DELETE टाइप करें।",
     "signedInAs": "{{email}} के रूप में साइन इन",
-    "appVersion": "LivestockPro Mobile v{{version}}"
+    "appVersion": "LivestockPro Mobile v{{version}}",
+    "livestockId": "Livestock आईडी",
+    "copyId": "अपनी Livestock आईडी कॉपी करें",
+    "idCopied": "Livestock आईडी कॉपी हो गई"
   },
   "dashboardPage": {
     "title": "डैशबोर्ड",
@@ -496,7 +501,20 @@
     "noRecordsMatchFilters": "कोई रिकॉर्ड आपके वर्तमान फ़िल्टर से मेल नहीं खाता।",
     "recordsCount": "{{count}} रिकॉर्ड",
     "reportRefreshed": "रिपोर्ट रीफ़्रेश की गई।",
-    "fullReportExported": "पूर्ण रिपोर्ट CSV में निर्यात की गई।"
+    "fullReportExported": "पूर्ण रिपोर्ट CSV में निर्यात की गई।",
+    "to": "से",
+    "animalReportTitle": "पशु रिपोर्ट: {{tag}}",
+    "farmReportTitle": "फ़ार्म रिपोर्ट",
+    "healthChecks": "स्वास्थ्य जाँच",
+    "openCases": "खुले मामले",
+    "breedingEvents": "प्रजनन रिकॉर्ड",
+    "births": "जन्म",
+    "summary": "सारांश",
+    "exportReport": "रिपोर्ट निर्यात करें",
+    "allAnimals": "सभी पशु",
+    "clearFilters": "फ़िल्टर साफ़ करें",
+    "animalProfile": "पशु का विवरण",
+    "nothingToReport": "रिपोर्ट करने को कुछ नहीं"
   },
   "animalsPage": {
     "title": "पशु",
@@ -577,7 +595,9 @@
     "descriptionPlaceholder": "इस लेनदेन के बारे में विवरण...",
     "confirmDeleteMessage": "क्या आप वाकई इस वित्तीय रिकॉर्ड को हटाना चाहते हैं?",
     "amountMustBeGreaterThanZero": "राशि 0 से अधिक होनी चाहिए।",
-    "convertedNote": "कुल राशि वर्तमान विनिमय दरों पर {{currency}} में बदली गई है।"
+    "convertedNote": "कुल राशि वर्तमान विनिमय दरों पर {{currency}} में बदली गई है।",
+    "noAnimal": "किसी एक पशु के लिए नहीं",
+    "animalHint": "पशु चिकित्सक का बिल, खरीद या बिक्री किसी एक पशु से जोड़ें ताकि वह उस पशु की रिपोर्ट में दिखे।"
   },
   "tasksPage": {
     "title": "कार्य",
@@ -1013,9 +1033,9 @@
   "ai": {
     "title": "AI सहायक",
     "subtitle": "निदान रिपोर्ट, फ़ार्म सलाह और आपके अपने रिकॉर्ड से उत्तर",
-    "notConfigured": "इस सर्वर पर अभी AI सेट नहीं है। किसी व्यवस्थापक को Anthropic API कुंजी जोड़नी होगी।",
+    "notConfigured": "इस सर्वर पर AI अभी चालू नहीं है। किसी व्यवस्थापक को इसे चालू करना होगा।",
     "vetNotice": "LivestockPro AI योग्य पशु चिकित्सक की सहायता करता है, उसकी जगह नहीं लेता। निदान और किसी भी पर्चे वाली दवा की पुष्टि हमेशा पशु चिकित्सक से करें।",
-    "poweredBy": "LivestockPro AI · Claude द्वारा संचालित",
+    "poweredBy": "LivestockPro AI",
     "working": "सोच रहा है...",
     "back": "वापस",
     "tabs": {
@@ -1069,7 +1089,7 @@
       "working": "रिकॉर्ड पढ़कर रिपोर्ट लिखी जा रही है...",
       "fromRecord": "AI से निदान करें",
       "previous": "इस रिकॉर्ड की पिछली रिपोर्ट",
-      "needInput": "पहले लक्षणों का वर्णन करें।"
+      "needInput": "पहले लक्षण बताएँ या फ़ोटो लें।"
     },
     "report": {
       "urgency": "तात्कालिकता",
@@ -1197,7 +1217,8 @@
       "licence": "लाइसेंस संख्या",
       "signature": "हस्ताक्षर",
       "date": "तारीख",
-      "important": "महत्वपूर्ण:"
+      "important": "महत्वपूर्ण:",
+      "photos": "जाँची गई फ़ोटो"
     },
     "usage": {
       "left": "आज {{limit}} में से {{remaining}} AI अनुरोध बचे हैं",
@@ -1209,6 +1230,20 @@
         "chat": "प्रश्न",
         "brief": "One Health सारांश"
       }
+    },
+    "photo": {
+      "label": "प्रभावित हिस्से की फ़ोटो",
+      "take": "फ़ोटो लें",
+      "upload": "फ़ोटो अपलोड करें",
+      "hint": "शरीर के प्रभावित हिस्से की अच्छी रोशनी में ली गई अधिकतम {{max}} साफ़ फ़ोटो।",
+      "alt": "फ़ोटो {{n}}",
+      "remove": "फ़ोटो हटाएँ",
+      "unreadable": "वह तस्वीर पढ़ी नहीं जा सकी। दूसरी फ़ोटो आज़माएँ।",
+      "cameraTitle": "फ़ोटो लें",
+      "capture": "खींचें",
+      "noCamera": "कैमरा नहीं खुल सका। ब्राउज़र में कैमरे की अनुमति दें, या फ़ोटो अपलोड करें।",
+      "tip": "अच्छी रोशनी में कैमरे को प्रभावित हिस्से के पास रखें और स्थिर रखें।",
+      "defaultQuestion": "इस फ़ोटो में आपको क्या दिखता है? क्या इस पशु को कोई स्वास्थ्य समस्या है, और मुझे क्या करना चाहिए?"
     }
   },
   "org": {
@@ -1659,6 +1694,142 @@
     "staffInvite": {
       "title": "संगठन का आमंत्रण",
       "body": "आपको {{name}} में आमंत्रित किया गया है।"
+    }
+  },
+  "search": {
+    "placeholder": "पशु, रिकॉर्ड, कार्य खोजें…",
+    "clear": "खोज साफ़ करें",
+    "filteringPage": "लिखते समय {{section}} छाँटा जा रहा है",
+    "noneElsewhere": "दूसरे भागों में कोई मिलान नहीं",
+    "none": "“{{query}}” के लिए कुछ नहीं मिला",
+    "viewAll_one": "{{count}} देखें",
+    "viewAll_other": "सभी {{count}} देखें"
+  },
+  "aiAdmin": {
+    "tab": "AI",
+    "saved": "AI सेटिंग सहेजी गईं",
+    "status": "LivestockPro AI",
+    "on": "चालू",
+    "off": "बंद",
+    "requestsToday": "आज के अनुरोध",
+    "okFailed": "{{ok}} के उत्तर दिए गए, {{failed}} विफल",
+    "refusedToday": "आज सीमाओं के कारण अस्वीकृत",
+    "usersToday": "आज के उपयोगकर्ता",
+    "tokensToday": "आज के टोकन",
+    "tokensSplit": "{{input}} इनपुट, {{output}} आउटपुट",
+    "avgTime": "औसत उत्तर समय",
+    "seconds": "{{n}} सेकंड",
+    "settingsTitle": "मॉडल और सीमाएँ",
+    "notConfigured": "AI बंद है: सर्वर में AI कुंजी नहीं है। AI चालू करने के लिए इसे सर्वर सेटिंग में जोड़ें।",
+    "model": "मॉडल",
+    "modelHint": "सभी AI सुविधाएँ इसी मॉडल का उपयोग करती हैं। बदलने से पहले LivestockPro जाँचता है कि मॉडल उन सभी को चला सकता है।",
+    "tier": {
+      "frontier": "सबसे नई पीढ़ी",
+      "advanced": "सबसे सक्षम",
+      "balanced": "तेज़ और सक्षम",
+      "fast": "सबसे तेज़, सबसे कम लागत"
+    },
+    "limit": {
+      "per_minute": "प्रति मिनट अनुरोध (प्रति उपयोगकर्ता)",
+      "per_hour": "प्रति घंटा अनुरोध (प्रति उपयोगकर्ता)",
+      "total": "प्रति दिन अनुरोध (प्रति उपयोगकर्ता)",
+      "diagnose": "प्रति दिन निदान",
+      "advisor": "प्रति दिन फ़ार्म सलाह",
+      "chat": "प्रति दिन प्रश्न",
+      "brief": "प्रति दिन वन हेल्थ रिपोर्ट",
+      "admin_multiplier": "व्यवस्थापक सीमा गुणक"
+    },
+    "defaultValue": "डिफ़ॉल्ट {{n}}",
+    "testing": "मॉडल की जाँच हो रही है…",
+    "updatedAt": "पिछला बदलाव {{date}}",
+    "last14": "पिछले 14 दिन",
+    "answered": "उत्तर दिए गए",
+    "failed": "विफल",
+    "refused": "अस्वीकृत",
+    "byFeature": "आज सुविधा के अनुसार",
+    "noUseToday": "आज अभी तक AI का उपयोग नहीं हुआ।",
+    "feature": "सुविधा",
+    "tokens": "टोकन",
+    "kind": {
+      "diagnose": "निदान",
+      "advisor": "फ़ार्म सलाह",
+      "chat": "प्रश्न",
+      "brief": "वन हेल्थ रिपोर्ट"
+    },
+    "refusals": "आज अस्वीकृत अनुरोध",
+    "noRefusals": "आज कोई अनुरोध अस्वीकृत नहीं हुआ।",
+    "reason": "कारण",
+    "requests": "अनुरोध",
+    "users": "उपयोगकर्ता",
+    "refusal": {
+      "AI_BURST": "एक मिनट में बहुत अधिक",
+      "AI_LIMIT": "घंटे की सीमा पूरी",
+      "AI_QUOTA": "दिन का कोटा समाप्त"
+    },
+    "topUsers": "आज सबसे सक्रिय उपयोगकर्ता",
+    "user": "उपयोगकर्ता",
+    "byModel": "पिछले 14 दिन मॉडल के अनुसार"
+  },
+  "exports": {
+    "export": "निर्यात करें",
+    "preparing": "तैयार हो रहा है…",
+    "done": "{{format}} फ़ाइल सहेजी गई",
+    "failed": "निर्यात विफल रहा: {{message}}",
+    "formats": {
+      "pdf": "PDF",
+      "xlsx": "Excel",
+      "csv": "CSV"
+    },
+    "formatHints": {
+      "pdf": "प्रिंट या साझा करने के लिए ब्रांड वाला दस्तावेज़",
+      "xlsx": "स्प्रेडशीट, हर भाग के लिए एक शीट",
+      "csv": "किसी भी प्रोग्राम के लिए सादा डेटा"
+    },
+    "fields": {
+      "district": "ज़िला",
+      "last_check_date": "पिछली जाँच"
+    },
+    "recordsCount_one": "{{count}} रिकॉर्ड",
+    "recordsCount_other": "{{count}} रिकॉर्ड",
+    "farm": "फ़ार्म",
+    "generated": "बनाया गया",
+    "filters": "फ़िल्टर",
+    "page": "पृष्ठ {{page}} / {{pages}}"
+  },
+  "calendar": {
+    "title": "कैलेंडर",
+    "subtitle": "कार्य, स्वास्थ्य जाँच, प्रजनन और जन्म एक ही कैलेंडर में",
+    "today": "आज",
+    "previous": "पिछला महीना",
+    "next": "अगला महीना",
+    "show": "कैलेंडर में दिखाएँ",
+    "kinds": {
+      "task": "कार्य",
+      "overdue": "समय से पीछे",
+      "followUp": "फ़ॉलो अप जाँच",
+      "healthCheck": "स्वास्थ्य जाँच",
+      "breeding": "प्रजनन",
+      "birthDue": "अपेक्षित जन्म",
+      "birth": "जन्म",
+      "feeding": "चारा"
+    },
+    "eventsCount_one": "{{count}} घटना",
+    "eventsCount_other": "{{count}} घटनाएँ",
+    "more_one": "{{count}} और",
+    "more_other": "{{count}} और",
+    "upcoming": "अगले 30 दिन",
+    "nothingUpcoming": "अगले 30 दिनों के लिए कुछ तय नहीं है।",
+    "addTaskOnDay": "इस दिन कार्य जोड़ें",
+    "nothingThisDay": "इस दिन कुछ नहीं।",
+    "events": {
+      "healthCheck": "स्वास्थ्य जाँच: {{tag}}",
+      "followUp": "फ़ॉलो अप जाँच: {{tag}}",
+      "followUpMissed": "छूटी फ़ॉलो अप जाँच: {{tag}}",
+      "breeding": "गर्भाधान: {{tag}}",
+      "birthDue": "अपेक्षित जन्म: {{tag}}",
+      "birth": "जन्म: {{tag}}",
+      "newborns_one": "{{count}} नवजात",
+      "newborns_other": "{{count}} नवजात"
     }
   }
 }

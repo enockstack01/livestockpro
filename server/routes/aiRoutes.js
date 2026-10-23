@@ -4,7 +4,8 @@ const rateLimit = require('express-rate-limit');
 const { getDb } = require('../db');
 const { requireAuth, requireRole } = require('../authMiddleware');
 const { requireApproved } = require('../lib/accounts');
-const { MODEL, AiError, isConfigured, ask, textOf, brandVoice, VET_NOTICE, mapApiError } = require('../lib/ai');
+const { AiError, isConfigured, ask, textOf, brandVoice, VET_NOTICE, mapApiError, imageBlocks } = require('../lib/ai');
+const { getAiSettings, currentModel, aiContext, logRefusal, describeModel, publicModel } = require('../lib/aiSettings');
 const { computeOneHealthAlerts } = require('./adminRoutes');
 const { reserve, getUsage, QuotaError } = require('../lib/aiQuota');
 
@@ -13,8 +14,9 @@ const router = express.Router();
 router.use(requireAuth);
 
 /* GET /api/ai/status: lets the apps show or hide the AI features. */
-router.get('/status', (req, res) => {
-  res.json({ data: { configured: isConfigured(), model: isConfigured() ? MODEL : null }, error: null });
+router.get('/status', async (req, res) => {
+  const model = isConfigured() ? publicModel(describeModel(await currentModel())) : null;
+  res.json({ data: { configured: isConfigured(), model: model ? model.label : null }, error: null });
 });
 
 router.use(requireApproved);
@@ -25,10 +27,19 @@ router.use(requireApproved);
    3. daily: an allowance per feature plus an overall cap, kept in MongoDB
    Reading saved reports and usage is not limited; only the requests that
    call the model are. */
-const limitHandler = (code, message) => (req, res) => res.status(429).json({ error: { message, code } });
+const limitHandler = (code, message) => (req, res) => {
+  const ctx = aiContext.getStore() || {};
+  logRefusal(req.user.id, ctx.kind || null, code);
+  res.status(429).json({ error: { message, code } });
+};
+/* The limits come from the admin's AI settings (cached for 30 seconds). */
+const settingLimit = (key) => async () => {
+  const { limits } = await getAiSettings();
+  return Math.max(1, limits[key]);
+};
 const burst = rateLimit({
   windowMs: 60 * 1000,
-  max: Number(process.env.AI_REQUESTS_PER_MINUTE) || 5,
+  limit: settingLimit('per_minute'),
   keyGenerator: (req) => req.user.id,
   standardHeaders: true,
   legacyHeaders: false,
@@ -37,7 +48,7 @@ const burst = rateLimit({
 });
 const hourly = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: Number(process.env.AI_REQUESTS_PER_HOUR) || 25,
+  limit: settingLimit('per_hour'),
   keyGenerator: (req) => req.user.id,
   standardHeaders: true,
   legacyHeaders: false,
@@ -55,13 +66,17 @@ function quota(kind) {
       next();
     } catch (err) {
       if (err instanceof QuotaError) {
+        logRefusal(req.user.id, kind, err.code);
         return res.status(429).json({ error: { message: err.message, code: err.code, kind: err.kind, usage: err.usage } });
       }
       res.status(500).json({ error: { message: 'Could not check your AI allowance: ' + err.message } });
     }
   };
 }
-const aiLimits = (kind) => [burst, hourly, quota(kind)];
+/* Who is asking and for which feature, so every model call and refusal
+   can be logged for the admin AI monitor (server/lib/aiSettings.js). */
+const track = (kind) => (req, res, next) => aiContext.run({ userId: req.user.id, kind }, next);
+const aiLimits = (kind) => [track(kind), burst, hourly, quota(kind)];
 
 async function sendError(res, err, req) {
   if (req && req.releaseQuota) await req.releaseQuota();
@@ -218,9 +233,9 @@ function reports() {
 }
 
 async function saveReport(userId, kind, title, input, report, language) {
-  const doc = { _id: crypto.randomUUID(), user_id: userId, kind, title, input, report, language, model: MODEL, created_at: new Date().toISOString() };
+  const doc = { _id: crypto.randomUUID(), user_id: userId, kind, title, input, report, language, model: await currentModel(), created_at: new Date().toISOString() };
   await reports().insertOne(doc);
-  const { user_id: _u, _id, ...rest } = doc;
+  const { user_id: _u, _id, model: _m, ...rest } = doc;
   return { id: _id, ...rest };
 }
 
@@ -229,7 +244,7 @@ router.get('/reports', async (req, res) => {
     const filter = { user_id: req.user.id };
     if (['diagnosis', 'advisor', 'onehealth'].includes(req.query.kind)) filter.kind = req.query.kind;
     if (req.query.record_id) filter['input.health_record_id'] = String(req.query.record_id);
-    const rows = await reports().find(filter, { projection: { user_id: 0 } }).sort({ created_at: -1 }).limit(Math.min(Number(req.query.limit) || 30, 100)).toArray();
+    const rows = await reports().find(filter, { projection: { user_id: 0, model: 0 } }).sort({ created_at: -1 }).limit(Math.min(Number(req.query.limit) || 30, 100)).toArray();
     res.json({ data: rows.map(clean), error: null });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
@@ -238,7 +253,7 @@ router.get('/reports', async (req, res) => {
 
 router.get('/reports/:id', async (req, res) => {
   try {
-    const doc = await reports().findOne({ _id: String(req.params.id), user_id: req.user.id }, { projection: { user_id: 0 } });
+    const doc = await reports().findOne({ _id: String(req.params.id), user_id: req.user.id }, { projection: { user_id: 0, model: 0 } });
     if (!doc) return sendError(res, new AiError(404, 'AI_BAD_REQUEST', 'Report not found.'), req);
     res.json({ data: clean(doc), error: null });
   } catch (err) {
@@ -256,9 +271,11 @@ router.delete('/reports/:id', async (req, res) => {
 });
 
 /* ---------- POST /api/ai/diagnose ----------
-   Body: { health_record_id?, animal_id?, tag_id?, species?, symptoms?, language }
+   Body: { health_record_id?, animal_id?, tag_id?, species?, symptoms?,
+           images?: [{ media_type, data }], thumbnails?: [dataUrl], language }
    A disease diagnosis and treatment report for one animal, built from its
-   health record, its history and the symptoms the farmer describes. */
+   health record, its history, the symptoms the farmer describes and photos
+   of the affected part of the body taken with the camera. */
 
 const str = { type: 'string' };
 const strList = { type: 'array', items: str };
@@ -267,6 +284,7 @@ const obj = (properties) => ({ type: 'object', properties, required: Object.keys
 const DIAGNOSIS_SCHEMA = obj({
   title: str,
   summary: str,
+  photo_findings: str,
   urgency: { type: 'string', enum: ['emergency', 'urgent', 'soon', 'routine'] },
   see_vet: { type: 'boolean' },
   see_vet_reason: str,
@@ -292,7 +310,8 @@ const DIAGNOSIS_RULES = [
   'Set see_vet to true whenever the condition could be serious, contagious, notifiable or needs a prescription medicine. Use urgency "emergency" for anything that can kill within hours.',
   'Flag zoonotic risk (diseases that can pass to people) and whether the disease is usually notifiable to the veterinary authorities, with precautions for the household.',
   'List what information is missing that would change the diagnosis in data_gaps.',
-  'Never claim certainty. The report supports, and does not replace, a veterinarian.'
+  'Never claim certainty. The report supports, and does not replace, a veterinarian.',
+  'When photos are attached, examine the visible part of the body closely: describe the lesions, swelling, discharge, skin, hair, eyes, hooves or wounds you can see in photo_findings, and use them in the diagnosis. If a photo is unclear, too dark or does not show an animal, say so in photo_findings and data_gaps and ask for a clearer picture. When there are no photos, leave photo_findings empty.'
 ].join('\n');
 
 router.post('/diagnose', aiLimits('diagnose'), async (req, res) => {
@@ -301,6 +320,7 @@ router.post('/diagnose', aiLimits('diagnose'), async (req, res) => {
     const body = req.body || {};
     const language = String(body.language || 'en');
     const symptoms = String(body.symptoms || '').slice(0, 4000);
+    const photos = imageBlocks(body.images);
 
     let record = null;
     if (body.health_record_id) {
@@ -319,7 +339,7 @@ router.post('/diagnose', aiLimits('diagnose'), async (req, res) => {
     let animal = null;
     if (animalId) [animal] = await find(userId, 'animals', { _id: String(animalId) }, { limit: 1 });
     if (!animal && tagId) [animal] = await find(userId, 'animals', { tag_id: String(tagId) }, { limit: 1 });
-    if (!record && !symptoms) return sendError(res, new AiError(400, 'AI_BAD_REQUEST', 'Describe the symptoms or choose a health record.'), req);
+    if (!record && !symptoms && !photos.length) return sendError(res, new AiError(400, 'AI_BAD_REQUEST', 'Describe the symptoms, take a photo or choose a health record.'), req);
 
     const historyFilter = animal ? { $or: [{ animal_id: animal.id }, { tag_id: animal.tag_id }] } : tagId ? { tag_id: String(tagId) } : null;
     const [history, breeding, context] = await Promise.all([
@@ -347,7 +367,7 @@ router.post('/diagnose', aiLimits('diagnose'), async (req, res) => {
 
     const { data } = await ask({
       system: `${brandVoice(language)}\n\n${DIAGNOSIS_RULES}\n\n${DATA_NOTE}`,
-      messages: [{ role: 'user', content: `${asData('animal_case', facts)}\n\nWrite the diagnosis and treatment report.` }],
+      messages: [{ role: 'user', content: [...photos, { type: 'text', text: `${asData('animal_case', { ...facts, photos_attached: photos.length })}\n\n${photos.length ? `The ${photos.length === 1 ? 'photo shows' : `${photos.length} photos show`} the affected part of this animal. ` : ''}Write the diagnosis and treatment report.` }] }],
       schema: DIAGNOSIS_SCHEMA,
       effort: 'high'
     });
@@ -367,8 +387,15 @@ router.post('/diagnose', aiLimits('diagnose'), async (req, res) => {
       check_date: record ? record.check_date : undefined,
       vet_name: record ? record.vet_name : undefined,
       reported_signs: [record && record.disease, symptoms].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i).join('. ') || undefined,
-      current_treatment: record ? [record.treatment, record.medicine].filter(Boolean).join(', ') || undefined : undefined
+      current_treatment: record ? [record.treatment, record.medicine].filter(Boolean).join(', ') || undefined : undefined,
+      photo_count: photos.length || undefined
     };
+    /* Small previews of the photos, so the saved and printed report shows
+       what was examined. The full pictures are not stored. */
+    const thumbs = (Array.isArray(body.thumbnails) ? body.thumbnails : [])
+      .filter((t) => typeof t === 'string' && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(t) && t.length <= 200000)
+      .slice(0, photos.length);
+    if (thumbs.length) input.photos = thumbs;
     const title = data.title || `Diagnosis: ${input.tag_id || 'animal'}`;
     const saved = await saveReport(userId, 'diagnosis', title, input, data, language);
     res.status(201).json(await withUsage(req, { data: saved, error: null }));
@@ -569,6 +596,13 @@ router.post('/chat', aiLimits('chat'), async (req, res) => {
     if (!history.length || history[history.length - 1].role !== 'user') {
       return sendError(res, new AiError(400, 'AI_BAD_REQUEST', 'Ask a question first.'), req);
     }
+    /* Photos taken with the camera go with the latest question, for example
+       a picture of a wound or skin problem. */
+    const photos = imageBlocks(body.images);
+    if (photos.length) {
+      const last = history[history.length - 1];
+      last.content = [...photos, { type: 'text', text: last.content }];
+    }
 
     const context = await farmContext(userId);
     const system = [
@@ -576,6 +610,7 @@ router.post('/chat', aiLimits('chat'), async (req, res) => {
       'You answer questions from the farmer about their own farm, and general livestock husbandry questions.',
       'Use the tools to look up the farm records before answering anything about this farm. Quote the actual numbers you find. Keep answers short: a few sentences or a short list.',
       `For animal health questions, give practical first steps, then say clearly when to call a vet. ${VET_NOTICE}`,
+      'When the farmer sends a photo, look closely at the visible part of the animal: describe what you can see (lesions, swelling, discharge, skin, hair, eyes, hooves, wounds), name the likely problems from most to least likely, and say what to do next. If the photo is unclear or does not show an animal, say so and ask for a clearer picture.',
       `Farm context: ${JSON.stringify(context)}`,
       DATA_NOTE.replace('inside the XML tags', 'returned by the tools')
     ].join('\n\n');

@@ -48,7 +48,8 @@
       "administration": "Ubuyobozi",
       "system": "Sisitemu"
     },
-    "assistant": "Umufasha wa AI"
+    "assistant": "Umufasha wa AI",
+    "calendar": "Kalendari"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -215,7 +216,8 @@
         "category": "Icyiciro",
         "date": "Itariki",
         "description": "Ibisobanuro",
-        "currency": "Ifaranga"
+        "currency": "Ifaranga",
+        "tag_id": "Itungo"
       }
     },
     "tasks": {
@@ -422,7 +424,10 @@
     "languageHelp": "Hitamo ururimi ukunda kugira ngo rukoreshwe muri porogaramu.",
     "typeDeleteToConfirm": "Andika DELETE kugira ngo wemeze.",
     "signedInAs": "Winjiye nka {{email}}",
-    "appVersion": "LivestockPro Mobile v{{version}}"
+    "appVersion": "LivestockPro Mobile v{{version}}",
+    "livestockId": "Nomero ya Livestock",
+    "copyId": "Koporora nomero yawe ya Livestock",
+    "idCopied": "Nomero ya Livestock yakoporowe"
   },
   "dashboardPage": {
     "title": "Ikibaho",
@@ -496,7 +501,20 @@
     "noRecordsMatchFilters": "Nta nyandiko ihuye na muyunguruzi ukoresha ubu.",
     "recordsCount": "inyandiko {{count}}",
     "reportRefreshed": "Raporo yavuguruwe.",
-    "fullReportExported": "Raporo yuzuye yoherejwe muri CSV."
+    "fullReportExported": "Raporo yuzuye yoherejwe muri CSV.",
+    "to": "kugeza",
+    "animalReportTitle": "Raporo y’itungo: {{tag}}",
+    "farmReportTitle": "Raporo y’ifamu",
+    "healthChecks": "Isuzuma ry’ubuzima",
+    "openCases": "Indwara zitarakira",
+    "breedingEvents": "Inyandiko z’imyororokere",
+    "births": "Imbyaro",
+    "summary": "Incamake",
+    "exportReport": "Sohora raporo",
+    "allAnimals": "Amatungo yose",
+    "clearFilters": "Siba iyungurura",
+    "animalProfile": "Umwirondoro w’itungo",
+    "nothingToReport": "Nta cyo gutangaza"
   },
   "animalsPage": {
     "title": "Amatungo",
@@ -577,7 +595,9 @@
     "descriptionPlaceholder": "Ibisobanuro ku miyoborere y’aya mafaranga...",
     "confirmDeleteMessage": "Uremeza ko ushaka gusiba iyi nyandiko y’imari?",
     "amountMustBeGreaterThanZero": "Umubare ugomba kuba uruta 0.",
-    "convertedNote": "Ibiteranyo byahinduwe muri {{currency}} hakurikijwe igipimo cy’ivunjisha cy’ubu."
+    "convertedNote": "Ibiteranyo byahinduwe muri {{currency}} hakurikijwe igipimo cy’ivunjisha cy’ubu.",
+    "noAnimal": "Si iby’itungo rimwe",
+    "animalHint": "Huza fagitire ya muganga w’amatungo, ibyaguzwe cyangwa ibyagurishijwe n’itungo rimwe kugira ngo bigaragare muri raporo yaryo."
   },
   "tasksPage": {
     "title": "Imirimo",
@@ -1013,9 +1033,9 @@
   "ai": {
     "title": "Umufasha wa AI",
     "subtitle": "Raporo zo gusuzuma, inama ku murima n'ibisubizo bivuye mu makuru yawe",
-    "notConfigured": "AI ntirashyirwa kuri iyi seriveri. Umuyobozi agomba kongeramo urufunguzo rwa API rwa Anthropic.",
+    "notConfigured": "AI ntiratangizwa kuri iyi seriveri. Umuyobozi agomba kuyitangiza.",
     "vetNotice": "AI ya LivestockPro ifasha, ariko ntisimbura, umuganga w'amatungo wabigize umwuga. Buri gihe emeza isuzuma n'umuti wese wandikwa na muganga ku muganga w'amatungo.",
-    "poweredBy": "LivestockPro AI · ikoreshwa na Claude",
+    "poweredBy": "LivestockPro AI",
     "working": "Irimo gutekereza...",
     "back": "Subira inyuma",
     "tabs": {
@@ -1069,7 +1089,7 @@
       "working": "Irimo gusoma amakuru no kwandika raporo...",
       "fromRecord": "Suzuma ukoresheje AI",
       "previous": "Raporo zabanje z'iyi nyandiko",
-      "needInput": "Banza usobanure ibimenyetso."
+      "needInput": "Banza usobanure ibimenyetso cyangwa ufate ifoto."
     },
     "report": {
       "urgency": "Byihutirwa",
@@ -1197,7 +1217,8 @@
       "licence": "Nimero y'uruhushya",
       "signature": "Umukono",
       "date": "Itariki",
-      "important": "Icyitonderwa:"
+      "important": "Icyitonderwa:",
+      "photos": "Amafoto yasuzumwe"
     },
     "usage": {
       "left": "Ubusabe bwa AI {{remaining}} kuri {{limit}} busigaye uyu munsi",
@@ -1209,6 +1230,20 @@
         "chat": "ibibazo",
         "brief": "incamake za One Health"
       }
+    },
+    "photo": {
+      "label": "Amafoto y’igice cyafashwe",
+      "take": "Fata ifoto",
+      "upload": "Ohereza ifoto",
+      "hint": "Amafoto agera kuri {{max}} agaragara neza y’igice cy’umubiri cyafashwe, afashwe ahari urumuri ruhagije.",
+      "alt": "Ifoto {{n}}",
+      "remove": "Kuraho ifoto",
+      "unreadable": "Iyo foto ntiyasomwe. Gerageza indi foto.",
+      "cameraTitle": "Fata ifoto",
+      "capture": "Fata",
+      "noCamera": "Kamera ntiyafungutse. Emerera mushakisha gukoresha kamera, cyangwa wohereze ifoto.",
+      "tip": "Egereza kamera igice cyafashwe, ahari urumuri ruhagije, kandi ntunyeganyege.",
+      "defaultQuestion": "Ubona iki kuri iyi foto? Iri tungo rifite ikibazo cy’ubuzima, kandi nkore iki?"
     }
   },
   "org": {
@@ -1659,6 +1694,142 @@
     "staffInvite": {
       "title": "Ubutumire bw'ikigo",
       "body": "Watumiwe kwinjira muri {{name}}."
+    }
+  },
+  "search": {
+    "placeholder": "Shakisha amatungo, inyandiko, imirimo…",
+    "clear": "Siba ibyo washakishaga",
+    "filteringPage": "Biri gushungura {{section}} uko wandika",
+    "noneElsewhere": "Nta bisubizo mu bindi bice",
+    "none": "Nta cyabonetse kuri “{{query}}”",
+    "viewAll_one": "Reba {{count}}",
+    "viewAll_other": "Reba byose {{count}}"
+  },
+  "aiAdmin": {
+    "tab": "AI",
+    "saved": "Igenamiterere rya AI ryabitswe",
+    "status": "LivestockPro AI",
+    "on": "Irakora",
+    "off": "Ntikora",
+    "requestsToday": "Ibisabwa uyu munsi",
+    "okFailed": "{{ok}} byasubijwe, {{failed}} byanze",
+    "refusedToday": "Byanzwe n’imipaka uyu munsi",
+    "usersToday": "Abakoresha uyu munsi",
+    "tokensToday": "Tokeni z’uyu munsi",
+    "tokensSplit": "{{input}} zinjiye, {{output}} zasohotse",
+    "avgTime": "Igihe gisanzwe cyo gusubiza",
+    "seconds": "amasegonda {{n}}",
+    "settingsTitle": "Moderi n’imipaka",
+    "notConfigured": "AI ntikora: seriveri nta rufunguzo rwa AI ifite. Rwongere mu igenamiterere rya seriveri kugira ngo AI ikore.",
+    "model": "Moderi",
+    "modelHint": "Serivisi zose za AI zikoresha iyi moderi. Mbere yo guhindura, LivestockPro igenzura ko moderi ishobora gukoresha serivisi zose.",
+    "tier": {
+      "frontier": "igisekuru gishya",
+      "advanced": "ifite ubushobozi bwinshi",
+      "balanced": "yihuta kandi ishoboye",
+      "fast": "yihuta cyane, ihendutse"
+    },
+    "limit": {
+      "per_minute": "Ibisabwa ku munota (kuri buri mukoresha)",
+      "per_hour": "Ibisabwa ku isaha (kuri buri mukoresha)",
+      "total": "Ibisabwa ku munsi (kuri buri mukoresha)",
+      "diagnose": "Isuzuma ku munsi",
+      "advisor": "Inama z’ubworozi ku munsi",
+      "chat": "Ibibazo ku munsi",
+      "brief": "Raporo za One Health ku munsi",
+      "admin_multiplier": "Inshuro z’abayobozi"
+    },
+    "defaultValue": "Bisanzwe {{n}}",
+    "testing": "Biri kugenzura moderi…",
+    "updatedAt": "Byahinduwe bwa nyuma {{date}}",
+    "last14": "Iminsi 14 ishize",
+    "answered": "Byasubijwe",
+    "failed": "Byanze",
+    "refused": "Byanzwe",
+    "byFeature": "Uyu munsi hakurikijwe serivisi",
+    "noUseToday": "Nta ikoreshwa rya AI rirabaho uyu munsi.",
+    "feature": "Serivisi",
+    "tokens": "Tokeni",
+    "kind": {
+      "diagnose": "Isuzuma",
+      "advisor": "Inama z’ubworozi",
+      "chat": "Ibibazo",
+      "brief": "Raporo ya One Health"
+    },
+    "refusals": "Ibisabwa byanzwe uyu munsi",
+    "noRefusals": "Nta cyasabwe cyanzwe uyu munsi.",
+    "reason": "Impamvu",
+    "requests": "Ibisabwa",
+    "users": "Abakoresha",
+    "refusal": {
+      "AI_BURST": "Byinshi cyane mu munota umwe",
+      "AI_LIMIT": "Umupaka w’isaha wagezweho",
+      "AI_QUOTA": "Ibyagenewe uyu munsi byashize"
+    },
+    "topUsers": "Abakoresha bakoresheje cyane uyu munsi",
+    "user": "Umukoresha",
+    "byModel": "Iminsi 14 ishize hakurikijwe moderi"
+  },
+  "exports": {
+    "export": "Sohora",
+    "preparing": "Biri gutegurwa…",
+    "done": "Dosiye ya {{format}} yabitswe",
+    "failed": "Gusohora byanze: {{message}}",
+    "formats": {
+      "pdf": "PDF",
+      "xlsx": "Excel",
+      "csv": "CSV"
+    },
+    "formatHints": {
+      "pdf": "Inyandiko iriho ikirango yo gucapa cyangwa gusangiza",
+      "xlsx": "Imbonerahamwe, urupapuro rumwe kuri buri gice",
+      "csv": "Amakuru gusa ku porogaramu iyo ari yo yose"
+    },
+    "fields": {
+      "district": "Akarere",
+      "last_check_date": "Isuzuma rya nyuma"
+    },
+    "recordsCount_one": "inyandiko {{count}}",
+    "recordsCount_other": "inyandiko {{count}}",
+    "farm": "Ifamu",
+    "generated": "Byakozwe",
+    "filters": "Iyungurura",
+    "page": "Urupapuro {{page}} kuri {{pages}}"
+  },
+  "calendar": {
+    "title": "Kalendari",
+    "subtitle": "Imirimo, isuzuma ry’ubuzima, imyororokere n’imbyaro kuri kalendari imwe",
+    "today": "Uyu munsi",
+    "previous": "Ukwezi gushize",
+    "next": "Ukwezi gutaha",
+    "show": "Erekana kuri kalendari",
+    "kinds": {
+      "task": "Imirimo",
+      "overdue": "Byarengeje igihe",
+      "followUp": "Isuzuma ryo gukurikirana",
+      "healthCheck": "Isuzuma ry’ubuzima",
+      "breeding": "Imyororokere",
+      "birthDue": "Imbyaro zitegerejwe",
+      "birth": "Imbyaro",
+      "feeding": "Kugaburira"
+    },
+    "eventsCount_one": "igikorwa {{count}}",
+    "eventsCount_other": "ibikorwa {{count}}",
+    "more_one": "n’ikindi {{count}}",
+    "more_other": "n’ibindi {{count}}",
+    "upcoming": "Iminsi 30 iri imbere",
+    "nothingUpcoming": "Nta kintu giteganyijwe mu minsi 30 iri imbere.",
+    "addTaskOnDay": "Ongeraho umurimo kuri uyu munsi",
+    "nothingThisDay": "Nta kintu kuri uyu munsi.",
+    "events": {
+      "healthCheck": "Isuzuma ry’ubuzima: {{tag}}",
+      "followUp": "Isuzuma ryo gukurikirana: {{tag}}",
+      "followUpMissed": "Isuzuma ryasubitswe: {{tag}}",
+      "breeding": "Yimiwe: {{tag}}",
+      "birthDue": "Kubyara bitegerejwe: {{tag}}",
+      "birth": "Yabyaye: {{tag}}",
+      "newborns_one": "icyana {{count}}",
+      "newborns_other": "ibyana {{count}}"
     }
   }
 }

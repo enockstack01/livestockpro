@@ -21,7 +21,11 @@ export function useTopbarSearch(placeholder, onChange) {
 
   useEffect(() => {
     if (!ctx) return;
-    ctx.setValue('');
+    /* A link from the top bar search (?search=…) opens the page already
+       filtered by that text. */
+    const fromLink = new URLSearchParams(window.location.search).get('search') || '';
+    ctx.setValue(fromLink);
+    if (fromLink) onChangeRef.current(fromLink);
     ctx.setConfig({ placeholder, onChange: (v) => onChangeRef.current(v) });
     return () => ctx.setConfig(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps

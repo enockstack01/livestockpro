@@ -2,22 +2,27 @@ const AnthropicModule = require('@anthropic-ai/sdk');
 
 const Anthropic = AnthropicModule.default || AnthropicModule;
 
-/* LivestockPro's AI features run on Claude through the Anthropic API.
-   ANTHROPIC_API_KEY turns them on; without it every /api/ai route answers
-   503 so the clients can show "AI is not set up yet" instead of failing.
-   ANTHROPIC_MODEL overrides the model without a code change. */
-const MODEL = process.env.ANTHROPIC_MODEL || 'claude-opus-5-5';
+const { currentModel, logModelCall } = require('./aiSettings');
+
+/* LivestockPro AI. AI_API_KEY turns it on; without it every /api/ai
+   route answers 503 so the clients can show "AI is not set up yet" instead
+   of failing. The model comes from the admin's AI settings
+   (server/lib/aiSettings.js); users never see which provider runs it. */
 const FALLBACK_BETA = 'server-side-fallback-2026-07-01';
 
 let client = null;
 
+/* AI_API_KEY; the older variable name still works so existing deployments
+   keep running. */
+const apiKey = () => process.env.AI_API_KEY || process.env.ANTHROPIC_API_KEY || '';
+
 function isConfigured() {
-  return Boolean(process.env.ANTHROPIC_API_KEY);
+  return Boolean(apiKey());
 }
 
 function getClient() {
   if (!isConfigured()) return null;
-  if (!client) client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, maxRetries: 2, timeout: 5 * 60 * 1000 });
+  if (!client) client = new Anthropic({ apiKey: apiKey(), maxRetries: 2, timeout: 5 * 60 * 1000 });
   return client;
 }
 
@@ -57,7 +62,7 @@ const VET_NOTICE = 'LivestockPro AI supports, and does not replace, a qualified 
 function mapApiError(err) {
   if (err instanceof AiError) return err;
   if (err instanceof Anthropic.AuthenticationError || err instanceof Anthropic.PermissionDeniedError) {
-    return new AiError(503, 'AI_KEY_INVALID', 'The AI service rejected the API key. Check ANTHROPIC_API_KEY.');
+    return new AiError(503, 'AI_KEY_INVALID', 'The AI service rejected the server key. An administrator needs to check the AI key.');
   }
   if (err instanceof Anthropic.RateLimitError) return new AiError(429, 'AI_BUSY', 'The AI service is busy. Please try again in a minute.');
   if (err instanceof Anthropic.BadRequestError) return new AiError(400, 'AI_BAD_REQUEST', err.message);
@@ -69,12 +74,13 @@ function mapApiError(err) {
 /* One Messages API call. `schema` asks for JSON matching that schema
    (structured outputs) and returns the parsed object; otherwise the text.
    With `tools` the raw message is returned so the caller can run them. */
-async function ask({ system, messages, schema, tools, effort = 'medium', maxTokens = 16000, raw = false }) {
+async function ask({ system, messages, schema, tools, effort = 'medium', maxTokens = 16000, raw = false, model }) {
   const anthropic = getClient();
   if (!anthropic) throw new AiError(503, 'AI_NOT_CONFIGURED', 'AI is not set up on this server yet.');
 
+  const modelId = model || (await currentModel());
   const params = {
-    model: MODEL,
+    model: modelId,
     max_tokens: maxTokens,
     betas: [FALLBACK_BETA],
     fallbacks: 'default',
@@ -85,11 +91,15 @@ async function ask({ system, messages, schema, tools, effort = 'medium', maxToke
   if (tools) params.tools = tools;
 
   let response;
+  const started = Date.now();
   try {
     response = await anthropic.beta.messages.create(params);
   } catch (err) {
-    throw mapApiError(err);
+    const mapped = mapApiError(err);
+    logModelCall({ model: modelId, ok: false, code: mapped.code, usage: null, ms: Date.now() - started });
+    throw mapped;
   }
+  logModelCall({ model: modelId, ok: response.stop_reason !== 'refusal', code: response.stop_reason === 'refusal' ? 'AI_REFUSED' : null, usage: response.usage, ms: Date.now() - started });
 
   if (response.stop_reason === 'refusal') {
     throw new AiError(422, 'AI_REFUSED', 'The AI could not help with this request.');
@@ -112,4 +122,21 @@ function textOf(response) {
   return response.content.filter((b) => b.type === 'text').map((b) => b.text).join('').trim();
 }
 
-module.exports = { MODEL, AiError, isConfigured, ask, textOf, brandVoice, languageName, VET_NOTICE, mapApiError };
+/* Image blocks for photos the user took: [{ media_type, data }] in base64. */
+const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_IMAGES = 3;
+const MAX_IMAGE_CHARS = 7 * 1024 * 1024; // about 5 MB once decoded
+
+function imageBlocks(images) {
+  if (!Array.isArray(images) || !images.length) return [];
+  if (images.length > MAX_IMAGES) throw new AiError(400, 'AI_BAD_REQUEST', `Send at most ${MAX_IMAGES} photos.`);
+  return images.map((img) => {
+    const type = img && String(img.media_type || '').toLowerCase();
+    const data = img && String(img.data || '').replace(/^data:[^,]+,/, '');
+    if (!IMAGE_TYPES.includes(type) || !data || !/^[A-Za-z0-9+/=]+$/.test(data)) throw new AiError(400, 'AI_BAD_REQUEST', 'A photo could not be read. Use a JPEG, PNG or WebP picture.');
+    if (data.length > MAX_IMAGE_CHARS) throw new AiError(400, 'AI_BAD_REQUEST', 'A photo is too large. Use a smaller picture.');
+    return { type: 'image', source: { type: 'base64', media_type: type, data } };
+  });
+}
+
+module.exports = { imageBlocks, MAX_IMAGES, getClient, AiError, isConfigured, ask, textOf, brandVoice, languageName, VET_NOTICE, mapApiError };

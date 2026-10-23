@@ -6,6 +6,7 @@ import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import { fmtDate } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
+import { RecordExportMenu } from '../components/ExportMenu.jsx';
 import { useOpenAddFromUrl } from '../lib/useOpenAddFromUrl.js';
 import { formatRecordMoney, getCurrency } from '../../../shared/currency';
 import MoneyInput from '../components/MoneyInput.jsx';
@@ -95,7 +96,10 @@ export default function Feeding() {
     <>
       <div className="page-header">
         <div><h1>{t('feedingPage.title')}</h1><p>{t('feedingPage.subtitle')}</p></div>
-        <button className="btn btn-primary" onClick={openAdd}><i className="fas fa-plus"></i> {t('feedingPage.addRecord')}</button>
+        <div className="d-flex gap-16 flex-wrap">
+          <RecordExportMenu table="feeding_records" rows={filtered} filtersText={search} />
+          <button className="btn btn-primary" onClick={openAdd}><i className="fas fa-plus"></i> {t('feedingPage.addRecord')}</button>
+        </div>
       </div>
 
       <div className="card mb-24">

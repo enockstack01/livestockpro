@@ -3,6 +3,7 @@ const { getDb } = require('../db');
 const { requireAuth, requireRole, getRole, primaryEmail, clerkClient } = require('../authMiddleware');
 const { ACCOUNT_STATUSES, accounts, getAccount, forgetApproval } = require('../lib/accounts');
 const { farmerLink, endFarmerLink } = require('../lib/orgs');
+const { livestockIdsFor } = require('../lib/livestockId');
 
 const router = express.Router();
 
@@ -147,6 +148,7 @@ router.get('/users', async (req, res) => {
     const today = new Date().toISOString().slice(0, 10);
     const usageDocs = await db.collection('ai_usage').find({ day: today, user_id: { $in: sorted.map((u) => u.id) } }).toArray();
     const aiUsedById = new Map(usageDocs.map((d) => [d.user_id, d.total || 0]));
+    const livestockIds = await livestockIdsFor(sorted.map((u) => u.id));
 
     const users = await Promise.all(sorted.map(async (u) => {
       const [profile, ...counts] = await Promise.all([
@@ -164,6 +166,7 @@ router.get('/users', async (req, res) => {
       if (role !== 'user') accountStatus = 'approved';
       return {
         id: u.id,
+        livestockId: livestockIds[u.id] || null,
         email: primaryEmail(u),
         createdAt: u.createdAt,
         lastSignInAt: u.lastSignInAt,

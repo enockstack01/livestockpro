@@ -6,6 +6,7 @@ import { useTopbarSearch } from '../lib/topbarSearch.jsx';
 import { PregnancyBadge, fmtDate } from '../lib/badges.jsx';
 import { useGeoCapture, LocationCaptureBadge } from '../lib/geolocation.jsx';
 import Modal from '../components/Modal.jsx';
+import { RecordExportMenu } from '../components/ExportMenu.jsx';
 import { useOpenAddFromUrl } from '../lib/useOpenAddFromUrl.js';
 
 const EMPTY_FORM = { tag_id: '', breeding_date: '', pregnancy_status: 'Not Confirmed', expected_birth_date: '', birth_date: '', newborn_count: '', newborn_details: '', notes: '' };
@@ -83,7 +84,10 @@ export default function Breeding() {
     <>
       <div className="page-header">
         <div><h1>{t('breedingPage.title')}</h1><p>{t('breedingPage.subtitle')}</p></div>
-        <button className="btn btn-primary" onClick={openAdd}><i className="fas fa-plus"></i> {t('breedingPage.addRecord')}</button>
+        <div className="d-flex gap-16 flex-wrap">
+          <RecordExportMenu table="breeding_records" rows={filtered} filtersText={search} />
+          <button className="btn btn-primary" onClick={openAdd}><i className="fas fa-plus"></i> {t('breedingPage.addRecord')}</button>
+        </div>
       </div>
 
       <div className="filter-bar">

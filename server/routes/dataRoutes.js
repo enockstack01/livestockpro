@@ -16,7 +16,7 @@ const SCHEMAS = {
   feeding_records: ['feed_type', 'quantity', 'unit', 'cost', 'currency', 'feeding_date', 'animal_group', 'district', 'latitude', 'longitude', 'notes'],
   breeding_records: ['animal_id', 'tag_id', 'breeding_date', 'pregnancy_status', 'expected_birth_date', 'birth_date', 'newborn_count', 'newborn_details', 'district', 'latitude', 'longitude', 'notes'],
   production_records: ['animal_id', 'tag_id', 'production_type', 'quantity', 'unit', 'production_date', 'district', 'latitude', 'longitude', 'notes'],
-  finance_records: ['type', 'category', 'amount', 'currency', 'date', 'description', 'district', 'latitude', 'longitude'],
+  finance_records: ['type', 'category', 'amount', 'currency', 'date', 'description', 'animal_id', 'tag_id', 'district', 'latitude', 'longitude'],
   tasks: ['title', 'description', 'due_date', 'status', 'priority', 'district', 'latitude', 'longitude'],
   /* Registered by the mobile app (src/notifications/registerPushToken.js) —
      never synced/cached, written and read directly, one row per device. */

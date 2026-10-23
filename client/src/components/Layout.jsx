@@ -3,7 +3,9 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useClerk, useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
 import { useApi } from '../lib/api.js';
-import { TopbarSearchProvider, useTopbarSearchBox } from '../lib/topbarSearch.jsx';
+import { TopbarSearchProvider } from '../lib/topbarSearch.jsx';
+import GlobalSearch from './GlobalSearch.jsx';
+import LanguageMenu from './LanguageMenu.jsx';
 import { useTheme } from '../theme/ThemeProvider.jsx';
 import { isOverdueTask } from '../../../shared/businessRules';
 import { NAV_SECTIONS, ORG_NAV_SECTIONS } from '../../../shared/navigation';
@@ -134,22 +136,6 @@ function useReadNotifications(userId) {
   return { readIds, markRead, markAllRead };
 }
 
-function TopbarSearchInput() {
-  const { config, value, setValue } = useTopbarSearchBox();
-  if (!config) return null;
-  return (
-    <div className="search-box">
-      <i className="fas fa-search"></i>
-      <input
-        type="text"
-        placeholder={config.placeholder}
-        value={value}
-        onChange={(e) => { setValue(e.target.value); config.onChange(e.target.value); }}
-      />
-    </div>
-  );
-}
-
 function LayoutInner() {
   const { t } = useTranslation();
   const { scheme, setThemePreference } = useTheme();
@@ -221,9 +207,10 @@ function LayoutInner() {
       <header className="topbar">
         <div className="topbar-left">
           <button className="menu-toggle" onClick={() => setSidebarOpen(true)}><i className="fas fa-bars"></i></button>
-          <TopbarSearchInput />
+          <GlobalSearch farmData={!isOrg} />
         </div>
         <div className="topbar-right">
+          <LanguageMenu />
           <button
             className="topbar-btn"
             title={t('layout.toggleTheme')}

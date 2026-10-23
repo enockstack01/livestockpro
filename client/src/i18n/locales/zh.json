@@ -48,7 +48,8 @@
       "administration": "管理",
       "system": "系统"
     },
-    "assistant": "AI 助手"
+    "assistant": "AI 助手",
+    "calendar": "日历"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -215,7 +216,8 @@
         "category": "类别",
         "date": "日期",
         "description": "描述",
-        "currency": "货币"
+        "currency": "货币",
+        "tag_id": "牲畜"
       }
     },
     "tasks": {
@@ -422,7 +424,10 @@
     "languageHelp": "选择您在应用界面中偏好使用的语言。",
     "typeDeleteToConfirm": "请输入 DELETE 以确认。",
     "signedInAs": "已登录为 {{email}}",
-    "appVersion": "LivestockPro Mobile v{{version}}"
+    "appVersion": "LivestockPro Mobile v{{version}}",
+    "livestockId": "Livestock 编号",
+    "copyId": "复制您的 Livestock 编号",
+    "idCopied": "已复制 Livestock 编号"
   },
   "dashboardPage": {
     "title": "仪表板",
@@ -496,7 +501,20 @@
     "noRecordsMatchFilters": "没有符合当前筛选条件的记录。",
     "recordsCount": "{{count}}条记录",
     "reportRefreshed": "报告已刷新。",
-    "fullReportExported": "完整报告已导出为CSV。"
+    "fullReportExported": "完整报告已导出为CSV。",
+    "to": "至",
+    "animalReportTitle": "牲畜报告：{{tag}}",
+    "farmReportTitle": "农场报告",
+    "healthChecks": "健康检查",
+    "openCases": "未结病例",
+    "breedingEvents": "繁殖记录",
+    "births": "出生",
+    "summary": "摘要",
+    "exportReport": "导出报告",
+    "allAnimals": "全部牲畜",
+    "clearFilters": "清除筛选",
+    "animalProfile": "牲畜档案",
+    "nothingToReport": "没有可报告的内容"
   },
   "animalsPage": {
     "title": "动物",
@@ -577,7 +595,9 @@
     "descriptionPlaceholder": "关于此交易的详细信息...",
     "confirmDeleteMessage": "确定要删除此财务记录吗？",
     "amountMustBeGreaterThanZero": "金额必须大于0。",
-    "convertedNote": "合计已按当前汇率换算为 {{currency}}。"
+    "convertedNote": "合计已按当前汇率换算为 {{currency}}。",
+    "noAnimal": "不属于某一头牲畜",
+    "animalHint": "将兽医账单、采购或销售关联到一头牲畜，它就会出现在该牲畜的报告中。"
   },
   "tasksPage": {
     "title": "任务",
@@ -1013,9 +1033,9 @@
   "ai": {
     "title": "AI 助手",
     "subtitle": "诊断报告、农场建议以及基于您自己记录的解答",
-    "notConfigured": "此服务器尚未设置 AI。管理员需要添加 Anthropic API 密钥。",
+    "notConfigured": "此服务器尚未开启 AI。需要管理员开启。",
     "vetNotice": "LivestockPro AI 辅助而不取代合格的兽医。诊断结果和任何处方药都请务必由兽医确认。",
-    "poweredBy": "LivestockPro AI · 由 Claude 提供支持",
+    "poweredBy": "LivestockPro 智能助手",
     "working": "正在思考...",
     "back": "返回",
     "tabs": {
@@ -1069,7 +1089,7 @@
       "working": "正在读取记录并撰写报告...",
       "fromRecord": "用 AI 诊断",
       "previous": "此记录的历史报告",
-      "needInput": "请先描述症状。"
+      "needInput": "请先描述症状或拍一张照片。"
     },
     "report": {
       "urgency": "紧急程度",
@@ -1197,7 +1217,8 @@
       "licence": "执业证号",
       "signature": "签名",
       "date": "日期",
-      "important": "重要："
+      "important": "重要：",
+      "photos": "已检查的照片"
     },
     "usage": {
       "left": "今天还剩 {{remaining}}/{{limit}} 次 AI 请求",
@@ -1209,6 +1230,20 @@
         "chat": "提问",
         "brief": "One Health 简报"
       }
+    },
+    "photo": {
+      "label": "患处照片",
+      "take": "拍照",
+      "upload": "上传照片",
+      "hint": "最多 {{max}} 张在光线充足处拍摄的、清晰的患处照片。",
+      "alt": "照片 {{n}}",
+      "remove": "移除照片",
+      "unreadable": "无法读取这张图片。请换一张照片。",
+      "cameraTitle": "拍照",
+      "capture": "拍摄",
+      "noCamera": "无法打开摄像头。请在浏览器中允许使用摄像头，或改为上传照片。",
+      "tip": "在光线充足处把摄像头靠近患处，并保持稳定。",
+      "defaultQuestion": "这张照片里能看到什么？这头牲畜有健康问题吗？我该怎么做？"
     }
   },
   "org": {
@@ -1659,6 +1694,137 @@
     "staffInvite": {
       "title": "机构邀请",
       "body": "您受邀加入 {{name}}。"
+    }
+  },
+  "search": {
+    "placeholder": "搜索牲畜、记录、任务…",
+    "clear": "清除搜索",
+    "filteringPage": "输入时筛选{{section}}",
+    "noneElsewhere": "其他板块没有匹配结果",
+    "none": "没有找到“{{query}}”",
+    "viewAll_other": "查看全部 {{count}} 条"
+  },
+  "aiAdmin": {
+    "tab": "AI",
+    "saved": "AI 设置已保存",
+    "status": "LivestockPro 智能助手",
+    "on": "已开启",
+    "off": "已关闭",
+    "requestsToday": "今日请求",
+    "okFailed": "已回答 {{ok}}，失败 {{failed}}",
+    "refusedToday": "今日因限制被拒绝",
+    "usersToday": "今日用户",
+    "tokensToday": "今日令牌",
+    "tokensSplit": "输入 {{input}}，输出 {{output}}",
+    "avgTime": "平均回答时间",
+    "seconds": "{{n}} 秒",
+    "settingsTitle": "模型和限制",
+    "notConfigured": "AI 已关闭：服务器没有 AI 密钥。请在服务器设置中添加以开启 AI。",
+    "model": "模型",
+    "modelHint": "所有 AI 功能都使用此模型。切换前，LivestockPro 会检查该模型能否运行全部功能。",
+    "tier": {
+      "frontier": "最新一代",
+      "advanced": "能力最强",
+      "balanced": "快速且能力强",
+      "fast": "最快、成本最低"
+    },
+    "limit": {
+      "per_minute": "每分钟请求数（每位用户）",
+      "per_hour": "每小时请求数（每位用户）",
+      "total": "每天请求数（每位用户）",
+      "diagnose": "每天诊断次数",
+      "advisor": "每天农场建议次数",
+      "chat": "每天提问次数",
+      "brief": "每天同一健康简报次数",
+      "admin_multiplier": "管理员额度倍数"
+    },
+    "defaultValue": "默认 {{n}}",
+    "testing": "正在检查模型…",
+    "updatedAt": "最近修改于 {{date}}",
+    "last14": "最近 14 天",
+    "answered": "已回答",
+    "failed": "失败",
+    "refused": "被拒绝",
+    "byFeature": "今日按功能",
+    "noUseToday": "今天还没有使用 AI。",
+    "feature": "功能",
+    "tokens": "令牌",
+    "kind": {
+      "diagnose": "诊断",
+      "advisor": "农场建议",
+      "chat": "提问",
+      "brief": "同一健康简报"
+    },
+    "refusals": "今日被拒绝的请求",
+    "noRefusals": "今天没有请求被拒绝。",
+    "reason": "原因",
+    "requests": "请求",
+    "users": "用户",
+    "refusal": {
+      "AI_BURST": "一分钟内请求过多",
+      "AI_LIMIT": "已达每小时上限",
+      "AI_QUOTA": "今日额度已用完"
+    },
+    "topUsers": "今日最活跃的用户",
+    "user": "用户",
+    "byModel": "最近 14 天按模型"
+  },
+  "exports": {
+    "export": "导出",
+    "preparing": "正在准备…",
+    "done": "已保存 {{format}} 文件",
+    "failed": "导出失败：{{message}}",
+    "formats": {
+      "pdf": "PDF",
+      "xlsx": "Excel",
+      "csv": "CSV"
+    },
+    "formatHints": {
+      "pdf": "带品牌标识的文档，可打印或分享",
+      "xlsx": "电子表格，每个板块一张工作表",
+      "csv": "适用于任何程序的纯数据"
+    },
+    "fields": {
+      "district": "区",
+      "last_check_date": "最近检查"
+    },
+    "recordsCount_other": "{{count}} 条记录",
+    "farm": "农场",
+    "generated": "生成时间",
+    "filters": "筛选条件",
+    "page": "第 {{page}} 页，共 {{pages}} 页"
+  },
+  "calendar": {
+    "title": "日历",
+    "subtitle": "任务、健康检查、繁殖和出生都在一个日历中",
+    "today": "今天",
+    "previous": "上个月",
+    "next": "下个月",
+    "show": "在日历中显示",
+    "kinds": {
+      "task": "任务",
+      "overdue": "已逾期",
+      "followUp": "复查",
+      "healthCheck": "健康检查",
+      "breeding": "繁殖",
+      "birthDue": "预计分娩",
+      "birth": "出生",
+      "feeding": "饲喂"
+    },
+    "eventsCount_other": "{{count}} 个事件",
+    "more_other": "还有 {{count}} 个",
+    "upcoming": "未来 30 天",
+    "nothingUpcoming": "未来 30 天没有安排。",
+    "addTaskOnDay": "在这一天添加任务",
+    "nothingThisDay": "这一天没有安排。",
+    "events": {
+      "healthCheck": "健康检查：{{tag}}",
+      "followUp": "复查：{{tag}}",
+      "followUpMissed": "错过复查：{{tag}}",
+      "breeding": "配种：{{tag}}",
+      "birthDue": "预计分娩：{{tag}}",
+      "birth": "出生：{{tag}}",
+      "newborns_other": "{{count}} 头幼畜"
     }
   }
 }

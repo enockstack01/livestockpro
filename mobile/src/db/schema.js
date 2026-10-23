@@ -1,7 +1,7 @@
 import { SCHEMAS, SYNCED_TABLES } from '../lib/shared';
 
 export const DB_NAME = 'livestockpro.db';
-const DATABASE_VERSION = 3;
+const DATABASE_VERSION = 4;
 
 /* Fields known to hold numbers, so their SQLite column gets NUMERIC affinity
    (matters for correct ORDER BY / range comparisons — SQLite is otherwise
@@ -59,6 +59,16 @@ export async function migrateDbIfNeeded(db) {
       if (!cols.some((c) => c.name === col)) await db.execAsync(`ALTER TABLE profiles ADD COLUMN ${col} TEXT;`);
     }
     version = 3;
+  }
+
+  /* v4: a finance record can name the animal it is for (a vet bill, a
+     sale), so a report filtered to one animal shows its money too. */
+  if (version < 4) {
+    const cols = await db.getAllAsync('PRAGMA table_info(finance_records)');
+    for (const col of ['animal_id', 'tag_id']) {
+      if (!cols.some((c) => c.name === col)) await db.execAsync(`ALTER TABLE finance_records ADD COLUMN ${col} TEXT;`);
+    }
+    version = 4;
   }
 
   await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION};`);

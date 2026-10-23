@@ -15,6 +15,7 @@ const ratesRoutes = require('./routes/ratesRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const orgRoutes = require('./routes/orgRoutes');
 const adminOrgRoutes = require('./routes/adminOrgRoutes');
+const adminAiRoutes = require('./routes/adminAiRoutes');
 const { join: joinRoutes, me: meOrgRoutes, notes: notificationRoutes } = require('./routes/joinRoutes');
 const { startStatsJob } = require('./lib/orgs');
 
@@ -115,6 +116,9 @@ app.use('/api', cors((req, callback) => {
   const allowed = !origin || ALLOWED_ORIGINS.includes(origin) || isOwnOrigin(origin, req);
   callback(null, { origin: allowed });
 }));
+/* AI requests can carry up to three camera photos; everything else stays
+   at 5 MB. */
+app.use('/api/ai', express.json({ limit: '25mb' }));
 app.use(express.json({ limit: '5mb' }));
 
 /* General abuse/brute-force guard on the API surface — generous enough for
@@ -130,6 +134,7 @@ app.use('/api', clerkMiddleware());
 app.use('/api/data', dataRoutes);
 app.use('/api/rpc', rpcRoutes);
 app.use('/api/admin', adminOrgRoutes);
+app.use('/api/admin', adminAiRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/account', accountRoutes);
 app.use('/api/rates', ratesRoutes);

@@ -48,7 +48,8 @@
       "administration": "الإدارة",
       "system": "النظام"
     },
-    "assistant": "المساعد الذكي"
+    "assistant": "المساعد الذكي",
+    "calendar": "التقويم"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -215,7 +216,8 @@
         "category": "الفئة",
         "date": "التاريخ",
         "description": "الوصف",
-        "currency": "العملة"
+        "currency": "العملة",
+        "tag_id": "الحيوان"
       }
     },
     "tasks": {
@@ -422,7 +424,10 @@
     "languageHelp": "اختر لغتك المفضلة لواجهة التطبيق.",
     "typeDeleteToConfirm": "اكتب DELETE للتأكيد.",
     "signedInAs": "تم تسجيل الدخول باسم {{email}}",
-    "appVersion": "LivestockPro Mobile v{{version}}"
+    "appVersion": "LivestockPro Mobile v{{version}}",
+    "livestockId": "معرّف Livestock",
+    "copyId": "نسخ معرّف Livestock الخاص بك",
+    "idCopied": "تم نسخ معرّف Livestock"
   },
   "dashboardPage": {
     "title": "لوحة التحكم",
@@ -496,7 +501,20 @@
     "noRecordsMatchFilters": "لا توجد سجلات تطابق عوامل التصفية الحالية.",
     "recordsCount": "{{count}} سجل",
     "reportRefreshed": "تم تحديث التقرير.",
-    "fullReportExported": "تم تصدير التقرير الكامل إلى CSV."
+    "fullReportExported": "تم تصدير التقرير الكامل إلى CSV.",
+    "to": "إلى",
+    "animalReportTitle": "تقرير الحيوان: {{tag}}",
+    "farmReportTitle": "تقرير المزرعة",
+    "healthChecks": "الفحوص الصحية",
+    "openCases": "الحالات المفتوحة",
+    "breedingEvents": "سجلات التكاثر",
+    "births": "الولادات",
+    "summary": "الملخص",
+    "exportReport": "تصدير التقرير",
+    "allAnimals": "كل الحيوانات",
+    "clearFilters": "مسح عوامل التصفية",
+    "animalProfile": "ملف الحيوان",
+    "nothingToReport": "لا شيء للإبلاغ عنه"
   },
   "animalsPage": {
     "title": "الحيوانات",
@@ -577,7 +595,9 @@
     "descriptionPlaceholder": "تفاصيل حول هذه المعاملة...",
     "confirmDeleteMessage": "هل أنت متأكد من حذف هذا السجل المالي؟",
     "amountMustBeGreaterThanZero": "يجب أن يكون المبلغ أكبر من 0.",
-    "convertedNote": "الإجماليات محوّلة إلى {{currency}} بأسعار الصرف الحالية."
+    "convertedNote": "الإجماليات محوّلة إلى {{currency}} بأسعار الصرف الحالية.",
+    "noAnimal": "ليس لحيوان واحد",
+    "animalHint": "اربط فاتورة بيطرية أو عملية شراء أو بيع بحيوان واحد لتظهر في تقريره."
   },
   "tasksPage": {
     "title": "المهام",
@@ -1013,9 +1033,9 @@
   "ai": {
     "title": "المساعد الذكي",
     "subtitle": "تقارير التشخيص ونصائح المزرعة وإجابات من سجلاتك",
-    "notConfigured": "لم يتم إعداد الذكاء الاصطناعي على هذا الخادم بعد. يجب على المسؤول إضافة مفتاح Anthropic API.",
+    "notConfigured": "لم يُفعَّل الذكاء الاصطناعي على هذا الخادم بعد. يجب أن يفعّله أحد المسؤولين.",
     "vetNotice": "الذكاء الاصطناعي في LivestockPro يدعم الطبيب البيطري المؤهل ولا يحل محله. أكّد دائمًا التشخيص وأي دواء يحتاج وصفة مع طبيب بيطري.",
-    "poweredBy": "LivestockPro AI · بتقنية Claude",
+    "poweredBy": "LivestockPro للذكاء الاصطناعي",
     "working": "جارٍ التفكير...",
     "back": "رجوع",
     "tabs": {
@@ -1069,7 +1089,7 @@
       "working": "جارٍ قراءة السجلات وكتابة التقرير...",
       "fromRecord": "شخّص بالذكاء الاصطناعي",
       "previous": "تقارير سابقة لهذا السجل",
-      "needInput": "صف الأعراض أولًا."
+      "needInput": "صف الأعراض أولًا أو التقط صورة."
     },
     "report": {
       "urgency": "الاستعجال",
@@ -1197,7 +1217,8 @@
       "licence": "رقم الترخيص",
       "signature": "التوقيع",
       "date": "التاريخ",
-      "important": "مهم:"
+      "important": "مهم:",
+      "photos": "الصور التي فُحصت"
     },
     "usage": {
       "left": "تبقى {{remaining}} من {{limit}} طلبات ذكاء اصطناعي اليوم",
@@ -1209,6 +1230,20 @@
         "chat": "الأسئلة",
         "brief": "موجزات One Health"
       }
+    },
+    "photo": {
+      "label": "صور المنطقة المصابة",
+      "take": "التقاط صورة",
+      "upload": "رفع صورة",
+      "hint": "حتى {{max}} صور واضحة للجزء المصاب من الجسم، ملتقطة في إضاءة جيدة.",
+      "alt": "الصورة {{n}}",
+      "remove": "إزالة الصورة",
+      "unreadable": "تعذّرت قراءة هذه الصورة. جرّب صورة أخرى.",
+      "cameraTitle": "التقاط صورة",
+      "capture": "التقاط",
+      "noCamera": "تعذّر فتح الكاميرا. اسمح بالوصول إلى الكاميرا في المتصفح، أو ارفع صورة بدلًا من ذلك.",
+      "tip": "قرّب الكاميرا من المنطقة المصابة، في إضاءة جيدة، وأبقها ثابتة.",
+      "defaultQuestion": "ماذا ترى في هذه الصورة؟ هل يعاني هذا الحيوان من مشكلة صحية، وماذا يجب أن أفعل؟"
     }
   },
   "org": {
@@ -1659,6 +1694,162 @@
     "staffInvite": {
       "title": "دعوة من منظمة",
       "body": "تمت دعوتك إلى {{name}}."
+    }
+  },
+  "search": {
+    "placeholder": "ابحث عن الحيوانات والسجلات والمهام…",
+    "clear": "مسح البحث",
+    "filteringPage": "تتم تصفية {{section}} أثناء الكتابة",
+    "noneElsewhere": "لا نتائج في الأقسام الأخرى",
+    "none": "لم يُعثر على شيء لـ «{{query}}»",
+    "viewAll_zero": "عرض {{count}}",
+    "viewAll_one": "عرض {{count}}",
+    "viewAll_two": "عرض {{count}}",
+    "viewAll_few": "عرض الكل {{count}}",
+    "viewAll_many": "عرض الكل {{count}}",
+    "viewAll_other": "عرض الكل {{count}}"
+  },
+  "aiAdmin": {
+    "tab": "الذكاء الاصطناعي",
+    "saved": "تم حفظ إعدادات الذكاء الاصطناعي",
+    "status": "LivestockPro للذكاء الاصطناعي",
+    "on": "مفعّل",
+    "off": "متوقف",
+    "requestsToday": "طلبات اليوم",
+    "okFailed": "أُجيب عن {{ok}}، وفشل {{failed}}",
+    "refusedToday": "المرفوضة بسبب الحدود اليوم",
+    "usersToday": "مستخدمو اليوم",
+    "tokensToday": "رموز اليوم",
+    "tokensSplit": "{{input}} مُدخلة، {{output}} مُخرجة",
+    "avgTime": "متوسط زمن الإجابة",
+    "seconds": "{{n}} ث",
+    "settingsTitle": "النموذج والحدود",
+    "notConfigured": "الذكاء الاصطناعي متوقف: لا يوجد مفتاح ذكاء اصطناعي على الخادم. أضفه إلى إعدادات الخادم لتفعيله.",
+    "model": "النموذج",
+    "modelHint": "تستخدم كل ميزات الذكاء الاصطناعي هذا النموذج. قبل التبديل، يتحقق LivestockPro من أن النموذج قادر على تشغيلها كلها.",
+    "tier": {
+      "frontier": "أحدث جيل",
+      "advanced": "الأكثر قدرة",
+      "balanced": "سريع وقادر",
+      "fast": "الأسرع والأقل تكلفة"
+    },
+    "limit": {
+      "per_minute": "الطلبات في الدقيقة (لكل مستخدم)",
+      "per_hour": "الطلبات في الساعة (لكل مستخدم)",
+      "total": "الطلبات في اليوم (لكل مستخدم)",
+      "diagnose": "التشخيصات في اليوم",
+      "advisor": "نصائح المزرعة في اليوم",
+      "chat": "الأسئلة في اليوم",
+      "brief": "تقارير الصحة الواحدة في اليوم",
+      "admin_multiplier": "مضاعف حصة المسؤولين"
+    },
+    "defaultValue": "الافتراضي {{n}}",
+    "testing": "جارٍ التحقق من النموذج…",
+    "updatedAt": "آخر تغيير {{date}}",
+    "last14": "آخر 14 يومًا",
+    "answered": "أُجيب عنها",
+    "failed": "فشلت",
+    "refused": "رُفضت",
+    "byFeature": "اليوم حسب الميزة",
+    "noUseToday": "لم يُستخدم الذكاء الاصطناعي اليوم بعد.",
+    "feature": "الميزة",
+    "tokens": "الرموز",
+    "kind": {
+      "diagnose": "التشخيص",
+      "advisor": "نصائح المزرعة",
+      "chat": "الأسئلة",
+      "brief": "تقرير الصحة الواحدة"
+    },
+    "refusals": "الطلبات المرفوضة اليوم",
+    "noRefusals": "لم يُرفض أي طلب اليوم.",
+    "reason": "السبب",
+    "requests": "الطلبات",
+    "users": "المستخدمون",
+    "refusal": {
+      "AI_BURST": "طلبات كثيرة في دقيقة واحدة",
+      "AI_LIMIT": "بلوغ حد الساعة",
+      "AI_QUOTA": "نفاد الحصة اليومية"
+    },
+    "topUsers": "أكثر المستخدمين نشاطًا اليوم",
+    "user": "المستخدم",
+    "byModel": "آخر 14 يومًا حسب النموذج"
+  },
+  "exports": {
+    "export": "تصدير",
+    "preparing": "جارٍ التحضير…",
+    "done": "تم حفظ ملف {{format}}",
+    "failed": "فشل التصدير: {{message}}",
+    "formats": {
+      "pdf": "PDF",
+      "xlsx": "Excel",
+      "csv": "CSV"
+    },
+    "formatHints": {
+      "pdf": "مستند بهوية العلامة للطباعة أو المشاركة",
+      "xlsx": "جدول بيانات، ورقة لكل قسم",
+      "csv": "بيانات مجرّدة لأي برنامج"
+    },
+    "fields": {
+      "district": "المنطقة",
+      "last_check_date": "آخر فحص"
+    },
+    "recordsCount_zero": "{{count}} سجل",
+    "recordsCount_one": "سجل واحد",
+    "recordsCount_two": "سجلان",
+    "recordsCount_few": "{{count}} سجلات",
+    "recordsCount_many": "{{count}} سجلًا",
+    "recordsCount_other": "{{count}} سجل",
+    "farm": "المزرعة",
+    "generated": "تاريخ الإنشاء",
+    "filters": "عوامل التصفية",
+    "page": "الصفحة {{page}} من {{pages}}"
+  },
+  "calendar": {
+    "title": "التقويم",
+    "subtitle": "المهام والفحوص الصحية والتكاثر والولادات في تقويم واحد",
+    "today": "اليوم",
+    "previous": "الشهر السابق",
+    "next": "الشهر التالي",
+    "show": "العرض في التقويم",
+    "kinds": {
+      "task": "المهام",
+      "overdue": "متأخرة",
+      "followUp": "فحوص المتابعة",
+      "healthCheck": "الفحوص الصحية",
+      "breeding": "التكاثر",
+      "birthDue": "ولادات متوقعة",
+      "birth": "الولادات",
+      "feeding": "التغذية"
+    },
+    "eventsCount_zero": "لا أحداث",
+    "eventsCount_one": "حدث واحد",
+    "eventsCount_two": "حدثان",
+    "eventsCount_few": "{{count}} أحداث",
+    "eventsCount_many": "{{count}} حدثًا",
+    "eventsCount_other": "{{count}} حدث",
+    "more_zero": "{{count}} أخرى",
+    "more_one": "واحد آخر",
+    "more_two": "اثنان آخران",
+    "more_few": "{{count}} أخرى",
+    "more_many": "{{count}} أخرى",
+    "more_other": "{{count}} أخرى",
+    "upcoming": "الأيام الثلاثون القادمة",
+    "nothingUpcoming": "لا شيء مخطط له للأيام الثلاثين القادمة.",
+    "addTaskOnDay": "إضافة مهمة في هذا اليوم",
+    "nothingThisDay": "لا شيء في هذا اليوم.",
+    "events": {
+      "healthCheck": "فحص صحي: {{tag}}",
+      "followUp": "فحص متابعة: {{tag}}",
+      "followUpMissed": "متابعة فائتة: {{tag}}",
+      "breeding": "تلقيح: {{tag}}",
+      "birthDue": "ولادة متوقعة: {{tag}}",
+      "birth": "ولادة: {{tag}}",
+      "newborns_zero": "لا مواليد",
+      "newborns_one": "مولود واحد",
+      "newborns_two": "مولودان",
+      "newborns_few": "{{count}} مواليد",
+      "newborns_many": "{{count}} مولودًا",
+      "newborns_other": "{{count}} مولود"
     }
   }
 }

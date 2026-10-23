@@ -48,7 +48,8 @@
       "administration": "Administration",
       "system": "Système"
     },
-    "assistant": "Assistant IA"
+    "assistant": "Assistant IA",
+    "calendar": "Calendrier"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -215,7 +216,8 @@
         "category": "Catégorie",
         "date": "Date",
         "description": "Description",
-        "currency": "Devise"
+        "currency": "Devise",
+        "tag_id": "Animal"
       }
     },
     "tasks": {
@@ -422,7 +424,10 @@
     "languageHelp": "Choisissez la langue préférée pour l’interface de l’application.",
     "typeDeleteToConfirm": "Tapez DELETE pour confirmer.",
     "signedInAs": "Connecté en tant que {{email}}",
-    "appVersion": "LivestockPro Mobile v{{version}}"
+    "appVersion": "LivestockPro Mobile v{{version}}",
+    "livestockId": "ID Livestock",
+    "copyId": "Copier votre ID Livestock",
+    "idCopied": "ID Livestock copié"
   },
   "dashboardPage": {
     "title": "Tableau de bord",
@@ -496,7 +501,20 @@
     "noRecordsMatchFilters": "Aucun enregistrement ne correspond à vos filtres actuels.",
     "recordsCount": "{{count}} enregistrements",
     "reportRefreshed": "Rapport actualisé.",
-    "fullReportExported": "Rapport complet exporté en CSV."
+    "fullReportExported": "Rapport complet exporté en CSV.",
+    "to": "au",
+    "animalReportTitle": "Rapport de l’animal : {{tag}}",
+    "farmReportTitle": "Rapport de l’exploitation",
+    "healthChecks": "Contrôles sanitaires",
+    "openCases": "Cas en cours",
+    "breedingEvents": "Fiches de reproduction",
+    "births": "Naissances",
+    "summary": "Résumé",
+    "exportReport": "Exporter le rapport",
+    "allAnimals": "Tous les animaux",
+    "clearFilters": "Effacer les filtres",
+    "animalProfile": "Profil de l’animal",
+    "nothingToReport": "Rien à signaler"
   },
   "animalsPage": {
     "title": "Animaux",
@@ -577,7 +595,9 @@
     "descriptionPlaceholder": "Détails sur cette transaction...",
     "confirmDeleteMessage": "Voulez-vous vraiment supprimer cet enregistrement financier ?",
     "amountMustBeGreaterThanZero": "Le montant doit être supérieur à 0.",
-    "convertedNote": "Totaux convertis en {{currency}} aux taux de change actuels."
+    "convertedNote": "Totaux convertis en {{currency}} aux taux de change actuels.",
+    "noAnimal": "Pas pour un seul animal",
+    "animalHint": "Reliez une facture vétérinaire, un achat ou une vente à un animal pour l’afficher dans son rapport."
   },
   "tasksPage": {
     "title": "Tâches",
@@ -1013,9 +1033,9 @@
   "ai": {
     "title": "Assistant IA",
     "subtitle": "Rapports de diagnostic, conseils pour la ferme et réponses tirées de vos propres données",
-    "notConfigured": "L'IA n'est pas encore configurée sur ce serveur. Un administrateur doit ajouter la clé API Anthropic.",
+    "notConfigured": "L’IA n’est pas encore activée sur ce serveur. Un administrateur doit l’activer.",
     "vetNotice": "L'IA de LivestockPro aide, mais ne remplace pas, un vétérinaire qualifié. Confirmez toujours un diagnostic et tout médicament sur ordonnance avec un vétérinaire.",
-    "poweredBy": "LivestockPro IA · propulsé par Claude",
+    "poweredBy": "LivestockPro IA",
     "working": "Analyse en cours...",
     "back": "Retour",
     "tabs": {
@@ -1069,7 +1089,7 @@
       "working": "Lecture des dossiers et rédaction du rapport...",
       "fromRecord": "Diagnostiquer avec l'IA",
       "previous": "Rapports précédents pour ce dossier",
-      "needInput": "Décrivez d'abord les symptômes."
+      "needInput": "Décrivez d’abord les symptômes ou prenez une photo."
     },
     "report": {
       "urgency": "Urgence",
@@ -1197,7 +1217,8 @@
       "licence": "N° d'agrément",
       "signature": "Signature",
       "date": "Date",
-      "important": "Important :"
+      "important": "Important :",
+      "photos": "Photos examinées"
     },
     "usage": {
       "left": "{{remaining}} sur {{limit}} demandes IA restantes aujourd'hui",
@@ -1209,6 +1230,20 @@
         "chat": "questions",
         "brief": "synthèses One Health"
       }
+    },
+    "photo": {
+      "label": "Photos de la zone atteinte",
+      "take": "Prendre une photo",
+      "upload": "Importer une photo",
+      "hint": "Jusqu’à {{max}} photos nettes de la partie du corps atteinte, prises avec une bonne lumière.",
+      "alt": "Photo {{n}}",
+      "remove": "Retirer la photo",
+      "unreadable": "Cette image n’a pas pu être lue. Essayez une autre photo.",
+      "cameraTitle": "Prendre une photo",
+      "capture": "Capturer",
+      "noCamera": "La caméra n’a pas pu s’ouvrir. Autorisez l’accès à la caméra dans votre navigateur ou importez une photo.",
+      "tip": "Tenez la caméra près de la zone atteinte, avec une bonne lumière, sans bouger.",
+      "defaultQuestion": "Que voyez-vous sur cette photo ? Cet animal a-t-il un problème de santé et que dois-je faire ?"
     }
   },
   "org": {
@@ -1659,6 +1694,142 @@
     "staffInvite": {
       "title": "Invitation d'organisation",
       "body": "Vous êtes invité à rejoindre {{name}}."
+    }
+  },
+  "search": {
+    "placeholder": "Rechercher animaux, fiches, tâches…",
+    "clear": "Effacer la recherche",
+    "filteringPage": "Filtre de {{section}} pendant la saisie",
+    "noneElsewhere": "Aucun résultat dans les autres sections",
+    "none": "Aucun résultat pour « {{query}} »",
+    "viewAll_one": "Voir {{count}}",
+    "viewAll_other": "Voir les {{count}}"
+  },
+  "aiAdmin": {
+    "tab": "IA",
+    "saved": "Paramètres IA enregistrés",
+    "status": "LivestockPro IA",
+    "on": "Activée",
+    "off": "Désactivée",
+    "requestsToday": "Demandes aujourd’hui",
+    "okFailed": "{{ok}} réponses, {{failed}} échecs",
+    "refusedToday": "Refusées par les limites aujourd’hui",
+    "usersToday": "Utilisateurs aujourd’hui",
+    "tokensToday": "Jetons aujourd’hui",
+    "tokensSplit": "{{input}} en entrée, {{output}} en sortie",
+    "avgTime": "Temps de réponse moyen",
+    "seconds": "{{n}} s",
+    "settingsTitle": "Modèle et limites",
+    "notConfigured": "L’IA est désactivée : le serveur n’a pas de clé IA. Ajoutez-la aux paramètres du serveur pour l’activer.",
+    "model": "Modèle",
+    "modelHint": "Toutes les fonctions IA utilisent ce modèle. Avant de changer, LivestockPro vérifie que le modèle peut toutes les faire fonctionner.",
+    "tier": {
+      "frontier": "dernière génération",
+      "advanced": "le plus performant",
+      "balanced": "rapide et performant",
+      "fast": "le plus rapide, coût le plus bas"
+    },
+    "limit": {
+      "per_minute": "Demandes par minute (par utilisateur)",
+      "per_hour": "Demandes par heure (par utilisateur)",
+      "total": "Demandes par jour (par utilisateur)",
+      "diagnose": "Diagnostics par jour",
+      "advisor": "Conseils d’élevage par jour",
+      "chat": "Questions par jour",
+      "brief": "Bilans One Health par jour",
+      "admin_multiplier": "Multiplicateur pour les administrateurs"
+    },
+    "defaultValue": "Par défaut {{n}}",
+    "testing": "Vérification du modèle…",
+    "updatedAt": "Dernière modification {{date}}",
+    "last14": "14 derniers jours",
+    "answered": "Réponses",
+    "failed": "Échecs",
+    "refused": "Refusées",
+    "byFeature": "Aujourd’hui par fonction",
+    "noUseToday": "Aucune utilisation de l’IA aujourd’hui.",
+    "feature": "Fonction",
+    "tokens": "Jetons",
+    "kind": {
+      "diagnose": "Diagnostic",
+      "advisor": "Conseils d’élevage",
+      "chat": "Questions",
+      "brief": "Bilan One Health"
+    },
+    "refusals": "Demandes refusées aujourd’hui",
+    "noRefusals": "Aucune demande refusée aujourd’hui.",
+    "reason": "Motif",
+    "requests": "Demandes",
+    "users": "Utilisateurs",
+    "refusal": {
+      "AI_BURST": "Trop de demandes en une minute",
+      "AI_LIMIT": "Limite horaire atteinte",
+      "AI_QUOTA": "Quota du jour épuisé"
+    },
+    "topUsers": "Utilisateurs les plus actifs aujourd’hui",
+    "user": "Utilisateur",
+    "byModel": "14 derniers jours par modèle"
+  },
+  "exports": {
+    "export": "Exporter",
+    "preparing": "Préparation…",
+    "done": "Fichier {{format}} enregistré",
+    "failed": "L’export a échoué : {{message}}",
+    "formats": {
+      "pdf": "PDF",
+      "xlsx": "Excel",
+      "csv": "CSV"
+    },
+    "formatHints": {
+      "pdf": "Document à l’image de la marque, à imprimer ou partager",
+      "xlsx": "Tableur, une feuille par section",
+      "csv": "Données brutes pour tout logiciel"
+    },
+    "fields": {
+      "district": "District",
+      "last_check_date": "Dernier contrôle"
+    },
+    "recordsCount_one": "{{count}} fiche",
+    "recordsCount_other": "{{count}} fiches",
+    "farm": "Exploitation",
+    "generated": "Généré le",
+    "filters": "Filtres",
+    "page": "Page {{page}} sur {{pages}}"
+  },
+  "calendar": {
+    "title": "Calendrier",
+    "subtitle": "Tâches, contrôles sanitaires, reproduction et naissances dans un seul calendrier",
+    "today": "Aujourd’hui",
+    "previous": "Mois précédent",
+    "next": "Mois suivant",
+    "show": "Afficher dans le calendrier",
+    "kinds": {
+      "task": "Tâches",
+      "overdue": "En retard",
+      "followUp": "Contrôles de suivi",
+      "healthCheck": "Contrôles sanitaires",
+      "breeding": "Reproduction",
+      "birthDue": "Naissances prévues",
+      "birth": "Naissances",
+      "feeding": "Alimentation"
+    },
+    "eventsCount_one": "{{count}} événement",
+    "eventsCount_other": "{{count}} événements",
+    "more_one": "{{count}} de plus",
+    "more_other": "{{count}} de plus",
+    "upcoming": "30 prochains jours",
+    "nothingUpcoming": "Rien de prévu pour les 30 prochains jours.",
+    "addTaskOnDay": "Ajouter une tâche ce jour",
+    "nothingThisDay": "Rien ce jour.",
+    "events": {
+      "healthCheck": "Contrôle sanitaire : {{tag}}",
+      "followUp": "Contrôle de suivi : {{tag}}",
+      "followUpMissed": "Suivi manqué : {{tag}}",
+      "breeding": "Saillie : {{tag}}",
+      "birthDue": "Naissance prévue : {{tag}}",
+      "birth": "Naissance : {{tag}}",
+      "newborns_one": "{{count}} nouveau-né",
+      "newborns_other": "{{count}} nouveau-nés"
     }
   }
 }

@@ -48,7 +48,8 @@
       "administration": "Verwaltung",
       "system": "System"
     },
-    "assistant": "KI-Assistent"
+    "assistant": "KI-Assistent",
+    "calendar": "Kalender"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -215,7 +216,8 @@
         "category": "Kategorie",
         "date": "Datum",
         "description": "Beschreibung",
-        "currency": "Währung"
+        "currency": "Währung",
+        "tag_id": "Tier"
       }
     },
     "tasks": {
@@ -422,7 +424,10 @@
     "languageHelp": "Wählen Sie Ihre bevorzugte Sprache für die App-Oberfläche.",
     "typeDeleteToConfirm": "Geben Sie zur Bestätigung DELETE ein.",
     "signedInAs": "Angemeldet als {{email}}",
-    "appVersion": "LivestockPro Mobile v{{version}}"
+    "appVersion": "LivestockPro Mobile v{{version}}",
+    "livestockId": "Livestock-ID",
+    "copyId": "Ihre Livestock-ID kopieren",
+    "idCopied": "Livestock-ID kopiert"
   },
   "dashboardPage": {
     "title": "Dashboard",
@@ -496,7 +501,20 @@
     "noRecordsMatchFilters": "Keine Datensätze entsprechen Ihren aktuellen Filtern.",
     "recordsCount": "{{count}} Datensätze",
     "reportRefreshed": "Bericht aktualisiert.",
-    "fullReportExported": "Vollständiger Bericht als CSV exportiert."
+    "fullReportExported": "Vollständiger Bericht als CSV exportiert.",
+    "to": "bis",
+    "animalReportTitle": "Tierbericht: {{tag}}",
+    "farmReportTitle": "Betriebsbericht",
+    "healthChecks": "Gesundheitskontrollen",
+    "openCases": "Offene Fälle",
+    "breedingEvents": "Zuchteinträge",
+    "births": "Geburten",
+    "summary": "Zusammenfassung",
+    "exportReport": "Bericht exportieren",
+    "allAnimals": "Alle Tiere",
+    "clearFilters": "Filter löschen",
+    "animalProfile": "Tierprofil",
+    "nothingToReport": "Nichts zu berichten"
   },
   "animalsPage": {
     "title": "Tiere",
@@ -577,7 +595,9 @@
     "descriptionPlaceholder": "Details zu dieser Transaktion...",
     "confirmDeleteMessage": "Möchten Sie diesen Finanzeintrag wirklich löschen?",
     "amountMustBeGreaterThanZero": "Der Betrag muss größer als 0 sein.",
-    "convertedNote": "Summen zum aktuellen Wechselkurs in {{currency}} umgerechnet."
+    "convertedNote": "Summen zum aktuellen Wechselkurs in {{currency}} umgerechnet.",
+    "noAnimal": "Nicht für ein einzelnes Tier",
+    "animalHint": "Verknüpfen Sie eine Tierarztrechnung, einen Kauf oder Verkauf mit einem Tier, damit er in dessen Bericht erscheint."
   },
   "tasksPage": {
     "title": "Aufgaben",
@@ -1013,9 +1033,9 @@
   "ai": {
     "title": "KI-Assistent",
     "subtitle": "Diagnoseberichte, Betriebsberatung und Antworten aus Ihren eigenen Daten",
-    "notConfigured": "Die KI ist auf diesem Server noch nicht eingerichtet. Ein Administrator muss den Anthropic API-Schlüssel hinzufügen.",
+    "notConfigured": "Die KI ist auf diesem Server noch nicht eingeschaltet. Ein Administrator muss sie einschalten.",
     "vetNotice": "Die KI von LivestockPro unterstützt einen qualifizierten Tierarzt, ersetzt ihn aber nicht. Lassen Sie eine Diagnose und verschreibungspflichtige Medikamente immer von einem Tierarzt bestätigen.",
-    "poweredBy": "LivestockPro KI · mit Claude",
+    "poweredBy": "LivestockPro KI",
     "working": "Wird durchdacht...",
     "back": "Zurück",
     "tabs": {
@@ -1069,7 +1089,7 @@
       "working": "Daten werden gelesen und der Bericht geschrieben...",
       "fromRecord": "Mit KI diagnostizieren",
       "previous": "Frühere Berichte zu diesem Eintrag",
-      "needInput": "Beschreiben Sie zuerst die Symptome."
+      "needInput": "Beschreiben Sie zuerst die Symptome oder machen Sie ein Foto."
     },
     "report": {
       "urgency": "Dringlichkeit",
@@ -1197,7 +1217,8 @@
       "licence": "Approbationsnr.",
       "signature": "Unterschrift",
       "date": "Datum",
-      "important": "Wichtig:"
+      "important": "Wichtig:",
+      "photos": "Untersuchte Fotos"
     },
     "usage": {
       "left": "Heute noch {{remaining}} von {{limit}} KI-Anfragen",
@@ -1209,6 +1230,20 @@
         "chat": "Fragen",
         "brief": "One Health Lageberichte"
       }
+    },
+    "photo": {
+      "label": "Fotos der betroffenen Stelle",
+      "take": "Foto aufnehmen",
+      "upload": "Foto hochladen",
+      "hint": "Bis zu {{max}} scharfe Fotos der betroffenen Körperstelle, bei gutem Licht aufgenommen.",
+      "alt": "Foto {{n}}",
+      "remove": "Foto entfernen",
+      "unreadable": "Dieses Bild konnte nicht gelesen werden. Versuchen Sie ein anderes Foto.",
+      "cameraTitle": "Foto aufnehmen",
+      "capture": "Aufnehmen",
+      "noCamera": "Die Kamera konnte nicht geöffnet werden. Erlauben Sie den Kamerazugriff im Browser oder laden Sie ein Foto hoch.",
+      "tip": "Halten Sie die Kamera nah an die betroffene Stelle, bei gutem Licht und ruhig.",
+      "defaultQuestion": "Was sehen Sie auf diesem Foto? Hat dieses Tier ein gesundheitliches Problem und was soll ich tun?"
     }
   },
   "org": {
@@ -1659,6 +1694,142 @@
     "staffInvite": {
       "title": "Einladung einer Organisation",
       "body": "Sie wurden zu {{name}} eingeladen."
+    }
+  },
+  "search": {
+    "placeholder": "Tiere, Einträge, Aufgaben suchen…",
+    "clear": "Suche löschen",
+    "filteringPage": "{{section}} wird beim Tippen gefiltert",
+    "noneElsewhere": "Keine Treffer in anderen Bereichen",
+    "none": "Nichts gefunden für „{{query}}“",
+    "viewAll_one": "{{count}} ansehen",
+    "viewAll_other": "Alle {{count}} ansehen"
+  },
+  "aiAdmin": {
+    "tab": "KI",
+    "saved": "KI-Einstellungen gespeichert",
+    "status": "LivestockPro KI",
+    "on": "Ein",
+    "off": "Aus",
+    "requestsToday": "Anfragen heute",
+    "okFailed": "{{ok}} beantwortet, {{failed}} fehlgeschlagen",
+    "refusedToday": "Heute durch Limits abgelehnt",
+    "usersToday": "Nutzer heute",
+    "tokensToday": "Tokens heute",
+    "tokensSplit": "{{input}} ein, {{output}} aus",
+    "avgTime": "Durchschnittliche Antwortzeit",
+    "seconds": "{{n}} s",
+    "settingsTitle": "Modell und Limits",
+    "notConfigured": "Die KI ist aus: Der Server hat keinen KI-Schlüssel. Fügen Sie ihn in den Servereinstellungen hinzu, um die KI einzuschalten.",
+    "model": "Modell",
+    "modelHint": "Alle KI-Funktionen nutzen dieses Modell. Vor dem Wechsel prüft LivestockPro, ob das Modell alle Funktionen ausführen kann.",
+    "tier": {
+      "frontier": "neueste Generation",
+      "advanced": "am leistungsfähigsten",
+      "balanced": "schnell und leistungsfähig",
+      "fast": "am schnellsten, geringste Kosten"
+    },
+    "limit": {
+      "per_minute": "Anfragen pro Minute (je Nutzer)",
+      "per_hour": "Anfragen pro Stunde (je Nutzer)",
+      "total": "Anfragen pro Tag (je Nutzer)",
+      "diagnose": "Diagnosen pro Tag",
+      "advisor": "Betriebsberatungen pro Tag",
+      "chat": "Fragen pro Tag",
+      "brief": "One-Health-Berichte pro Tag",
+      "admin_multiplier": "Faktor für Administratoren"
+    },
+    "defaultValue": "Standard {{n}}",
+    "testing": "Modell wird geprüft…",
+    "updatedAt": "Zuletzt geändert {{date}}",
+    "last14": "Letzte 14 Tage",
+    "answered": "Beantwortet",
+    "failed": "Fehlgeschlagen",
+    "refused": "Abgelehnt",
+    "byFeature": "Heute nach Funktion",
+    "noUseToday": "Heute wurde die KI noch nicht genutzt.",
+    "feature": "Funktion",
+    "tokens": "Tokens",
+    "kind": {
+      "diagnose": "Diagnose",
+      "advisor": "Betriebsberatung",
+      "chat": "Fragen",
+      "brief": "One-Health-Bericht"
+    },
+    "refusals": "Heute abgelehnte Anfragen",
+    "noRefusals": "Heute wurde keine Anfrage abgelehnt.",
+    "reason": "Grund",
+    "requests": "Anfragen",
+    "users": "Nutzer",
+    "refusal": {
+      "AI_BURST": "Zu viele in einer Minute",
+      "AI_LIMIT": "Stundenlimit erreicht",
+      "AI_QUOTA": "Tageskontingent aufgebraucht"
+    },
+    "topUsers": "Aktivste Nutzer heute",
+    "user": "Nutzer",
+    "byModel": "Letzte 14 Tage nach Modell"
+  },
+  "exports": {
+    "export": "Exportieren",
+    "preparing": "Wird vorbereitet…",
+    "done": "{{format}}-Datei gespeichert",
+    "failed": "Der Export ist fehlgeschlagen: {{message}}",
+    "formats": {
+      "pdf": "PDF",
+      "xlsx": "Excel",
+      "csv": "CSV"
+    },
+    "formatHints": {
+      "pdf": "Gestaltetes Dokument zum Drucken oder Teilen",
+      "xlsx": "Tabelle, ein Blatt je Bereich",
+      "csv": "Reine Daten für jedes Programm"
+    },
+    "fields": {
+      "district": "Bezirk",
+      "last_check_date": "Letzte Kontrolle"
+    },
+    "recordsCount_one": "{{count}} Eintrag",
+    "recordsCount_other": "{{count}} Einträge",
+    "farm": "Betrieb",
+    "generated": "Erstellt",
+    "filters": "Filter",
+    "page": "Seite {{page}} von {{pages}}"
+  },
+  "calendar": {
+    "title": "Kalender",
+    "subtitle": "Aufgaben, Gesundheitskontrollen, Zucht und Geburten in einem Kalender",
+    "today": "Heute",
+    "previous": "Vorheriger Monat",
+    "next": "Nächster Monat",
+    "show": "Im Kalender anzeigen",
+    "kinds": {
+      "task": "Aufgaben",
+      "overdue": "Überfällig",
+      "followUp": "Nachkontrollen",
+      "healthCheck": "Gesundheitskontrollen",
+      "breeding": "Zucht",
+      "birthDue": "Erwartete Geburten",
+      "birth": "Geburten",
+      "feeding": "Fütterung"
+    },
+    "eventsCount_one": "{{count}} Termin",
+    "eventsCount_other": "{{count}} Termine",
+    "more_one": "{{count}} weiterer",
+    "more_other": "{{count}} weitere",
+    "upcoming": "Nächste 30 Tage",
+    "nothingUpcoming": "Für die nächsten 30 Tage ist nichts geplant.",
+    "addTaskOnDay": "Aufgabe an diesem Tag hinzufügen",
+    "nothingThisDay": "An diesem Tag ist nichts.",
+    "events": {
+      "healthCheck": "Gesundheitskontrolle: {{tag}}",
+      "followUp": "Nachkontrolle: {{tag}}",
+      "followUpMissed": "Versäumte Nachkontrolle: {{tag}}",
+      "breeding": "Belegt: {{tag}}",
+      "birthDue": "Geburt erwartet: {{tag}}",
+      "birth": "Geburt: {{tag}}",
+      "newborns_one": "{{count}} Jungtier",
+      "newborns_other": "{{count}} Jungtiere"
     }
   }
 }

@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next';
 import Modal from '../Modal.jsx';
 import { useApi } from '../../lib/api.js';
 import { useToast } from '../../lib/toast.jsx';
+import PhotoPicker, { usePhotos } from './PhotoPicker.jsx';
 import { AiNotConfigured, AiUsageMeter, AiWorking, SavedReport, aiErrorText, useAiStatus } from './AiViews.jsx';
 
-/* "Diagnose with AI" on a health record: the farmer adds what they see, the
-   server reads the animal's records and writes a diagnosis and treatment
+/* "Diagnose with AI" on a health record: the farmer adds what they see and
+   can photograph the affected part of the animal with the camera; the server reads the animal's records and writes a diagnosis and treatment
    report, saved against the record so it can be reopened and printed. */
 export default function DiagnoseModal({ record, onClose }) {
   const { t, i18n } = useTranslation();
@@ -17,20 +18,23 @@ export default function DiagnoseModal({ record, onClose }) {
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(null);
   const [earlier, setEarlier] = useState([]);
+  const photos = usePhotos();
 
   useEffect(() => {
     if (!record) return;
     setSaved(null);
+    photos.clear();
     setSymptoms([record.disease, record.notes].filter(Boolean).join('. '));
     api.aiReports({ kind: 'diagnosis', record_id: record.id, limit: 5 }).then(({ data }) => setEarlier(data || []));
-  }, [record, api]);
+  }, [record, api]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function run() {
     setBusy(true);
-    const { data, error } = await api.aiDiagnose({ health_record_id: record.id, symptoms, language: i18n.language });
+    const { data, error } = await api.aiDiagnose({ health_record_id: record.id, symptoms, language: i18n.language, ...photos.payload() });
     setBusy(false);
     if (error) { showToast(aiErrorText(t, error, i18n.language), 'error'); return; }
     setSaved(data);
+    photos.clear();
     setEarlier((list) => [data, ...list]);
   }
 
@@ -53,7 +57,7 @@ export default function DiagnoseModal({ record, onClose }) {
       ) : (
         <>
           <button className="btn btn-secondary" onClick={onClose}>{t('common.cancel')}</button>
-          <button className="btn btn-primary" onClick={run} disabled={busy || configured === false || !symptoms.trim()}>
+          <button className="btn btn-primary" onClick={run} disabled={busy || configured === false || (!symptoms.trim() && !photos.photos.length)}>
             <i className="fas fa-wand-magic-sparkles"></i> {t('ai.diagnose.run')}
           </button>
         </>
@@ -70,6 +74,10 @@ export default function DiagnoseModal({ record, onClose }) {
           <div className="form-group">
             <label>{t('ai.diagnose.symptoms')}</label>
             <textarea className="form-control" rows={4} value={symptoms} placeholder={t('ai.diagnose.symptomsHint')} onChange={(e) => setSymptoms(e.target.value)} />
+          </div>
+          <div className="form-group">
+            <label>{t('ai.photo.label')}</label>
+            <PhotoPicker state={photos} disabled={configured === false} />
           </div>
           <p className="ai-disclaimer"><i className="fas fa-user-doctor"></i> {t('ai.vetNotice')}</p>
           {configured ? <div className="ai-usage-row"><AiUsageMeter kind="diagnose" /></div> : null}

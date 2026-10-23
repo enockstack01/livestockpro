@@ -11,6 +11,7 @@ import Breeding from './pages/Breeding.jsx';
 import Production from './pages/Production.jsx';
 import Finance from './pages/Finance.jsx';
 import Tasks from './pages/Tasks.jsx';
+import Calendar from './pages/Calendar.jsx';
 import Reports from './pages/Reports.jsx';
 import Settings from './pages/Settings.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
@@ -57,6 +58,7 @@ export default function App() {
         <Route path="/production" element={F(<Production />)} />
         <Route path="/finance" element={F(<Finance />)} />
         <Route path="/tasks" element={F(<Tasks />)} />
+        <Route path="/calendar" element={F(<Calendar />)} />
         <Route path="/reports" element={F(<Reports />)} />
         <Route path="/assistant" element={F(<Assistant />)} />
         <Route path="/settings" element={<Settings />} />
