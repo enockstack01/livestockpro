@@ -514,7 +514,8 @@
     "allAnimals": "Alle Tiere",
     "clearFilters": "Filter löschen",
     "animalProfile": "Tierprofil",
-    "nothingToReport": "Nichts zu berichten"
+    "nothingToReport": "Nichts zu berichten",
+    "openAnimalReport": "Tierbericht"
   },
   "animalsPage": {
     "title": "Tiere",
@@ -1077,7 +1078,7 @@
     },
     "diagnose": {
       "title": "KI-Diagnose",
-      "intro": "Beschreiben Sie, was Sie sehen. LivestockPro liest die Daten des Tieres und schreibt einen Diagnose- und Behandlungsbericht, den Sie drucken oder als PDF speichern können.",
+      "intro": "Beschreiben Sie, was Sie sehen, oder fotografieren Sie die betroffene Stelle des Tieres. LivestockPro liest die Einträge des Tieres und erstellt einen Diagnose- und Behandlungsbericht zum Drucken oder Speichern als PDF.",
       "animal": "Tier",
       "chooseAnimal": "Tier auswählen (optional)",
       "species": "Tierart",

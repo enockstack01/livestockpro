@@ -514,7 +514,8 @@
     "allAnimals": "全部牲畜",
     "clearFilters": "清除筛选",
     "animalProfile": "牲畜档案",
-    "nothingToReport": "没有可报告的内容"
+    "nothingToReport": "没有可报告的内容",
+    "openAnimalReport": "牲畜报告"
   },
   "animalsPage": {
     "title": "动物",
@@ -1077,7 +1078,7 @@
     },
     "diagnose": {
       "title": "AI 诊断",
-      "intro": "描述您看到的情况。LivestockPro 会读取该牲畜的记录，撰写可打印或保存为 PDF 的诊断与治疗报告。",
+      "intro": "描述您看到的情况，或给牲畜的患处拍一张照片。LivestockPro 会读取该牲畜的记录，写出可打印或保存为 PDF 的诊断和治疗报告。",
       "animal": "牲畜",
       "chooseAnimal": "选择牲畜（可选）",
       "species": "物种",

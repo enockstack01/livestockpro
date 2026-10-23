@@ -514,7 +514,8 @@
     "allAnimals": "Wanyama wote",
     "clearFilters": "Futa vichujio",
     "animalProfile": "Wasifu wa mnyama",
-    "nothingToReport": "Hakuna cha kuripoti"
+    "nothingToReport": "Hakuna cha kuripoti",
+    "openAnimalReport": "Ripoti ya mnyama"
   },
   "animalsPage": {
     "title": "Wanyama",
@@ -1077,7 +1078,7 @@
     },
     "diagnose": {
       "title": "Uchunguzi wa AI",
-      "intro": "Eleza unachoona. LivestockPro husoma kumbukumbu za mnyama na kuandika ripoti ya uchunguzi na matibabu unayoweza kuchapisha au kuhifadhi kama PDF.",
+      "intro": "Eleza unachokiona, au piga picha ya sehemu iliyoathirika ya mnyama. LivestockPro husoma kumbukumbu za mnyama na kuandika ripoti ya uchunguzi na matibabu unayoweza kuchapisha au kuhifadhi kama PDF.",
       "animal": "Mnyama",
       "chooseAnimal": "Chagua mnyama (si lazima)",
       "species": "Aina",

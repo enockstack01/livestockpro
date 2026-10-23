@@ -247,6 +247,7 @@ export default function RecordListScreen({ config }) {
         title={t('records.detailsTitle', { item: singular })}
         footer={<>
           <Button variant="secondary" title={t('common.close')} onPress={() => setViewRow(null)} />
+          {config.table === 'animals' && viewRow ? <Button variant="secondary" icon="file-lines" title={t('reportsPage.openAnimalReport')} onPress={() => { const id = viewRow.id; setViewRow(null); router.replace(`/reports?animal=${id}`); }} /> : null}
           <Button icon="pen" title={t('common.edit')} onPress={() => { const r = viewRow; setViewRow(null); openEdit(r); }} />
         </>}
       >

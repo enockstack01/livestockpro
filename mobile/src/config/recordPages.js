@@ -22,9 +22,8 @@ const TYPE_ICON = { Milk: 'bottle-droplet', Eggs: 'egg', Meat: 'drumstick-bite' 
 
 export const RECORD_PAGES = {
   animals: {
-    page: 'animalsPage', addKey: 'animalsPage.addAnimal', emptyIcon: 'cow', exportable: true, importable: true,
+    page: 'animalsPage', addKey: 'animalsPage.addAnimal', emptyIcon: 'cow', importable: true,
     summary: (t) => (a) => ({ title: dot(a.tag_id, a.name), subtitle: dot(t(`enums.species.${a.species}`, a.species), a.breed, a.sex ? t(`enums.sex.${a.sex}`, a.sex) : null, a.date_of_birth ? calcAge(a.date_of_birth) : null), badge: <StatusBadge status={a.health_status} />, meta: a.location }),
-    exportFields: ['tag_id', 'name', 'species', 'breed', 'sex', 'date_of_birth', 'location', 'health_status', 'last_check_date', 'notes'],
     columns: (t) => [
       { key: 'tag_id', label: t('tables.animals.fields.tag_id'), strong: true },
       { key: 'name', label: t('tables.animals.fields.name') },
@@ -42,9 +41,8 @@ export const RECORD_PAGES = {
     ],
   },
   health_records: {
-    page: 'healthPage', addKey: 'healthPage.addRecord', emptyIcon: 'stethoscope', exportable: true,
+    page: 'healthPage', addKey: 'healthPage.addRecord', emptyIcon: 'stethoscope',
     summary: (t) => (h) => ({ title: dot(h.tag_id, h.disease), subtitle: dot(h.treatment, h.medicine, h.vet_name), badge: <StatusBadge status={h.status} />, meta: dot(fmtDate(h.check_date), h.next_check_date ? '→ ' + fmtDate(h.next_check_date) : null) }),
-    exportFields: ['tag_id', 'disease', 'treatment', 'medicine', 'vet_name', 'check_date', 'next_check_date', 'status', 'notes'],
     columns: (t) => [
       { key: 'tag_id', label: t('tables.animals.fields.tag_id'), strong: true },
       { key: 'disease', label: t('tables.health_records.fields.disease') },
@@ -87,9 +85,8 @@ export const RECORD_PAGES = {
     ],
   },
   production_records: {
-    page: 'productionPage', addKey: 'productionPage.addRecord', emptyIcon: 'gauge-high', exportable: true, extra: 'productionSummary',
+    page: 'productionPage', addKey: 'productionPage.addRecord', emptyIcon: 'gauge-high', extra: 'productionSummary',
     summary: (t) => (p) => ({ title: `${p.quantity || 0} ${p.unit ? t(`enums.productionUnit.${p.unit}`, p.unit) : ''}`.trim(), subtitle: dot(p.tag_id, trunc(p.notes, 50) === '—' ? null : trunc(p.notes, 50)), badge: <Badge color={TYPE_BADGE[p.production_type] || 'green'} icon={TYPE_ICON[p.production_type] || 'box'} label={t(`enums.productionType.${p.production_type}`, p.production_type)} />, meta: fmtDate(p.production_date) }),
-    exportFields: ['production_type', 'tag_id', 'quantity', 'unit', 'production_date', 'notes'],
     columns: (t) => [
       { key: 'production_type', label: t('tables.production_records.fields.production_type'), render: (p) => <Badge color={TYPE_BADGE[p.production_type] || 'green'} icon={TYPE_ICON[p.production_type] || 'box'} label={t(`enums.productionType.${p.production_type}`, p.production_type)} /> },
       { key: 'tag_id', label: t('tables.production_records.fields.tag_id') },
@@ -102,9 +99,8 @@ export const RECORD_PAGES = {
     ],
   },
   finance_records: {
-    page: 'financePage', addKey: 'financePage.addRecord', emptyIcon: 'receipt', exportable: true, extra: 'financeSummary',
+    page: 'financePage', addKey: 'financePage.addRecord', emptyIcon: 'receipt', extra: 'financeSummary',
     summary: (t) => (f) => ({ title: `${f.type === 'Income' ? '+' : '-'}${formatRecordMoney(f)}`, subtitle: dot(f.category ? t(`enums.financeCategory.${f.category}`, f.category) : null, trunc(f.description, 50) === '—' ? null : trunc(f.description, 50)), badge: <Badge color={f.type === 'Income' ? 'green' : 'red'} icon={f.type === 'Income' ? 'arrow-up' : 'arrow-down'} label={t(`enums.financeType.${f.type}`, f.type)} />, meta: fmtDate(f.date) }),
-    exportFields: ['type', 'category', 'amount', 'currency', 'date', 'description'],
     tabs: { key: 'type', values: ['Income', 'Expense'], labelKey: (v) => `enums.financeType.${v}` },
     columns: (t, colors) => [
       { key: 'type', label: t('tables.finance_records.fields.type'), render: (f) => <Badge color={f.type === 'Income' ? 'green' : 'red'} icon={f.type === 'Income' ? 'arrow-up' : 'arrow-down'} label={t(`enums.financeType.${f.type}`, f.type)} /> },

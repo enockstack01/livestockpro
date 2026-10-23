@@ -514,7 +514,8 @@
     "allAnimals": "Amatungo yose",
     "clearFilters": "Siba iyungurura",
     "animalProfile": "Umwirondoro w’itungo",
-    "nothingToReport": "Nta cyo gutangaza"
+    "nothingToReport": "Nta cyo gutangaza",
+    "openAnimalReport": "Raporo y’itungo"
   },
   "animalsPage": {
     "title": "Amatungo",
@@ -1077,7 +1078,7 @@
     },
     "diagnose": {
       "title": "Isuzuma rya AI",
-      "intro": "Sobanura ibyo ubona. LivestockPro isoma amakuru y'itungo ikandika raporo y'isuzuma n'ubuvuzi ushobora gucapa cyangwa kubika nka PDF.",
+      "intro": "Sobanura ibyo ubona, cyangwa ufotore igice cy’itungo cyafashwe. LivestockPro isoma inyandiko z’itungo ikandika raporo y’isuzuma n’ubuvuzi ushobora gucapa cyangwa kubika nka PDF.",
       "animal": "Itungo",
       "chooseAnimal": "Hitamo itungo (si ngombwa)",
       "species": "Ubwoko",

@@ -97,8 +97,8 @@ export function printAiReport(saved, t, lang) {
 
 /* Builds the branded report as an A4 PDF file and downloads it: the page is
    drawn off screen, split into pages that keep sections and table rows
-   whole, and each page gets the LivestockPro · Agricoders footer and its
-   page number. */
+   whole, and each page gets the site address and its page number (the
+   brand appears once, in the band at the top of the first page). */
 export async function downloadAiReport(saved, t, lang) {
   const { default: html2pdf } = await import('html2pdf.js');
   const opts = reportOpts(saved, t, lang);
@@ -125,7 +125,8 @@ export async function downloadAiReport(saved, t, lang) {
       pdf.line(14, 284, 196, 284);
       pdf.setFontSize(8);
       pdf.setTextColor(91, 107, 93);
-      pdf.text('LivestockPro · by Agricoders · livestock.agricoders.com', 14, 289);
+      /* The brand is in the band at the top of the first page only. */
+      pdf.text('livestock.agricoders.com', 14, 289);
       pdf.text(`${i} / ${pages}`, 196, 289, { align: 'right' });
     }
     await worker.save();

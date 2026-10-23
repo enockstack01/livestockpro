@@ -514,7 +514,8 @@
     "allAnimals": "Todos os animais",
     "clearFilters": "Limpar filtros",
     "animalProfile": "Ficha do animal",
-    "nothingToReport": "Nada a relatar"
+    "nothingToReport": "Nada a relatar",
+    "openAnimalReport": "Relatório do animal"
   },
   "animalsPage": {
     "title": "Animais",
@@ -1077,7 +1078,7 @@
     },
     "diagnose": {
       "title": "Diagnóstico por IA",
-      "intro": "Descreva o que observa. O LivestockPro lê os registos do animal e escreve um relatório de diagnóstico e tratamento que pode imprimir ou guardar em PDF.",
+      "intro": "Descreva o que vê ou tire uma fotografia da parte afetada do animal. O LivestockPro lê os registos do animal e escreve um relatório de diagnóstico e tratamento que pode imprimir ou guardar em PDF.",
       "animal": "Animal",
       "chooseAnimal": "Escolha um animal (opcional)",
       "species": "Espécie",

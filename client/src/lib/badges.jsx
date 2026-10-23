@@ -27,16 +27,3 @@ export function PregnancyBadge({ status }) {
 
 export { fmtDate, calcAge } from '../../../shared/format';
 
-export function downloadCSV(csvContent, filename) {
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(link.href);
-}
-
-export function csvCell(value) {
-  if (value === null || value === undefined) return '""';
-  return '"' + String(value).replace(/"/g, '""') + '"';
-}

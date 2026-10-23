@@ -220,8 +220,6 @@ const CSS = `
   .disclaimer { border: 1px solid #C62828; border-radius: 8px; padding: 8px 12px; font-size: 9pt; margin-bottom: 12px; }
   .disclaimer strong { color: #C62828; }
   .end { display: flex; justify-content: space-between; align-items: center; gap: 12px; border-top: 2px solid #2E7D32; padding-top: 8px; margin-top: 6px; color: #5B6B5D; font-size: 8.5pt; }
-  .end .mark { display: flex; align-items: center; gap: 6px; }
-  .end img { width: 22px; height: 22px; display: block; }
   .avoid { page-break-inside: avoid; break-inside: avoid; }
   /* The web PDF writer draws text in small fixed-height boxes too low; lift it. */
   .lp-pdf .pt { position: relative; top: -5px; }
@@ -233,7 +231,7 @@ const CSS = `
    desktop browsers) stamp the footer and page number on every page. */
 const PAGE_FOOTER = `
   @page {
-    @bottom-left { content: "LivestockPro · by Agricoders · livestock.agricoders.com"; font-family: Calibri, Carlito, Arial, sans-serif; font-size: 8pt; color: #5B6B5D; }
+    @bottom-left { content: "livestock.agricoders.com"; font-family: Calibri, Carlito, Arial, sans-serif; font-size: 8pt; color: #5B6B5D; }
     @bottom-right { content: counter(page) " / " counter(pages); direction: ltr; font-family: Calibri, Carlito, Arial, sans-serif; font-size: 8pt; color: #5B6B5D; }
   }
 `;
@@ -273,7 +271,7 @@ export function aiReportHtml({ kind, report, title, caseInfo, reportId, createdA
     <span>${esc(t('ai.pdf.preparedWith'))}</span>
   </div>
   ${body}
-  <div class="end avoid"><span class="mark"><img src="${AGRICODERS_LOGO}" alt=""><span>${esc(t('brand.byline'))}</span></span><span>${esc(REPORT_CONTACT)}</span></div>
+  <div class="end avoid"><span>${esc(number || heading)}</span><span>${esc(REPORT_CONTACT)}</span></div>
 </div>
 </body></html>`;
 }

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { useTopbarSearch } from '../lib/topbarSearch.jsx';
@@ -15,6 +16,7 @@ const SPECIES_OPTIONS = ['Cattle', 'Sheep', 'Goat', 'Pig', 'Poultry', 'Horse', '
 
 export default function Animals() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const api = useApi();
   const showToast = useToast();
   const fileInputRef = useRef(null);
@@ -174,6 +176,7 @@ export default function Animals() {
                     <td>{fmtDate(a.last_check_date)}</td>
                     <td>
                       <div className="table-actions">
+                        <button className="btn-icon" title={t('reportsPage.openAnimalReport')} aria-label={t('reportsPage.openAnimalReport')} onClick={() => navigate(`/reports?animal=${a.id}`)}><i className="fas fa-file-lines"></i></button>
                         <button className="btn-icon" title={t('common.edit')} onClick={() => openEdit(a)}><i className="fas fa-pen-to-square"></i></button>
                         <button className="btn-icon danger" title={t('common.delete')} onClick={() => confirmDelete(a)}><i className="fas fa-trash"></i></button>
                       </div>
