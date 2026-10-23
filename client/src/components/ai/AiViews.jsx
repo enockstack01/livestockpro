@@ -115,7 +115,7 @@ export async function downloadAiReport(saved, t, lang) {
       image: { type: 'jpeg', quality: 0.95 },
       html2canvas: { scale: 2, backgroundColor: '#FFFFFF', logging: false },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
-      pagebreak: { mode: ['css', 'legacy'], avoid: ['.avoid', 'tr', '.li', 'p', '.kv', '.sec h2'] }
+      pagebreak: { mode: ['css', 'legacy'], avoid: ['.avoid', '.disc-wrap', '.review', '.end', '.photos', 'tr', '.li', 'p', '.kv', '.sec h2'] }
     }).from(holder.querySelector('.lp-doc')).toPdf();
     const pdf = await worker.get('pdf');
     const pages = pdf.internal.getNumberOfPages();

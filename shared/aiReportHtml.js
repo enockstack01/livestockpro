@@ -119,7 +119,8 @@ function diagnosisBody(r, t, caseInfo) {
         <div><span>${esc(t('ai.pdf.date'))}</span></div>
       </div>
     </div>`,
-    `<div class="disclaimer avoid"><strong>${esc(t('ai.pdf.important'))}</strong> ${esc(t('ai.vetNotice'))}</div>`
+    /* Wrapped with padding so a page break never cuts through its border. */
+    `<div class="disc-wrap avoid"><div class="disclaimer"><strong>${esc(t('ai.pdf.important'))}</strong> ${esc(t('ai.vetNotice'))}</div></div>`
   ].join('');
 }
 
@@ -217,11 +218,14 @@ const CSS = `
   .sign div { width: calc(50% - 9px); border-bottom: 1px solid #5B6B5D; height: 34px; position: relative; }
   .sign span { position: absolute; bottom: -15px; left: 0; color: #5B6B5D; font-size: 8pt; }
   .review { padding-bottom: 22px; }
+  .disc-wrap { padding-top: 3mm; }
   .disclaimer { border: 1px solid #C62828; border-radius: 8px; padding: 8px 12px; font-size: 9pt; margin-bottom: 12px; }
   .disclaimer strong { color: #C62828; }
   .end { display: flex; justify-content: space-between; align-items: center; gap: 12px; border-top: 2px solid #2E7D32; padding-top: 8px; margin-top: 6px; color: #5B6B5D; font-size: 8.5pt; }
   .avoid { page-break-inside: avoid; break-inside: avoid; }
   /* The web PDF writer draws text in small fixed-height boxes too low; lift it. */
+  /* Room under the last line so the PDF renderer does not clip it. */
+  .lp-pdf { padding-bottom: 8mm; }
   .lp-pdf .pt { position: relative; top: -5px; }
   .lp-pdf .pill, .lp-pdf .num { position: relative; top: 5px; }
   [dir="rtl"] .tbl th, [dir="rtl"] .tbl td { text-align: right; }
