@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Print from 'expo-print';
@@ -10,6 +10,7 @@ import { useApi } from '../api/client';
 import { useRepository } from '../db/repository';
 import { useToast } from '../lib/toast';
 import { printHtml } from '../lib/printReport';
+import PhotoPicker, { usePhotos } from '../components/PhotoPicker';
 import { useTheme } from '../theme/ThemeProvider';
 import { Button, Card, CardBody, CardHeader, EmptyState, FormGroup, Input, Muted, Page, PageHeader, Select, Tabs } from '../ui/kit';
 import { aiReportFileName, aiReportHtml } from '../../../shared/aiReportHtml';
@@ -153,13 +154,24 @@ function Note({ children, danger }) {
   );
 }
 
-function DiagnosisView({ r }) {
+function DiagnosisView({ r, photos }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const tr = (k, o) => t(`ai.report.${k}`, o);
   const z = r.zoonotic || {};
   return (
     <View>
+      {(photos && photos.length) || r.photo_findings ? (
+        <View style={[styles.photoBox, { borderColor: colors.border }]}>
+          <Text style={{ color: colors.primary, fontWeight: '800', fontSize: 14, marginBottom: 6 }}>{t('ai.pdf.photos')}</Text>
+          {photos && photos.length ? (
+            <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+              {photos.map((src, i) => <Image key={i} source={{ uri: src }} style={styles.photoThumb} accessibilityLabel={t('ai.photo.alt', { n: i + 1 })} />)}
+            </View>
+          ) : null}
+          {r.photo_findings ? <Text selectable style={{ color: colors.text, fontSize: 14, lineHeight: 20 }}>{r.photo_findings}</Text> : null}
+        </View>
+      ) : null}
       <View style={styles.pills}>
         <Pill value={r.urgency}>{tr('urgency')}: {tr(`urgencyLevels.${r.urgency}`)}</Pill>
         {r.see_vet ? <Pill value="urgent">{tr('seeVet')}</Pill> : <Pill value="routine">{tr('seeVetNo')}</Pill>}
@@ -263,7 +275,8 @@ export function SavedReport({ saved, subtitle, onDelete }) {
   const { colors } = useTheme();
   const showToast = useToast();
   const [downloading, setDownloading] = useState(false);
-  const opts = { kind: saved.kind, report: saved.report, title: saved.title, caseInfo: saved.input && saved.input.case, reportId: saved.id, createdAt: saved.created_at, t, lang: i18n.language };
+  const caseInfo = saved.input && (saved.input.case || saved.input.photos) ? { ...(saved.input.case || {}), photos: saved.input.photos } : undefined;
+  const opts = { kind: saved.kind, report: saved.report, title: saved.title, caseInfo, reportId: saved.id, createdAt: saved.created_at, t, lang: i18n.language };
   const html = () => aiReportHtml(opts);
 
   async function print() {
@@ -294,7 +307,7 @@ export function SavedReport({ saved, subtitle, onDelete }) {
         <Button title={t('ai.report.print')} icon="print" variant="secondary" size="sm" onPress={print} />
         {onDelete ? <Button title={t('ai.report.delete')} icon="trash" variant="secondary" size="sm" onPress={() => onDelete(saved)} /> : null}
       </View>
-      <View_ r={saved.report || {}} />
+      <View_ r={saved.report || {}} photos={saved.input && saved.input.photos} />
     </View>
   );
 }
@@ -329,17 +342,22 @@ function AskTab({ disabled }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const scroll = useRef(null);
+  const photos = usePhotos();
   const examples = t('ai.ask.examples', { returnObjects: true });
 
+  /* A photo can go with a question, or on its own. */
   async function send(text) {
-    const q = (text || draft).trim();
+    const withPhotos = photos.photos.length > 0;
+    const q = (text || draft).trim() || (withPhotos ? t('ai.photo.defaultQuestion') : '');
     if (!q || busy) return;
-    const next = [...messages, { role: 'user', content: q }];
+    const extra = withPhotos ? photos.payload() : {};
+    const next = [...messages, { role: 'user', content: q, thumbs: withPhotos ? photos.photos.map((p) => p.thumb) : undefined }];
     setMessages(next);
     setDraft('');
+    photos.clear();
     setError('');
     setBusy(true);
-    const { data, error: err } = await api.aiChat({ messages: next, language: i18n.language });
+    const { data, error: err } = await api.aiChat({ messages: next.map(({ role, content }) => ({ role, content })), language: i18n.language, images: extra.images });
     setBusy(false);
     if (err) { setError(aiErrorText(t, err, i18n.language)); return; }
     setMessages([...next, { role: 'assistant', content: data.reply }]);
@@ -367,6 +385,7 @@ function AskTab({ disabled }) {
               <View key={i} style={{ alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '92%' }}>
                 <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textLight, marginBottom: 2, textAlign: m.role === 'user' ? 'right' : 'left' }}>{m.role === 'user' ? t('ai.ask.you') : t('ai.ask.assistant')}</Text>
                 <View style={[styles.bubble, m.role === 'user' ? { backgroundColor: colors.primary } : { backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border }]}>
+                  {m.thumbs ? <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>{m.thumbs.map((src, j) => <Image key={j} source={{ uri: src }} style={styles.chatThumb} />)}</View> : null}
                   <Text selectable style={{ color: m.role === 'user' ? '#FFFFFF' : colors.text, fontSize: 14, lineHeight: 20 }}>{m.content}</Text>
                 </View>
               </View>
@@ -377,9 +396,10 @@ function AskTab({ disabled }) {
         {error ? <Notice error>{error}</Notice> : null}
         <View style={{ marginTop: 12, gap: 8 }}>
           <Input multiline value={draft} onChangeText={setDraft} placeholder={t('ai.ask.placeholder')} editable={!disabled} />
+          <PhotoPicker state={photos} disabled={disabled || busy} compact />
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8 }}>
             {messages.length ? <Button title={t('ai.ask.clear')} icon="plus" variant="secondary" onPress={() => { setMessages([]); setError(''); }} /> : null}
-            <Button title={t('ai.ask.send')} icon="paper-plane" onPress={() => send()} disabled={disabled || busy || !draft.trim()} />
+            <Button title={t('ai.ask.send')} icon="paper-plane" onPress={() => send()} disabled={disabled || busy || (!draft.trim() && !photos.photos.length)} />
           </View>
         </View>
       </CardBody>
@@ -458,6 +478,7 @@ function DiagnoseTab({ disabled, recordId }) {
   const [symptoms, setSymptoms] = useState('');
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(null);
+  const photos = usePhotos();
 
   useEffect(() => {
     let live = true;
@@ -482,9 +503,9 @@ function DiagnoseTab({ disabled, recordId }) {
   const animal = animals.find((a) => a.id === animalId);
 
   async function run() {
-    if (!symptoms.trim()) { showToast(t('ai.diagnose.needInput'), 'error'); return; }
+    if (!symptoms.trim() && !photos.photos.length) { showToast(t('ai.diagnose.needInput'), 'error'); return; }
     setBusy(true);
-    const body = { symptoms, language: i18n.language };
+    const body = { symptoms, language: i18n.language, ...photos.payload() };
     if (record) {
       body.health_record_id = record.id;
       body.record = { tag_id: record.tag_id, animal_id: record.animal_id, disease: record.disease, treatment: record.treatment, medicine: record.medicine, vet_name: record.vet_name, check_date: record.check_date, next_check_date: record.next_check_date, status: record.status, notes: record.notes };
@@ -494,6 +515,7 @@ function DiagnoseTab({ disabled, recordId }) {
     const { data, error } = await api.aiDiagnose(body);
     setBusy(false);
     if (error) { showToast(aiErrorText(t, error, i18n.language), 'error'); return; }
+    photos.clear();
     setSaved(data);
   }
 
@@ -529,9 +551,12 @@ function DiagnoseTab({ disabled, recordId }) {
             <FormGroup label={t('ai.diagnose.symptoms')}>
               <Input multiline value={symptoms} onChangeText={setSymptoms} placeholder={t('ai.diagnose.symptomsHint')} />
             </FormGroup>
+            <FormGroup label={t('ai.photo.label')}>
+              <PhotoPicker state={photos} disabled={disabled} />
+            </FormGroup>
             <Note danger>{t('ai.vetNotice')}</Note>
             <AiUsageMeter kind="diagnose" style={{ marginTop: 12 }} />
-            <Button title={t('ai.diagnose.run')} icon="wand-magic-sparkles" onPress={run} disabled={disabled || !symptoms.trim()} style={{ marginTop: 14 }} block />
+            <Button title={t('ai.diagnose.run')} icon="wand-magic-sparkles" onPress={run} disabled={disabled || (!symptoms.trim() && !photos.photos.length)} style={{ marginTop: 14 }} block />
           </>
         )}
       </CardBody>
@@ -618,6 +643,9 @@ export default function AssistantScreen() {
 }
 
 const styles = StyleSheet.create({
+  photoBox: { borderWidth: 1, borderRadius: 10, padding: 12, marginBottom: 12 },
+  photoThumb: { width: 96, height: 72, borderRadius: 8 },
+  chatThumb: { width: 110, height: 82, borderRadius: 8 },
   pill: { borderRadius: 999, paddingHorizontal: 9, paddingVertical: 3, alignSelf: 'flex-start' },
   pillText: { fontSize: 11, fontWeight: '700' },
   pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 8 },

@@ -125,6 +125,8 @@ export const TABLES = {
       { key: 'amount', type: 'number', required: true },
       { key: 'currency', type: 'currency' },
       { key: 'date', type: 'date' },
+      // optional: the animal this money is for, so it shows in that animal's report
+      { key: 'tag_id', type: 'text' },
       { key: 'description', type: 'textarea' },
     ],
     titleField: 'category',

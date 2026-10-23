@@ -133,7 +133,7 @@ export function ReportView({ doc }) {
         <div className="card mb-24 report-section" key={s.key}>
           <div className="card-header">
             <h3>{s.title}</h3>
-            <span className="badge badge-green">{t('reportsPage.recordsCount', { count: s.rows.length })}</span>
+            <span className="badge badge-green">{t('exports.recordsCount', { count: s.rows.length })}</span>
           </div>
           <div className="card-body" style={{ padding: 0 }}>
             <div className="table-wrapper">

@@ -12,7 +12,8 @@
       "bundleIdentifier": "com.livestockpro.mobile",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "LivestockPro tags new animal, health, feeding, breeding, production, finance, and task records with your farm's location so admins can spot regional patterns like disease clusters.",
-        "NSPhotoLibraryUsageDescription": "LivestockPro needs access to your photos so you can set a profile picture."
+        "NSPhotoLibraryUsageDescription": "LivestockPro needs access to your photos so you can set a profile picture.",
+        "NSCameraUsageDescription": "LivestockPro uses the camera so you can photograph a sick animal and get an AI health assessment."
       },
       "associatedDomains": [
         "applinks:livestock.agricoders.com"
@@ -29,7 +30,8 @@
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA"
       ],
       "intentFilters": [
         {
@@ -88,7 +90,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "LivestockPro needs access to your photos so you can set a profile picture."
+          "photosPermission": "LivestockPro needs access to your photos so you can set a profile picture.",
+          "cameraPermission": "LivestockPro uses the camera so you can photograph a sick animal and get an AI health assessment."
         }
       ],
       "@react-native-community/datetimepicker",

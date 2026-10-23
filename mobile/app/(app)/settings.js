@@ -19,6 +19,7 @@ import { useAccount } from '../../src/account/AccountProvider';
 import { accountDisplayName } from '../../../shared/account';
 import MyOrganizationCard from '../../src/screens/org/MyOrganization';
 import { CURRENCIES, currencyName } from '../../../shared/currency';
+import * as Clipboard from 'expo-clipboard';
 
 /* Settings, organized like the CropManager app (and client/src/pages/
    Settings.jsx) as one column: profile header card (avatar, name, email,
@@ -161,6 +162,18 @@ export default function SettingsScreen() {
           </Pressable>
           <View style={{ flex: 1, minWidth: 160 }}>
             <Text style={[styles.name, { color: colors.text }]}>{displayName}</Text>
+            {account && account.livestockId ? (
+              <Pressable
+                onPress={() => Clipboard.setStringAsync(account.livestockId).then(() => showToast(t('settings.idCopied'), 'success')).catch(() => {})}
+                accessibilityRole="button"
+                accessibilityLabel={t('settings.copyId')}
+                style={[styles.livestockId, { backgroundColor: colors.primary }]}
+              >
+                <Text style={styles.livestockIdLabel}>{t('settings.livestockId')}</Text>
+                <Text style={styles.livestockIdValue}>{account.livestockId}</Text>
+                <Icon name="copy" size={11} color="#FFFFFF" />
+              </Pressable>
+            ) : null}
             <Text style={{ fontSize: 13, color: colors.textLight }}>{email}</Text>
           </View>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
@@ -253,6 +266,9 @@ function ReadonlyRow({ label, value, colors, mono, last }) {
 }
 
 const styles = StyleSheet.create({
+  livestockId: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5, marginTop: 6 },
+  livestockIdLabel: { color: 'rgba(255,255,255,0.85)', fontSize: 11 },
+  livestockIdValue: { color: '#FFFFFF', fontSize: 12, fontWeight: '700', letterSpacing: 0.3 },
   headerCard: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 20, padding: 24 },
   avatar: { width: 64, height: 64, borderRadius: 32, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   avatarImg: { width: 60, height: 60, borderRadius: 30 },

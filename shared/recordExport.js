@@ -217,7 +217,7 @@ const CSS = `
   @page { size: A4 PORTRAIT_OR_LANDSCAPE; margin: 14mm 12mm 16mm; }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: Calibri, Carlito, Arial, sans-serif; color: #1C2B1E; font-size: 9.5pt; line-height: 1.4; background: #FFFFFF; }
-  .doc { max-width: 100%; }
+  .doc { max-width: 100%; padding-bottom: 6mm; }
   .band { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #14532D; color: #FFFFFF; padding: 12px 16px; border-radius: 6px; }
   .band .brand { display: flex; align-items: center; gap: 10px; }
   .band .brand img { width: 34px; height: 34px; border-radius: 8px; }

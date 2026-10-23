@@ -21,6 +21,8 @@ import { ConsentRequest, useMyOrganization } from '../screens/org/MyOrganization
 import { accountDisplayName } from '../../../shared/account';
 import { useAccount } from '../account/AccountProvider';
 import { useBreakpoint } from './layout';
+import { LanguagePanel, SearchPanel } from './HeaderTools';
+import { useLanguage } from '../i18n/LanguageProvider';
 
 /* The app frame, organized like the CropManager app (and the web app, which
    shares the same sidebar definition in shared/navigation.js):
@@ -53,12 +55,14 @@ const SERVER_NOTIF = {
 
 /* ---------- Page search (search box at the top of a list page) ---------- */
 /* Returns the search field element for the page to render, with a clear (×)
-   button once something is typed. */
-export function usePageSearch(placeholder, onChange) {
-  const [value, setValue] = useState('');
+   button once something is typed. `initial` is a search handed over by the
+   header's search (?search=…), applied when it arrives or changes. */
+export function usePageSearch(placeholder, onChange, initial) {
+  const [value, setValue] = useState(initial || '');
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
   const update = useCallback((v) => { setValue(v); onChangeRef.current(v); }, []);
+  useEffect(() => { if (initial) update(String(initial)); }, [initial, update]);
   return <PageSearch placeholder={placeholder} value={value} onChange={update} />;
 }
 
@@ -197,6 +201,9 @@ export default function AppShell({ children }) {
   const home = isOrg ? '/organization' : '/';
   const [open, setOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const { language } = useLanguage();
   const notifItems = useNotifications(t, isOrg);
   const local = useReadNotifications(user?.id);
   const readIds = new Set([...local.readIds, ...notifItems.filter((n) => n.serverRead).map((n) => n.id)]);
@@ -222,6 +229,8 @@ export default function AppShell({ children }) {
   }, [open, pathname, router, home]);
 
   const go = (href) => { setOpen(false); if (href !== pathname) router.replace(href); };
+  /* Search results link to a section with ?search=…, even the one open now. */
+  const goSearch = (href) => { setOpen(false); router.replace(href); };
 
   const initials = (accountDisplayName(t, account, account?.role)[0] || 'U').toUpperCase();
 
@@ -234,7 +243,16 @@ export default function AppShell({ children }) {
       <View style={{ flex: 1 }}>
         <View style={[baseStyles.topbar, { paddingTop: insets.top, height: 60 + insets.top, backgroundColor: colors.card, borderBottomColor: colors.border }]}>
           {!isTablet ? <TopbarButton icon="bars" label="Open menu" onPress={() => setOpen(true)} /> : null}
-          <View style={{ flex: 1 }} />
+          {!isOrg ? (
+            <Pressable onPress={() => { haptics.select(); setSearchOpen(true); }} accessibilityRole="search" accessibilityLabel={t('search.placeholder')} style={({ pressed }) => [baseStyles.searchTrigger, { backgroundColor: colors.bg, opacity: pressed ? 0.8 : 1 }]}>
+              <Icon name="magnifying-glass" size={13} color={colors.placeholder} />
+              <Text style={[baseStyles.searchTriggerText, { color: colors.placeholder }]} numberOfLines={1}>{t('search.placeholder')}</Text>
+            </Pressable>
+          ) : <View style={{ flex: 1 }} />}
+          <Pressable onPress={() => { haptics.select(); setLangOpen(true); }} accessibilityRole="button" accessibilityLabel={t('settings.language')} hitSlop={4} style={({ pressed }) => [baseStyles.topbarBtn, baseStyles.langBtn, pressed && { backgroundColor: colors.bg }]}>
+            <Icon name="globe" size={16} color={colors.textLight} />
+            <Text style={[baseStyles.langCode, { color: colors.textLight }]}>{String(language || 'en').slice(0, 2).toUpperCase()}</Text>
+          </Pressable>
           <TopbarButton icon={scheme === 'dark' ? 'sun' : 'moon'} label={t('layout.toggleTheme')} onPress={() => setThemePreference(scheme === 'dark' ? 'light' : 'dark')} />
           <TopbarButton icon="bell" label={t('layout.notifications')} badge={unread} onPress={() => setNotifOpen(true)} />
           <Pressable onPress={() => { haptics.select(); go('/settings'); }} accessibilityRole="button" accessibilityLabel={t('nav.settings')} style={({ pressed }) => ({ marginLeft: 6, opacity: pressed ? 0.8 : 1 })}>
@@ -265,6 +283,8 @@ export default function AppShell({ children }) {
         onViewTasks={isOrg ? null : () => { setNotifOpen(false); go('/tasks'); }}
       />
       {!isOrg ? <ConsentRequest mine={myOrg.data} onAnswered={myOrg.reload} /> : null}
+      {!isOrg ? <SearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} onGo={goSearch} /> : null}
+      <LanguagePanel open={langOpen} onClose={() => setLangOpen(false)} />
     </View>
   );
 }
@@ -420,6 +440,10 @@ const baseStyles = StyleSheet.create({
   avatar: { width: 34, height: 34, borderRadius: 17, overflow: 'hidden' },
   avatarText: { fontWeight: '700', fontSize: 13 },
   searchBox: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 8, borderWidth: 1, paddingHorizontal: 13, minHeight: 42, marginBottom: 10 },
+  searchTrigger: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 8, paddingHorizontal: 12, minHeight: 38, marginHorizontal: 6 },
+  searchTriggerText: { flex: 1, fontSize: 13 },
+  langBtn: { width: 'auto', flexDirection: 'row', gap: 4, paddingHorizontal: 8 },
+  langCode: { fontSize: 11, fontWeight: '700' },
   searchInput: { flex: 1, fontSize: 13, paddingVertical: 10 },
 
   notifPanel: { position: 'absolute', borderRadius: 12, overflow: 'hidden' },

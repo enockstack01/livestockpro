@@ -3,7 +3,6 @@ import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useRepository } from '../db/repository';
-import { csvCell, shareCsv } from '../lib/shareCsv';
 import { useSync } from '../sync/SyncProvider';
 import { useGeoCapture } from '../hooks/useGeoCapture';
 import { useToast } from '../lib/toast';
@@ -18,6 +17,7 @@ import { Grid, useBreakpoint } from '../ui/layout';
 import DataTable from '../ui/DataTable';
 import { usePageSearch } from '../ui/AppShell';
 import { RECORD_PAGES } from '../config/recordPages';
+import { RecordExportButton } from '../components/ExportButton';
 import { formatMoney, getCurrency, moneyOf, recordCurrency } from '../../../shared/currency';
 
 const PER_PAGE = 15;
@@ -59,7 +59,8 @@ export default function RecordListScreen({ config }) {
   const [pageNum, setPageNum] = useState(1);
   const [viewRow, setViewRow] = useState(null);
 
-  const searchBox = usePageSearch(t('records.searchPlaceholder', { label: label.toLowerCase() }), (v) => { setSearch(v); setPageNum(1); });
+  const params = useLocalSearchParams();
+  const searchBox = usePageSearch(t('records.searchPlaceholder', { label: label.toLowerCase() }), (v) => { setSearch(v); setPageNum(1); }, params.search);
 
   const load = useCallback(async () => {
     setRecords(await repo.list(config.table, { order: 'created_at DESC' }));
@@ -67,12 +68,12 @@ export default function RecordListScreen({ config }) {
   useEffect(() => { load(); }, [load, lastSyncedAt]);
 
   // Dashboard Quick Actions open a page with ?new=1 to go straight to its Add form.
-  const params = useLocalSearchParams();
   const router = useRouter();
   useEffect(() => {
     if (params.new !== '1') return;
-    openAdd();
-    router.setParams({ new: undefined });
+    // the calendar's "Add task on this day" passes ?due=YYYY-MM-DD
+    openAdd(params.due && config.fields.some((f) => f.key === 'due_date') ? { due_date: String(params.due) } : null);
+    router.setParams({ new: undefined, due: undefined });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.new]);
 
@@ -99,10 +100,10 @@ export default function RecordListScreen({ config }) {
     });
   }, [rows, search, filters, tab, config.searchFields, page.tabs]);
 
-  function openAdd() {
+  function openAdd(prefill) {
     setModal('add');
     setEditingId(null);
-    setValues(emptyValues(config.fields));
+    setValues({ ...emptyValues(config.fields), ...(prefill && typeof prefill === 'object' && !prefill.nativeEvent ? prefill : {}) });
     geo.reset();
     geo.capture();
   }
@@ -149,16 +150,6 @@ export default function RecordListScreen({ config }) {
     await load();
   }
 
-  async function exportCsv() {
-    if (rows.length === 0) { showToast(t('records.noRecordsToExport', { label: label.toLowerCase() }), 'warning'); return; }
-    const csv = [page.exportFields.join(','), ...rows.map((r) => page.exportFields.map((h) => csvCell(h === 'currency' ? recordCurrency(r) : r[h])).join(','))].join('\n');
-    try {
-      if (!(await shareCsv(csv, `${config.table}_export.csv`))) { showToast(t('reports.sharingUnavailable'), 'error'); return; }
-      showToast(t('records.exported', { label }), 'success');
-    } catch (err) {
-      showToast(t('reports.exportFailed', { message: err.message }), 'error');
-    }
-  }
 
   if (!records) return <ListSkeleton />;
 
@@ -189,7 +180,7 @@ export default function RecordListScreen({ config }) {
     <Page refreshing={refreshing || syncing} onRefresh={onRefresh}>
       <PageHeader title={t(`${page.page}.title`)} subtitle={t(`${page.page}.subtitle`)}>
         {page.importable ? <Button variant="secondary" icon="file-import" title={t('animalsPage.importCsv')} onPress={() => setImportOpen(true)} /> : null}
-        {page.exportable ? <Button variant="secondary" icon="file-export" title={t('reports.exportCsv')} onPress={exportCsv} /> : null}
+        <RecordExportButton table={config.table} rows={filtered} filtersText={search} />
         <Button icon="plus" title={t(page.addKey)} onPress={openAdd} />
       </PageHeader>
 
