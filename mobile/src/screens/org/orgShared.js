@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import { useTheme } from '../../theme/ThemeProvider';
@@ -86,7 +86,7 @@ export function OrgBanner({ org, children }) {
   return (
     <View style={styles.banner}>
       <View style={styles.bannerRow}>
-        <View style={styles.bannerMark}><Icon name={ORG_TYPE_ICONS[org.type] || 'building'} size={20} color="#14532D" /></View>
+        {org.logo ? <Image source={{ uri: org.logo }} style={styles.bannerLogo} /> : <View style={styles.bannerMark}><Icon name={ORG_TYPE_ICONS[org.type] || 'building'} size={20} color="#14532D" /></View>}
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text style={styles.bannerEyebrow} numberOfLines={1}>{t(`org.types.${org.type}`)}{org.district ? ` · ${org.district}` : ''}</Text>
           <Text style={styles.bannerName} numberOfLines={2}>{org.name}</Text>
@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
   banner: { backgroundColor: '#14532D', borderRadius: 12, padding: 16, marginBottom: 14 },
   bannerRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   bannerMark: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
+  bannerLogo: { width: 44, height: 44, borderRadius: 10, backgroundColor: '#FFFFFF' },
   bannerEyebrow: { color: 'rgba(255,255,255,0.85)', fontSize: 12 },
   bannerName: { color: '#FFFFFF', fontSize: 19, fontWeight: '800' }
 });

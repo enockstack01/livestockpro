@@ -83,9 +83,9 @@ export const ORG_NAV_SECTIONS = [
   {
     labelKey: 'org.nav.sectionManage',
     items: [
-      { key: 'orgStaff', path: '/organization/staff', icon: 'user-group', labelKey: 'org.nav.staff', roles: ['org_admin'], webOnly: true },
-      { key: 'orgProfile', path: '/organization/profile', icon: 'building', labelKey: 'org.nav.profile', webOnly: true },
-      { key: 'orgActivity', path: '/organization/activity', icon: 'clock-rotate-left', labelKey: 'org.nav.activity', roles: ['org_admin'], webOnly: true },
+      { key: 'orgStaff', path: '/organization/staff', icon: 'user-group', labelKey: 'org.nav.staff', roles: ['org_admin'] },
+      { key: 'orgProfile', path: '/organization/profile', icon: 'building', labelKey: 'org.nav.profile' },
+      { key: 'orgActivity', path: '/organization/activity', icon: 'clock-rotate-left', labelKey: 'org.nav.activity', roles: ['org_admin'] },
     ],
   },
   {

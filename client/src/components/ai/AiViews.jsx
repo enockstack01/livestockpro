@@ -5,7 +5,7 @@ import { useToast } from '../../lib/toast.jsx';
 import { aiReportFileName, aiReportHtml } from '../../../../shared/aiReportHtml.js';
 import { aiResetTime, getAiUsage, subscribeAiUsage } from '../../../../shared/aiUsage';
 
-/* Whether the server has an Anthropic API key. null while loading. */
+/* Whether the server has an AI key. null while loading. */
 export function useAiStatus() {
   const api = useApi();
   const [configured, setConfigured] = useState(null);

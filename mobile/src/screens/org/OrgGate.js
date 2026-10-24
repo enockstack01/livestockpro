@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { useUser } from '@clerk/expo';
 import { useTranslation } from 'react-i18next';
 import AuthShell from '../../components/AuthShell';
@@ -22,17 +24,84 @@ function useAuthStyles() {
   return makeAuthStyles(colors, radius);
 }
 
-export function OrgRegisterForm({ onDone, onBack }) {
+export const emptyOrgForm = (email = '') => ({ name: '', type: 'cooperative', country: 'Rwanda', district: '', sector: '', contact_email: email, contact_phone: '', description: '', logo: null });
+
+/* A logo picked from the gallery, shrunk on the phone to 256 px on its
+   longest side (the server accepts about 150 KB). */
+async function pickLogo() {
+  const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (!perm.granted) return undefined;
+  const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 1, exif: false });
+  if (result.canceled || !result.assets || !result.assets[0]) return undefined;
+  const a = result.assets[0];
+  const ctx = ImageManipulator.manipulate(a.uri);
+  if (Math.max(a.width || 0, a.height || 0) > 256) ctx.resize((a.width || 0) >= (a.height || 0) ? { width: 256 } : { height: 256 });
+  const saved = await (await ctx.renderAsync()).saveAsync({ format: SaveFormat.JPEG, compress: 0.85, base64: true });
+  return `data:image/jpeg;base64,${saved.base64}`;
+}
+
+/* The organization fields (twin of the web's OrgFields), shared by
+   registration and the organization profile screen. */
+export function OrgFields({ form, setForm, editable = true, withLogo = true }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
+  const showToast = useToast();
+  const set = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
+  async function chooseLogo() {
+    try {
+      const logo = await pickLogo();
+      if (logo === undefined) return;
+      if (logo.length > 200000) { showToast(t('org.errors.BAD_LOGO'), 'error'); return; }
+      setForm((f) => ({ ...f, logo }));
+    } catch {
+      showToast(t('org.errors.BAD_LOGO'), 'error');
+    }
+  }
+  const field = (k, props = {}) => <Input value={form[k] || ''} onChangeText={set(k)} editable={editable} {...props} />;
+  return (
+    <>
+      <FormGroup label={t('org.fields.name')} required>{field('name')}</FormGroup>
+      <FormGroup label={t('org.fields.type')} required>
+        <View style={styles.typeGrid}>
+          {ORG_TYPES.map((type) => {
+            const active = form.type === type;
+            return (
+              <Pressable key={type} disabled={!editable} onPress={() => { haptics.select(); setForm((f) => ({ ...f, type })); }} style={[styles.type, { borderColor: active ? colors.primary : colors.border, backgroundColor: active ? colors.primary : colors.card }]}>
+                <Icon name={ORG_TYPE_ICONS[type]} size={13} color={active ? '#FFFFFF' : colors.textLight} />
+                <Text style={{ fontSize: 12.5, fontWeight: '700', color: active ? '#FFFFFF' : colors.text }}>{t(`org.types.${type}`)}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </FormGroup>
+      <FormGroup label={t('org.fields.country')}>{field('country')}</FormGroup>
+      <FormGroup label={t('org.fields.district')}>{field('district')}</FormGroup>
+      <FormGroup label={t('org.fields.sector')}>{field('sector')}</FormGroup>
+      <FormGroup label={t('org.fields.contactPhone')} required>{field('contact_phone', { keyboardType: 'phone-pad' })}</FormGroup>
+      <FormGroup label={t('org.fields.contactEmail')} required>{field('contact_email', { keyboardType: 'email-address', autoCapitalize: 'none' })}</FormGroup>
+      <FormGroup label={t('org.fields.description')}>{field('description', { multiline: true })}</FormGroup>
+      {withLogo ? (
+        <FormGroup label={t('org.fields.logo')}>
+          <View style={styles.logoRow}>
+            {form.logo ? <Image source={{ uri: form.logo }} style={[styles.logo, { borderColor: colors.border }]} /> : <View style={[styles.logo, styles.logoEmpty, { borderColor: colors.border, backgroundColor: colors.bg }]}><Icon name="image" size={20} color={colors.textLight} /></View>}
+            {editable ? <Button title={t('org.fields.logo')} icon="upload" variant="secondary" size="sm" onPress={chooseLogo} /> : null}
+            {editable && form.logo ? <Button title={t('common.delete')} variant="secondary" size="sm" onPress={() => setForm((f) => ({ ...f, logo: null }))} /> : null}
+          </View>
+        </FormGroup>
+      ) : null}
+    </>
+  );
+}
+
+export function OrgRegisterForm({ onDone, onBack }) {
+  const { t } = useTranslation();
   const auth = useAuthStyles();
   const { user } = useUser();
   const api = useApi();
   const showToast = useToast();
   const [adminName, setAdminName] = useState(user?.fullName || '');
-  const [form, setForm] = useState({ name: '', type: 'cooperative', country: 'Rwanda', district: '', sector: '', contact_email: user?.primaryEmailAddress?.emailAddress || '', contact_phone: '', description: '' });
+  const [form, setForm] = useState(emptyOrgForm(user?.primaryEmailAddress?.emailAddress || ''));
   const [busy, setBusy] = useState(false);
-  const set = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
 
   async function submit() {
     if (!form.name.trim() || !form.contact_email.trim() || !form.contact_phone.trim()) { showToast(t('account.requiredFields'), 'error'); return; }
@@ -50,25 +119,7 @@ export function OrgRegisterForm({ onDone, onBack }) {
         <Text style={auth.title}>{t('org.register.title')}</Text>
         <Text style={[auth.subtitle, { marginBottom: 20 }]}>{t('org.register.subtitle')}</Text>
         <FormGroup label={t('org.register.yourName')} required><Input value={adminName} onChangeText={setAdminName} /></FormGroup>
-        <FormGroup label={t('org.fields.name')} required><Input value={form.name} onChangeText={set('name')} /></FormGroup>
-        <FormGroup label={t('org.fields.type')} required>
-          <View style={styles.typeGrid}>
-            {ORG_TYPES.map((type) => {
-              const active = form.type === type;
-              return (
-                <Pressable key={type} onPress={() => { haptics.select(); setForm((f) => ({ ...f, type })); }} style={[styles.type, { borderColor: active ? colors.primary : colors.border, backgroundColor: active ? colors.primary : colors.card }]}>
-                  <Icon name={ORG_TYPE_ICONS[type]} size={13} color={active ? '#FFFFFF' : colors.textLight} />
-                  <Text style={{ fontSize: 12.5, fontWeight: '700', color: active ? '#FFFFFF' : colors.text }}>{t(`org.types.${type}`)}</Text>
-                </Pressable>
-              );
-            })}
-          </View>
-        </FormGroup>
-        <FormGroup label={t('org.fields.district')}><Input value={form.district} onChangeText={set('district')} /></FormGroup>
-        <FormGroup label={t('org.fields.sector')}><Input value={form.sector} onChangeText={set('sector')} /></FormGroup>
-        <FormGroup label={t('org.fields.contactPhone')} required><Input value={form.contact_phone} onChangeText={set('contact_phone')} keyboardType="phone-pad" /></FormGroup>
-        <FormGroup label={t('org.fields.contactEmail')} required><Input value={form.contact_email} onChangeText={set('contact_email')} keyboardType="email-address" autoCapitalize="none" /></FormGroup>
-        <FormGroup label={t('org.fields.description')}><Input value={form.description} onChangeText={set('description')} multiline /></FormGroup>
+        <OrgFields form={form} setForm={setForm} />
         <Button title={t('org.register.submit')} icon="paper-plane" loading={busy} onPress={submit} block />
         <Pressable onPress={onBack} style={{ marginTop: 16, alignSelf: 'center' }}><Text style={auth.link}>{t('org.register.backToFarmer')}</Text></Pressable>
       </ScrollView>
@@ -155,5 +206,8 @@ const styles = StyleSheet.create({
   stateIcon: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
   invite: { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderRadius: 12, padding: 12, marginBottom: 10 },
   mark: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  logoRow: { flexDirection: 'row', alignItems: 'center', gap: 10, flexWrap: 'wrap' },
+  logo: { width: 56, height: 56, borderRadius: 10, borderWidth: 1 },
+  logoEmpty: { alignItems: 'center', justifyContent: 'center' },
   cta: { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderStyle: 'dashed', borderRadius: 12, padding: 12, marginTop: 12 }
 });

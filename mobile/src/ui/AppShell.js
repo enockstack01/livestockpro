@@ -127,7 +127,7 @@ function useNotifications(t, isOrg) {
       const res = await api.http('GET', '/notifications');
       const server = (res.data || []).map((n) => {
         const [icon, color] = SERVER_NOTIF[n.key] || ['bell', 'blue'];
-        return { id: 'srv-' + n.id, serverId: n.id, serverRead: Boolean(n.read_at), icon, color, title: t(`notifications.${n.key}.title`, n.vars || {}), sub: t(`notifications.${n.key}.body`, n.vars || {}), link: n.link && n.link.startsWith('/organization') && !n.link.startsWith('/organization/farmers') && n.link !== '/organization' ? '/organization' : (n.link || '/') };
+        return { id: 'srv-' + n.id, serverId: n.id, serverRead: Boolean(n.read_at), icon, color, title: t(`notifications.${n.key}.title`, n.vars || {}), sub: t(`notifications.${n.key}.body`, n.vars || {}), link: n.link || '/' };
       });
       if (isOrg) { if (!cancelled) setItems(server); return; }
       const [tasks, animals, health, breeding] = await Promise.all([

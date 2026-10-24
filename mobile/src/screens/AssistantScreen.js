@@ -44,7 +44,7 @@ export function useAiUsage() {
 
 /* "12 of 50 AI requests left today" with a small meter. */
 export function AiUsageMeter({ kind, style }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { colors } = useTheme();
   const usage = useAiUsage();
   if (!usage) return null;
@@ -59,6 +59,7 @@ export function AiUsageMeter({ kind, style }) {
       <View style={{ height: 6, borderRadius: 3, backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' }}>
         <View style={{ width: `${pct}%`, height: '100%', backgroundColor: bar }} />
       </View>
+      {pct <= 20 ? <Text style={{ fontSize: 11.5, color: colors.textLight }}>{t('ai.usage.resets', { time: aiResetTime(usage, i18n.language) })}</Text> : null}
     </View>
   );
 }
@@ -468,6 +469,7 @@ export function AdvisorCard({ disabled, compact }) {
 
 function DiagnoseTab({ disabled, recordId }) {
   const { t, i18n } = useTranslation();
+  const { colors } = useTheme();
   const api = useApi();
   const repo = useRepository();
   const showToast = useToast();
@@ -478,10 +480,12 @@ function DiagnoseTab({ disabled, recordId }) {
   const [symptoms, setSymptoms] = useState('');
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(null);
+  const [earlier, setEarlier] = useState([]);
   const photos = usePhotos();
 
   useEffect(() => {
     let live = true;
+    if (recordId) api.aiReports({ kind: 'diagnosis', record_id: recordId, limit: 5 }).then(({ data }) => { if (live) setEarlier(data || []); });
     (async () => {
       const list = await repo.list('animals', { order: 'tag_id ASC' });
       if (!live) return;
@@ -498,7 +502,7 @@ function DiagnoseTab({ disabled, recordId }) {
       }
     })();
     return () => { live = false; };
-  }, [repo, recordId]);
+  }, [repo, recordId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const animal = animals.find((a) => a.id === animalId);
 
@@ -517,6 +521,7 @@ function DiagnoseTab({ disabled, recordId }) {
     if (error) { showToast(aiErrorText(t, error, i18n.language), 'error'); return; }
     photos.clear();
     setSaved(data);
+    if (record) setEarlier((list) => [data, ...list]);
   }
 
   if (saved) {
@@ -557,6 +562,18 @@ function DiagnoseTab({ disabled, recordId }) {
             <Note danger>{t('ai.vetNotice')}</Note>
             <AiUsageMeter kind="diagnose" style={{ marginTop: 12 }} />
             <Button title={t('ai.diagnose.run')} icon="wand-magic-sparkles" onPress={run} disabled={disabled || (!symptoms.trim() && !photos.photos.length)} style={{ marginTop: 14 }} block />
+            {earlier.length ? (
+              <View style={{ marginTop: 18, gap: 6 }}>
+                <Text style={{ fontWeight: '800', color: colors.text }}>{t('ai.diagnose.previous')}</Text>
+                {earlier.map((r) => (
+                  <Pressable key={r.id} onPress={() => setSaved(r)} accessibilityRole="button" style={({ pressed }) => [styles.earlier, { borderColor: colors.border, backgroundColor: pressed ? colors.bg : colors.card }]}>
+                    <Icon name="file-medical" size={14} color={colors.primary} />
+                    <Text style={{ flex: 1, color: colors.text, fontSize: 13 }} numberOfLines={2}>{r.title}</Text>
+                    <Text style={{ color: colors.textLight, fontSize: 11.5 }}>{new Date(r.created_at).toLocaleDateString(i18n.language)}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            ) : null}
           </>
         )}
       </CardBody>
@@ -644,6 +661,7 @@ export default function AssistantScreen() {
 
 const styles = StyleSheet.create({
   photoBox: { borderWidth: 1, borderRadius: 10, padding: 12, marginBottom: 12 },
+  earlier: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10 },
   photoThumb: { width: 96, height: 72, borderRadius: 8 },
   chatThumb: { width: 110, height: 82, borderRadius: 8 },
   pill: { borderRadius: 999, paddingHorizontal: 9, paddingVertical: 3, alignSelf: 'flex-start' },
