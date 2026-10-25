@@ -3,8 +3,9 @@ import { formatCompact, formatMoneyCompact } from '../../../shared/currency';
 
 /* Every chart shows the numbers it draws. Registered once for all Chart.js
    charts (useChart.js):
-   - bars: the value at the end of each bar (turned upright when it is wider
-     than the bar); stacked bars show each segment that fits plus the total
+   - bars: the value at the end of each bar, always written flat (a smaller
+     size when the bar is narrow); stacked bars show each segment that fits
+     plus the total
    - lines: the value above each point
    - doughnuts: the value on each slice that fits, and "label: value (pct%)"
      in the legend
@@ -114,9 +115,14 @@ export const valueLabelsPlugin = {
           drawText(ctx, text, neg ? x - 5 : x + 5, y, { color: ink, align: neg ? 'right' : 'left' });
         } else {
           const neg = v < 0;
-          const rotate = w > width + 6;
-          if (rotate) drawText(ctx, text, x, neg ? y + 5 : y - 5, { color: ink, align: neg ? 'right' : 'left', rotate: true });
-          else drawText(ctx, text, x, neg ? y + 5 : y - 5, { color: ink, baseline: neg ? 'top' : 'bottom' });
+          // The room a column's number may take: its own slot across the axis.
+          const slot = (chart.scales.x.width / Math.max(1, chart.data.labels.length)) / Math.max(1, chart.data.datasets.filter((_, k) => chart.isDatasetVisible(k)).length);
+          const base = opts.small ? 9.5 : 11;
+          const size = w > slot - 2 ? Math.max(8, Math.floor(base * (slot - 2) / w)) : base;
+          ctx.save();
+          ctx.font = FONT(size);
+          drawText(ctx, text, x, neg ? y + 4 : y - 4, { color: ink, baseline: neg ? 'top' : 'bottom', halo: surface });
+          ctx.restore();
         }
       });
     });

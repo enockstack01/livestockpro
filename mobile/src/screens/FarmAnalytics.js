@@ -145,8 +145,10 @@ export default function FarmAnalytics({ data }) {
 
       <SectionTitle icon="coins">{t('analytics.sectionFinance')}</SectionTitle>
       <CardGrid>
+        {/* Months run down the chart, each with its income and expense bar
+            and the amount beside it, so every figure stays readable. */}
         <ChartCard wide title={t('analytics.incomeVsExpenses')} icon="chart-column" empty={a.financeInRangeCount === 0}>
-          <BarChart money legend labels={labels} datasets={[{ label: enumLabel('financeType', 'Income'), data: a.monthIncome, color: cc.positive }, { label: enumLabel('financeType', 'Expense'), data: a.monthExpense, color: cc.negative }]} />
+          <BarChart horizontal money legend height={labels.length * 44 + 80} labels={labels} datasets={[{ label: enumLabel('financeType', 'Income'), data: a.monthIncome, color: cc.positive }, { label: enumLabel('financeType', 'Expense'), data: a.monthExpense, color: cc.negative }]} />
         </ChartCard>
         <ChartCard wide title={t('analytics.netCashFlow')} icon="scale-balanced" empty={a.financeInRangeCount === 0}>
           <BarChart money labels={labels} datasets={[{ label: t('analytics.net'), data: a.monthNet, color: cc.positive, colors: a.monthNet.map((v) => (v >= 0 ? cc.positive : cc.negative)) }]} />

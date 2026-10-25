@@ -209,11 +209,16 @@ export default function FarmAnalytics({ data }) {
 
       <SectionTitle icon="fa-coins">{t('analytics.sectionFinance')}</SectionTitle>
       <CardGrid>
+        {/* Months run down the chart, each with its income and expense bar
+            and the amount beside it, so every figure stays readable. */}
         <ChartCard wide title={t('analytics.incomeVsExpenses')} icon="fa-chart-column" empty={a.financeInRangeCount === 0}>
-          <Chart depKey={JSON.stringify([a.monthIncome, a.monthExpense, labels])} build={(ct) => ({
+          <Chart height={labels.length * 46 + 90} depKey={JSON.stringify([a.monthIncome, a.monthExpense, labels])} build={(ct) => ({
             type: 'bar',
-            data: { labels, datasets: [barDataset(ct, enumLabel('financeType', 'Income'), a.monthIncome, ct.positive), barDataset(ct, enumLabel('financeType', 'Expense'), a.monthExpense, ct.negative)] },
-            options: cartesianOptions(ct, { legend: true, money: true })
+            data: { labels, datasets: [
+              { ...barDataset(ct, enumLabel('financeType', 'Income'), a.monthIncome, ct.positive), maxBarThickness: 16 },
+              { ...barDataset(ct, enumLabel('financeType', 'Expense'), a.monthExpense, ct.negative), maxBarThickness: 16 }
+            ] },
+            options: cartesianOptions(ct, { horizontal: true, legend: true, money: true })
           })} />
         </ChartCard>
         <ChartCard wide title={t('analytics.netCashFlow')} icon="fa-scale-balanced" empty={a.financeInRangeCount === 0}>

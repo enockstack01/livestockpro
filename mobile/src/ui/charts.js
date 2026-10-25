@@ -3,7 +3,7 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
 import { useTheme } from '../theme/ThemeProvider';
 import { chartPalette, fmtMoney } from '../../../shared/chartPalette';
-import { formatCompact, formatMoneyCompact } from '../../../shared/currency';
+import { formatCompact, getCurrency } from '../../../shared/currency';
 import { useCardSize } from './cardGrid';
 
 /* Native counterparts of the web dashboard's Chart.js charts (see
@@ -13,9 +13,11 @@ import { useCardSize } from './cardGrid';
    that never overshoot, donuts with surface-colored separators, and a
    tap-to-inspect tooltip showing every series at that point (the web's
    index-mode hover). Like the web's valueLabels plugin, every chart prints
-   its numbers: bar ends (upright when wider than the bar), stacked segments
-   that fit plus the stack total, every line point, and donut slices plus
-   "label: value (pct%)" in the legend. */
+   its numbers: bar ends (always flat, smaller when the bar is narrow),
+   stacked segments that fit plus the stack total, every line point, and
+   donut slices plus "label: value (pct%)" in the legend. Money charts show
+   short figures (600K) with the currency named once beside the axis; the
+   tooltip keeps the exact amount. */
 
 export function useChartColors() {
   const { scheme } = useTheme();
@@ -34,8 +36,8 @@ const GRACE = 1.18;
 
 /* A value label; halo draws a surface-colored outline first so it stays
    readable where it crosses a line. */
-function ValueText({ x, y, children, fill, anchor = 'middle', rotate, halo, bold = true }) {
-  const common = { x, y, fontSize: LABEL, fontFamily: FONT_FAMILY, fontWeight: bold ? '700' : '400', textAnchor: anchor, transform: rotate ? `rotate(-90 ${x} ${y})` : undefined };
+function ValueText({ x, y, children, fill, anchor = 'middle', halo, bold = true, size = LABEL }) {
+  const common = { x, y, fontSize: size, fontFamily: FONT_FAMILY, fontWeight: bold ? '700' : '400', textAnchor: anchor };
   return (
     <G>
       {halo ? <SvgText {...common} fill={halo} stroke={halo} strokeWidth={3}>{children}</SvgText> : null}
@@ -141,7 +143,9 @@ export function BarChart({ labels, datasets, horizontal, stacked, money, integer
   const [w, onLayout] = useWidth();
   const [sel, setSel] = useState(null);
   const fmt = money ? fmtMoney : fmtNum;
-  const short = money ? (v) => formatMoneyCompact(v) : formatCompact;
+  const tick = money ? formatCompact : fmtNum;
+  const short = formatCompact;
+  const unit = money ? getCurrency() : '';
   const n = labels.length;
 
   const sums = labels.map((_, i) => datasets.reduce((s, d) => s + Math.max(0, d.data[i] || 0), 0));
@@ -152,22 +156,35 @@ export function BarChart({ labels, datasets, horizontal, stacked, money, integer
   let chart = null;
   if (w > 0 && n > 0) {
     if (!horizontal) {
-      const yLabelW = Math.max(...sc.ticks.map((v) => fmt(v).length)) * CH + 10;
-      const left = yLabelW, top = 8, bottom = 26, right = 4;
+      const yLabelW = Math.max(unit.length, ...sc.ticks.map((v) => tick(v).length)) * CH + 10;
+      const right = 4;
+      const band = (w - yLabelW - right) / n;
+      // Category names wider than their column wrap onto two lines (short
+      // category lists; long month series skip labels from the newest back).
+      const tickLines = labels.map((lab) => {
+        const s = String(lab);
+        if (n > 8 || textW(s) * (FONT / LABEL) <= band - 4 || !s.includes(' ')) return [s];
+        const mid = s.length / 2;
+        const at = [...s].reduce((best, ch, k) => (ch === ' ' && Math.abs(k - mid) < Math.abs(best - mid) ? k : best), -1);
+        return [s.slice(0, at), s.slice(at + 1)];
+      });
+      const wrapped = tickLines.some((l) => l.length > 1);
+      const left = yLabelW, top = unit ? 22 : 8, bottom = wrapped ? 38 : 26;
       const pw = w - left - right, ph = plotH - top - bottom;
       const y = (v) => top + ph - ((v - sc.min) / (sc.max - sc.min)) * ph;
-      const band = pw / n;
       const groups = stacked ? 1 : datasets.length;
       const barW = Math.min(30, (band * 0.72) / groups);
-      const every = Math.max(1, Math.ceil((n * 44) / pw));
+      const widest = Math.max(...tickLines.flat().map((s) => textW(s) * (FONT / LABEL)));
+      const every = Math.max(1, Math.ceil((n * Math.max(44, widest + 8)) / pw));
       chart = (
         <Svg width={w} height={plotH}>
           {sc.ticks.map((v) => (
             <G key={v}>
               <Line x1={left} x2={w - right} y1={y(v)} y2={y(v)} stroke={cc.grid} strokeWidth={1} />
-              <SvgText x={left - 6} y={y(v) + 4} fontSize={FONT} fontFamily={FONT_FAMILY} fill={cc.text} textAnchor="end">{fmt(v)}</SvgText>
+              <SvgText x={left - 6} y={y(v) + 4} fontSize={FONT} fontFamily={FONT_FAMILY} fill={cc.text} textAnchor="end">{tick(v)}</SvgText>
             </G>
           ))}
+          {unit ? <SvgText x={left - 6} y={11} fontSize={FONT} fontFamily={FONT_FAMILY} fontWeight="700" fill={cc.text} textAnchor="end">{unit}</SvgText> : null}
           {labels.map((lab, i) => {
             const cx = left + band * i + band / 2;
             let acc = 0;
@@ -192,21 +209,23 @@ export function BarChart({ labels, datasets, horizontal, stacked, money, integer
                   const x = cx - (barW * groups) / 2 + barW * di;
                   const y0 = y(0), y1 = y(v);
                   const label = v === 0 && n > 8 ? '' : short(v); // empty months in a long series stay unlabelled
-                  const upright = textW(label) > barW + 4;
+                  // Written flat in the bar's own slot; a smaller size when the slot is narrow.
+                  const slot = band / groups;
+                  const size = textW(label) > slot - 2 ? Math.max(8.5, (LABEL * (slot - 2)) / textW(label)) : LABEL;
                   const lx = x + barW / 2;
                   return (
                     <G key={di}>
                       {v >= 0
                         ? <Path d={barPath(x + 1, y1, barW - 2, y0 - y1, 4, 'top')} fill={color} />
                         : <Path d={barPath(x + 1, y0, barW - 2, y1 - y0, 4, 'bottom')} fill={color} />}
-                      {upright
-                        ? <ValueText x={lx + 3.5} y={v >= 0 ? y1 - 4 : y1 + 4} anchor={v >= 0 ? 'start' : 'end'} rotate fill={cc.text}>{label}</ValueText>
-                        : <ValueText x={lx} y={v >= 0 ? y1 - 4 : y1 + 12} fill={cc.text}>{label}</ValueText>}
+                      <ValueText x={lx} y={v >= 0 ? y1 - 4 : y1 + 12} size={size} halo={cc.surface} fill={cc.text}>{label}</ValueText>
                     </G>
                   );
                 })}
                 {stacked && sums[i] > 0 ? <ValueText x={cx} y={y(sums[i]) - 4} fill={cc.text}>{short(sums[i])}</ValueText> : null}
-                {i % every === 0 ? <SvgText x={cx} y={plotH - 8} fontSize={FONT} fontFamily={FONT_FAMILY} fill={cc.text} textAnchor="middle">{lab}</SvgText> : null}
+                {(n - 1 - i) % every === 0 ? tickLines[i].map((line, li) => (
+                  <SvgText key={li} x={cx} y={top + ph + 15 + li * (FONT + 2)} fontSize={FONT} fontFamily={FONT_FAMILY} fill={cc.text} textAnchor="middle">{line}</SvgText>
+                )) : null}
                 <Rect x={left + band * i} y={top} width={band} height={ph} fill="transparent" onPress={() => setSel(sel === i ? null : i)} />
               </G>
             );
@@ -224,7 +243,7 @@ export function BarChart({ labels, datasets, horizontal, stacked, money, integer
     } else {
       const labelW = Math.min(w * 0.36, Math.max(...labels.map((l) => String(l).length)) * (CH + 0.2) + 12);
       const endLabelW = Math.max(...labels.map((_, i) => textW(short(stacked ? sums[i] : Math.max(...datasets.map((d) => d.data[i] || 0)))))) + 8;
-      const left = labelW, top = 4, bottom = 24, right = Math.max(10, endLabelW);
+      const left = labelW, top = 4, bottom = unit ? 40 : 24, right = Math.max(10, endLabelW);
       const pw = w - left - right, ph = plotH - top - bottom;
       const x = (v) => left + ((v - sc.min) / (sc.max - sc.min)) * pw;
       const band = ph / n;
@@ -236,9 +255,10 @@ export function BarChart({ labels, datasets, horizontal, stacked, money, integer
           {sc.ticks.map((v, ti) => (
             <G key={v}>
               <Line x1={x(v)} x2={x(v)} y1={top} y2={top + ph} stroke={cc.grid} strokeWidth={1} />
-              {ti % tickEvery === 0 ? <SvgText x={x(v)} y={plotH - 6} fontSize={FONT} fontFamily={FONT_FAMILY} fill={cc.text} textAnchor="middle">{fmt(v)}</SvgText> : null}
+              {ti % tickEvery === 0 ? <SvgText x={x(v)} y={top + ph + 16} fontSize={FONT} fontFamily={FONT_FAMILY} fill={cc.text} textAnchor="middle">{tick(v)}</SvgText> : null}
             </G>
           ))}
+          {unit ? <SvgText x={left + pw / 2} y={plotH - 6} fontSize={FONT} fontFamily={FONT_FAMILY} fontWeight="700" fill={cc.text} textAnchor="middle">{unit}</SvgText> : null}
           {labels.map((lab, i) => {
             const cy = top + band * i + band / 2;
             const text = String(lab).length > maxChars ? String(lab).slice(0, Math.max(1, maxChars - 1)) + '…' : String(lab);
@@ -268,7 +288,7 @@ export function BarChart({ labels, datasets, horizontal, stacked, money, integer
                   return (
                     <G key={di}>
                       <Path d={barPath(x(0), by, x(v) - x(0), bh, 4, 'right')} fill={color} />
-                      <ValueText x={x(v) + 5} y={by + bh / 2 + 3.5} anchor="start" fill={cc.text}>{short(v)}</ValueText>
+                      {v === 0 && n > 8 ? null : <ValueText x={x(v) + 5} y={by + bh / 2 + 3.5} anchor="start" fill={cc.text}>{short(v)}</ValueText>}
                     </G>
                   );
                 })}
@@ -308,7 +328,8 @@ export function LineChart({ labels, datasets, money, integer, legend, height: fu
   const [w, onLayout] = useWidth();
   const [sel, setSel] = useState(null);
   const fmt = money ? fmtMoney : fmtNum;
-  const short = money ? (v) => formatMoneyCompact(v) : formatCompact;
+  const tick = money ? formatCompact : fmtNum;
+  const short = formatCompact;
   const n = labels.length;
   const all = datasets.flatMap((d) => d.data);
   const sc = scale(Math.min(0, ...all) * GRACE, Math.max(0, ...all) * GRACE, integer);
@@ -316,7 +337,7 @@ export function LineChart({ labels, datasets, money, integer, legend, height: fu
 
   let chart = null;
   if (w > 0 && n > 0) {
-    const yLabelW = Math.max(...sc.ticks.map((v) => fmt(v).length)) * CH + 10;
+    const yLabelW = Math.max(...sc.ticks.map((v) => tick(v).length)) * CH + 10;
     const left = yLabelW, top = 8, bottom = 26, right = 8;
     const pw = w - left - right, ph = plotH - top - bottom;
     const x = (i) => left + (n === 1 ? pw / 2 : (pw * i) / (n - 1));
@@ -328,7 +349,7 @@ export function LineChart({ labels, datasets, money, integer, legend, height: fu
         {sc.ticks.map((v) => (
           <G key={v}>
             <Line x1={left} x2={w - right} y1={y(v)} y2={y(v)} stroke={cc.grid} strokeWidth={1} />
-            <SvgText x={left - 6} y={y(v) + 4} fontSize={FONT} fontFamily={FONT_FAMILY} fill={cc.text} textAnchor="end">{fmt(v)}</SvgText>
+            <SvgText x={left - 6} y={y(v) + 4} fontSize={FONT} fontFamily={FONT_FAMILY} fill={cc.text} textAnchor="end">{tick(v)}</SvgText>
           </G>
         ))}
         {labels.map((lab, i) => (i % every === 0 ? <SvgText key={i} x={x(i)} y={plotH - 8} fontSize={FONT} fontFamily={FONT_FAMILY} fill={cc.text} textAnchor="middle">{lab}</SvgText> : null))}

@@ -1,5 +1,6 @@
 import { useTheme } from '../theme/ThemeProvider.jsx';
 import { chartPalette, CHART_STATUS, fmtMoney } from '../../../shared/chartPalette';
+import { formatCompact, getCurrency } from '../../../shared/currency';
 
 /* Palette + status colors live in shared/chartPalette.js (the mobile app
    draws its charts from the same values). They're keyed off the theme
@@ -16,13 +17,18 @@ export function useChartTheme() {
 
 /* Shared Chart.js options for bar/line charts: recessive hairline grid, no
    axis clutter, index-mode tooltips (a hover anywhere in a column shows
-   every series at that point). */
+   every series at that point). Money axes show short figures (600K) with
+   the currency named once in the axis title, so ticks and bar values stay
+   short enough to read flat; tooltips keep the exact amount. Value axes get
+   headroom so the number at the end of the longest bar is never cut off. */
 export function cartesianOptions(ct, { horizontal = false, stacked = false, legend = false, money = false, integer = false } = {}) {
-  const valueTicks = { color: ct.text, font: { size: 11 }, padding: 6 };
-  if (money) valueTicks.callback = (v) => fmtMoney(v);
+  const valueTicks = { color: ct.text, font: { size: 11 }, padding: 6, maxRotation: 0 };
+  if (money) valueTicks.callback = (v) => formatCompact(v);
   if (integer) valueTicks.precision = 0;
-  const valueAxis = { beginAtZero: true, stacked, grid: { color: ct.grid, drawTicks: false }, border: { display: false }, ticks: valueTicks };
-  const categoryAxis = { stacked, grid: { display: false }, border: { color: ct.grid }, ticks: { color: ct.text, font: { size: 11 } } };
+  if (horizontal) valueTicks.maxTicksLimit = 5;
+  const valueAxis = { beginAtZero: true, stacked, grace: horizontal ? '26%' : '16%', grid: { color: ct.grid, drawTicks: false }, border: { display: false }, ticks: valueTicks };
+  if (money) valueAxis.title = { display: true, text: getCurrency(), color: ct.text, font: { size: 11, weight: '700' }, padding: { top: 4, bottom: 2 } };
+  const categoryAxis = { stacked, grid: { display: false }, border: { color: ct.grid }, ticks: { color: ct.text, font: { size: 11 }, maxRotation: 45 } };
 
   const tooltip = {};
   if (money) {
@@ -37,7 +43,7 @@ export function cartesianOptions(ct, { horizontal = false, stacked = false, lege
     scales: horizontal ? { x: valueAxis, y: categoryAxis } : { x: categoryAxis, y: valueAxis },
     plugins: {
       legend: { display: legend, position: 'bottom', labels: { color: ct.text, usePointStyle: true, pointStyleWidth: 10, padding: 14, font: { size: 12 } } },
-      valueLabels: { money, color: ct.text, surface: ct.surface },
+      valueLabels: { money: false, color: ct.text, surface: ct.surface },
       tooltip
     }
   };
