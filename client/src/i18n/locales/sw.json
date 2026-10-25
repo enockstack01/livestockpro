@@ -1310,7 +1310,9 @@
     },
     "pending": {
       "title": "{{name}} linasubiri idhini",
-      "message": "Logistack inakagua shirika lako. Utaarifiwa mara litakapoidhinishwa, kisha unaweza kualika wafugaji."
+      "message": "Logistack inakagua shirika lako. Utaarifiwa mara litakapoidhinishwa, kisha unaweza kualika wafugaji.",
+      "memberTitle": "Akaunti yako inasubiri kuidhinishwa",
+      "memberMessage": "Msimamizi wa LivestockPro anakagua akaunti yako ya {{name}}. Utaarifiwa mara itakapoidhinishwa."
     },
     "invite": {
       "title": "Umealikwa",
@@ -1340,7 +1342,8 @@
         "other_org": "Kwa sasa umeunganishwa na {{name}}. Ondoka kwanza kwenye Mipangilio, au wasiliana na msaada.",
         "org_account": "Hii ni akaunti ya shirika. Tafadhali ingia kwa akaunti ya mfugaji ili ujiunge."
       },
-      "openInApp": "Fungua kwenye programu ya LivestockPro"
+      "openInApp": "Fungua kwenye programu ya LivestockPro",
+      "pendingMessage": "Umeunganishwa na {{name}}. Msimamizi wa LivestockPro sasa anahitaji kuidhinisha akaunti yako. Utaarifiwa mara itakapoidhinishwa, kisha unaweza kuanza kurekodi mifugo yako."
     },
     "errors": {
       "LINK_EXPIRED": "Kiungo hiki cha mwaliko kimeisha muda. Tafadhali omba kiungo kipya kwa shirika lako.",
@@ -1357,7 +1360,7 @@
       "ORG_READ_ONLY": "Shirika hili si hai, kwa hivyo ni la kusoma tu.",
       "ORG_FORBIDDEN": "Huna ruhusa ya kufikia shirika hili.",
       "RATE_LIMITED": "Majaribio mengi mno. Tafadhali subiri dakika chache ujaribu tena.",
-      "BAD_LOGO": "Nembo lazima iwe picha ya PNG, JPEG au WebP chini ya KB 150.",
+      "BAD_LOGO": "Picha hiyo haiwezi kutumika kama nembo. Tafadhali jaribu picha nyingine.",
       "REASON_REQUIRED": "Tafadhali andika sababu ya kubadilisha kikomo cha wafugaji.",
       "LAST_ADMIN": "Shirika linahitaji angalau msimamizi mmoja.",
       "NO_DETAIL_ACCESS": "Mfugaji huyu hajatoa ruhusa ya kuona kumbukumbu zake za kina."

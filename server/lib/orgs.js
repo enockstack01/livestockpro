@@ -194,14 +194,19 @@ async function isOrgAccount(userId) {
 }
 
 /* Express guard for /api/organizations/:id/... routes. `roles` lists the
-   organization roles allowed; system admins pass for reading. With
-   write: true the organization must be active (suspended means read only). */
+   organization roles allowed; system admins pass for reading. A member's own
+   account must be approved by a system admin first. With write: true the
+   organization must be active (suspended means read only). */
 function requireOrgRole(roles, { write = false } = {}) {
   return async (req, res, next) => {
     try {
       const orgId = String(req.params.id || '');
       const m = await activeMembership(req.user.id);
       if (m && m.org._id === orgId && roles.includes(m.member.role)) {
+        // Required lazily: lib/accounts loads after this module.
+        if (!(await require('./accounts').isApproved(req.user.id))) {
+          return res.status(403).json({ error: { message: 'Your account is awaiting approval.', code: 'ACCOUNT_NOT_APPROVED' } });
+        }
         if (write && m.org.status !== 'active') {
           return res.status(403).json({ error: { message: 'This organization is not active, so it is read only.', code: 'ORG_READ_ONLY' } });
         }
@@ -231,7 +236,8 @@ function requireOrgRole(roles, { write = false } = {}) {
    below max_farmers (so concurrent joins can never pass the limit), the
    link's use_count is raised only if below max_uses, and the membership row
    is created (the partial unique index keeps one organization per farmer).
-   The farmer's account is approved, because the organization vouches. */
+   The link does not approve the farmer's account: like every account it
+   waits for a system admin (an account already approved stays approved). */
 async function joinOrganization({ userId, token, consent, detailAccess = false, profile = null }) {
   if (!consent) throw new OrgError(400, 'CONSENT_REQUIRED', 'Please agree to share your farm summary with the organization.');
   if (await isOrgAccount(userId)) throw new OrgError(409, 'ORG_ACCOUNT', 'Organization accounts cannot join as farmers. Please sign in with a farmer account.');
@@ -247,6 +253,8 @@ async function joinOrganization({ userId, token, consent, detailAccess = false, 
   const session = getClient().startSession();
   const now = nowIso();
   const rowId = uuid();
+  const before = await col('accounts').findOne({ _id: userId });
+  const accountStatus = before && before.status === 'approved' ? 'approved' : 'pending';
   try {
     await session.withTransaction(async () => {
       const orgUpdate = await col('organizations').updateOne(
@@ -273,7 +281,7 @@ async function joinOrganization({ userId, token, consent, detailAccess = false, 
       await col('accounts').updateOne(
         { _id: userId },
         {
-          $set: { status: 'approved', approved_via: 'referral', reviewed_at: now, updated_at: now, account_type: 'farmer', ...(profile || {}) },
+          $set: { status: accountStatus, joined_via: 'referral', ...(accountStatus === 'pending' ? { submitted_at: now, review_note: '' } : {}), updated_at: now, account_type: 'farmer', ...(profile || {}) },
           $setOnInsert: { user_id: userId, currency: 'RWF', created_at: now }
         },
         { upsert: true, session }
@@ -289,7 +297,7 @@ async function joinOrganization({ userId, token, consent, detailAccess = false, 
   const fresh = await col('organizations').findOne({ _id: org._id });
   refreshFarmerStats(userId).catch(() => {});
   usageNotices(fresh, org.active_farmers).catch(() => {});
-  return { org: fresh, membershipId: rowId };
+  return { org: fresh, membershipId: rowId, accountStatus };
 }
 
 /* Notifications at 80 percent and 100 percent of the limit. */

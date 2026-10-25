@@ -4,28 +4,18 @@ import { useApi } from '../../lib/api.js';
 import { useToast } from '../../lib/toast.jsx';
 import { orgErrorText } from '../../lib/org.jsx';
 import { ORG_TYPES, ORG_TYPE_ICONS } from '../../../../shared/org';
+import { IMAGE_ACCEPT, decodeImage, drawToDataUrl, isImageFile } from '../../lib/imageFile.js';
 
-/* Reads an image file into a small data URL (the server accepts up to about
-   150 KB), scaled down to 256 px on its longest side. */
-export function readLogo(file) {
-  return new Promise((resolve, reject) => {
-    if (!file) return resolve(null);
-    if (!/^image\/(png|jpeg|webp)$/.test(file.type)) return reject(new Error('type'));
-    const img = new Image();
-    const reader = new FileReader();
-    reader.onload = () => { img.src = reader.result; };
-    reader.onerror = reject;
-    img.onload = () => {
-      const scale = Math.min(1, 256 / Math.max(img.width, img.height));
-      const c = document.createElement('canvas');
-      c.width = Math.round(img.width * scale);
-      c.height = Math.round(img.height * scale);
-      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-      resolve(c.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.85));
-    };
-    img.onerror = reject;
-    reader.readAsDataURL(file);
-  });
+/* Reads a picture in any format into a small data URL (the server accepts
+   up to about 150 KB), scaled down to 256 px on its longest side. Pictures
+   that can be transparent (PNG, GIF, WebP, SVG, ICO) stay PNG. */
+export async function readLogo(file) {
+  if (!file) return null;
+  if (!isImageFile(file)) throw new Error('type');
+  const img = await decodeImage(file);
+  const clear = /png|gif|webp|svg|icon/.test(file.type);
+  const png = clear ? drawToDataUrl(img, 256, { type: 'image/png' }) : null;
+  return png && png.length <= 200000 ? png : drawToDataUrl(img, 256, { quality: 0.85 });
 }
 
 /* The organization fields, shared by registration, the organization profile
@@ -71,7 +61,7 @@ export function OrgFields({ form, set, setForm, withLogo = true }) {
           <label>{t('org.fields.logo')}</label>
           <div className="org-logo-pick">
             {form.logo ? <img src={form.logo} alt="" /> : <span className="org-logo-empty"><i className="fas fa-image"></i></span>}
-            <input type="file" accept="image/png,image/jpeg,image/webp" onChange={pickLogo} />
+            <input type="file" accept={IMAGE_ACCEPT} onChange={pickLogo} />
             {form.logo ? <button type="button" className="btn btn-secondary btn-sm" onClick={() => setForm((f) => ({ ...f, logo: null }))}>{t('common.delete')}</button> : null}
           </div>
         </div>
@@ -121,11 +111,12 @@ export function OrgRegisterForm({ email, defaultName, onDone, onBack }) {
 export function OrgPendingScreen({ account, checking, onCheck, onSignOut }) {
   const { t } = useTranslation();
   const org = account.organization || {};
+  const member = org.status === 'active';
   return (
     <div className="account-state">
       <div className="account-state-icon green"><i className="fas fa-building-circle-check"></i></div>
-      <h1 className="auth-title">{t('org.pending.title', { name: org.name || '' })}</h1>
-      <p className="subtitle">{t('org.pending.message')}</p>
+      <h1 className="auth-title">{member ? t('org.pending.memberTitle') : t('org.pending.title', { name: org.name || '' })}</h1>
+      <p className="subtitle">{member ? t('org.pending.memberMessage', { name: org.name || '' }) : t('org.pending.message')}</p>
       <div className="account-state-actions">
         <button className="btn btn-primary" disabled={checking} onClick={onCheck}><i className={`fas ${checking ? 'fa-spinner fa-spin' : 'fa-rotate'}`}></i> {t('account.checkStatus')}</button>
         <button className="btn btn-secondary" onClick={onSignOut}><i className="fas fa-right-from-bracket"></i> {t('nav.signOut')}</button>

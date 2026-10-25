@@ -69,5 +69,5 @@ async function requireApproved(req, res, next) {
 
 module.exports = {
   ACCOUNT_STATUSES, ACCOUNT_TYPES, CURRENCY_RE, DEFAULT_CURRENCY,
-  accounts, getAccount, requireApproved, forgetApproval
+  accounts, getAccount, isApproved, requireApproved, forgetApproval
 };

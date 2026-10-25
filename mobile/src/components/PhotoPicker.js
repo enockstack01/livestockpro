@@ -55,7 +55,8 @@ export default function PhotoPicker({ state, disabled, compact }) {
     try {
       const perm = fromCamera ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!perm.granted) { showToast(t('ai.photo.noCamera'), 'error'); return; }
-      const opts = { mediaTypes: ['images'], quality: 1, exif: false };
+      // Any picture the phone holds; iPhones hand over a JPEG copy of HEIC photos.
+      const opts = { mediaTypes: ['images'], quality: 1, exif: false, preferredAssetRepresentationMode: ImagePicker.UIImagePickerPreferredAssetRepresentationMode.Compatible };
       const result = fromCamera
         ? await ImagePicker.launchCameraAsync(opts)
         : await ImagePicker.launchImageLibraryAsync({ ...opts, allowsMultipleSelection: true, selectionLimit: MAX_PHOTOS - state.photos.length });

@@ -1310,7 +1310,9 @@
     },
     "pending": {
       "title": "{{name}} espera la aprobación",
-      "message": "Logistack está revisando su organización. Le avisaremos en cuanto se apruebe y entonces podrá invitar ganaderos."
+      "message": "Logistack está revisando su organización. Le avisaremos en cuanto se apruebe y entonces podrá invitar ganaderos.",
+      "memberTitle": "Tu cuenta está pendiente de aprobación",
+      "memberMessage": "Un administrador de LivestockPro está revisando tu cuenta de {{name}}. Te avisaremos en cuanto se apruebe."
     },
     "invite": {
       "title": "Ha sido invitado",
@@ -1340,7 +1342,8 @@
         "other_org": "Actualmente está vinculado a {{name}}. Déjela primero en Ajustes o contacte con soporte.",
         "org_account": "Esta es una cuenta de organización. Inicie sesión con una cuenta de ganadero para unirse."
       },
-      "openInApp": "Abrir en la app LivestockPro"
+      "openInApp": "Abrir en la app LivestockPro",
+      "pendingMessage": "Estás vinculado a {{name}}. Ahora un administrador de LivestockPro debe aprobar tu cuenta. Te avisaremos en cuanto se apruebe y entonces podrás empezar a registrar tu ganado."
     },
     "errors": {
       "LINK_EXPIRED": "Este enlace de invitación ha vencido. Pida un nuevo enlace a su organización.",
@@ -1357,7 +1360,7 @@
       "ORG_READ_ONLY": "Esta organización no está activa, por lo que es de solo lectura.",
       "ORG_FORBIDDEN": "No tiene acceso a esta organización.",
       "RATE_LIMITED": "Demasiados intentos. Espere unos minutos y vuelva a intentarlo.",
-      "BAD_LOGO": "El logotipo debe ser una imagen PNG, JPEG o WebP de menos de 150 KB.",
+      "BAD_LOGO": "Esa imagen no se puede usar como logotipo. Prueba con otra imagen.",
       "REASON_REQUIRED": "Indique el motivo del cambio de límite.",
       "LAST_ADMIN": "Una organización necesita al menos un administrador.",
       "NO_DETAIL_ACCESS": "Este ganadero no ha dado permiso para ver sus registros detallados."

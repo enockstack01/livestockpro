@@ -2,7 +2,7 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 const { getAuth } = require('@clerk/express');
 const { requireAuth } = require('../authMiddleware');
-const { forgetApproval } = require('../lib/accounts');
+const { forgetApproval, requireApproved } = require('../lib/accounts');
 const {
   OrgError, sendOrgError, audit, notifyOrgAdmins, findLink, linkState, joinError, joinOrganization,
   farmerLink, endFarmerLink, isOrgAccount, refreshFarmerStats, col, nowIso
@@ -62,7 +62,7 @@ join.post('/:token', requireAuth, async (req, res) => {
     const profile = {};
     if (text(p.full_name)) profile.full_name = text(p.full_name);
     if (text(p.phone, 40)) profile.phone = text(p.phone, 40);
-    const { org } = await joinOrganization({ userId: req.user.id, token: req.params.token, consent: body.consent === true, detailAccess: body.detail_access === true, profile });
+    const { org, accountStatus } = await joinOrganization({ userId: req.user.id, token: req.params.token, consent: body.consent === true, detailAccess: body.detail_access === true, profile });
     forgetApproval(req.user.id);
 
     /* Location on the farm profile, for the organization's filters. */
@@ -80,7 +80,7 @@ join.post('/:token', requireAuth, async (req, res) => {
     const name = profile.full_name || 'A farmer';
     await notifyOrgAdmins(org._id, 'farmerJoined', { name: org.name, farmer: name }, '/organization/farmers');
     await audit(req, 'farmer.join', { targetType: 'farmer', targetId: req.user.id, organizationId: org._id, details: { via: 'referral_link', detail_access: body.detail_access === true } });
-    res.status(201).json({ data: { organization: { id: org._id, name: org.name, logo: org.logo || null } }, error: null });
+    res.status(201).json({ data: { organization: { id: org._id, name: org.name, logo: org.logo || null }, account_status: accountStatus }, error: null });
   } catch (err) {
     sendOrgError(res, err);
   }
@@ -89,6 +89,8 @@ join.post('/:token', requireAuth, async (req, res) => {
 /* ---------- /api/me/organization (the farmer's side) ---------- */
 const me = express.Router();
 me.use(requireAuth);
+/* Everything here but leaving needs an approved account. */
+me.use((req, res, next) => (req.method === 'POST' && req.path === '/leave' ? next() : requireApproved(req, res, next)));
 
 me.get('/', async (req, res) => {
   try {

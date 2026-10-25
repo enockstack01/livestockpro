@@ -1310,7 +1310,9 @@
     },
     "pending": {
       "title": "{{name}} gitegereje kwemezwa",
-      "message": "Logistack irimo gusuzuma ikigo cyawe. Uzamenyeshwa nikimara kwemezwa, maze ubone gutumira aborozi."
+      "message": "Logistack irimo gusuzuma ikigo cyawe. Uzamenyeshwa nikimara kwemezwa, maze ubone gutumira aborozi.",
+      "memberTitle": "Konti yawe itegereje kwemezwa",
+      "memberMessage": "Umuyobozi wa LivestockPro arimo gusuzuma konti yawe ya {{name}}. Uzamenyeshwa ikimara kwemezwa."
     },
     "invite": {
       "title": "Watumiwe",
@@ -1340,7 +1342,8 @@
         "other_org": "Ubu uri muri {{name}}. Banza uvemo muri Igenamiterere, cyangwa uvugane n'ubufasha.",
         "org_account": "Iyi ni konti y'ikigo. Injira ukoresheje konti y'umworozi kugira ngo winjire."
       },
-      "openInApp": "Fungura muri porogaramu ya LivestockPro"
+      "openInApp": "Fungura muri porogaramu ya LivestockPro",
+      "pendingMessage": "Uhujwe na {{name}}. Ubu umuyobozi wa LivestockPro agomba kwemeza konti yawe. Uzamenyeshwa ikimara kwemezwa, hanyuma utangire kwandika amatungo yawe."
     },
     "errors": {
       "LINK_EXPIRED": "Iri huza ry'ubutumire ryarangiye. Saba ikigo cyawe irindi huza.",
@@ -1357,7 +1360,7 @@
       "ORG_READ_ONLY": "Iki kigo ntigikora, ushobora kureba gusa.",
       "ORG_FORBIDDEN": "Ntiwemerewe kugera kuri iki kigo.",
       "RATE_LIMITED": "Wagerageje kenshi cyane. Tegereza iminota mike wongere ugerageze.",
-      "BAD_LOGO": "Ikirango kigomba kuba ifoto ya PNG, JPEG cyangwa WebP iri munsi ya 150 KB.",
+      "BAD_LOGO": "Iyo foto ntishobora gukoreshwa nk’ikirango. Gerageza indi foto.",
       "REASON_REQUIRED": "Andika impamvu yo guhindura umubare ntarengwa.",
       "LAST_ADMIN": "Ikigo kigomba kugira nibura umuyobozi umwe.",
       "NO_DETAIL_ACCESS": "Uyu mworozi ntiyatanze uburenganzira bwo kureba amakuru ye arambuye."

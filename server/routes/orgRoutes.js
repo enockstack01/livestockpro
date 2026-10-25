@@ -153,12 +153,14 @@ router.post('/invites/:inviteId', async (req, res) => {
     }
     if (await activeMembership(userId)) throw new OrgError(409, 'ALREADY_MEMBER', 'You already belong to an organization.');
     if (await farmerLink(userId) || await hasFarmData(userId)) throw new OrgError(409, 'FARMER_ACCOUNT', 'This account is used as a farmer account. Please accept the invitation with a different account.');
-    const org = await col('organizations').findOne({ _id: invite.organization_id });
+    const before = await col('accounts').findOne({ _id: userId });
+    // Like every account, a new staff member waits for a system admin's approval.
+    const status = before && before.status === 'approved' ? 'approved' : 'pending';
     await col('organization_members').updateOne({ _id: invite._id }, { $set: { status: 'active', user_id: userId, joined_at: now } });
     await col('accounts').updateOne(
       { _id: userId },
       {
-        $set: { kind: 'organization', organization_id: invite.organization_id, account_type: 'organization', status: org && org.status !== 'pending' ? 'approved' : 'pending', email: primaryEmail(user), updated_at: now, reviewed_at: now },
+        $set: { kind: 'organization', organization_id: invite.organization_id, account_type: 'organization', status, ...(status === 'pending' ? { submitted_at: now, review_note: '' } : {}), email: primaryEmail(user), updated_at: now },
         $setOnInsert: { user_id: userId, currency: 'RWF', created_at: now }
       },
       { upsert: true }

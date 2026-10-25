@@ -125,9 +125,10 @@ router.patch('/organizations/:id', async (req, res) => {
     await col('organizations').updateOne({ _id: org._id }, { $set: set });
     const fresh = await col('organizations').findOne({ _id: org._id });
 
-    /* Organization accounts follow the organization's approval. */
+    /* Approving an organization approves the account of the person who
+       registered it; staff who joined since are approved one by one. */
     if (set.status === 'active' && org.status === 'pending') {
-      const members = await col('organization_members').find({ organization_id: org._id, status: 'active' }).toArray();
+      const members = await col('organization_members').find({ organization_id: org._id, status: 'active', user_id: org.created_by }).toArray();
       for (const m of members) {
         await col('accounts').updateOne({ _id: m.user_id }, { $set: { status: 'approved', reviewed_at: now, reviewed_by: req.user.id, updated_at: now } });
         forgetApproval(m.user_id);

@@ -60,7 +60,7 @@ export default function Join() {
     setBusy(false);
     if (err) { setError(orgErrorText(t, err)); return; }
     try { sessionStorage.removeItem('lp_join_token'); } catch { /* storage unavailable */ }
-    setJoined(data.organization);
+    setJoined({ ...data.organization, pending: data.account_status === 'pending' });
   }
 
   const org = state.data && state.data.organization;
@@ -84,7 +84,7 @@ export default function Join() {
       <div className="account-state">
         <div className="account-state-icon green"><i className="fas fa-circle-check"></i></div>
         <h1 className="auth-title">{t('org.join.joinedTitle', { name: joined.name })}</h1>
-        <p className="subtitle">{t('org.join.joinedMessage', { name: joined.name })}</p>
+        <p className="subtitle">{t(joined.pending ? 'org.join.pendingMessage' : 'org.join.joinedMessage', { name: joined.name })}</p>
         <a className="btn btn-primary" href="/dashboard"><i className="fas fa-arrow-right"></i> {t('org.join.openApp')}</a>
       </div>
     );

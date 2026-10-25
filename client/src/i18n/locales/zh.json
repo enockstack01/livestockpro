@@ -1310,7 +1310,9 @@
     },
     "pending": {
       "title": "{{name}} 正在等待审批",
-      "message": "Logistack 正在审核您的机构。获批后会通知您，届时即可邀请养殖户。"
+      "message": "Logistack 正在审核您的机构。获批后会通知您，届时即可邀请养殖户。",
+      "memberTitle": "您的账户正在等待批准",
+      "memberMessage": "LivestockPro 管理员正在审核您在 {{name}} 的账户。获批后我们会立即通知您。"
     },
     "invite": {
       "title": "您收到了邀请",
@@ -1340,7 +1342,8 @@
         "other_org": "您目前与 {{name}} 关联。请先在设置中退出，或联系客服。",
         "org_account": "这是机构账户。请使用养殖户账户登录后加入。"
       },
-      "openInApp": "在 LivestockPro 应用中打开"
+      "openInApp": "在 LivestockPro 应用中打开",
+      "pendingMessage": "您已关联到 {{name}}。现在需要 LivestockPro 管理员批准您的账户。账户获批后我们会立即通知您，届时您即可开始记录畜群。"
     },
     "errors": {
       "LINK_EXPIRED": "此邀请链接已过期，请向您的机构索取新链接。",
@@ -1357,7 +1360,7 @@
       "ORG_READ_ONLY": "该机构未启用，仅可查看。",
       "ORG_FORBIDDEN": "您无权访问该机构。",
       "RATE_LIMITED": "尝试次数过多，请稍等几分钟后再试。",
-      "BAD_LOGO": "标志须为小于 150 KB 的 PNG、JPEG 或 WebP 图片。",
+      "BAD_LOGO": "该图片无法用作标志，请尝试其他图片。",
       "REASON_REQUIRED": "请填写更改上限的原因。",
       "LAST_ADMIN": "机构至少需要一名管理员。",
       "NO_DETAIL_ACCESS": "该养殖户未授权查看其详细记录。"

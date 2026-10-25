@@ -2,46 +2,31 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import Modal from '../Modal.jsx';
+import { IMAGE_ACCEPT, decodeImage, drawToDataUrl } from '../../lib/imageFile.js';
 
 /* Photos for LivestockPro AI: "Take photo" opens the phone camera directly
    (or a live camera view on a computer) so a farmer can photograph the
-   affected part of the animal; "Upload" picks an existing picture. Each photo
-   is shrunk before sending (longest side 1568 px, JPEG) and gets a small
-   preview the saved report keeps. */
+   affected part of the animal; "Upload" picks an existing picture in any
+   format (iPhone HEIC and TIFF included, lib/imageFile.js). Each photo is
+   turned into a JPEG and shrunk before sending (longest side 1568 px) and
+   gets a small preview the saved report keeps. */
 
 export const MAX_PHOTOS = 3;
 const FULL_SIDE = 1568;
 const THUMB_SIDE = 320;
 
-function draw(source, w, h, side, quality) {
-  const scale = Math.min(1, side / Math.max(w, h));
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.round(w * scale);
-  canvas.height = Math.round(h * scale);
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL('image/jpeg', quality);
-}
-
-function fromSource(source, w, h) {
-  const full = draw(source, w, h, FULL_SIDE, 0.85);
+function fromSource(source, width, height) {
+  const full = drawToDataUrl({ source, width, height }, FULL_SIDE, { quality: 0.85 });
   return {
     media_type: 'image/jpeg',
     data: full.slice(full.indexOf(',') + 1),
-    thumb: draw(source, w, h, THUMB_SIDE, 0.7)
+    thumb: drawToDataUrl({ source, width, height }, THUMB_SIDE, { quality: 0.7 })
   };
 }
 
-function loadFile(file) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => { try { resolve(fromSource(img, img.naturalWidth, img.naturalHeight)); } catch (e) { reject(e); } finally { URL.revokeObjectURL(url); } };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('unreadable')); };
-    img.src = url;
-  });
+async function loadFile(file) {
+  const img = await decodeImage(file);
+  return fromSource(img.source, img.width, img.height);
 }
 
 /* State for the photos of one request: { photos, add, remove, clear, payload }. */
@@ -109,16 +94,19 @@ export default function PhotoPicker({ state, disabled, compact }) {
   const fileInput = useRef(null);
   const [cameraOpen, setCameraOpen] = useState(false);
   const [error, setError] = useState('');
+  const [reading, setReading] = useState(false);
   const full = state.photos.length >= MAX_PHOTOS;
 
   async function onFiles(e) {
     const files = [...(e.target.files || [])].slice(0, MAX_PHOTOS - state.photos.length);
     e.target.value = '';
     setError('');
+    setReading(true);
     const out = [];
     for (const f of files) {
       try { out.push(await loadFile(f)); } catch { setError(t('ai.photo.unreadable')); }
     }
+    setReading(false);
     if (out.length) state.add(out);
   }
 
@@ -130,13 +118,13 @@ export default function PhotoPicker({ state, disabled, compact }) {
   return (
     <div className={`ai-photos${compact ? ' compact' : ''}`}>
       <input ref={cameraInput} type="file" accept="image/*" capture="environment" hidden onChange={onFiles} />
-      <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden onChange={onFiles} />
+      <input ref={fileInput} type="file" accept={IMAGE_ACCEPT} multiple hidden onChange={onFiles} />
       <div className="ai-photo-actions">
         <button type="button" className="btn btn-secondary btn-sm" onClick={takePhoto} disabled={disabled || full} title={t('ai.photo.take')}>
           <i className="fas fa-camera"></i>{compact ? null : <> {t('ai.photo.take')}</>}
         </button>
-        <button type="button" className="btn btn-secondary btn-sm" onClick={() => fileInput.current.click()} disabled={disabled || full} title={t('ai.photo.upload')}>
-          <i className="fas fa-image"></i>{compact ? null : <> {t('ai.photo.upload')}</>}
+        <button type="button" className="btn btn-secondary btn-sm" onClick={() => fileInput.current.click()} disabled={disabled || full || reading} title={t('ai.photo.upload')}>
+          <i className={`fas ${reading ? 'fa-spinner fa-spin' : 'fa-image'}`}></i>{compact ? null : <> {t('ai.photo.upload')}</>}
         </button>
         {!compact ? <small className="ai-muted">{t('ai.photo.hint', { max: MAX_PHOTOS })}</small> : null}
       </div>

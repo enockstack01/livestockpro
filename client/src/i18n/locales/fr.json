@@ -1310,7 +1310,9 @@
     },
     "pending": {
       "title": "{{name}} attend l'approbation",
-      "message": "Logistack examine votre organisation. Vous serez averti dès son approbation, puis vous pourrez inviter des éleveurs."
+      "message": "Logistack examine votre organisation. Vous serez averti dès son approbation, puis vous pourrez inviter des éleveurs.",
+      "memberTitle": "Votre compte attend une approbation",
+      "memberMessage": "Un administrateur LivestockPro examine votre compte pour {{name}}. Vous serez averti dès qu’il sera approuvé."
     },
     "invite": {
       "title": "Vous avez été invité",
@@ -1340,7 +1342,8 @@
         "other_org": "Vous êtes actuellement lié à {{name}}. Quittez-la d'abord dans les paramètres ou contactez le support.",
         "org_account": "Ceci est un compte d'organisation. Connectez-vous avec un compte éleveur pour rejoindre."
       },
-      "openInApp": "Ouvrir dans l'application LivestockPro"
+      "openInApp": "Ouvrir dans l'application LivestockPro",
+      "pendingMessage": "Vous êtes lié à {{name}}. Un administrateur LivestockPro doit maintenant approuver votre compte. Vous serez averti dès son approbation, puis vous pourrez commencer à enregistrer votre troupeau."
     },
     "errors": {
       "LINK_EXPIRED": "Ce lien d'invitation a expiré. Veuillez demander un nouveau lien à votre organisation.",
@@ -1357,7 +1360,7 @@
       "ORG_READ_ONLY": "Cette organisation n'est pas active : elle est en lecture seule.",
       "ORG_FORBIDDEN": "Vous n'avez pas accès à cette organisation.",
       "RATE_LIMITED": "Trop de tentatives. Veuillez patienter quelques minutes et réessayer.",
-      "BAD_LOGO": "Le logo doit être une image PNG, JPEG ou WebP de moins de 150 Ko.",
+      "BAD_LOGO": "Cette image ne peut pas servir de logo. Veuillez essayer une autre image.",
       "REASON_REQUIRED": "Veuillez indiquer la raison du changement de limite.",
       "LAST_ADMIN": "Une organisation doit avoir au moins un administrateur.",
       "NO_DETAIL_ACCESS": "Cet éleveur n'a pas autorisé la consultation de ses registres détaillés."

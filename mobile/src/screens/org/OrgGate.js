@@ -31,7 +31,7 @@ export const emptyOrgForm = (email = '') => ({ name: '', type: 'cooperative', co
 async function pickLogo() {
   const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
   if (!perm.granted) return undefined;
-  const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 1, exif: false });
+  const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 1, exif: false, preferredAssetRepresentationMode: ImagePicker.UIImagePickerPreferredAssetRepresentationMode.Compatible });
   if (result.canceled || !result.assets || !result.assets[0]) return undefined;
   const a = result.assets[0];
   const ctx = ImageManipulator.manipulate(a.uri);
@@ -133,12 +133,14 @@ export function OrgPendingScreen({ account, checking, onCheck }) {
   const auth = useAuthStyles();
   const signOut = useSignOut();
   const org = account.organization || {};
+  // Staff of an approved organization wait for their own account's approval.
+  const member = org.status === 'active';
   return (
     <AuthShell>
       <View style={[auth.content, { alignItems: 'center' }]}>
         <View style={[styles.stateIcon, { backgroundColor: colors.leaf }]}><Icon name="building-circle-check" size={26} color="#FFFFFF" /></View>
-        <Text style={[auth.title, { textAlign: 'center' }]}>{t('org.pending.title', { name: org.name || '' })}</Text>
-        <Text style={[auth.subtitle, { textAlign: 'center' }]}>{t('org.pending.message')}</Text>
+        <Text style={[auth.title, { textAlign: 'center' }]}>{member ? t('org.pending.memberTitle') : t('org.pending.title', { name: org.name || '' })}</Text>
+        <Text style={[auth.subtitle, { textAlign: 'center' }]}>{member ? t('org.pending.memberMessage', { name: org.name || '' }) : t('org.pending.message')}</Text>
         <Button title={t('account.checkStatus')} icon="rotate" loading={checking} onPress={onCheck} block />
         <Button title={t('nav.signOut')} icon="right-from-bracket" variant="secondary" onPress={signOut} block style={{ marginTop: 10 }} />
       </View>

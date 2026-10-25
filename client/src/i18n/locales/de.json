@@ -1310,7 +1310,9 @@
     },
     "pending": {
       "title": "{{name}} wartet auf Freigabe",
-      "message": "Logistack prüft Ihre Organisation. Sie werden benachrichtigt, sobald sie freigegeben ist, und können dann Landwirte einladen."
+      "message": "Logistack prüft Ihre Organisation. Sie werden benachrichtigt, sobald sie freigegeben ist, und können dann Landwirte einladen.",
+      "memberTitle": "Ihr Konto wartet auf Freigabe",
+      "memberMessage": "Ein LivestockPro-Administrator prüft Ihr Konto für {{name}}. Sie werden benachrichtigt, sobald es freigegeben ist."
     },
     "invite": {
       "title": "Sie wurden eingeladen",
@@ -1340,7 +1342,8 @@
         "other_org": "Sie sind derzeit mit {{name}} verbunden. Verlassen Sie sie zuerst in den Einstellungen oder wenden Sie sich an den Support.",
         "org_account": "Dies ist ein Organisationskonto. Melden Sie sich mit einem Landwirtkonto an, um beizutreten."
       },
-      "openInApp": "In der LivestockPro App öffnen"
+      "openInApp": "In der LivestockPro App öffnen",
+      "pendingMessage": "Sie sind mit {{name}} verbunden. Jetzt muss ein LivestockPro-Administrator Ihr Konto freigeben. Sie werden benachrichtigt, sobald es freigegeben ist, und können dann Ihre Herde erfassen."
     },
     "errors": {
       "LINK_EXPIRED": "Dieser Einladungslink ist abgelaufen. Bitten Sie Ihre Organisation um einen neuen Link.",
@@ -1357,7 +1360,7 @@
       "ORG_READ_ONLY": "Diese Organisation ist nicht aktiv und daher schreibgeschützt.",
       "ORG_FORBIDDEN": "Sie haben keinen Zugriff auf diese Organisation.",
       "RATE_LIMITED": "Zu viele Versuche. Bitte warten Sie einige Minuten und versuchen Sie es erneut.",
-      "BAD_LOGO": "Das Logo muss ein PNG-, JPEG- oder WebP-Bild unter 150 KB sein.",
+      "BAD_LOGO": "Dieses Bild kann nicht als Logo verwendet werden. Bitte versuchen Sie ein anderes Bild.",
       "REASON_REQUIRED": "Bitte geben Sie einen Grund für die Limitänderung an.",
       "LAST_ADMIN": "Eine Organisation braucht mindestens einen Administrator.",
       "NO_DETAIL_ACCESS": "Dieser Landwirt hat keine Erlaubnis für detaillierte Daten erteilt."

@@ -60,7 +60,7 @@ export default function JoinScreen() {
     setBusy(false);
     if (err) { setError(orgErrorText(t, err)); return; }
     await SecureStore.deleteItemAsync(JOIN_TOKEN_KEY).catch(() => {});
-    setJoined(data.organization);
+    setJoined({ ...data.organization, pending: data.account_status === 'pending' });
     if (accountCtx && accountCtx.refresh) accountCtx.refresh();
   }
 
@@ -84,7 +84,7 @@ export default function JoinScreen() {
       <View style={styles.center}>
         <View style={[styles.stateIcon, { backgroundColor: colors.leaf }]}><Icon name="circle-check" size={26} color="#FFFFFF" /></View>
         <Text style={[styles.title, { color: colors.primaryDark }]}>{t('org.join.joinedTitle', { name: joined.name })}</Text>
-        <Muted style={{ textAlign: 'center' }}>{t('org.join.joinedMessage', { name: joined.name })}</Muted>
+        <Muted style={{ textAlign: 'center' }}>{t(joined.pending ? 'org.join.pendingMessage' : 'org.join.joinedMessage', { name: joined.name })}</Muted>
         <Button title={t('org.join.openApp')} icon="arrow-right" onPress={() => router.replace('/')} style={{ marginTop: 16 }} />
       </View>
     );

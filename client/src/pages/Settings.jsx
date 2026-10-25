@@ -11,6 +11,7 @@ import { useAccount } from '../components/AccountGate.jsx';
 import { accountDisplayName } from '../../../shared/account';
 import MyOrganizationCard from '../components/org/MyOrganization.jsx';
 import { CURRENCIES, currencyName } from '../../../shared/currency';
+import { IMAGE_ACCEPT, isImageFile, toJpegFile } from '../lib/imageFile.js';
 
 export default function Settings() {
   const { t } = useTranslation();
@@ -61,13 +62,14 @@ export default function Settings() {
     const file = e.target.files[0];
     e.target.value = '';
     if (!file) return;
-    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    if (!allowed.includes(file.type)) { showToast(t('settings.onlyImageTypes'), 'error'); return; }
-    if (file.size > 2 * 1024 * 1024) { showToast(t('settings.imageSizeLimit'), 'error'); return; }
+    if (!isImageFile(file)) { showToast(t('ai.photo.unreadable'), 'error'); return; }
 
     setUploading(true);
     try {
-      await user.setProfileImage({ file });
+      // Any picture format: sent as a JPEG of at most 800 px, well inside the 2 MB limit.
+      let upload;
+      try { upload = await toJpegFile(file, 800); } catch { showToast(t('ai.photo.unreadable'), 'error'); return; }
+      await user.setProfileImage({ file: upload });
       await user.reload();
       showToast(t('settings.photoUpdated'), 'success');
     } catch (err) {
@@ -140,7 +142,7 @@ export default function Settings() {
           {imageUrl ? <img src={imageUrl} alt="Profile" /> : <span className="initials">{initials}</span>}
           <div className="settings-avatar-edit"><i className="fas fa-camera"></i></div>
         </div>
-        <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif" style={{ display: 'none' }} onChange={handleAvatarChange} />
+        <input ref={fileInputRef} type="file" accept={IMAGE_ACCEPT} style={{ display: 'none' }} onChange={handleAvatarChange} />
 
         <div className="settings-header-info">
           <h3>{displayName}</h3>

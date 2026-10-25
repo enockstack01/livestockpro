@@ -1310,7 +1310,9 @@
     },
     "pending": {
       "title": "{{name}} is waiting for approval",
-      "message": "Logistack is reviewing your organization. You will be notified as soon as it is approved, and then you can invite farmers."
+      "message": "Logistack is reviewing your organization. You will be notified as soon as it is approved, and then you can invite farmers.",
+      "memberTitle": "Your account is waiting for approval",
+      "memberMessage": "A LivestockPro administrator is reviewing your account for {{name}}. You will be notified as soon as it is approved."
     },
     "invite": {
       "title": "You have been invited",
@@ -1340,7 +1342,8 @@
         "other_org": "You are currently linked to {{name}}. Leave it first in Settings, or contact support.",
         "org_account": "This is an organization account. Please sign in with a farmer account to join."
       },
-      "openInApp": "Open in the LivestockPro app"
+      "openInApp": "Open in the LivestockPro app",
+      "pendingMessage": "You are linked to {{name}}. A LivestockPro administrator now needs to approve your account. You will be notified as soon as it is approved, and then you can start recording your herd."
     },
     "errors": {
       "LINK_EXPIRED": "This invitation link has expired. Please ask your organization for a new link.",
@@ -1357,7 +1360,7 @@
       "ORG_READ_ONLY": "This organization is not active, so it is read only.",
       "ORG_FORBIDDEN": "You do not have access to this organization.",
       "RATE_LIMITED": "Too many attempts. Please wait a few minutes and try again.",
-      "BAD_LOGO": "The logo must be a PNG, JPEG or WebP image under 150 KB.",
+      "BAD_LOGO": "That picture could not be used as a logo. Please try another picture.",
       "REASON_REQUIRED": "Please enter a reason for changing the farmer limit.",
       "LAST_ADMIN": "An organization needs at least one admin.",
       "NO_DETAIL_ACCESS": "This farmer has not given permission to view their detailed records."
