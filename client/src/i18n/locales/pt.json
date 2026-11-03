@@ -898,7 +898,8 @@
       "last30": "Últimos 30 d"
     },
     "incomeVsExpenses": "Receitas e despesas",
-    "caseOutcomes": "Desfecho dos casos"
+    "caseOutcomes": "Desfecho dos casos",
+    "records": "Registos"
   },
   "herdProfile": {
     "eyebrow": "Perfil do rebanho · Visão geral",
@@ -1029,7 +1030,8 @@
   },
   "brand": {
     "tagline": "Conheça o seu rebanho, proteja a sua saúde, aumente o seu valor",
-    "byline": "LivestockPro · por Agricoders"
+    "byline": "LivestockPro · por Agricoders",
+    "by": "por Agricoders"
   },
   "ai": {
     "title": "Assistente IA",

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useChartTheme } from '../../lib/chartTheme.js';
 import { Meter, MiniColumns, Ring, SplitBar } from './MicroViz.jsx';
-import { formatCompact, formatMoney, formatMoneyCompact } from '../../../../shared/currency';
+import { formatCompact } from '../../../../shared/currency';
 import TileGrid from './TileGrid.jsx';
 
 /* Key insights as tiles — a figure, a 2–4 word label and a small chart —
@@ -22,9 +22,11 @@ export function useInsightColors() {
 }
 
 /* The small column chart behind a single-figure insight: each bar with its
-   value on top and its label underneath. */
+   value on top and its label underneath. The tile's big figure already
+   names the currency, so the bars carry short numbers only (15.9K), which
+   keeps neighbouring values from running into each other. */
 function Bars({ bars, color, money, decimals, t }) {
-  const fmt = money ? (v) => (v === 0 ? '0' : decimals ? formatMoney(v, { decimals }) : formatMoneyCompact(v)) : formatCompact;
+  const fmt = money && decimals ? (v) => (v === 0 ? '0' : Number(v).toLocaleString(undefined, { maximumFractionDigits: Math.min(decimals, 1) })) : formatCompact;
   return (
     <div className="insight-bars">
       <MiniColumns values={bars.map((b) => b.value)} color={color} labels={bars.map((b) => b.label || t(b.labelKey))} fmt={fmt} valueFmt={fmt} height={34} />

@@ -175,7 +175,8 @@ export function BarChart({ labels, datasets, horizontal, stacked, money, integer
       const groups = stacked ? 1 : datasets.length;
       const barW = Math.min(30, (band * 0.72) / groups);
       const widest = Math.max(...tickLines.flat().map((s) => textW(s) * (FONT / LABEL)));
-      const every = Math.max(1, Math.ceil((n * Math.max(44, widest + 8)) / pw));
+      // Short category lists wrap instead of skipping; long month series skip.
+      const every = n <= 8 ? 1 : Math.max(1, Math.ceil((n * Math.max(44, widest + 8)) / pw));
       chart = (
         <Svg width={w} height={plotH}>
           {sc.ticks.map((v) => (
@@ -399,7 +400,8 @@ export function LineChart({ labels, datasets, money, integer, legend, height: fu
 }
 
 /* Doughnut (65% cutout) with the legend underneath. */
-export function DonutChart({ labels, data, colors, height: fullHeight = 280 }) {
+/* `center`: { value, label } shown in the middle of the ring until a slice is tapped. */
+export function DonutChart({ labels, data, colors, center, height: fullHeight = 280 }) {
   const { narrow } = useCardSize();
   const height = narrow ? Math.round(fullHeight * 0.8) : fullHeight;
   const cc = useChartColors();
@@ -407,7 +409,7 @@ export function DonutChart({ labels, data, colors, height: fullHeight = 280 }) {
   const [sel, setSel] = useState(null);
   const total = data.reduce((s, v) => s + v, 0);
   const size = Math.min(w, height - 70);
-  const r = size / 2, ir = r * 0.65, c = w / 2;
+  const r = size / 2, ir = r * 0.68, c = w / 2;
 
   const arcs = [];
   let a0 = -Math.PI / 2;
@@ -442,6 +444,11 @@ export function DonutChart({ labels, data, colors, height: fullHeight = 280 }) {
               <Text style={[styles.donutValue, { color: colors[sel] }]}>{data[sel]}</Text>
               <Text style={[styles.donutLabel, { color: cc.text }]} numberOfLines={1}>{labels[sel]}</Text>
             </View>
+          ) : center ? (
+            <View pointerEvents="none" style={[styles.donutCenter, { top: size / 2 - 22 }]}>
+              <Text style={[styles.donutValue, { color: cc.tooltip.title }]}>{String(center.value)}</Text>
+              {center.label ? <Text style={[styles.donutLabel, { color: cc.text }]} numberOfLines={1}>{center.label}</Text> : null}
+            </View>
           ) : null}
         </View>
       ) : null}
@@ -455,11 +462,11 @@ const styles = StyleSheet.create({
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   legendDot: { width: 10, height: 10, borderRadius: 5 },
   legendText: { fontSize: 12 },
-  tooltip: { position: 'absolute', width: 170, backgroundColor: 'rgba(0,0,0,0.8)', borderRadius: 6, paddingVertical: 7, paddingHorizontal: 9, gap: 3 },
-  tooltipTitle: { color: '#fff', fontSize: 12, fontWeight: '700' },
+  tooltip: { position: 'absolute', width: 170, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#D5E3D6', borderRadius: 8, paddingVertical: 9, paddingHorizontal: 11, gap: 3 },
+  tooltipTitle: { color: '#1C2B1E', fontSize: 12, fontWeight: '700' },
   tooltipRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  tooltipDot: { width: 9, height: 9, borderRadius: 2, borderWidth: 1, borderColor: '#fff' },
-  tooltipText: { color: '#fff', fontSize: 12, flexShrink: 1 },
+  tooltipDot: { width: 9, height: 9, borderRadius: 2 },
+  tooltipText: { color: '#5B6B5D', fontSize: 12, flexShrink: 1 },
   donutCenter: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
   donutValue: { fontSize: 22, fontWeight: '800' },
   donutLabel: { fontSize: 12, maxWidth: 120 },

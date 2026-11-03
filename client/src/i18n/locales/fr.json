@@ -898,7 +898,8 @@
       "last30": "30 derniers j"
     },
     "incomeVsExpenses": "Revenus et dépenses",
-    "caseOutcomes": "Issues des cas"
+    "caseOutcomes": "Issues des cas",
+    "records": "Fiches"
   },
   "herdProfile": {
     "eyebrow": "Profil du troupeau · Aperçu",
@@ -1029,7 +1030,8 @@
   },
   "brand": {
     "tagline": "Connaissez votre troupeau, protégez sa santé, augmentez sa valeur",
-    "byline": "LivestockPro · par Agricoders"
+    "byline": "LivestockPro · par Agricoders",
+    "by": "par Agricoders"
   },
   "ai": {
     "title": "Assistant IA",

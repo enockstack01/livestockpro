@@ -339,7 +339,10 @@ function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInse
       {/* Logo on a translucent tile, name in two tones. */}
       <View style={[baseStyles.sidebarHeader, { paddingTop: topInset + 14 }]}>
         <Image source={require('../../assets/icon.png')} style={baseStyles.appIcon} />
-        <Text style={baseStyles.logoText}>LivestockPro</Text>
+        <View>
+          <Text style={baseStyles.logoText}>LivestockPro</Text>
+          <Text style={baseStyles.logoBy}>{t('brand.by')}</Text>
+        </View>
         <View style={{ flex: 1 }} />
         {closable ? <Pressable onPress={onClose} hitSlop={10} accessibilityLabel="Close menu"><Icon name="xmark" size={18} color="rgba(255,255,255,0.6)" /></Pressable> : null}
       </View>
@@ -367,7 +370,6 @@ function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInse
           <Text style={baseStyles.syncText} numberOfLines={1}>{syncLine}{failedCount > 0 ? ` · ${t('sync.recordsFailed', { count: failedCount })}` : ''}</Text>
         </Pressable> : null}
         <NavItem icon="right-from-bracket" label={t('nav.signOut')} onPress={() => { onClose(); signOut(); }} danger />
-        <Text style={baseStyles.byline}>{t('brand.byline')}</Text>
       </View>
     </View>
   );
@@ -423,12 +425,12 @@ const baseStyles = StyleSheet.create({
   sidebarHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingBottom: 16, paddingHorizontal: 18, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)' },
   appIcon: { width: 34, height: 34, borderRadius: 9 },
   logoTile: { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' },
-  logoText: { color: '#FFFFFF', fontSize: 17, fontWeight: '700' },
+  logoText: { color: '#FFFFFF', fontSize: 17, fontWeight: '700', lineHeight: 20 },
+  logoBy: { color: 'rgba(255,255,255,0.72)', fontSize: 11 },
   sectionLabel: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, color: 'rgba(255,255,255,0.35)', paddingTop: 16, paddingBottom: 6, paddingHorizontal: 20 },
   navItem: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11, paddingLeft: 17, paddingRight: 20, borderLeftWidth: 3, borderLeftColor: 'transparent' },
   navItemActive: { backgroundColor: 'rgba(255,255,255,0.14)', borderLeftColor: 'transparent' },
   navText: { fontSize: 13, fontWeight: '500' },
-  byline: { color: 'rgba(255,255,255,0.6)', fontSize: 11, paddingHorizontal: 20, paddingTop: 4 },
   sidebarFooter: { borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', paddingTop: 6 },
   syncRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8, paddingLeft: 20, paddingRight: 20 },
   syncText: { color: 'rgba(255,255,255,0.5)', fontSize: 11, flex: 1 },

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Image, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { File, Paths } from 'expo-file-system';
@@ -408,60 +408,36 @@ function AskTab({ disabled }) {
   );
 }
 
-/* Latest advice, or a button to ask for it. `compact` is the dashboard card. */
-export function AdvisorCard({ disabled, compact }) {
+/* Farm advisor, on request only (twin of the web's AdvisorTab): the
+   farmer asks for advice and sees the answer written now. Earlier advice
+   is never loaded or shown, here or on the dashboard. */
+export function AdvisorCard({ disabled }) {
   const { t, i18n } = useTranslation();
-  const { colors } = useTheme();
   const api = useApi();
-  const router = useRouter();
-  const configured = useAiStatus();
   const showToast = useToast();
-  const [saved, setSaved] = useState(undefined);
+  const [saved, setSaved] = useState(null);
   const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    api.aiReports({ kind: 'advisor', limit: 1 }).then(({ data }) => setSaved((data && data[0]) || null));
-  }, [api]);
 
   async function run() {
     setBusy(true);
+    setSaved(null);
     const { data, error } = await api.aiAdvisor({ language: i18n.language });
     setBusy(false);
     if (error) { showToast(aiErrorText(t, error, i18n.language), 'error'); return; }
     setSaved(data);
   }
 
-  if (compact && !configured) return null;
-  const r = (saved && saved.report) || {};
   return (
-    <Card style={compact ? { marginBottom: 20 } : null}>
+    <Card>
       <CardHeader
         title={t('ai.advisor.title')}
         icon="seedling"
         right={<Button title={saved ? t('ai.advisor.refresh') : t('ai.advisor.run')} icon="wand-magic-sparkles" size="sm" onPress={run} disabled={disabled || busy} loading={busy} />}
       />
       <CardBody>
-        {busy ? <Working label={t('ai.advisor.working')} /> : saved && compact ? (
-          <View style={{ gap: 8 }}>
-            <Text style={[styles.reportTitle, { color: colors.text }]}>{saved.title}</Text>
-            <Text style={[styles.para, { color: colors.text }]}>{r.summary}</Text>
-            {(r.priorities || []).slice(0, 3).map((p, i) => (
-              <View key={i} style={{ flexDirection: 'row', gap: 8 }}>
-                <Text style={{ color: colors.textLight, width: 16 }}>{i + 1}.</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontWeight: '700', color: colors.text }}>{p.title} <Text style={{ fontWeight: '400', color: colors.textLight }}>· {t(`ai.advisor.when.${p.when}`)}</Text></Text>
-                  <Text style={[styles.para, { color: colors.textLight }]}>{p.detail}</Text>
-                </View>
-              </View>
-            ))}
-            <Pressable onPress={() => router.push({ pathname: '/assistant', params: { tab: 'advisor' } })} style={{ alignSelf: 'flex-end', flexDirection: 'row', gap: 6, alignItems: 'center', paddingVertical: 4 }}>
-              <Text style={{ color: colors.leaf, fontWeight: '700' }}>{t('ai.advisor.openFull')}</Text>
-              <Icon name="arrow-right" size={11} color={colors.leaf} />
-            </Pressable>
-          </View>
-        ) : saved ? (
+        {busy ? <Working label={t('ai.advisor.working')} /> : saved ? (
           <SavedReport saved={saved} onDelete={async (x) => { await api.aiDeleteReport(x.id); setSaved(null); }} />
-        ) : saved === null ? <Muted>{t('ai.advisor.intro')}</Muted> : null}
+        ) : <Muted>{t('ai.advisor.intro')}</Muted>}
       </CardBody>
     </Card>
   );
@@ -592,7 +568,7 @@ function ReportsTab() {
   const load = useCallback(async () => {
     const { data, error: err } = await api.aiReports({ limit: 60 });
     if (err) { setError(aiErrorText(t, err, i18n.language)); setList([]); return; }
-    setList(data || []);
+    setList((data || []).filter((r) => r.kind !== 'advisor')); // earlier advice is not kept on show
   }, [api, t, i18n.language]);
   useEffect(() => { load(); }, [load]);
 

@@ -1,6 +1,7 @@
 const express = require('express');
 const { requireAuth, primaryEmail, clerkClient, getRole } = require('../authMiddleware');
 const { forgetApproval } = require('../lib/accounts');
+const { publicAuditRows } = require('../lib/livestockId');
 const {
   ORG_TYPES, MEMBER_ROLES, FARMER_COLLECTIONS, OrgError, sendOrgError, getSettings, audit, notify, notifyOrgAdmins,
   newToken, hashToken, linkState, activeMembership, farmerLink, hasFarmData, requireOrgRole, endFarmerLink, col, nowIso, uuid
@@ -385,7 +386,8 @@ router.delete('/:id/farmers/:farmerId', requireOrgRole(ADMIN, { write: true }), 
 router.get('/:id/audit', requireOrgRole(ADMIN), async (req, res) => {
   try {
     const list = await col('audit_logs').find({ organization_id: req.org._id }).sort({ at: -1 }).limit(200).toArray();
-    res.json({ data: list.map(({ _id, ip: _ip, user_agent: _ua, ...r }) => ({ id: _id, ...r })), error: null });
+    const rows = await publicAuditRows(list.map(({ _id, ip: _ip, user_agent: _ua, ...r }) => ({ id: _id, ...r })));
+    res.json({ data: rows, error: null });
   } catch (err) {
     sendOrgError(res, err);
   }

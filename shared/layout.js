@@ -13,6 +13,8 @@
      wide: 'soft'  — a time series that reads fine at half width (a line,
                      single bars), given two columns only when that leaves
                      no card alone
+     wide: 'full'  — a tall chart that takes the whole row (so no short card
+                     is left with empty space beside it)
      wide: false   — an ordinary card, one column
    Packing is "dense": when a wide card doesn't fit the rest of a row, the
    next ordinary card fills it first. A card that would still end up alone
@@ -27,10 +29,11 @@ export function gridColumns(width) {
   return 2;
 }
 
-function pack(wides, cols) {
-  const queue = wides.map((wide, i) => ({ i, span: wide ? Math.min(2, cols) : 1 }));
+/* want: the columns each card asks for (1, 2, or Infinity for a full row). */
+function pack(want, cols) {
+  const queue = want.map((w, i) => ({ i, span: Math.min(w, cols) }));
   const order = [];
-  const spans = new Array(wides.length).fill(1);
+  const spans = new Array(want.length).fill(1);
   const alone = [];
   let used = 0;
   let row = [];
@@ -38,7 +41,7 @@ function pack(wides, cols) {
     if (row.length && used < cols) {
       const last = row[row.length - 1];
       spans[last] += cols - used;
-      if (row.length === 1 && !wides[last]) alone.push(last);
+      if (row.length === 1 && want[last] === 1) alone.push(last);
     }
     used = 0;
     row = [];
@@ -62,14 +65,14 @@ function pack(wides, cols) {
    (positions, by item index). */
 export function layoutCards(items, width) {
   const cols = gridColumns(width);
-  const kind = items.map((it) => (it.wide === 'soft' ? 'soft' : it.wide ? 'hard' : 'none'));
-  const wides = kind.map((k) => k !== 'none');
-  let result = pack(wides, cols);
+  const kind = items.map((it) => (it.wide === 'full' ? 'full' : it.wide === 'soft' ? 'soft' : it.wide ? 'hard' : 'none'));
+  const want = kind.map((k) => (k === 'full' ? Infinity : k === 'none' ? 1 : 2));
+  let result = pack(want, cols);
   const tryNarrow = (which) => {
-    for (let i = wides.length - 1; i >= 0 && result.alone.length > 0; i--) {
-      if (!wides[i] || kind[i] !== which) continue;
-      wides[i] = false;
-      result = pack(wides, cols);
+    for (let i = want.length - 1; i >= 0 && result.alone.length > 0; i--) {
+      if (want[i] === 1 || kind[i] !== which) continue;
+      want[i] = 1;
+      result = pack(want, cols);
     }
   };
   tryNarrow('soft');

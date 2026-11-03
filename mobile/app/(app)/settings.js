@@ -220,7 +220,7 @@ export default function SettingsScreen() {
           <CardBody>
             <ReadonlyRow label={t('account.accountType')} value={displayName} colors={colors} />
             <ReadonlyRow label={t('settings.email')} value={email} colors={colors} />
-            <ReadonlyRow label={t('settings.userId')} value={user?.id || ''} colors={colors} mono last />
+            <ReadonlyRow label={t('settings.userId')} value={(account && account.livestockId) || ''} colors={colors} mono last />
             <Muted style={{ marginTop: 16 }}>{t('settings.passwordNote')}</Muted>
             <Muted style={{ marginTop: 12, marginBottom: 14 }}>{t('settings.signedInAs', { email })}</Muted>
             <Button variant="danger" icon="right-from-bracket" title={t('nav.signOut')} onPress={requestSignOut} style={{ alignSelf: 'flex-start' }} />

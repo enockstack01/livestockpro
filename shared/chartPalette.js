@@ -21,8 +21,9 @@ export const CHART_PALETTE = {
     /* Ordinal ramp (ordered bins such as age bands): neutral to deep green. */
     ramp: ['#8A948B', '#5B6B5D', '#2E7D32', '#1B5E20', '#14532D'],
     text: '#5B6B5D',
-    grid: '#E8EAE8',
-    surface: '#FFFFFF'
+    grid: 'rgba(0,0,0,0.06)',
+    surface: '#FFFFFF',
+    tooltip: { bg: '#FFFFFF', title: '#1C2B1E', body: '#5B6B5D', border: '#D5E3D6' }
   },
   dark: {
     series: ['#2E7D32', '#F9A825', '#4E8F55', '#A9B2AA', '#C9803F', '#7D877E', '#8FA33B', '#E8ECE8'],
@@ -31,9 +32,10 @@ export const CHART_PALETTE = {
     negative: '#F9A825',
     neutral: '#7D877E',
     ramp: ['#5B6B5D', '#7D877E', '#2E7D32', '#1B5E20', '#14532D'],
-    text: '#A9B2AA',
-    grid: '#2A332C',
-    surface: '#1E1E1E'
+    text: 'rgba(255,255,255,0.72)',
+    grid: 'rgba(255,255,255,0.08)',
+    surface: '#1E1E1E',
+    tooltip: { bg: '#1E1E1E', title: '#FFFFFF', body: 'rgba(255,255,255,0.85)', border: '#3A3A3A' }
   }
 };
 

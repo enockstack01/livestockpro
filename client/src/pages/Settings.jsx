@@ -226,7 +226,7 @@ export default function Settings() {
           <div className="card-body">
             <div className="settings-readonly-row"><span className="label">{t('account.accountType')}</span><span className="value">{displayName}</span></div>
             <div className="settings-readonly-row"><span className="label">{t('settings.email')}</span><span className="value">{email}</span></div>
-            <div className="settings-readonly-row"><span className="label">{t('settings.userId')}</span><span className="value mono">{user?.id || ''}</span></div>
+            <div className="settings-readonly-row"><span className="label">{t('settings.userId')}</span><span className="value mono">{(account && account.livestockId) || ''}</span></div>
             <p className="text-muted" style={{ fontSize: 13, margin: '16px 0' }}>{t('settings.passwordManagedNote')}</p>
             <div className="d-flex gap-16 flex-wrap">
               <button className="btn btn-primary" onClick={() => openUserProfile()}><i className="fas fa-key"></i> {t('settings.manageAccountSecurity')}</button>

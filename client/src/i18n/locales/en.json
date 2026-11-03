@@ -898,7 +898,8 @@
       "last30": "Last 30d"
     },
     "incomeVsExpenses": "Income vs expenses",
-    "caseOutcomes": "Case outcomes"
+    "caseOutcomes": "Case outcomes",
+    "records": "Records"
   },
   "herdProfile": {
     "eyebrow": "Herd profile · Overview",
@@ -1029,7 +1030,8 @@
   },
   "brand": {
     "tagline": "Know your herd, protect its health, grow its value",
-    "byline": "LivestockPro · by Agricoders"
+    "byline": "LivestockPro · by Agricoders",
+    "by": "by Agricoders"
   },
   "ai": {
     "title": "AI assistant",

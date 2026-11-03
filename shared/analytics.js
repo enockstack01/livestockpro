@@ -1,6 +1,6 @@
 import { isOverdueTask, todayIso } from './businessRules';
 import { fmtMoney } from './chartPalette';
-import { formatMoney, moneyOf } from './currency';
+import { formatMoney, formatMoneyCompact, moneyOf } from './currency';
 
 /* Farm Analytics & Insights — the numbers behind the dashboard's analytics
    section, shared by the web app (client/src/components/FarmAnalytics.jsx)
@@ -253,7 +253,7 @@ function computeInsights({ enumLabel, animals, living, health, breeding, product
   if (income > 0) {
     const margin = Math.round(((income - expense) / income) * 100);
     add('profitMargin', margin >= 0 ? 'good' : 'bad', 'profitMargin', { pct: margin, net: fmtMoney(income - expense) },
-      { kind: 'ring', pct: Math.max(0, Math.min(100, margin)), figure: `${margin}%`, sub: fmtMoney(income - expense) });
+      { kind: 'ring', pct: Math.max(0, Math.min(100, margin)), figure: `${margin}%`, sub: formatMoneyCompact(income - expense) });
   }
   const topExpense = sortedEntries(tally(financeInRange.filter((f) => f.type === 'Expense'), (f) => f.category || 'Other Expense', (f) => moneyOf(f)), 1)[0];
   if (topExpense && expense > 0) {

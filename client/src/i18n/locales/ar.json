@@ -898,7 +898,8 @@
       "last30": "آخر 30 يوماً"
     },
     "incomeVsExpenses": "الإيرادات والمصروفات",
-    "caseOutcomes": "نتائج الحالات"
+    "caseOutcomes": "نتائج الحالات",
+    "records": "سجلات"
   },
   "herdProfile": {
     "eyebrow": "ملف القطيع · نظرة عامة",
@@ -1029,7 +1030,8 @@
   },
   "brand": {
     "tagline": "اعرف قطيعك، احمِ صحته، وزِد قيمته",
-    "byline": "LivestockPro · من Agricoders"
+    "byline": "LivestockPro · من Agricoders",
+    "by": "من Agricoders"
   },
   "ai": {
     "title": "المساعد الذكي",

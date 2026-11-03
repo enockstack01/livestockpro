@@ -898,7 +898,8 @@
       "last30": "पिछले 30 दिन"
     },
     "incomeVsExpenses": "आय और व्यय",
-    "caseOutcomes": "मामलों के परिणाम"
+    "caseOutcomes": "मामलों के परिणाम",
+    "records": "रिकॉर्ड"
   },
   "herdProfile": {
     "eyebrow": "पशुधन प्रोफ़ाइल · अवलोकन",
@@ -1029,7 +1030,8 @@
   },
   "brand": {
     "tagline": "अपने पशुधन को जानें, उसके स्वास्थ्य की रक्षा करें, उसका मूल्य बढ़ाएँ",
-    "byline": "LivestockPro · Agricoders द्वारा"
+    "byline": "LivestockPro · Agricoders द्वारा",
+    "by": "Agricoders द्वारा"
   },
   "ai": {
     "title": "AI सहायक",

@@ -898,7 +898,8 @@
       "last30": "Siku 30 zilizopita"
     },
     "incomeVsExpenses": "Mapato na Matumizi",
-    "caseOutcomes": "Matokeo ya Matibabu"
+    "caseOutcomes": "Matokeo ya Matibabu",
+    "records": "Rekodi"
   },
   "herdProfile": {
     "eyebrow": "Wasifu wa Mifugo · Muhtasari",
@@ -1029,7 +1030,8 @@
   },
   "brand": {
     "tagline": "Ujue mifugo yako, linda afya yake, ongeza thamani yake",
-    "byline": "LivestockPro · na Agricoders"
+    "byline": "LivestockPro · na Agricoders",
+    "by": "na Agricoders"
   },
   "ai": {
     "title": "Msaidizi wa AI",

@@ -9,40 +9,47 @@
    icons on a colored surface); --card is the "page surface" color, identical
    to --white in light mode but diverges in dark mode below. */
 :root {
-  /* Agricoders brand (Brand and Template Guidelines v1.0): Forest, Pine and
-     Leaf greens lead, Harvest Amber highlights, Ink text, Slate helper text,
-     Alert Red only for critical states. Light greens (Mint, Pale Sage, Dew)
-     are deliberately not used anywhere in LivestockPro. */
+  /* Agricoders brand, applied exactly as Crop Manager (crop.agricoders.com)
+     does: Pine sidebar, Leaf as the accent, Forest buttons, table headings
+     and page titles, Mist page background, Fern borders, flat cards, Harvest
+     Amber highlights, Ink text, Slate helper text, Alert Red for critical. */
+  --mist: #F3F8F3;
+  --fern: #D5E3D6;
+  --night: #0F1F14;
+  --screen: #1E1E1E;
   --forest: #1B5E20;
   --pine: #14532D;
   --leaf: #2E7D32;
   --amber: #F9A825;
   --ink: #1C2B1E;
   --slate: #5B6B5D;
-  --primary: #1B5E20;
-  --primary-light: #EEF0EE;
-  --primary-hover: #14532D;
+  --primary: #2E7D32;
+  --primary-light: #F3F8F3;
+  --primary-hover: #1B5E20;
   --primary-dark: #1B5E20;
+  --heading: #1B5E20;
   --white: #FFFFFF;
   --card: #FFFFFF;
-  --bg: #F5F6F5;
+  --bg: #F3F8F3;
   --text: #1C2B1E;
   --text-light: #5B6B5D;
   --placeholder: #8A948B;
-  --border: #DFE2DF;
+  --border: #D5E3D6;
+  --table-stripe: #F3F8F3;
+  --table-hover: rgba(213, 227, 214, 0.5);
   --orange: #F9A825;
   --red: #C62828;
   --blue: #5B6B5D;
   --purple: #14532D;
   /* Brand surface for the sidebar — deliberately NOT redefined in the dark
      palette (unlike --primary-dark, which turns pale green there for text). */
-  --sidebar-bg: #1B5E20;
+  --sidebar-bg: #14532D;
   --sidebar-w: 260px;
   --sidebar-collapsed: 70px;
   --topbar-h: 64px;
   --radius: 10px;
-  --shadow: 0 2px 8px rgba(0,0,0,0.08);
-  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+  --shadow: none;
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.18);
   --transition: 0.25s ease;
 }
 
@@ -52,15 +59,18 @@
 :root[data-theme='dark'] {
   /* Night Field background, Screen Frame cards, green as the accent. */
   --primary: #2E7D32;
-  --primary-light: #1F3324;
-  --primary-dark: #F1F3F1;
+  --primary-light: rgba(255,255,255,0.08);
+  --primary-dark: #FFFFFF;
   --primary-hover: #1B5E20;
+  --heading: #FFFFFF;
   --card: #1E1E1E;
   --bg: #0F1F14;
-  --text: #F1F3F1;
-  --text-light: #A9B2AA;
-  --placeholder: #7D877E;
-  --border: #2E3A31;
+  --text: #FFFFFF;
+  --text-light: rgba(255,255,255,0.72);
+  --placeholder: rgba(255,255,255,0.5);
+  --border: rgba(255,255,255,0.14);
+  --table-stripe: #232323;
+  --table-hover: rgba(255,255,255,0.06);
   --orange: #F9A825;
   --red: #E05252;
   --blue: #A9B2AA;
@@ -2434,13 +2444,6 @@ a { color: var(--leaf); }
 .ai-chat-input textarea { resize: vertical; }
 .ai-chat-actions { display: flex; justify-content: flex-end; gap: 8px; }
 
-.ai-advisor-card { margin-bottom: 24px; }
-.ai-digest h4 { margin: 0 0 6px; color: var(--forest); font-size: 16px; }
-:root[data-theme='dark'] .ai-digest h4 { color: var(--text); }
-.ai-digest p { margin: 0 0 10px; line-height: 1.5; }
-.ai-digest-list { margin: 0 0 10px; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
-.ai-digest-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12.5px; }
-.ai-digest-foot a { font-weight: 700; }
 
 @media (max-width: 600px) {
   .ai-msg { max-width: 94%; }
@@ -2783,3 +2786,54 @@ a { color: var(--leaf); }
 .livestock-id strong { letter-spacing: 0.4px; }
 .livestock-id i { font-size: 11px; opacity: 0.85; }
 .livestock-id-small { font-size: 11.5px; font-weight: 600; color: var(--leaf); letter-spacing: 0.3px; margin-top: 2px; }
+
+/* ============================================================
+   Crop Manager colour system (crop.agricoders.com), applied the same way:
+   - Sidebar: Pine, white text at 78%, hover white 8%, active white 14% bold
+   - Top bar and cards: white (Screen in dark mode), flat, Fern border
+   - Buttons: Forest, hover Pine; secondary white with a Fern border
+   - Tables: Forest heading row with white text, Mist stripes
+   - Headings: Forest (white in dark mode); accent Leaf
+   ============================================================ */
+.sidebar { background: var(--sidebar-bg); }
+.sidebar-header { border-bottom-color: rgba(255,255,255,0.12); min-height: 64px; }
+.sidebar-logo-text { font-size: 18px; font-weight: 700; line-height: 1.15; color: #FFFFFF; white-space: nowrap; }
+.sidebar-logo-text small { display: block; font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.72); }
+.nav-section-label { color: rgba(255,255,255,0.62); }
+.nav-item { color: rgba(255,255,255,0.78); }
+.nav-item:hover { color: #FFFFFF; background: rgba(255,255,255,0.08); }
+.nav-item.active { color: #FFFFFF; background: rgba(255,255,255,0.14); font-weight: 700; border-left-color: transparent; }
+.sidebar-footer { border-top-color: rgba(255,255,255,0.12); }
+
+.topbar { background: var(--card); border-bottom: 1px solid var(--border); }
+
+.card, .summary-card, .chart-card, .insight-tile { border: 1px solid var(--border); box-shadow: none; }
+.summary-card:hover { transform: none; box-shadow: none; border-color: var(--primary); }
+.card-header h3 { color: var(--text); }
+h1, .page-header h1 { color: var(--heading); }
+
+.btn-primary { background: var(--forest); border-color: var(--forest); color: #FFFFFF; }
+.btn-primary:hover:not(:disabled) { background: var(--pine); border-color: var(--pine); }
+.btn-primary:disabled, .btn-primary[disabled] { background: var(--forest); }
+.btn-secondary { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover:not(:disabled) { background: var(--bg); border-color: var(--text-light); }
+
+.data-table thead th { background: var(--forest); color: #FFFFFF; font-size: 11px; font-weight: 700; border-bottom: 1px solid var(--forest); }
+.data-table tbody tr:nth-child(2n) { background: var(--table-stripe); }
+.data-table tbody tr:hover { background: var(--table-hover); }
+.data-table td { border-bottom-color: var(--border); }
+
+.form-control { border-color: var(--border); }
+.form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 2px var(--leaf); }
+
+.badge-green { background: var(--forest); color: #FFFFFF; }
+.badge-orange { background: var(--amber); color: var(--ink); }
+.badge-red { background: var(--red); color: #FFFFFF; }
+.badge-blue, .badge-gray { background: var(--mist); color: var(--slate); border: 1px solid var(--fern); }
+.badge-purple { background: var(--mist); color: var(--forest); border: 1px solid var(--fern); }
+:root[data-theme='dark'] .badge-blue, :root[data-theme='dark'] .badge-gray, :root[data-theme='dark'] .badge-purple { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.14); }
+
+.summary-icon { border-radius: 50%; }
+.summary-icon.green, .summary-icon.blue, .summary-icon.purple { background: var(--leaf); color: #FFFFFF; }
+.summary-icon.orange { background: var(--amber); color: #FFFFFF; }
+.summary-icon.red { background: var(--red); color: #FFFFFF; }

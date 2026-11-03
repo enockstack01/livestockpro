@@ -178,7 +178,7 @@ function LayoutInner() {
         <div className="sidebar-header">
           <div className="sidebar-logo">
             <img className="sidebar-app-icon" src="/icon-192.png" alt="" width="34" height="34" />
-            <span>LivestockPro</span>
+            <span className="sidebar-logo-text">LivestockPro<small>{t('brand.by')}</small></span>
           </div>
           <button className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fas fa-xmark"></i></button>
         </div>
@@ -199,7 +199,6 @@ function LayoutInner() {
           <button type="button" className="nav-item logout-item" onClick={() => { setSidebarOpen(false); setSignOutOpen(true); }}>
             <i className="fas fa-right-from-bracket"></i> {t('nav.signOut')}
           </button>
-          <div className="sidebar-byline">{t('brand.byline')}</div>
         </div>
       </aside>
       <div className={`sidebar-overlay${sidebarOpen ? ' show' : ''}`} onClick={() => setSidebarOpen(false)}></div>

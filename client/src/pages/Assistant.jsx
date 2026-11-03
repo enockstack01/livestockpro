@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useApi } from '../lib/api.js';
 import { useToast } from '../lib/toast.jsx';
 import { AiNotConfigured, AiUsageMeter, AiWorking, SavedReport, aiErrorText, useAiStatus } from '../components/ai/AiViews.jsx';
@@ -124,20 +124,19 @@ function AskTab({ disabled }) {
 }
 
 /* Latest saved advice, or a button to ask for it; also used on the dashboard. */
-export function AdvisorTab({ disabled, compact }) {
+/* Farm advisor, on request only: the farmer asks for advice and sees the
+   answer written now. Earlier advice is never loaded or shown here (nor on
+   the dashboard), so what is on screen always reflects today's records. */
+export function AdvisorTab({ disabled }) {
   const { t, i18n } = useTranslation();
   const api = useApi();
-  const configured = useAiStatus();
   const showToast = useToast();
-  const [saved, setSaved] = useState(undefined);
+  const [saved, setSaved] = useState(null);
   const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    api.aiReports({ kind: 'advisor', limit: 1 }).then(({ data }) => setSaved((data && data[0]) || null));
-  }, [api]);
 
   async function run() {
     setBusy(true);
+    setSaved(null);
     const { data, error } = await api.aiAdvisor({ language: i18n.language });
     setBusy(false);
     if (error) { showToast(aiErrorText(t, error, i18n.language), 'error'); return; }
@@ -149,10 +148,8 @@ export function AdvisorTab({ disabled, compact }) {
     setSaved(null);
   }
 
-  if (compact && configured === false) return null;
-
   return (
-    <div className={`card${compact ? ' ai-advisor-card' : ''}`}>
+    <div className="card">
       <div className="card-header">
         <h3><i className="fas fa-seedling"></i> {t('ai.advisor.title')}</h3>
         <button className="btn btn-primary btn-sm" onClick={run} disabled={disabled || busy}>
@@ -160,34 +157,11 @@ export function AdvisorTab({ disabled, compact }) {
         </button>
       </div>
       <div className="card-body">
-        {busy ? <AiWorking label={t('ai.advisor.working')} /> : saved && compact ? (
-          <AdvisorDigest saved={saved} />
-        ) : saved ? (
+        {busy ? <AiWorking label={t('ai.advisor.working')} /> : saved ? (
           <SavedReport saved={saved} onDelete={remove} />
-        ) : saved === null ? (
+        ) : (
           <p className="ai-muted">{t('ai.advisor.intro')}</p>
-        ) : null}
-      </div>
-    </div>
-  );
-}
-
-/* Dashboard version: the headline, summary and the first three priorities. */
-function AdvisorDigest({ saved }) {
-  const { t, i18n } = useTranslation();
-  const r = saved.report || {};
-  return (
-    <div className="ai-digest">
-      <h4>{saved.title}</h4>
-      <p>{r.summary}</p>
-      <ol className="ai-digest-list">
-        {(r.priorities || []).slice(0, 3).map((p, i) => (
-          <li key={i}><strong>{p.title}</strong> <span className="ai-muted">· {t(`ai.advisor.when.${p.when}`)}</span><br /><span>{p.detail}</span></li>
-        ))}
-      </ol>
-      <div className="ai-digest-foot">
-        <span className="ai-muted">{t('ai.report.generated', { date: new Date(saved.created_at).toLocaleString(i18n.language) })}</span>
-        <Link to="/assistant?tab=advisor">{t('ai.advisor.openFull')} <i className="fas fa-arrow-right"></i></Link>
+        )}
       </div>
     </div>
   );
@@ -276,7 +250,7 @@ function ReportsTab() {
   const [open, setOpen] = useState(null);
 
   useEffect(() => {
-    api.aiReports({ limit: 60 }).then(({ data }) => setList(data || []));
+    api.aiReports({ limit: 60 }).then(({ data }) => setList((data || []).filter((r) => r.kind !== 'advisor')));
   }, [api]);
 
   async function remove(r) {

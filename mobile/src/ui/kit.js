@@ -323,7 +323,7 @@ function makeStyles(colors, radius, shadow, shadowLg) {
     pageSubtitle: { fontSize: 13, color: colors.textLight, marginTop: 2 },
     pageActions: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
 
-    card: { backgroundColor: colors.card, borderRadius: 10, overflow: 'hidden', ...cardShadow },
+    card: { backgroundColor: colors.card, borderRadius: 10, overflow: 'hidden', borderWidth: 1, borderColor: colors.border, ...cardShadow },
     cardDanger: { borderWidth: 1.5, borderColor: colors.red },
     cardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingVertical: 16, paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: colors.border },
     cardHeaderTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
@@ -335,7 +335,7 @@ function makeStyles(colors, radius, shadow, shadowLg) {
     cardHeaderTitleCompact: { fontSize: 12.5, fontWeight: '700' },
 
     btn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 10, paddingHorizontal: 20, borderRadius: 8 },
-    btn_primary: { backgroundColor: colors.primary },
+    btn_primary: { backgroundColor: colors.forest },
     btn_secondary: { backgroundColor: colors.bg, borderWidth: 1.5, borderColor: colors.border, paddingVertical: 8.5 },
     btn_danger: { backgroundColor: colors.red },
     btnSm: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6 },

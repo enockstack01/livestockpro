@@ -6,6 +6,7 @@ const {
   activeMembership, farmerLink, hasFarmData, refreshFarmerStats, col, nowIso, uuid
 } = require('../lib/orgs');
 const { farmerList } = require('../lib/orgDashboard');
+const { publicAuditRows } = require('../lib/livestockId');
 const orgRoutes = require('./orgRoutes');
 
 const { orgOut, linkOut, orgFields } = orgRoutes.helpers;
@@ -243,7 +244,8 @@ router.get('/audit', async (req, res) => {
     ]);
     const orgs = await col('organizations').find({ _id: { $in: [...new Set(list.map((l) => l.organization_id).filter(Boolean))] } }, { projection: { name: 1 } }).toArray();
     const names = new Map(orgs.map((o) => [o._id, o.name]));
-    res.json({ data: { total, page, rows: list.map(({ _id, ...a }) => ({ id: _id, ...a, organization_name: names.get(a.organization_id) || (a.details && a.details.name) || '' })) }, error: null });
+    const rows = await publicAuditRows(list.map(({ _id, ...a }) => ({ id: _id, ...a, organization_name: names.get(a.organization_id) || (a.details && a.details.name) || '' })));
+    res.json({ data: { total, page, rows }, error: null });
   } catch (err) {
     sendOrgError(res, err);
   }

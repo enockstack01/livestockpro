@@ -898,7 +898,8 @@
       "last30": "近30天"
     },
     "incomeVsExpenses": "收入与支出",
-    "caseOutcomes": "病例结果"
+    "caseOutcomes": "病例结果",
+    "records": "记录"
   },
   "herdProfile": {
     "eyebrow": "畜群概况 · 总览",
@@ -1029,7 +1030,8 @@
   },
   "brand": {
     "tagline": "了解您的畜群，守护其健康，提升其价值",
-    "byline": "LivestockPro · Agricoders 出品"
+    "byline": "LivestockPro · Agricoders 出品",
+    "by": "Agricoders 出品"
   },
   "ai": {
     "title": "AI 助手",

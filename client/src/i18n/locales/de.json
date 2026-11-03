@@ -898,7 +898,8 @@
       "last30": "Letzte 30 T"
     },
     "incomeVsExpenses": "Einnahmen und Ausgaben",
-    "caseOutcomes": "Behandlungsergebnisse"
+    "caseOutcomes": "Behandlungsergebnisse",
+    "records": "Einträge"
   },
   "herdProfile": {
     "eyebrow": "Herdenprofil · Überblick",
@@ -1029,7 +1030,8 @@
   },
   "brand": {
     "tagline": "Kenne deine Herde, schütze ihre Gesundheit, steigere ihren Wert",
-    "byline": "LivestockPro · von Agricoders"
+    "byline": "LivestockPro · von Agricoders",
+    "by": "von Agricoders"
   },
   "ai": {
     "title": "KI-Assistent",

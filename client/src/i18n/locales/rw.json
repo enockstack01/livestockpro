@@ -898,7 +898,8 @@
       "last30": "Iminsi 30 ishize"
     },
     "incomeVsExpenses": "Amafaranga yinjiye n’ayasohotse",
-    "caseOutcomes": "Uko indwara zarangiye"
+    "caseOutcomes": "Uko indwara zarangiye",
+    "records": "Inyandiko"
   },
   "herdProfile": {
     "eyebrow": "Imiterere y’Amatungo · Incamake",
@@ -1029,7 +1030,8 @@
   },
   "brand": {
     "tagline": "Menya amatungo yawe, rinda ubuzima bwayo, wongere agaciro kayo",
-    "byline": "LivestockPro · na Agricoders"
+    "byline": "LivestockPro · na Agricoders",
+    "by": "na Agricoders"
   },
   "ai": {
     "title": "Umufasha wa AI",
