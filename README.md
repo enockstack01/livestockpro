@@ -157,10 +157,11 @@ Three roles: `user` (default — their own farm data only), `admin`, and
 the backend re-derives it from Clerk on every admin request (never trusts
 the client), via `server/authMiddleware.js`'s `getRole()`/`requireRole()`.
 
-- **Built-in administrators** — `enockstack@gmail.com` is always
-  `super_admin` and `nshimiyimanaenock4@gmail.com` is always `admin`, once
-  Clerk has verified the address, so a fresh deploy or Clerk instance has
-  its administrators from the first sign in.
+- **Built-in super admins** — `enockstack@gmail.com` and
+  `nshimiyimanaenock4@gmail.com` are always `super_admin` once Clerk has
+  verified the address (shown as such in the admin dashboard, and their role
+  can't be changed there), so a fresh deploy or Clerk instance has its
+  administrators from the first sign in.
 - **More administrators** — either:
   1. Run a one-off script calling `clerkClient.users.updateUserMetadata(userId, { publicMetadata: { role: 'super_admin' } })`, or
   2. Set the `SUPER_ADMIN_EMAILS` or `ADMIN_EMAILS` env var (comma-separated

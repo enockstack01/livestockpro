@@ -1,6 +1,6 @@
 const express = require('express');
 const { getDb } = require('../db');
-const { requireAuth, requireRole, getRole, primaryEmail, clerkClient } = require('../authMiddleware');
+const { requireAuth, requireRole, getRole, roleOf, roleFromEmail, primaryEmail, clerkClient } = require('../authMiddleware');
 const { ACCOUNT_STATUSES, accounts, getAccount, forgetApproval } = require('../lib/accounts');
 const { farmerLink, endFarmerLink } = require('../lib/orgs');
 const { livestockIdsFor } = require('../lib/livestockId');
@@ -158,7 +158,7 @@ router.get('/users', async (req, res) => {
       const byCollection = {};
       RESOURCE_COLLECTIONS.forEach((name, i) => { byCollection[name] = counts[i]; });
       const recordCount = counts.reduce((s, c) => s + c, 0);
-      const role = (u.publicMetadata && u.publicMetadata.role) || 'user';
+      const role = roleOf(u);
       const account = accountById.get(u.id);
       /* Same rule as lib/accounts.js: admins are always in, and users who
          had data before approval existed are grandfathered as approved. */
@@ -307,9 +307,14 @@ router.patch('/users/:id/role', async (req, res) => {
       }
     }
 
+    const fixed = roleFromEmail(await clerkClient.users.getUser(targetId));
+    if (fixed && fixed !== role) {
+      return res.status(400).json({ error: { message: 'This account is a built in administrator; its role cannot be changed here.' } });
+    }
+
     if (role !== 'super_admin') {
       const list = await clerkClient.users.getUserList({ limit: 500 });
-      const superAdmins = list.data.filter((u) => u.publicMetadata && u.publicMetadata.role === 'super_admin');
+      const superAdmins = list.data.filter((u) => roleOf(u) === 'super_admin');
       if (superAdmins.length <= 1 && superAdmins.some((u) => u.id === targetId)) {
         return res.status(400).json({ error: { message: 'Cannot remove the last super admin.' } });
       }
