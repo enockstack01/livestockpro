@@ -376,7 +376,9 @@
     "notifMissedTitle": "छूटी हुई जांच: {{tag}}",
     "notifMissedSub": "{{count}} दिन पहले देय थी",
     "notifBirthTitle": "अपेक्षित जन्म: {{tag}}",
-    "notifBirthInDays": "{{count}} दिन में"
+    "notifBirthInDays": "{{count}} दिन में",
+    "collapse": "संक्षिप्त करें",
+    "expand": "मेनू विस्तृत करें"
   },
   "settings": {
     "title": "सेटिंग्स",

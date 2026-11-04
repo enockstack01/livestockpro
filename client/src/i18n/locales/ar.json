@@ -376,7 +376,9 @@
     "notifMissedTitle": "فحص فائت: {{tag}}",
     "notifMissedSub": "كانت مستحقة قبل {{count}} يوم",
     "notifBirthTitle": "الولادة المتوقعة: {{tag}}",
-    "notifBirthInDays": "خلال {{count}} يوم"
+    "notifBirthInDays": "خلال {{count}} يوم",
+    "collapse": "طي",
+    "expand": "توسيع القائمة"
   },
   "settings": {
     "title": "الإعدادات",

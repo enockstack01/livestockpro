@@ -376,7 +376,9 @@
     "notifMissedTitle": "Revisión perdida: {{tag}}",
     "notifMissedSub": "Venció hace {{count}} día(s)",
     "notifBirthTitle": "Parto esperado: {{tag}}",
-    "notifBirthInDays": "En {{count}} día(s)"
+    "notifBirthInDays": "En {{count}} día(s)",
+    "collapse": "Contraer",
+    "expand": "Expandir el menú"
   },
   "settings": {
     "title": "Configuración",

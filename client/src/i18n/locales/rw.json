@@ -376,7 +376,9 @@
     "notifMissedTitle": "Isuzuma ryatinze: {{tag}}",
     "notifMissedSub": "Yagombaga iminsi {{count}} ishize",
     "notifBirthTitle": "Kubyara biteganyijwe: {{tag}}",
-    "notifBirthInDays": "Mu minsi {{count}}"
+    "notifBirthInDays": "Mu minsi {{count}}",
+    "collapse": "Hina",
+    "expand": "Agura menu"
   },
   "settings": {
     "title": "Igenamiterere",

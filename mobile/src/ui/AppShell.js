@@ -31,10 +31,15 @@ import { useLanguage } from '../i18n/LanguageProvider';
      in the sidebar footer;
    - a slim white topbar: menu button (phones), theme toggle, notifications
      bell with an unread count, and a round avatar that opens Settings.
-   From 768px up (tablets) the sidebar is pinned open; below that it slides
-   in over a dimmed overlay. Page search lives in each page, not the topbar. */
+   From 768px up (tablets) the sidebar is pinned open and its Collapse button
+   folds it to a 70px icon rail; below that it slides in over a dimmed
+   overlay. The person's name, role and Livestock ID sit beside the avatar on
+   tablets and at the top of the sidebar footer on phones (CropManager's
+   profile block). Page search lives in each page, not the topbar. */
 
 const SIDEBAR_W = 260;
+const RAIL_W = 70;
+const COLLAPSED_KEY = 'lp_sidebar_collapsed';
 const NOTIF_ORDER = { red: 0, orange: 1, blue: 2, purple: 3, green: 4 };
 const mobilePath = (item) => (item.key === 'dashboard' ? '/' : item.path);
 /* Mobile has no admin screens (the Admin Panel and One Health map are web-only). */
@@ -212,6 +217,10 @@ export default function AppShell({ children }) {
   const myOrg = useMyOrganization(!isOrg);
   const unread = notifItems.filter((n) => !readIds.has(n.id)).length;
   const slide = useRef(new Animated.Value(-SIDEBAR_W)).current;
+  const [collapsed, setCollapsed] = useState(false);
+  useEffect(() => { SecureStore.getItemAsync(COLLAPSED_KEY).then((v) => setCollapsed(v === '1')).catch(() => {}); }, []);
+  const toggleCollapsed = () => setCollapsed((c) => { SecureStore.setItemAsync(COLLAPSED_KEY, c ? '0' : '1').catch(() => {}); return !c; });
+  const rail = isTablet && collapsed;
 
   useEffect(() => {
     Animated.timing(slide, { toValue: open ? 0 : -SIDEBAR_W, duration: 250, useNativeDriver: true }).start();
@@ -232,13 +241,17 @@ export default function AppShell({ children }) {
   /* Search results link to a section with ?search=…, even the one open now. */
   const goSearch = (href) => { setOpen(false); router.replace(href); };
 
-  const initials = (accountDisplayName(t, account, account?.role)[0] || 'U').toUpperCase();
+  const roleName = accountDisplayName(t, account, account?.role);
+  const displayName = (!isOrg && user?.fullName) || roleName;
+  const profileLine = [displayName !== roleName ? roleName : null, account && account.livestockId].filter(Boolean).join(' · ');
+  const initials = (displayName[0] || 'U').toUpperCase();
+  const profile = { name: displayName, line: profileLine };
 
-  const sidebar = <Sidebar pathname={pathname} onNavigate={go} onClose={() => setOpen(false)} closable={!isTablet} topInset={insets.top} bottomInset={insets.bottom} sections={isOrg ? orgSections(account.organization && account.organization.role) : MOBILE_SECTIONS} isOrg={isOrg} />;
+  const sidebar = <Sidebar pathname={pathname} onNavigate={go} onClose={() => setOpen(false)} closable={!isTablet} topInset={insets.top} bottomInset={insets.bottom} sections={isOrg ? orgSections(account.organization && account.organization.role) : MOBILE_SECTIONS} isOrg={isOrg} rail={rail} onToggleCollapse={isTablet ? toggleCollapsed : null} profile={isTablet ? null : profile} />;
 
   return (
     <View style={[baseStyles.root, { backgroundColor: colors.bg }]}>
-      {isTablet ? <View style={{ width: SIDEBAR_W }}>{sidebar}</View> : null}
+      {isTablet ? <View style={{ width: rail ? RAIL_W : SIDEBAR_W }}>{sidebar}</View> : null}
 
       <View style={{ flex: 1 }}>
         <View style={[baseStyles.topbar, { paddingTop: insets.top, height: 60 + insets.top, backgroundColor: colors.card, borderBottomColor: colors.border }]}>
@@ -255,10 +268,16 @@ export default function AppShell({ children }) {
           </Pressable>
           <TopbarButton icon={scheme === 'dark' ? 'sun' : 'moon'} label={t('layout.toggleTheme')} onPress={() => setThemePreference(scheme === 'dark' ? 'light' : 'dark')} />
           <TopbarButton icon="bell" label={t('layout.notifications')} badge={unread} onPress={() => setNotifOpen(true)} />
-          <Pressable onPress={() => { haptics.select(); go('/settings'); }} accessibilityRole="button" accessibilityLabel={t('nav.settings')} style={({ pressed }) => ({ marginLeft: 6, opacity: pressed ? 0.8 : 1 })}>
+          <Pressable onPress={() => { haptics.select(); go('/settings'); }} accessibilityRole="button" accessibilityLabel={t('nav.settings')} style={({ pressed }) => [baseStyles.userMenu, { opacity: pressed ? 0.8 : 1 }]}>
             {user?.imageUrl
               ? <Image source={{ uri: user.imageUrl }} style={baseStyles.avatar} />
               : <View style={[baseStyles.avatar, { backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center' }]}><Text style={[baseStyles.avatarText, { color: colors.primary }]}>{initials}</Text></View>}
+            {isTablet ? (
+              <View style={{ maxWidth: 220 }}>
+                <Text style={[baseStyles.userName, { color: colors.text }]} numberOfLines={1}>{displayName}</Text>
+                {profileLine ? <Text style={[baseStyles.userRole, { color: colors.textLight }]} numberOfLines={1}>{profileLine}</Text> : null}
+              </View>
+            ) : null}
           </Pressable>
         </View>
 
@@ -310,22 +329,25 @@ function TopbarButton({ icon, label, onPress, badge }) {
   );
 }
 
-function NavItem({ icon, label, active, onPress, danger, accent }) {
-  const color = danger ? '#FFCDD2' : active ? '#FFFFFF' : 'rgba(255,255,255,0.7)';
+/* `rail`: the collapsed sidebar, icon only (the name stays as the
+   accessibility label). */
+function NavItem({ icon, label, active, onPress, danger, rail, iconStyle }) {
+  const color = danger ? '#FFCDD2' : active ? '#FFFFFF' : 'rgba(255,255,255,0.78)';
   return (
     <Pressable
       onPress={() => { haptics.select(); onPress(); }}
       accessibilityRole="menuitem"
+      accessibilityLabel={label}
       accessibilityState={{ selected: !!active }}
-      style={({ pressed }) => [baseStyles.navItem, active && baseStyles.navItemActive, pressed && !active && { backgroundColor: 'rgba(255,255,255,0.08)' }]}
+      style={({ pressed }) => [baseStyles.navItem, rail && baseStyles.navItemRail, active && baseStyles.navItemActive, pressed && !active && { backgroundColor: 'rgba(255,255,255,0.08)' }]}
     >
-      <View style={{ width: 20, alignItems: 'center' }}><Icon name={icon} size={14} color={accent || color} /></View>
-      <Text style={[baseStyles.navText, { color }]} numberOfLines={1}>{label}</Text>
+      <View style={[{ width: 20, alignItems: 'center' }, iconStyle]}><Icon name={icon} size={14} color={color} /></View>
+      {rail ? null : <Text style={[baseStyles.navText, { color }]} numberOfLines={1}>{label}</Text>}
     </Pressable>
   );
 }
 
-function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInset, sections, isOrg }) {
+function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInset, sections, isOrg, rail, onToggleCollapse, profile }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const signOut = useSignOut();
@@ -335,15 +357,15 @@ function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInse
     : lastSyncedAt ? t('sync.lastSynced', { time: new Date(lastSyncedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }) : t('sync.notSyncedYet');
 
   return (
-    <View style={[baseStyles.sidebar, { backgroundColor: colors.sidebar }]}>
-      {/* Logo on a translucent tile, name in two tones. */}
-      <View style={[baseStyles.sidebarHeader, { paddingTop: topInset + 14 }]}>
+    <View style={[baseStyles.sidebar, { width: rail ? RAIL_W : SIDEBAR_W, backgroundColor: colors.sidebar }]}>
+      {/* App icon and wordmark (icon only on the rail). */}
+      <View style={[baseStyles.sidebarHeader, rail && baseStyles.sidebarHeaderRail, { paddingTop: topInset + 14 }]}>
         <Image source={require('../../assets/icon.png')} style={baseStyles.appIcon} />
-        <View>
+        {rail ? null : <View>
           <Text style={baseStyles.logoText}>LivestockPro</Text>
           <Text style={baseStyles.logoBy}>{t('brand.by')}</Text>
-        </View>
-        <View style={{ flex: 1 }} />
+        </View>}
+        {rail ? null : <View style={{ flex: 1 }} />}
         {closable ? <Pressable onPress={onClose} hitSlop={10} accessibilityLabel="Close menu"><Icon name="xmark" size={18} color="rgba(255,255,255,0.6)" /></Pressable> : null}
       </View>
 
@@ -351,11 +373,11 @@ function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInse
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 12 }}>
         {sections.map((section) => (
           <View key={section.labelKey || 'main'}>
-            {section.labelKey ? <Text style={baseStyles.sectionLabel}>{t(section.labelKey)}</Text> : <View style={{ height: 8 }} />}
+            {section.labelKey && !rail ? <Text style={baseStyles.sectionLabel}>{t(section.labelKey)}</Text> : <View style={{ height: 8 }} />}
             {section.items.map((item) => {
               const href = mobilePath(item);
               const active = href === '/' || href === '/organization' ? pathname === href : pathname.startsWith(href);
-              return <NavItem key={item.key} icon={item.icon} label={t(item.labelKey)} active={active} onPress={() => onNavigate(href)} />;
+              return <NavItem key={item.key} icon={item.icon} label={t(item.labelKey)} active={active} rail={rail} onPress={() => onNavigate(href)} />;
             })}
           </View>
         ))}
@@ -363,13 +385,20 @@ function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInse
 
       {/* Footer, apart from the features: offline sync status, then Sign out. */}
       <View style={[baseStyles.sidebarFooter, { paddingBottom: bottomInset + 8 }]}>
-        {!isOrg ? <Pressable onPress={() => { haptics.select(); triggerSync(); }} style={baseStyles.syncRow} accessibilityRole="button">
+        {profile ? (
+          <View style={baseStyles.sideProfile}>
+            <Text style={baseStyles.sideProfileName} numberOfLines={1}>{profile.name}</Text>
+            {profile.line ? <Text style={baseStyles.sideProfileLine} numberOfLines={1}>{profile.line}</Text> : null}
+          </View>
+        ) : null}
+        {!isOrg && !rail ? <Pressable onPress={() => { haptics.select(); triggerSync(); }} style={baseStyles.syncRow} accessibilityRole="button">
           <View style={{ width: 20, alignItems: 'center' }}>
             <Icon name={syncing ? 'arrows-rotate' : lastError ? 'triangle-exclamation' : 'cloud'} size={12} color={lastError ? '#F9A825' : '#FFFFFF'} />
           </View>
           <Text style={baseStyles.syncText} numberOfLines={1}>{syncLine}{failedCount > 0 ? ` · ${t('sync.recordsFailed', { count: failedCount })}` : ''}</Text>
         </Pressable> : null}
-        <NavItem icon="right-from-bracket" label={t('nav.signOut')} onPress={() => { onClose(); signOut(); }} danger />
+        <NavItem icon="right-from-bracket" label={t('nav.signOut')} rail={rail} onPress={() => { onClose(); signOut(); }} danger />
+        {onToggleCollapse ? <NavItem icon="chevron-left" label={rail ? t('layout.expand') : t('layout.collapse')} rail={rail} iconStyle={rail && { transform: [{ rotate: '180deg' }] }} onPress={onToggleCollapse} /> : null}
       </View>
     </View>
   );
@@ -422,16 +451,21 @@ const baseStyles = StyleSheet.create({
   root: { flex: 1, flexDirection: 'row' },
   sidebar: { flex: 1, width: SIDEBAR_W },
   drawer: { position: 'absolute', left: 0, top: 0, bottom: 0, width: SIDEBAR_W, shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 12, elevation: 12 },
-  sidebarHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingBottom: 16, paddingHorizontal: 18, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)' },
+  sidebarHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingBottom: 16, paddingHorizontal: 18, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.12)' },
+  sidebarHeaderRail: { justifyContent: 'center', paddingHorizontal: 0 },
   appIcon: { width: 34, height: 34, borderRadius: 9 },
   logoTile: { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' },
   logoText: { color: '#FFFFFF', fontSize: 17, fontWeight: '700', lineHeight: 20 },
   logoBy: { color: 'rgba(255,255,255,0.72)', fontSize: 11 },
-  sectionLabel: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, color: 'rgba(255,255,255,0.35)', paddingTop: 16, paddingBottom: 6, paddingHorizontal: 20 },
+  sectionLabel: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, color: 'rgba(255,255,255,0.62)', paddingTop: 16, paddingBottom: 6, paddingHorizontal: 20 },
   navItem: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11, paddingLeft: 17, paddingRight: 20, borderLeftWidth: 3, borderLeftColor: 'transparent' },
+  navItemRail: { justifyContent: 'center', paddingLeft: 0, paddingRight: 0, gap: 0, borderLeftWidth: 0 },
   navItemActive: { backgroundColor: 'rgba(255,255,255,0.14)', borderLeftColor: 'transparent' },
-  navText: { fontSize: 13, fontWeight: '500' },
-  sidebarFooter: { borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', paddingTop: 6 },
+  navText: { fontSize: 13, fontWeight: '500', flexShrink: 1 },
+  sidebarFooter: { borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.12)', paddingTop: 6 },
+  sideProfile: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 6 },
+  sideProfileName: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
+  sideProfileLine: { color: 'rgba(255,255,255,0.72)', fontSize: 11, marginTop: 2 },
   syncRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8, paddingLeft: 20, paddingRight: 20 },
   syncText: { color: 'rgba(255,255,255,0.5)', fontSize: 11, flex: 1 },
 
@@ -440,6 +474,9 @@ const baseStyles = StyleSheet.create({
   badge: { position: 'absolute', top: 4, right: 4, minWidth: 18, height: 18, borderRadius: 9, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
   badgeText: { color: '#fff', fontSize: 10, fontWeight: '700' },
   avatar: { width: 34, height: 34, borderRadius: 17, overflow: 'hidden' },
+  userMenu: { flexDirection: 'row', alignItems: 'center', gap: 10, marginLeft: 6 },
+  userName: { fontSize: 13, fontWeight: '600' },
+  userRole: { fontSize: 11, marginTop: 1 },
   avatarText: { fontWeight: '700', fontSize: 13 },
   searchBox: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 8, borderWidth: 1, paddingHorizontal: 13, minHeight: 42, marginBottom: 10 },
   searchTrigger: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 8, paddingHorizontal: 12, minHeight: 38, marginHorizontal: 6 },

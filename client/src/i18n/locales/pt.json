@@ -376,7 +376,9 @@
     "notifMissedTitle": "Consulta perdida: {{tag}}",
     "notifMissedSub": "Venceu há {{count}} dia(s)",
     "notifBirthTitle": "Parto previsto: {{tag}}",
-    "notifBirthInDays": "Em {{count}} dia(s)"
+    "notifBirthInDays": "Em {{count}} dia(s)",
+    "collapse": "Recolher",
+    "expand": "Expandir o menu"
   },
   "settings": {
     "title": "Configurações",

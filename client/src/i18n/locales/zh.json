@@ -376,7 +376,9 @@
     "notifMissedTitle": "错过复查：{{tag}}",
     "notifMissedSub": "已逾期{{count}}天",
     "notifBirthTitle": "预计分娩：{{tag}}",
-    "notifBirthInDays": "还有{{count}}天"
+    "notifBirthInDays": "还有{{count}}天",
+    "collapse": "收起",
+    "expand": "展开菜单"
   },
   "settings": {
     "title": "设置",

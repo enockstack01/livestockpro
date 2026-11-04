@@ -45,8 +45,8 @@ export const NAV_SECTIONS = [
     labelKey: 'nav.sections.administration',
     adminOnly: true,
     items: [
-      { key: 'admin', path: '/admin', icon: 'user-shield', labelKey: 'layout.adminPanel', accent: '#F9A825' },
-      { key: 'onehealth', path: '/onehealth', icon: 'shield-virus', labelKey: 'layout.oneHealth', accent: '#F9A825' },
+      { key: 'admin', path: '/admin', icon: 'user-shield', labelKey: 'layout.adminPanel' },
+      { key: 'onehealth', path: '/onehealth', icon: 'shield-virus', labelKey: 'layout.oneHealth' },
     ],
   },
   {

@@ -376,7 +376,9 @@
     "notifMissedTitle": "Ukaguzi uliokosa: {{tag}}",
     "notifMissedSub": "Ilipaswa siku {{count}} zilizopita",
     "notifBirthTitle": "Kuzaa kunatarajiwa: {{tag}}",
-    "notifBirthInDays": "Baada ya siku {{count}}"
+    "notifBirthInDays": "Baada ya siku {{count}}",
+    "collapse": "Kunja",
+    "expand": "Panua menyu"
   },
   "settings": {
     "title": "Mipangilio",

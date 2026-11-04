@@ -376,7 +376,9 @@
     "notifMissedTitle": "Verpasste Untersuchung: {{tag}}",
     "notifMissedSub": "War vor {{count}} Tag(en) fällig",
     "notifBirthTitle": "Erwartete Geburt: {{tag}}",
-    "notifBirthInDays": "In {{count}} Tag(en)"
+    "notifBirthInDays": "In {{count}} Tag(en)",
+    "collapse": "Einklappen",
+    "expand": "Menü ausklappen"
   },
   "settings": {
     "title": "Einstellungen",

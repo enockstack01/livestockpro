@@ -376,7 +376,9 @@
     "notifMissedTitle": "Contrôle manqué : {{tag}}",
     "notifMissedSub": "Était prévu il y a {{count}} jour(s)",
     "notifBirthTitle": "Naissance prévue : {{tag}}",
-    "notifBirthInDays": "Dans {{count}} jour(s)"
+    "notifBirthInDays": "Dans {{count}} jour(s)",
+    "collapse": "Réduire",
+    "expand": "Développer le menu"
   },
   "settings": {
     "title": "Paramètres",

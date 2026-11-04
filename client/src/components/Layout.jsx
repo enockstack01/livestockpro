@@ -16,6 +16,7 @@ import Modal from './Modal.jsx';
 
 
 const NOTIF_ORDER = { red: 0, orange: 1, blue: 2, purple: 3, green: 4 };
+const COLLAPSED_KEY = 'livestockpro_sidebar_collapsed';
 
 /* Server notifications (organization approvals, farmer limit warnings,
    joins and leaves), stored as a key plus values and shown here in the
@@ -160,10 +161,23 @@ function LayoutInner() {
   const isAdmin = role === 'admin' || role === 'super_admin';
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  /* Collapsed to an icon rail (tablets and up), remembered in this browser. */
+  const [collapsed, setCollapsed] = useState(() => {
+    try { return localStorage.getItem(COLLAPSED_KEY) === '1'; } catch { return false; }
+  });
+  const toggleCollapsed = () => setCollapsed((c) => {
+    try { localStorage.setItem(COLLAPSED_KEY, c ? '0' : '1'); } catch { /* storage unavailable */ }
+    return !c;
+  });
 
-  const displayName = accountDisplayName(t, account, role);
+  /* Profile block like CropManager's: the person's name, then their role
+     and Livestock ID underneath. */
+  const roleName = accountDisplayName(t, account, role);
+  const displayName = (!isOrg && user?.fullName) || roleName;
+  const profileLine = [displayName !== roleName ? roleName : null, account.livestockId].filter(Boolean).join(' · ');
   const initials = (displayName[0] || 'U').toUpperCase();
   const imageUrl = user?.imageUrl;
+  const shift = collapsed ? ' sidebar-collapsed' : '';
 
   const [signOutOpen, setSignOutOpen] = useState(false);
   async function handleLogout() {
@@ -174,7 +188,7 @@ function LayoutInner() {
 
   return (
     <>
-      <aside className={`sidebar${sidebarOpen ? ' open' : ''}`}>
+      <aside className={`sidebar${sidebarOpen ? ' open' : ''}${shift}`}>
         <div className="sidebar-header">
           <div className="sidebar-logo">
             <img className="sidebar-app-icon" src="/icon-192.png" alt="" width="34" height="34" />
@@ -187,23 +201,27 @@ function LayoutInner() {
             <div key={section.labelKey || 'main'} className="nav-section">
               {section.labelKey && <div className="nav-section-label">{t(section.labelKey)}</div>}
               {section.items.filter((item) => !item.roles || item.roles.includes(orgRole)).map((item) => (
-                <NavLink key={item.key} to={item.path} end={item.path === '/organization'} className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')} onClick={() => setSidebarOpen(false)}>
-                  <i className={`fas fa-${item.icon}`} style={item.accent ? { color: item.accent } : undefined}></i> {t(item.labelKey)}
+                <NavLink key={item.key} to={item.path} end={item.path === '/organization'} title={collapsed ? t(item.labelKey) : undefined} className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')} onClick={() => setSidebarOpen(false)}>
+                  <i className={`fas fa-${item.icon}`}></i> <span className="nav-text">{t(item.labelKey)}</span>
                 </NavLink>
               ))}
             </div>
           ))}
         </nav>
-        {/* Sign out lives apart from the features, in the sidebar footer. */}
+        {/* Sign out lives apart from the features, in the sidebar footer,
+            with the collapse toggle below it (as in CropManager). */}
         <div className="sidebar-footer">
-          <button type="button" className="nav-item logout-item" onClick={() => { setSidebarOpen(false); setSignOutOpen(true); }}>
-            <i className="fas fa-right-from-bracket"></i> {t('nav.signOut')}
+          <button type="button" className="nav-item logout-item" title={collapsed ? t('nav.signOut') : undefined} onClick={() => { setSidebarOpen(false); setSignOutOpen(true); }}>
+            <i className="fas fa-right-from-bracket"></i> <span className="nav-text">{t('nav.signOut')}</span>
+          </button>
+          <button type="button" className="nav-item sidebar-toggle" onClick={toggleCollapsed} aria-expanded={!collapsed} title={collapsed ? t('layout.expand') : undefined}>
+            <i className="fas fa-chevron-left"></i> <span className="nav-text">{t('layout.collapse')}</span>
           </button>
         </div>
       </aside>
       <div className={`sidebar-overlay${sidebarOpen ? ' show' : ''}`} onClick={() => setSidebarOpen(false)}></div>
 
-      <header className="topbar">
+      <header className={`topbar${shift}`}>
         <div className="topbar-left">
           <button className="menu-toggle" onClick={() => setSidebarOpen(true)}><i className="fas fa-bars"></i></button>
           <GlobalSearch farmData={!isOrg} />
@@ -250,12 +268,15 @@ function LayoutInner() {
             <div className="user-avatar" style={{ overflow: 'hidden' }}>
               {imageUrl ? <img src={imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initials}
             </div>
-            <span className="user-name">{displayName}</span>
+            <div className="user-info">
+              <span className="user-name">{displayName}</span>
+              {profileLine && <span className="user-role" title={account.livestockId ? `${t('settings.userId')}: ${account.livestockId}` : undefined}>{profileLine}</span>}
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="main-content">
+      <main className={`main-content${shift}`}>
         <Outlet context={{ role, requestSignOut: () => setSignOutOpen(true) }} />
         {!isOrg ? <ConsentRequest mine={myOrg.data} onAnswered={myOrg.reload} /> : null}
       </main>

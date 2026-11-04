@@ -376,7 +376,9 @@
     "notifMissedTitle": "Missed check-up: {{tag}}",
     "notifMissedSub": "Was due {{count}} day(s) ago",
     "notifBirthTitle": "Expected birth: {{tag}}",
-    "notifBirthInDays": "In {{count}} day(s)"
+    "notifBirthInDays": "In {{count}} day(s)",
+    "collapse": "Collapse",
+    "expand": "Expand menu"
   },
   "settings": {
     "title": "Settings",
