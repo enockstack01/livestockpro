@@ -10,25 +10,32 @@ function requireAuth(req, res, next) {
   next();
 }
 
-/* Optional resilient bootstrap: emails listed here are always treated as
-   super_admin even before any publicMetadata.role has been set on their
-   Clerk account. Lets a fresh deployment (e.g. a new Render env) get its
-   first super admin without a manual script. */
-const SUPER_ADMIN_EMAILS = (process.env.SUPER_ADMIN_EMAILS || '')
-  .split(',')
-  .map((e) => e.trim().toLowerCase())
-  .filter(Boolean);
+/* Resilient bootstrap: emails listed here hold their role even before any
+   publicMetadata.role has been set on their Clerk account, so a fresh
+   deployment (e.g. a new Render env or a new Clerk instance) has its
+   administrators from the first sign in. The platform owners are built in;
+   SUPER_ADMIN_EMAILS and ADMIN_EMAILS (comma separated) add more. An email
+   only counts once Clerk has verified it. */
+const emailList = (value) => (value || '').split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
+const SUPER_ADMIN_EMAILS = ['enockstack@gmail.com', ...emailList(process.env.SUPER_ADMIN_EMAILS)];
+const ADMIN_EMAILS = ['nshimiyimanaenock4@gmail.com', ...emailList(process.env.ADMIN_EMAILS)];
 
 function primaryEmail(user) {
   const primary = user.emailAddresses.find((e) => e.id === user.primaryEmailAddressId);
   return ((primary || user.emailAddresses[0] || {}).emailAddress || '').toLowerCase();
 }
 
+function verifiedPrimaryEmail(user) {
+  const primary = user.emailAddresses.find((e) => e.id === user.primaryEmailAddressId) || user.emailAddresses[0];
+  return primary && primary.verification && primary.verification.status === 'verified' ? primary.emailAddress.toLowerCase() : '';
+}
+
 async function getRole(userId) {
   const user = await clerkClient.users.getUser(userId);
   const metaRole = user.publicMetadata && user.publicMetadata.role;
-  if (metaRole === 'super_admin' || SUPER_ADMIN_EMAILS.includes(primaryEmail(user))) return 'super_admin';
-  if (metaRole === 'admin') return 'admin';
+  const email = verifiedPrimaryEmail(user);
+  if (metaRole === 'super_admin' || (email && SUPER_ADMIN_EMAILS.includes(email))) return 'super_admin';
+  if (metaRole === 'admin' || (email && ADMIN_EMAILS.includes(email))) return 'admin';
   return 'user';
 }
 

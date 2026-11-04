@@ -157,12 +157,15 @@ Three roles: `user` (default — their own farm data only), `admin`, and
 the backend re-derives it from Clerk on every admin request (never trusts
 the client), via `server/authMiddleware.js`'s `getRole()`/`requireRole()`.
 
-- **Bootstrapping the first super admin** — either:
+- **Built-in administrators** — `enockstack@gmail.com` is always
+  `super_admin` and `nshimiyimanaenock4@gmail.com` is always `admin`, once
+  Clerk has verified the address, so a fresh deploy or Clerk instance has
+  its administrators from the first sign in.
+- **More administrators** — either:
   1. Run a one-off script calling `clerkClient.users.updateUserMetadata(userId, { publicMetadata: { role: 'super_admin' } })`, or
-  2. Set the `SUPER_ADMIN_EMAILS` env var (comma-separated emails) — anyone
-     signing in with one of those addresses is treated as `super_admin`
-     even before any metadata is set. Useful for a fresh deploy (e.g. Render)
-     that doesn't have console/script access yet.
+  2. Set the `SUPER_ADMIN_EMAILS` or `ADMIN_EMAILS` env var (comma-separated
+     emails) — anyone signing in with a verified address on the list gets
+     that role even before any metadata is set.
 - **`admin`** can: view platform-wide stats, the full user list, and the
   spatial map; ban/unban regular (`user`-role) accounts; promote a `user` to
   `admin` (nothing else — can't touch existing admins, can't grant
