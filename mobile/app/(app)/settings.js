@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth, useUser } from '@clerk/expo';
@@ -154,36 +154,46 @@ export default function SettingsScreen() {
       <View style={{ width: '100%', maxWidth: 720, gap: 20 }}>
       <PageHeader title={t('settings.title')} subtitle={t('settings.subtitle')} />
 
+      {/* Account: photo, name and email, then the read only account fields
+          (the CropManager app's Personal Information card). */}
       <Card>
-        <View style={styles.headerCard}>
-          <Pressable onPress={changeAvatar} disabled={uploading} style={[styles.avatar, { backgroundColor: colors.primaryLight, borderColor: colors.card, opacity: uploading ? 0.6 : 1 }]}>
-            {user?.imageUrl ? <Image source={{ uri: user.imageUrl }} style={styles.avatarImg} /> : <Text style={[styles.initials, { color: colors.primary }]}>{initials}</Text>}
-            <View style={[styles.avatarEdit, { backgroundColor: colors.primary, borderColor: colors.card }]}><Icon name="camera" size={9} color="#fff" /></View>
-          </Pressable>
-          <View style={{ flex: 1, minWidth: 160 }}>
-            <Text style={[styles.name, { color: colors.text }]}>{displayName}</Text>
-            {account && account.livestockId ? (
-              <Pressable
-                onPress={() => Clipboard.setStringAsync(account.livestockId).then(() => showToast(t('settings.idCopied'), 'success')).catch(() => {})}
-                accessibilityRole="button"
-                accessibilityLabel={t('settings.copyId')}
-                style={[styles.livestockId, { backgroundColor: colors.primary }]}
-              >
-                <Text style={styles.livestockIdLabel} numberOfLines={1}>{t('settings.livestockId')}</Text>
-                <Text style={styles.livestockIdValue} numberOfLines={1}>{account.livestockId}</Text>
-                <Icon name="copy" size={11} color="#FFFFFF" />
-              </Pressable>
-            ) : null}
-            <Text style={{ fontSize: 13, color: colors.textLight }}>{email}</Text>
+        <CardHeader title={t('settings.account')} icon="user" />
+        <CardBody>
+          <View style={styles.headerCard}>
+            <Pressable onPress={changeAvatar} disabled={uploading} accessibilityRole="button" accessibilityLabel={t('settings.changePhoto')} style={[styles.avatar, { backgroundColor: colors.primaryLight, opacity: uploading ? 0.6 : 1 }]}>
+              {user?.imageUrl ? <Image source={{ uri: user.imageUrl }} style={styles.avatarImg} /> : <Text style={[styles.initials, { color: colors.primary }]}>{initials}</Text>}
+              <View style={[styles.avatarEdit, { backgroundColor: colors.leaf, borderColor: colors.card }]}><Icon name="camera" size={10} color="#fff" /></View>
+            </Pressable>
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>{displayName}</Text>
+              <Text style={{ fontSize: 13, color: colors.textLight }} numberOfLines={1}>{email}</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
+                <Button size="sm" variant="secondary" icon="upload" title={uploading ? t('settings.workingEllipsis') : t('settings.changePhoto')} onPress={changeAvatar} disabled={uploading} />
+                {user?.imageUrl ? <Button size="sm" variant="secondary" icon="trash" title={t('settings.remove')} onPress={removeAvatar} disabled={uploading} /> : null}
+              </View>
+            </View>
           </View>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-            <Button size="sm" variant="secondary" icon="upload" title={uploading ? t('settings.workingEllipsis') : t('settings.changePhoto')} onPress={changeAvatar} disabled={uploading} />
-            {user?.imageUrl ? <Button size="sm" variant="secondary" icon="trash" title={t('settings.remove')} onPress={removeAvatar} disabled={uploading} /> : null}
-          </View>
-        </View>
+          <FormGroup label={t('settings.email')}><Input value={email} editable={false} style={styles.readonly} /></FormGroup>
+          <FormGroup label={t('settings.userId')}>
+            <Pressable
+              onPress={() => account && account.livestockId && Clipboard.setStringAsync(account.livestockId).then(() => showToast(t('settings.idCopied'), 'success')).catch(() => {})}
+              accessibilityRole="button"
+              accessibilityLabel={t('settings.copyId')}
+              style={[styles.idField, { borderColor: colors.border, backgroundColor: colors.bg }]}
+            >
+              <Text style={[styles.idValue, { color: colors.text }]} numberOfLines={1}>{(account && account.livestockId) || '—'}</Text>
+              <Icon name="copy" size={14} color={colors.primary} />
+            </Pressable>
+          </FormGroup>
+          <FormGroup label={t('account.accountType')}><Input value={displayName} editable={false} style={styles.readonly} /></FormGroup>
+          <FormGroup label={t('account.currency')} style={{ marginBottom: 6 }}>
+            <Select value={account?.currency || 'USD'} onChange={changeCurrency} placeholder={t('account.currency')}
+              options={CURRENCIES.map((c) => ({ value: c.code, label: `${c.code} (${currencyName(c.code, language)})` }))} />
+          </FormGroup>
+          <Muted>{savingCurrency ? t('settings.saving') : t('account.currencyHelp')}</Muted>
+        </CardBody>
       </Card>
 
-        {!isOrgAccount ? <MyOrganizationCard /> : null}
         {!isOrgAccount ? <Card>
           <CardHeader title={t('settings.farmProfile')} icon="tractor" />
           <CardBody>
@@ -196,37 +206,34 @@ export default function SettingsScreen() {
             <Button icon="check" title={saving ? t('settings.saving') : t('settings.saveProfile')} onPress={saveProfile} loading={saving} style={{ alignSelf: 'flex-start' }} />
           </CardBody>
         </Card> : null}
+        {!isOrgAccount ? <MyOrganizationCard /> : null}
 
         <Card>
-          <CardHeader title={t('settings.preferences')} icon="globe" />
+          <CardHeader title={t('settings.language')} icon="globe" />
           <CardBody>
-            <FormGroup label={t('settings.appearance')}>
-              <Select value={preference} onChange={setThemePreference} placeholder={t('settings.appearance')}
-                options={[{ value: 'light', label: t('settings.themeLight') }, { value: 'dark', label: t('settings.themeDark') }, { value: 'system', label: t('settings.themeSystem') }]} />
-            </FormGroup>
-            <FormGroup label={t('settings.language')}>
+            <FormGroup label={t('settings.language')} style={{ marginBottom: 6 }}>
               <Select value={language} onChange={setLanguage} placeholder={t('settings.language')} options={languages.map((l) => ({ value: l.code, label: l.nativeLabel }))} />
             </FormGroup>
-            <Muted style={{ marginBottom: 16 }}>{rtlRestartNeeded ? t('settings.rtlRestartNotice') : t('settings.languageHelp')}</Muted>
-            <FormGroup label={t('account.currency')}>
-              <Select value={account?.currency || 'USD'} onChange={changeCurrency} placeholder={t('account.currency')}
-                options={CURRENCIES.map((c) => ({ value: c.code, label: `${c.code} (${currencyName(c.code, language)})` }))} />
-            </FormGroup>
-            <Muted>{savingCurrency ? t('settings.saving') : t('account.currencyHelp')}</Muted>
+            <Muted>{rtlRestartNeeded ? t('settings.rtlRestartNotice') : t('settings.languageHelp')}</Muted>
           </CardBody>
         </Card>
+
         <Card>
-          <CardHeader title={t('settings.accountSecurity')} icon="user-shield" iconColor={colors.blue} />
+          <CardHeader title={t('settings.appearance')} icon="palette" />
           <CardBody>
-            <ReadonlyRow label={t('account.accountType')} value={displayName} colors={colors} />
-            <ReadonlyRow label={t('settings.email')} value={email} colors={colors} />
-            <ReadonlyRow label={t('settings.userId')} value={(account && account.livestockId) || ''} colors={colors} mono last />
-            <Muted style={{ marginTop: 16 }}>{t('settings.passwordNote')}</Muted>
-            <Muted style={{ marginTop: 12, marginBottom: 14 }}>{t('settings.signedInAs', { email })}</Muted>
+            <Select value={preference} onChange={setThemePreference} placeholder={t('settings.appearance')}
+              options={[{ value: 'system', label: t('settings.themeSystem') }, { value: 'light', label: t('settings.themeLight') }, { value: 'dark', label: t('settings.themeDark') }]} />
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader title={t('settings.accountSecurity')} icon="shield-halved" />
+          <CardBody>
+            <Muted>{t('settings.passwordNote')}</Muted>
+            <Muted style={{ marginTop: 10, marginBottom: 14 }}>{t('settings.signedInAs', { email })}</Muted>
             <Button variant="danger" icon="right-from-bracket" title={t('nav.signOut')} onPress={requestSignOut} style={{ alignSelf: 'flex-start' }} />
           </CardBody>
         </Card>
-
 
       <Card danger>
         <CardHeader title={t('settings.dangerZone')} icon="triangle-exclamation" iconColor={colors.red} titleColor={colors.red} />
@@ -256,27 +263,14 @@ export default function SettingsScreen() {
   );
 }
 
-function ReadonlyRow({ label, value, colors, mono, last }) {
-  return (
-    <View style={[styles.row, { borderBottomColor: colors.border }, last && { borderBottomWidth: 0 }]}>
-      <Text style={[styles.rowLabel, { color: colors.textLight }]}>{label}</Text>
-      <Text style={[styles.rowValue, { color: mono ? colors.textLight : colors.text }, mono && styles.mono]} numberOfLines={2}>{value}</Text>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  livestockId: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: 6, rowGap: 2, alignSelf: 'flex-start', maxWidth: '100%', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6, marginTop: 6 },
-  livestockIdLabel: { color: 'rgba(255,255,255,0.85)', fontSize: 11, flexShrink: 0 },
-  livestockIdValue: { color: '#FFFFFF', fontSize: 12, fontWeight: '700', letterSpacing: 0.3 },
-  headerCard: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 20, padding: 24 },
-  avatar: { width: 64, height: 64, borderRadius: 32, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
-  avatarImg: { width: 60, height: 60, borderRadius: 30 },
+  headerCard: { flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 20 },
+  readonly: { opacity: 0.85 },
+  idField: { minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, borderWidth: 1, borderRadius: 12, paddingHorizontal: 14 },
+  idValue: { fontSize: 15, fontWeight: '700', letterSpacing: 0.5, flexShrink: 1 },
+  avatar: { width: 72, height: 72, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  avatarImg: { width: 72, height: 72, borderRadius: 12 },
   initials: { fontSize: 20, fontWeight: '700' },
   avatarEdit: { position: 'absolute', bottom: -2, right: -2, width: 22, height: 22, borderRadius: 11, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   name: { fontSize: 18, fontWeight: '700', marginBottom: 2 },
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingVertical: 10, borderBottomWidth: 1 },
-  rowLabel: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.4 },
-  rowValue: { fontSize: 13, fontWeight: '600', textAlign: 'right', flexShrink: 1 },
-  mono: { fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }), fontSize: 12, fontWeight: '500' },
 });

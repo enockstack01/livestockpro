@@ -29,4 +29,28 @@ config.server.enhanceMiddleware = (middleware) => (req, res, next) => {
   return middleware(req, res, next);
 };
 
+// The app's own code (src/, app/, the shared/ package) gets React Native
+// through src/theme/reactNative.js, which sets Text and TextInput in the
+// Carlito typeface. Libraries in node_modules, and that file and the font
+// helper themselves, get React Native unchanged.
+// On web, babel-preset-expo has already split the import into single
+// react-native-web modules, so Text and TextInput are redirected one by one.
+const theme = (f) => path.resolve(__dirname, 'src/theme', f);
+const RN_WITH_CARLITO = theme('reactNative.js');
+const WEB_REDIRECTS = {
+  'react-native-web/dist/exports/Text': theme('carlitoWebText.js'),
+  'react-native-web/dist/exports/TextInput': theme('carlitoWebTextInput.js'),
+};
+const FONT_HELPERS = new Set([RN_WITH_CARLITO, theme('fontsCore.js'), theme('carlitoWeb.js'), theme('carlitoWebText.js'), theme('carlitoWebTextInput.js')]);
+const APP_CODE = [path.resolve(__dirname, 'src'), path.resolve(__dirname, 'app'), path.resolve(__dirname, '../shared')].map((d) => d + path.sep);
+const previousResolve = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  const from = context.originModulePath || '';
+  if (!FONT_HELPERS.has(from) && APP_CODE.some((d) => from.startsWith(d))) {
+    if (moduleName === 'react-native') return { type: 'sourceFile', filePath: RN_WITH_CARLITO };
+    if (WEB_REDIRECTS[moduleName]) return { type: 'sourceFile', filePath: WEB_REDIRECTS[moduleName] };
+  }
+  return previousResolve ? previousResolve(context, moduleName, platform) : context.resolveRequest(context, moduleName, platform);
+};
+
 module.exports = config;

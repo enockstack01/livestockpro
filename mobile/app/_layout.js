@@ -1,5 +1,6 @@
 import 'react-native-gesture-handler';
 import '../src/i18n'; // side-effect: initializes i18next before any component calls useTranslation()
+import { useFonts, Carlito_400Regular, Carlito_700Bold } from '@expo-google-fonts/carlito';
 import { Suspense } from 'react';
 import { ClerkProvider } from '@clerk/expo';
 import { tokenCache } from '@clerk/expo/token-cache';
@@ -21,9 +22,12 @@ import { SplashHost } from '../src/components/AppSplash';
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 export default function RootLayout() {
+  // Carlito (Calibri compatible), the Agricoders typeface; the splash covers the moment it takes to load.
+  const [fontsLoaded, fontError] = useFonts({ Carlito_400Regular, Carlito_700Bold });
   if (!publishableKey) {
     throw new Error('Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY — copy mobile/.env.example to mobile/.env and fill it in.');
   }
+  if (!fontsLoaded && !fontError) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
