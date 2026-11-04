@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { SCHEMAS, SYNCED_TABLES } from '../lib/shared';
 
 export const DB_NAME = 'livestockpro.db';
@@ -34,7 +35,8 @@ export async function migrateDbIfNeeded(db) {
   let version = (row && row.user_version) || 0;
   if (version >= DATABASE_VERSION) return;
 
-  await db.execAsync('PRAGMA journal_mode = WAL;');
+  // The browser build (expo start --web) keeps the file in OPFS, where WAL isn't available.
+  if (Platform.OS !== 'web') await db.execAsync('PRAGMA journal_mode = WAL;');
 
   if (version < 1) {
     await createSchema(db);

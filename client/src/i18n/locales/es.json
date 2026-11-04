@@ -24,7 +24,8 @@
     "age": "Edad",
     "lastCheck": "Última revisión",
     "prev": "Anterior",
-    "next": "Siguiente"
+    "next": "Siguiente",
+    "back": "Atrás"
   },
   "nav": {
     "dashboard": "Panel",
@@ -49,7 +50,8 @@
       "system": "Sistema"
     },
     "assistant": "Asistente IA",
-    "calendar": "Calendario"
+    "calendar": "Calendario",
+    "home": "Inicio"
   },
   "auth": {
     "brandName": "LivestockPro",

@@ -24,7 +24,8 @@
     "age": "आयु",
     "lastCheck": "अंतिम जांच",
     "prev": "पिछला",
-    "next": "अगला"
+    "next": "अगला",
+    "back": "वापस"
   },
   "nav": {
     "dashboard": "डैशबोर्ड",
@@ -49,7 +50,8 @@
       "system": "सिस्टम"
     },
     "assistant": "AI सहायक",
-    "calendar": "कैलेंडर"
+    "calendar": "कैलेंडर",
+    "home": "होम"
   },
   "auth": {
     "brandName": "LivestockPro",

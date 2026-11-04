@@ -24,7 +24,8 @@
     "age": "العمر",
     "lastCheck": "آخر فحص",
     "prev": "السابق",
-    "next": "التالي"
+    "next": "التالي",
+    "back": "رجوع"
   },
   "nav": {
     "dashboard": "لوحة التحكم",
@@ -49,7 +50,8 @@
       "system": "النظام"
     },
     "assistant": "المساعد الذكي",
-    "calendar": "التقويم"
+    "calendar": "التقويم",
+    "home": "الرئيسية"
   },
   "auth": {
     "brandName": "LivestockPro",

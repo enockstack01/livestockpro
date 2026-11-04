@@ -24,7 +24,8 @@
     "age": "年龄",
     "lastCheck": "上次检查",
     "prev": "上一页",
-    "next": "下一页"
+    "next": "下一页",
+    "back": "返回"
   },
   "nav": {
     "dashboard": "仪表盘",
@@ -49,7 +50,8 @@
       "system": "系统"
     },
     "assistant": "AI 助手",
-    "calendar": "日历"
+    "calendar": "日历",
+    "home": "首页"
   },
   "auth": {
     "brandName": "LivestockPro",

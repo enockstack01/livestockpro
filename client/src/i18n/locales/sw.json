@@ -24,7 +24,8 @@
     "age": "Umri",
     "lastCheck": "Ukaguzi wa Mwisho",
     "prev": "Iliyopita",
-    "next": "Inayofuata"
+    "next": "Inayofuata",
+    "back": "Rudi"
   },
   "nav": {
     "dashboard": "Dashibodi",
@@ -49,7 +50,8 @@
       "system": "Mfumo"
     },
     "assistant": "Msaidizi wa AI",
-    "calendar": "Kalenda"
+    "calendar": "Kalenda",
+    "home": "Nyumbani"
   },
   "auth": {
     "brandName": "LivestockPro",

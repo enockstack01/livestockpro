@@ -12,11 +12,14 @@ import { haptics } from '../lib/haptics';
      the edit/delete buttons at the right;
    - without it → one stacked block per row (heading + label/value pairs).
    `onRowPress(row)` makes rows tappable (e.g. to open a details view).
+   `cards`: on a phone each record is its own card instead of a row in one
+   panel (the CropManager app's list style) — the caller then doesn't wrap
+   the table in a Card.
 
    columns: [{ key, label, render?(row) -> node|string, strong?, minWidth? }]
    summary?(row) -> { title: node|string, subtitle?, badge?: node, meta? }
    actions?(row) -> node   (edit/delete buttons) */
-export default function DataTable({ columns, rows, keyField = 'id', actions, actionsLabel, empty, summary, onRowPress, stackBelow = 520 }) {
+export default function DataTable({ columns, rows, keyField = 'id', actions, actionsLabel, empty, summary, onRowPress, stackBelow = 520, cards }) {
   const { colors } = useTheme();
   const s = useMemo(() => makeStyles(colors), [colors]);
   const [w, setW] = useState(0);
@@ -31,19 +34,19 @@ export default function DataTable({ columns, rows, keyField = 'id', actions, act
   const text = (v, style, lines) => (typeof v === 'string' || typeof v === 'number' ? <Text style={style} numberOfLines={lines}>{v}</Text> : v);
   const press = onRowPress ? (row) => () => { haptics.tap(); onRowPress(row); } : () => undefined;
 
-  if (rows.length === 0) return <View onLayout={(e) => setW(e.nativeEvent.layout.width)}>{empty}</View>;
+  if (rows.length === 0) return <View onLayout={(e) => setW(e.nativeEvent.layout.width)} style={cards ? s.cardEmpty : null}>{empty}</View>;
 
-  const stacked = w > 0 && w < stackBelow;
+  const stacked = w > 0 && (cards || w < stackBelow);
 
   let body = null;
   if (w > 0 && stacked && summary) {
     body = rows.map((row, i) => {
       const v = summary(row);
       return (
-        <Pressable key={row[keyField] ?? i} onPress={press(row)} disabled={!onRowPress} style={({ pressed }) => [s.listRow, i === rows.length - 1 && { borderBottomWidth: 0 }, pressed && { backgroundColor: colors.bg }]}>
+        <Pressable key={row[keyField] ?? i} onPress={press(row)} disabled={!onRowPress} style={({ pressed }) => [cards ? s.cardRow : s.listRow, !cards && i === rows.length - 1 && { borderBottomWidth: 0 }, pressed && { backgroundColor: cards ? colors.primaryLight : colors.bg }]}>
           <View style={{ flex: 1, gap: 4, minWidth: 0 }}>
-            {text(v.title, s.listTitle, 2)}
-            {v.subtitle ? text(v.subtitle, s.listSub, 2) : null}
+            {text(v.title, cards ? s.cardTitle : s.listTitle, 2)}
+            {v.subtitle ? text(v.subtitle, cards ? s.cardSub : s.listSub, 2) : null}
             {v.badge || v.meta ? (
               <View style={s.listMetaRow}>
                 {v.badge || null}
@@ -103,12 +106,16 @@ function makeStyles(colors) {
     tdWrap: { paddingVertical: 12, paddingHorizontal: 14, justifyContent: 'center' },
     td: { fontSize: 13, color: colors.text },
     strong: { fontWeight: '600' },
-    actions: { flexDirection: 'row', gap: 4 },
+    actions: { flexDirection: 'row', gap: 0 },
 
     listRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 12, paddingLeft: 16, paddingRight: 10, borderBottomWidth: 1, borderBottomColor: colors.border },
     listTitle: { fontSize: 13, fontWeight: '600', color: colors.text },
     listSub: { fontSize: 12, color: colors.textLight },
     listMetaRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginTop: 2 },
+    cardRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12, paddingVertical: 14, paddingLeft: 16, paddingRight: 6, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 16 },
+    cardTitle: { fontSize: 16, lineHeight: 22, fontWeight: '700', color: colors.text },
+    cardSub: { fontSize: 14, color: colors.textLight },
+    cardEmpty: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 16 },
 
     stackRow: { paddingVertical: 14, paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: colors.border, gap: 6 },
     stackHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 2 },

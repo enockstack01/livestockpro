@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { useUser } from '@clerk/expo';
 import { useRepository } from '../../src/db/repository';
 import { useSync } from '../../src/sync/SyncProvider';
 import { Page, PageHeader, Spinner } from '../../src/ui/kit';
@@ -25,6 +26,7 @@ export default function DashboardScreen() {
   const repo = useRepository();
   const router = useRouter();
   const { account } = useAccount();
+  const { user } = useUser();
   const { syncing, lastSyncedAt, triggerSync } = useSync();
   const [data, setData] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -58,11 +60,12 @@ export default function DashboardScreen() {
 
   const glance = computeGlance(data, { lang: i18n.language });
 
-  const name = accountDisplayName(t, account, account?.role);
+  const name = (account && account.kind !== 'organization' && user?.firstName) || accountDisplayName(t, account, account?.role);
 
   return (
     <Page refreshing={refreshing || syncing} onRefresh={onRefresh}>
       <PageHeader title={greeting(t, name)} subtitle={t('dashboardPage.todaySubtitle')} />
+      <QuickActions />
 
       <HerdProfileCard animals={data.animals} health={data.health} breeding={data.breeding} profile={profile} glance={glance} onOpen={(link) => router.replace(link)} />
 
@@ -74,7 +77,6 @@ export default function DashboardScreen() {
         <RecentActivity activity={feed.activity} />
         <UpcomingEvents items={feed.upcoming} />
         <AlertsCard items={feed.alerts} />
-        <QuickActions />
       </View>
       <View style={{ height: 8 }} />
     </Page>

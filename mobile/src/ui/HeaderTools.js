@@ -7,6 +7,7 @@ import { useTheme } from '../theme/ThemeProvider';
 import { useRepository } from '../db/repository';
 import { useLanguage } from '../i18n/LanguageProvider';
 import { haptics } from '../lib/haptics';
+import { Modal } from './kit';
 import { SEARCH_TABLES, searchLink, searchRecords } from '../../../shared/globalSearch';
 
 /* Header tools on the phone (twins of the web top bar): search across every
@@ -36,12 +37,13 @@ export function SearchPanel({ open, onClose, onGo }) {
 
   return (
     <RNModal visible={open} animationType="slide" onRequestClose={onClose}>
-      <View style={[styles.full, { backgroundColor: colors.bg, paddingTop: insets.top }]}>
-        <View style={[styles.bar, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
+      <View style={[styles.full, { backgroundColor: colors.bg }]}>
+        <View style={{ height: insets.top, backgroundColor: colors.appBar }} />
+        <View style={[styles.bar, { backgroundColor: colors.appBar }]}>
           <Pressable onPress={onClose} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('common.close')} style={styles.barBtn}>
-            <Icon name="arrow-left" size={17} color={colors.text} />
+            <Icon name="arrow-left" size={18} color="#FFFFFF" />
           </Pressable>
-          <View style={[styles.field, { backgroundColor: colors.bg }]}>
+          <View style={[styles.field, { backgroundColor: colors.card }]}>
             <Icon name="magnifying-glass" size={13} color={colors.placeholder} />
             <TextInput
               ref={input}
@@ -82,44 +84,40 @@ export function SearchPanel({ open, onClose, onGo }) {
   );
 }
 
-/* Language menu: every interface language by its own name. */
+/* Language menu: every interface language by its own name, in a bottom
+   sheet (a dialog on tablets). */
 export function LanguagePanel({ open, onClose }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const { language, setLanguage, languages, rtlRestartNeeded } = useLanguage();
   const code = String(language || 'en').slice(0, 2);
   return (
-    <RNModal visible={open} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={styles.overlay} onPress={onClose}>
-        <Pressable style={[styles.sheet, { backgroundColor: colors.card }]} onPress={() => {}}>
-          <Text style={[styles.sheetTitle, { color: colors.text }]}>{t('settings.language')}</Text>
-          {languages.map((l) => (
-            <Pressable
-              key={l.code}
-              onPress={() => { haptics.select(); setLanguage(l.code); onClose(); }}
-              accessibilityRole="radio"
-              accessibilityState={{ checked: code === l.code }}
-              style={({ pressed }) => [styles.lang, { borderBottomColor: colors.border }, pressed && { backgroundColor: colors.bg }]}
-            >
-              <Text style={[styles.langName, { color: code === l.code ? colors.primary : colors.text, fontWeight: code === l.code ? '700' : '400' }]}>{l.nativeLabel}</Text>
-              {code === l.code ? <Icon name="check" size={14} color={colors.primary} /> : <Text style={{ color: colors.textLight, fontSize: 11 }}>{l.code.toUpperCase()}</Text>}
-            </Pressable>
-          ))}
-          {rtlRestartNeeded ? <Text style={{ color: colors.textLight, fontSize: 12, marginTop: 10 }}>{t('settings.rtlRestartNotice')}</Text> : null}
+    <Modal open={open} onClose={onClose} title={t('settings.language')} maxWidth={420}>
+      {languages.map((l, i) => (
+        <Pressable
+          key={l.code}
+          onPress={() => { haptics.select(); setLanguage(l.code); onClose(); }}
+          accessibilityRole="radio"
+          accessibilityState={{ checked: code === l.code }}
+          style={({ pressed }) => [styles.lang, { borderBottomColor: colors.border }, i === languages.length - 1 && { borderBottomWidth: 0 }, pressed && { backgroundColor: colors.primaryLight }]}
+        >
+          <Text style={[styles.langName, { color: code === l.code ? colors.primary : colors.text, fontWeight: code === l.code ? '700' : '400' }]}>{l.nativeLabel}</Text>
+          {code === l.code ? <Icon name="check" size={14} color={colors.primary} /> : <Text style={{ color: colors.textLight, fontSize: 12 }}>{l.code.toUpperCase()}</Text>}
         </Pressable>
-      </Pressable>
-    </RNModal>
+      ))}
+      {rtlRestartNeeded ? <Text style={{ color: colors.textLight, fontSize: 12, marginTop: 10 }}>{t('settings.rtlRestartNotice')}</Text> : null}
+    </Modal>
   );
 }
 
 const styles = StyleSheet.create({
   full: { flex: 1 },
-  bar: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 8, paddingVertical: 8, borderBottomWidth: 1 },
-  barBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  field: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 8, paddingHorizontal: 12, minHeight: 42 },
+  bar: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 4, paddingRight: 12, minHeight: 64 },
+  barBtn: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },
+  field: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 999, paddingHorizontal: 16, minHeight: 44 },
   input: { flex: 1, fontSize: 15, paddingVertical: 8 },
   empty: { textAlign: 'center', marginTop: 30, fontSize: 14 },
-  group: { borderWidth: 1, borderRadius: 10, marginBottom: 12, overflow: 'hidden' },
+  group: { borderWidth: 1, borderRadius: 16, marginBottom: 12, overflow: 'hidden' },
   groupHead: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12 },
   groupIcon: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
   groupTitle: { flex: 1, fontSize: 14, fontWeight: '700' },
@@ -130,6 +128,6 @@ const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', padding: 24 },
   sheet: { borderRadius: 14, padding: 16, maxWidth: 420, width: '100%', alignSelf: 'center' },
   sheetTitle: { fontSize: 16, fontWeight: '800', marginBottom: 8 },
-  lang: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, paddingHorizontal: 4, borderBottomWidth: 1 },
+  lang: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 52, paddingHorizontal: 4, borderBottomWidth: StyleSheet.hairlineWidth },
   langName: { fontSize: 15 }
 });

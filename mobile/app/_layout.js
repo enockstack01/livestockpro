@@ -13,7 +13,7 @@ import { ToastProvider } from '../src/lib/toast';
 import { ConfirmProvider } from '../src/lib/confirm';
 import { SyncProvider } from '../src/sync/SyncProvider';
 import { AccountProvider } from '../src/account/AccountProvider';
-import { ThemeProvider, useTheme } from '../src/theme/ThemeProvider';
+import { ThemeProvider } from '../src/theme/ThemeProvider';
 import { LanguageProvider } from '../src/i18n/LanguageProvider';
 import LoadingScreen from '../src/components/LoadingScreen';
 import { SplashHost } from '../src/components/AppSplash';
@@ -56,7 +56,8 @@ export default function RootLayout() {
   );
 }
 
+/* Every screen opens under a forest green bar (the app bar, the sign in
+   band), so the status bar icons are white in both themes. */
 function ThemedStatusBar() {
-  const { scheme } = useTheme();
-  return <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />;
+  return <StatusBar style="light" />;
 }

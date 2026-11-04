@@ -169,8 +169,8 @@ export default function SettingsScreen() {
                 accessibilityLabel={t('settings.copyId')}
                 style={[styles.livestockId, { backgroundColor: colors.primary }]}
               >
-                <Text style={styles.livestockIdLabel}>{t('settings.livestockId')}</Text>
-                <Text style={styles.livestockIdValue}>{account.livestockId}</Text>
+                <Text style={styles.livestockIdLabel} numberOfLines={1}>{t('settings.livestockId')}</Text>
+                <Text style={styles.livestockIdValue} numberOfLines={1}>{account.livestockId}</Text>
                 <Icon name="copy" size={11} color="#FFFFFF" />
               </Pressable>
             ) : null}
@@ -266,8 +266,8 @@ function ReadonlyRow({ label, value, colors, mono, last }) {
 }
 
 const styles = StyleSheet.create({
-  livestockId: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5, marginTop: 6 },
-  livestockIdLabel: { color: 'rgba(255,255,255,0.85)', fontSize: 11 },
+  livestockId: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: 6, rowGap: 2, alignSelf: 'flex-start', maxWidth: '100%', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6, marginTop: 6 },
+  livestockIdLabel: { color: 'rgba(255,255,255,0.85)', fontSize: 11, flexShrink: 0 },
   livestockIdValue: { color: '#FFFFFF', fontSize: 12, fontWeight: '700', letterSpacing: 0.3 },
   headerCard: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 20, padding: 24 },
   avatar: { width: 64, height: 64, borderRadius: 32, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },

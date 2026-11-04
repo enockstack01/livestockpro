@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, BackHandler, Image, Modal as RNModal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { BackHandler, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { usePathname, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -22,32 +22,62 @@ import { accountDisplayName } from '../../../shared/account';
 import { useAccount } from '../account/AccountProvider';
 import { useBreakpoint } from './layout';
 import { LanguagePanel, SearchPanel } from './HeaderTools';
-import { useLanguage } from '../i18n/LanguageProvider';
+import { AppBarTitleContext, Button, Modal } from './kit';
 
-/* The app frame, organized like the CropManager app (and the web app, which
-   shares the same sidebar definition in shared/navigation.js):
-   - a deep-green sidebar with the logo on a translucent tile, features
-     grouped under small uppercase section labels, and Sign out kept apart
-     in the sidebar footer;
-   - a slim white topbar: menu button (phones), theme toggle, notifications
-     bell with an unread count, and a round avatar that opens Settings.
-   From 768px up (tablets) the sidebar is pinned open and its Collapse button
-   folds it to a 70px icon rail; below that it slides in over a dimmed
-   overlay. The person's name, role and Livestock ID sit beside the avatar on
-   tablets and at the top of the sidebar footer on phones (CropManager's
-   profile block). Page search lives in each page, not the topbar. */
+/* The app frame, built to the CropManager mobile app (the Agriplan style):
+   - a solid forest app bar with the screen title (a back button on pages
+     below the tabs), search, the language menu and the notification bell;
+   - phones: a bottom tab bar (Home, Animals, the AI assistant in the
+     middle as the main action, Reports, More); every other page is
+     reached from More, which keeps its tab lit;
+   - tablets: the forest sidebar pinned on the left instead of the tabs
+     (with the Collapse button folding it to a 70px icon rail), and the
+     app bar adds the dark mode button and the profile (name, role and
+     Livestock ID) beside the avatar.
+   Page search lives in each page, the app bar's search covers everything. */
 
 const SIDEBAR_W = 260;
 const RAIL_W = 70;
 const COLLAPSED_KEY = 'lp_sidebar_collapsed';
 const NOTIF_ORDER = { red: 0, orange: 1, blue: 2, purple: 3, green: 4 };
+const AMBER = '#F9A825';
 const mobilePath = (item) => (item.key === 'dashboard' ? '/' : item.path);
 /* Mobile has no admin screens (the Admin Panel and One Health map are web-only). */
-const MOBILE_SECTIONS = NAV_SECTIONS.filter((s) => !s.adminOnly);
+export const MOBILE_SECTIONS = NAV_SECTIONS.filter((s) => !s.adminOnly);
 /* Organization accounts: the mobile part of the organization area. */
-const orgSections = (role) => ORG_NAV_SECTIONS
+export const orgSections = (role) => ORG_NAV_SECTIONS
   .map((sec) => ({ ...sec, items: sec.items.filter((it) => !it.webOnly && (!it.roles || it.roles.includes(role))) }))
   .filter((sec) => sec.items.length);
+export { mobilePath };
+
+/* The phone's bottom tabs. */
+const FARMER_TABS = [
+  { href: '/', icon: 'house', labelKey: 'nav.home' },
+  { href: '/animals', icon: 'cow', labelKey: 'nav.animals' },
+  { href: '/assistant', icon: 'wand-magic-sparkles', labelKey: 'nav.assistant', center: true },
+  { href: '/reports', icon: 'chart-bar', labelKey: 'nav.reports' },
+  { href: '/more', icon: 'bars', labelKey: 'nav.more' },
+];
+const ORG_TABS = [
+  { href: '/organization', icon: 'house', labelKey: 'org.nav.dashboard' },
+  { href: '/organization/farmers', icon: 'users', labelKey: 'org.nav.farmers' },
+  { href: '/organization/links', icon: 'link', labelKey: 'org.nav.links', center: true },
+  { href: '/organization/profile', icon: 'building', labelKey: 'org.nav.profile' },
+  { href: '/more', icon: 'bars', labelKey: 'nav.more' },
+];
+const isOn = (pathname, href) => (href === '/' || href === '/organization' ? pathname === href : pathname === href || pathname.startsWith(href + '/'));
+
+/* The app bar title for a path: the matching menu item's name. */
+function titleFor(pathname, sections, t) {
+  if (pathname === '/') return t('nav.home');
+  if (pathname === '/more') return t('nav.more');
+  let best = null;
+  sections.forEach((sec) => sec.items.forEach((it) => {
+    const href = mobilePath(it);
+    if (href !== '/' && isOn(pathname, href) && (!best || href.length > best.href.length)) best = { href, it };
+  }));
+  return best ? t(best.it.labelKey) : '';
+}
 
 /* Server notifications (organization approvals, limit warnings, joins), a
    translation key plus values. */
@@ -204,11 +234,9 @@ export default function AppShell({ children }) {
   const api = useApi();
   const isOrg = Boolean(account && account.kind === 'organization');
   const home = isOrg ? '/organization' : '/';
-  const [open, setOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
-  const { language } = useLanguage();
   const notifItems = useNotifications(t, isOrg);
   const local = useReadNotifications(user?.id);
   const readIds = new Set([...local.readIds, ...notifItems.filter((n) => n.serverRead).map((n) => n.id)]);
@@ -216,87 +244,93 @@ export default function AppShell({ children }) {
   const markAllRead = (ids) => { local.markAllRead(ids); const sids = notifItems.filter((n) => n.serverId && ids.includes(n.id)).map((n) => n.serverId); if (sids.length) api.http('POST', '/notifications/read', { ids: sids }); };
   const myOrg = useMyOrganization(!isOrg);
   const unread = notifItems.filter((n) => !readIds.has(n.id)).length;
-  const slide = useRef(new Animated.Value(-SIDEBAR_W)).current;
   const [collapsed, setCollapsed] = useState(false);
   useEffect(() => { SecureStore.getItemAsync(COLLAPSED_KEY).then((v) => setCollapsed(v === '1')).catch(() => {}); }, []);
   const toggleCollapsed = () => setCollapsed((c) => { SecureStore.setItemAsync(COLLAPSED_KEY, c ? '0' : '1').catch(() => {}); return !c; });
   const rail = isTablet && collapsed;
 
-  useEffect(() => {
-    Animated.timing(slide, { toValue: open ? 0 : -SIDEBAR_W, duration: 250, useNativeDriver: true }).start();
-  }, [open, slide]);
-  useEffect(() => { if (isTablet) setOpen(false); }, [isTablet]);
+  const sections = isOrg ? orgSections(account.organization && account.organization.role) : MOBILE_SECTIONS;
+  const tabs = isOrg ? ORG_TABS : FARMER_TABS;
+  const onTab = tabs.some((tb) => isOn(pathname, tb.href));
+  const title = titleFor(pathname, sections, t);
 
-  // Android back: close the drawer first, then fall back to the dashboard.
+  /* Pages visited, so Back returns to where you came from (More, a tab…). */
+  const history = useRef([]);
+  useEffect(() => {
+    const h = history.current;
+    if (h[h.length - 1] !== pathname) h.push(pathname);
+    if (h.length > 30) h.shift();
+  }, [pathname]);
+  const goBack = useCallback(() => {
+    const h = history.current;
+    h.pop();
+    const prev = h.pop() || home;
+    router.replace(prev);
+  }, [router, home]);
+
+  // Android back: up one page, then to the home page, then out of the app.
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (open) { setOpen(false); return true; }
-      if (pathname !== home) { router.replace(home); return true; }
+      if (pathname !== home) { goBack(); return true; }
       return false;
     });
     return () => sub.remove();
-  }, [open, pathname, router, home]);
+  }, [pathname, home, goBack]);
 
-  const go = (href) => { setOpen(false); if (href !== pathname) router.replace(href); };
+  const go = (href) => { if (href !== pathname) router.replace(href); };
   /* Search results link to a section with ?search=…, even the one open now. */
-  const goSearch = (href) => { setOpen(false); router.replace(href); };
+  const goSearch = (href) => router.replace(href);
 
   const roleName = accountDisplayName(t, account, account?.role);
   const displayName = (!isOrg && user?.fullName) || roleName;
   const profileLine = [displayName !== roleName ? roleName : null, account && account.livestockId].filter(Boolean).join(' · ');
   const initials = (displayName[0] || 'U').toUpperCase();
-  const profile = { name: displayName, line: profileLine };
-
-  const sidebar = <Sidebar pathname={pathname} onNavigate={go} onClose={() => setOpen(false)} closable={!isTablet} topInset={insets.top} bottomInset={insets.bottom} sections={isOrg ? orgSections(account.organization && account.organization.role) : MOBILE_SECTIONS} isOrg={isOrg} rail={rail} onToggleCollapse={isTablet ? toggleCollapsed : null} profile={isTablet ? null : profile} />;
+  const showBack = !isTablet && !onTab;
 
   return (
     <View style={[baseStyles.root, { backgroundColor: colors.bg }]}>
-      {isTablet ? <View style={{ width: rail ? RAIL_W : SIDEBAR_W }}>{sidebar}</View> : null}
-
-      <View style={{ flex: 1 }}>
-        <View style={[baseStyles.topbar, { paddingTop: insets.top, height: 60 + insets.top, backgroundColor: colors.card, borderBottomColor: colors.border }]}>
-          {!isTablet ? <TopbarButton icon="bars" label="Open menu" onPress={() => setOpen(true)} /> : null}
-          {!isOrg ? (
-            <Pressable onPress={() => { haptics.select(); setSearchOpen(true); }} accessibilityRole="search" accessibilityLabel={t('search.placeholder')} style={({ pressed }) => [baseStyles.searchTrigger, { backgroundColor: colors.bg, opacity: pressed ? 0.8 : 1 }]}>
-              <Icon name="magnifying-glass" size={13} color={colors.placeholder} />
-              <Text style={[baseStyles.searchTriggerText, { color: colors.placeholder }]} numberOfLines={1}>{t('search.placeholder')}</Text>
-            </Pressable>
-          ) : <View style={{ flex: 1 }} />}
-          <Pressable onPress={() => { haptics.select(); setLangOpen(true); }} accessibilityRole="button" accessibilityLabel={t('settings.language')} hitSlop={4} style={({ pressed }) => [baseStyles.topbarBtn, baseStyles.langBtn, pressed && { backgroundColor: colors.bg }]}>
-            <Icon name="globe" size={16} color={colors.textLight} />
-            <Text style={[baseStyles.langCode, { color: colors.textLight }]}>{String(language || 'en').slice(0, 2).toUpperCase()}</Text>
-          </Pressable>
-          <TopbarButton icon={scheme === 'dark' ? 'sun' : 'moon'} label={t('layout.toggleTheme')} onPress={() => setThemePreference(scheme === 'dark' ? 'light' : 'dark')} />
-          <TopbarButton icon="bell" label={t('layout.notifications')} badge={unread} onPress={() => setNotifOpen(true)} />
-          <Pressable onPress={() => { haptics.select(); go('/settings'); }} accessibilityRole="button" accessibilityLabel={t('nav.settings')} style={({ pressed }) => [baseStyles.userMenu, { opacity: pressed ? 0.8 : 1 }]}>
-            {user?.imageUrl
-              ? <Image source={{ uri: user.imageUrl }} style={baseStyles.avatar} />
-              : <View style={[baseStyles.avatar, { backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center' }]}><Text style={[baseStyles.avatarText, { color: colors.primary }]}>{initials}</Text></View>}
-            {isTablet ? (
-              <View style={{ maxWidth: 220 }}>
-                <Text style={[baseStyles.userName, { color: colors.text }]} numberOfLines={1}>{displayName}</Text>
-                {profileLine ? <Text style={[baseStyles.userRole, { color: colors.textLight }]} numberOfLines={1}>{profileLine}</Text> : null}
-              </View>
-            ) : null}
-          </Pressable>
-        </View>
-
-        <View style={{ flex: 1 }}>{children}</View>
-      </View>
-
-      {!isTablet ? (
-        <View style={StyleSheet.absoluteFill} pointerEvents={open ? 'auto' : 'none'}>
-          <Pressable style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', opacity: open ? 1 : 0 }]} onPress={() => setOpen(false)} />
-          <Animated.View style={[baseStyles.drawer, { transform: [{ translateX: slide }] }]}>{sidebar}</Animated.View>
+      {isTablet ? (
+        <View style={{ width: rail ? RAIL_W : SIDEBAR_W }}>
+          <Sidebar pathname={pathname} onNavigate={go} topInset={insets.top} bottomInset={insets.bottom} sections={sections} isOrg={isOrg} rail={rail} onToggleCollapse={toggleCollapsed} />
         </View>
       ) : null}
+
+      <View style={{ flex: 1 }}>
+        {/* App bar: forest green with the screen title. */}
+        <View style={{ backgroundColor: colors.appBar, paddingTop: insets.top }}>
+          <View style={[baseStyles.appBar, { paddingLeft: showBack ? 4 : 20 }]}>
+            {showBack ? <BarButton icon="arrow-left" label={t('common.back')} onPress={goBack} /> : null}
+            <Text style={[baseStyles.appBarTitle, showBack && { marginLeft: 4 }]} numberOfLines={1} accessibilityRole="header">{title}</Text>
+            {!isOrg ? <BarButton icon="magnifying-glass" label={t('search.placeholder')} onPress={() => setSearchOpen(true)} /> : null}
+            <BarButton icon="globe" label={t('settings.language')} onPress={() => setLangOpen(true)} />
+            {isTablet ? <BarButton icon={scheme === 'dark' ? 'sun' : 'moon'} label={t('layout.toggleTheme')} onPress={() => setThemePreference(scheme === 'dark' ? 'light' : 'dark')} /> : null}
+            <BarButton icon="bell" label={t('layout.notifications')} badge={unread} onPress={() => setNotifOpen(true)} />
+            {isTablet ? (
+              <Pressable onPress={() => { haptics.select(); go('/settings'); }} accessibilityRole="button" accessibilityLabel={t('nav.settings')} style={({ pressed }) => [baseStyles.userMenu, { opacity: pressed ? 0.8 : 1 }]}>
+                {user?.imageUrl
+                  ? <Image source={{ uri: user.imageUrl }} style={baseStyles.avatar} />
+                  : <View style={[baseStyles.avatar, { backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' }]}><Text style={[baseStyles.avatarText, { color: colors.forest }]}>{initials}</Text></View>}
+                <View style={{ maxWidth: 220 }}>
+                  <Text style={baseStyles.userName} numberOfLines={1}>{displayName}</Text>
+                  {profileLine ? <Text style={baseStyles.userRole} numberOfLines={1}>{profileLine}</Text> : null}
+                </View>
+              </Pressable>
+            ) : null}
+          </View>
+        </View>
+
+        <AppBarTitleContext.Provider value={title}>
+          <View style={{ flex: 1 }}>{children}</View>
+        </AppBarTitleContext.Provider>
+
+        {!isTablet ? <BottomBar tabs={tabs} pathname={pathname} onGo={go} bottomInset={insets.bottom} /> : null}
+      </View>
 
       <NotificationsPanel
         open={notifOpen}
         onClose={() => setNotifOpen(false)}
         items={notifItems}
         readIds={readIds}
-        topInset={insets.top}
         onItem={(n) => { markRead(n.id); setNotifOpen(false); go(n.link); }}
         onMarkAll={() => markAllRead(notifItems.map((n) => n.id))}
         onViewTasks={isOrg ? null : () => { setNotifOpen(false); go('/tasks'); }}
@@ -308,29 +342,62 @@ export default function AppShell({ children }) {
   );
 }
 
-/* Topbar icon button: 40px, radius 8, muted icon, optional count badge. */
-function TopbarButton({ icon, label, onPress, badge }) {
-  const { colors } = useTheme();
+/* 46px round touch target with a white icon, for the forest app bar; the
+   count sits on an Amber dot. */
+function BarButton({ icon, label, onPress, badge }) {
   return (
     <Pressable
       onPress={() => { haptics.select(); onPress(); }}
       accessibilityRole="button"
-      accessibilityLabel={label}
-      hitSlop={4}
-      style={({ pressed }) => [baseStyles.topbarBtn, pressed && { backgroundColor: colors.bg }]}
+      accessibilityLabel={badge ? `${label}, ${badge}` : label}
+      style={({ pressed }) => [baseStyles.barBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.14)' }]}
     >
-      <Icon name={icon} size={17} color={colors.textLight} />
+      <Icon name={icon} size={19} color="#FFFFFF" />
       {badge ? (
-        <View style={[baseStyles.badge, { backgroundColor: colors.red }]}>
-          <Text style={baseStyles.badgeText}>{badge > 99 ? '99+' : badge}</Text>
+        <View style={baseStyles.badge}>
+          <Text style={baseStyles.badgeText}>{badge > 9 ? '9+' : badge}</Text>
         </View>
       ) : null}
     </Pressable>
   );
 }
 
-/* `rail`: the collapsed sidebar, icon only (the name stays as the
-   accessibility label). */
+/* Bottom tab bar: an icon pill and a label per tab, 60px tall above the
+   gesture bar; the centre tab is the main action on a forest pill. Pages
+   that aren't tabs keep More lit. */
+function BottomBar({ tabs, pathname, onGo, bottomInset }) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  const activeHref = (tabs.find((tb) => isOn(pathname, tb.href)) || tabs[tabs.length - 1]).href;
+  return (
+    <View accessibilityRole="tablist" style={[baseStyles.tabBar, { backgroundColor: colors.card, borderTopColor: colors.border, paddingBottom: bottomInset }]}>
+      {tabs.map((tab) => {
+        const active = activeHref === tab.href;
+        const color = active ? colors.primary : colors.textLight;
+        return (
+          <Pressable
+            key={tab.href}
+            onPress={() => { haptics.select(); onGo(tab.href); }}
+            accessibilityRole="tab"
+            accessibilityLabel={t(tab.labelKey)}
+            accessibilityState={{ selected: active }}
+            style={({ pressed }) => [baseStyles.tab, pressed && { transform: [{ scale: 0.94 }] }]}
+          >
+            {tab.center ? (
+              <View style={[baseStyles.tabCenter, { backgroundColor: colors.forest }]}><Icon name={tab.icon} size={16} color="#FFFFFF" /></View>
+            ) : (
+              <View style={[baseStyles.tabPill, active && { backgroundColor: colors.primaryLight }]}><Icon name={tab.icon} size={18} color={color} /></View>
+            )}
+            <Text style={[baseStyles.tabLabel, { color: tab.center ? colors.primary : color, fontWeight: active || tab.center ? '700' : '500' }]} numberOfLines={1}>{t(tab.labelKey)}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+/* ``rail``: the collapsed sidebar, icon only (the name stays as the
+   accessibility label). The open page has an Amber edge, as in CropManager. */
 function NavItem({ icon, label, active, onPress, danger, rail, iconStyle }) {
   const color = danger ? '#FFCDD2' : active ? '#FFFFFF' : 'rgba(255,255,255,0.78)';
   return (
@@ -347,7 +414,7 @@ function NavItem({ icon, label, active, onPress, danger, rail, iconStyle }) {
   );
 }
 
-function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInset, sections, isOrg, rail, onToggleCollapse, profile }) {
+function Sidebar({ pathname, onNavigate, topInset, bottomInset, sections, isOrg, rail, onToggleCollapse }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const signOut = useSignOut();
@@ -365,129 +432,107 @@ function Sidebar({ pathname, onNavigate, onClose, closable, topInset, bottomInse
           <Text style={baseStyles.logoText}>LivestockPro</Text>
           <Text style={baseStyles.logoBy}>{t('brand.by')}</Text>
         </View>}
-        {rail ? null : <View style={{ flex: 1 }} />}
-        {closable ? <Pressable onPress={onClose} hitSlop={10} accessibilityLabel="Close menu"><Icon name="xmark" size={18} color="rgba(255,255,255,0.6)" /></Pressable> : null}
       </View>
 
       {/* Features, grouped into labelled sections. */}
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 12 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingVertical: 12 }}>
         {sections.map((section) => (
           <View key={section.labelKey || 'main'}>
             {section.labelKey && !rail ? <Text style={baseStyles.sectionLabel}>{t(section.labelKey)}</Text> : <View style={{ height: 8 }} />}
             {section.items.map((item) => {
               const href = mobilePath(item);
-              const active = href === '/' || href === '/organization' ? pathname === href : pathname.startsWith(href);
-              return <NavItem key={item.key} icon={item.icon} label={t(item.labelKey)} active={active} rail={rail} onPress={() => onNavigate(href)} />;
+              return <NavItem key={item.key} icon={item.icon} label={t(item.labelKey)} active={isOn(pathname, href)} rail={rail} onPress={() => onNavigate(href)} />;
             })}
           </View>
         ))}
       </ScrollView>
 
-      {/* Footer, apart from the features: offline sync status, then Sign out. */}
+      {/* Footer, apart from the features: offline sync status, Sign out, Collapse. */}
       <View style={[baseStyles.sidebarFooter, { paddingBottom: bottomInset + 8 }]}>
-        {profile ? (
-          <View style={baseStyles.sideProfile}>
-            <Text style={baseStyles.sideProfileName} numberOfLines={1}>{profile.name}</Text>
-            {profile.line ? <Text style={baseStyles.sideProfileLine} numberOfLines={1}>{profile.line}</Text> : null}
-          </View>
-        ) : null}
         {!isOrg && !rail ? <Pressable onPress={() => { haptics.select(); triggerSync(); }} style={baseStyles.syncRow} accessibilityRole="button">
           <View style={{ width: 20, alignItems: 'center' }}>
-            <Icon name={syncing ? 'arrows-rotate' : lastError ? 'triangle-exclamation' : 'cloud'} size={12} color={lastError ? '#F9A825' : '#FFFFFF'} />
+            <Icon name={syncing ? 'arrows-rotate' : lastError ? 'triangle-exclamation' : 'cloud'} size={12} color={lastError ? AMBER : '#FFFFFF'} />
           </View>
           <Text style={baseStyles.syncText} numberOfLines={1}>{syncLine}{failedCount > 0 ? ` · ${t('sync.recordsFailed', { count: failedCount })}` : ''}</Text>
         </Pressable> : null}
-        <NavItem icon="right-from-bracket" label={t('nav.signOut')} rail={rail} onPress={() => { onClose(); signOut(); }} danger />
-        {onToggleCollapse ? <NavItem icon="chevron-left" label={rail ? t('layout.expand') : t('layout.collapse')} rail={rail} iconStyle={rail && { transform: [{ rotate: '180deg' }] }} onPress={onToggleCollapse} /> : null}
+        <NavItem icon="right-from-bracket" label={t('nav.signOut')} rail={rail} onPress={signOut} danger />
+        <NavItem icon="chevron-left" label={rail ? t('layout.expand') : t('layout.collapse')} rail={rail} iconStyle={rail && { transform: [{ rotate: '180deg' }] }} onPress={onToggleCollapse} />
       </View>
     </View>
   );
 }
 
-function NotificationsPanel({ open, onClose, items, readIds, onItem, onMarkAll, onViewTasks, topInset }) {
+/* Notifications in a bottom sheet (a dialog on tablets). */
+function NotificationsPanel({ open, onClose, items, readIds, onItem, onMarkAll, onViewTasks }) {
   const { t } = useTranslation();
-  const { colors, shadowLg } = useTheme();
-  const { width } = useBreakpoint();
+  const { colors } = useTheme();
   const tints = { red: colors.red, orange: colors.orange, blue: colors.blue, purple: colors.purple, green: colors.primary };
   return (
-    <RNModal visible={open} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
-      <View style={[baseStyles.notifPanel, {
-        top: topInset + 54, right: width <= 480 ? 10 : 16, width: Math.min(360, width - 20), backgroundColor: colors.card,
-        shadowColor: shadowLg.color, shadowOpacity: shadowLg.opacity, shadowRadius: shadowLg.radius, shadowOffset: shadowLg.offset, elevation: shadowLg.elevation,
-      }]}>
-        <View style={[baseStyles.notifHeader, { borderBottomColor: colors.border }]}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <Icon name="bell" size={13} color={colors.primary} />
-            <Text style={{ fontSize: 14, fontWeight: '600', color: colors.text }}>{t('layout.notifications')}</Text>
-          </View>
-          <Pressable onPress={onMarkAll}><Text style={{ fontSize: 12, color: colors.primary, fontWeight: '600' }}>{t('layout.markAllRead')}</Text></Pressable>
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={t('layout.notifications')}
+      maxWidth={460}
+      footer={<>
+        {items.length ? <Button variant="ghost" size="sm" title={t('layout.markAllRead')} onPress={onMarkAll} /> : null}
+        {onViewTasks ? <Button variant="secondary" size="sm" icon="list-check" title={t('layout.viewAllTasks')} onPress={onViewTasks} /> : null}
+      </>}
+    >
+      {items.length === 0 ? (
+        <View style={{ alignItems: 'center', paddingVertical: 24, gap: 10 }}>
+          <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center' }}><Icon name="bell-slash" size={22} color={colors.primary} /></View>
+          <Text style={{ fontSize: 14, color: colors.textLight }}>{t('layout.noNotifications')}</Text>
         </View>
-        <ScrollView style={{ maxHeight: 360 }}>
-          {items.length === 0 ? (
-            <View style={{ alignItems: 'center', padding: 30, gap: 8 }}>
-              <Icon name="bell-slash" size={26} color={colors.border} />
-              <Text style={{ fontSize: 13, color: colors.textLight }}>{t('layout.noNotifications')}</Text>
-            </View>
-          ) : items.map((n) => (
-            <Pressable key={n.id} onPress={() => onItem(n)} style={[baseStyles.notifItem, { borderBottomColor: colors.border, opacity: readIds.has(n.id) ? 0.55 : 1 }]}>
-              <View style={[baseStyles.notifIcon, { backgroundColor: tints[n.color] || colors.primary }]}><Icon name={n.icon} size={13} color={n.color === 'orange' ? '#1C2B1E' : '#FFFFFF'} /></View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text }} numberOfLines={2}>{n.title}</Text>
-                <Text style={{ fontSize: 11, color: colors.textLight, marginTop: 2 }} numberOfLines={1}>{n.sub}</Text>
-              </View>
-            </Pressable>
-          ))}
-        </ScrollView>
-        {onViewTasks ? <Pressable onPress={onViewTasks} style={[baseStyles.notifFooter, { borderTopColor: colors.border }]}>
-          <Text style={{ fontSize: 13, fontWeight: '600', color: colors.primary }}>{t('layout.viewAllTasks')}</Text>
-        </Pressable> : null}
-      </View>
-    </RNModal>
+      ) : items.map((n, i) => (
+        <Pressable key={n.id} onPress={() => onItem(n)} style={({ pressed }) => [baseStyles.notifItem, { borderBottomColor: colors.border, opacity: readIds.has(n.id) ? 0.55 : 1 }, i === items.length - 1 && { borderBottomWidth: 0 }, pressed && { backgroundColor: colors.primaryLight }]}>
+          <View style={[baseStyles.notifIcon, { backgroundColor: tints[n.color] || colors.primary }]}><Icon name={n.icon} size={13} color={n.color === 'orange' ? '#1C2B1E' : '#FFFFFF'} /></View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 14, fontWeight: '600', color: colors.text }} numberOfLines={2}>{n.title}</Text>
+            <Text style={{ fontSize: 12, color: colors.textLight, marginTop: 2 }} numberOfLines={1}>{n.sub}</Text>
+          </View>
+        </Pressable>
+      ))}
+    </Modal>
   );
 }
 
 const baseStyles = StyleSheet.create({
   root: { flex: 1, flexDirection: 'row' },
   sidebar: { flex: 1, width: SIDEBAR_W },
-  drawer: { position: 'absolute', left: 0, top: 0, bottom: 0, width: SIDEBAR_W, shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 12, elevation: 12 },
   sidebarHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingBottom: 16, paddingHorizontal: 18, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.12)' },
   sidebarHeaderRail: { justifyContent: 'center', paddingHorizontal: 0 },
-  appIcon: { width: 34, height: 34, borderRadius: 9 },
-  logoTile: { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' },
-  logoText: { color: '#FFFFFF', fontSize: 17, fontWeight: '700', lineHeight: 20 },
+  appIcon: { width: 36, height: 36, borderRadius: 8 },
+  logoText: { color: '#FFFFFF', fontSize: 18, fontWeight: '700', lineHeight: 21 },
   logoBy: { color: 'rgba(255,255,255,0.72)', fontSize: 11 },
-  sectionLabel: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, color: 'rgba(255,255,255,0.62)', paddingTop: 16, paddingBottom: 6, paddingHorizontal: 20 },
+  sectionLabel: { fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, color: 'rgba(255,255,255,0.55)', paddingTop: 16, paddingBottom: 6, paddingHorizontal: 20 },
   navItem: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11, paddingLeft: 17, paddingRight: 20, borderLeftWidth: 3, borderLeftColor: 'transparent' },
-  navItemRail: { justifyContent: 'center', paddingLeft: 0, paddingRight: 0, gap: 0, borderLeftWidth: 0 },
-  navItemActive: { backgroundColor: 'rgba(255,255,255,0.14)', borderLeftColor: 'transparent' },
-  navText: { fontSize: 13, fontWeight: '500', flexShrink: 1 },
-  sidebarFooter: { borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.12)', paddingTop: 6 },
-  sideProfile: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 6 },
-  sideProfileName: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
-  sideProfileLine: { color: 'rgba(255,255,255,0.72)', fontSize: 11, marginTop: 2 },
+  navItemRail: { justifyContent: 'center', paddingLeft: 0, paddingRight: 0, gap: 0 },
+  navItemActive: { backgroundColor: 'rgba(255,255,255,0.12)', borderLeftColor: AMBER },
+  navText: { fontSize: 14, fontWeight: '500', flexShrink: 1 },
+  sidebarFooter: { borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', paddingTop: 6 },
   syncRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8, paddingLeft: 20, paddingRight: 20 },
-  syncText: { color: 'rgba(255,255,255,0.5)', fontSize: 11, flex: 1 },
+  syncText: { color: 'rgba(255,255,255,0.6)', fontSize: 11, flex: 1 },
 
-  topbar: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, borderBottomWidth: 1 },
-  topbarBtn: { width: 40, height: 40, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-  badge: { position: 'absolute', top: 4, right: 4, minWidth: 18, height: 18, borderRadius: 9, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
-  badgeText: { color: '#fff', fontSize: 10, fontWeight: '700' },
-  avatar: { width: 34, height: 34, borderRadius: 17, overflow: 'hidden' },
-  userMenu: { flexDirection: 'row', alignItems: 'center', gap: 10, marginLeft: 6 },
-  userName: { fontSize: 13, fontWeight: '600' },
-  userRole: { fontSize: 11, marginTop: 1 },
-  avatarText: { fontWeight: '700', fontSize: 13 },
-  searchBox: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 8, borderWidth: 1, paddingHorizontal: 13, minHeight: 42, marginBottom: 10 },
-  searchTrigger: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 8, paddingHorizontal: 12, minHeight: 38, marginHorizontal: 6 },
-  searchTriggerText: { flex: 1, fontSize: 13 },
-  langBtn: { width: 'auto', flexDirection: 'row', gap: 4, paddingHorizontal: 8 },
-  langCode: { fontSize: 11, fontWeight: '700' },
-  searchInput: { flex: 1, fontSize: 13, paddingVertical: 10 },
+  appBar: { height: 56, flexDirection: 'row', alignItems: 'center', paddingRight: 4, gap: 2 },
+  appBarTitle: { flex: 1, color: '#FFFFFF', fontSize: 21, fontWeight: '700' },
+  barBtn: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },
+  badge: { position: 'absolute', top: 4, right: 3, minWidth: 18, height: 18, borderRadius: 9, paddingHorizontal: 4, backgroundColor: AMBER, alignItems: 'center', justifyContent: 'center' },
+  badgeText: { color: '#111611', fontSize: 11, fontWeight: '700' },
+  userMenu: { flexDirection: 'row', alignItems: 'center', gap: 10, marginLeft: 6, marginRight: 8 },
+  avatar: { width: 36, height: 36, borderRadius: 18, overflow: 'hidden' },
+  avatarText: { fontWeight: '700', fontSize: 14 },
+  userName: { fontSize: 13, fontWeight: '700', color: '#FFFFFF' },
+  userRole: { fontSize: 11, marginTop: 1, color: 'rgba(255,255,255,0.8)' },
 
-  notifPanel: { position: 'absolute', borderRadius: 12, overflow: 'hidden' },
-  notifHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16, borderBottomWidth: 1 },
-  notifItem: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingVertical: 12, paddingHorizontal: 16, borderBottomWidth: 1 },
-  notifIcon: { width: 32, height: 32, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-  notifFooter: { paddingVertical: 12, alignItems: 'center', borderTopWidth: 1 },
+  tabBar: { flexDirection: 'row', borderTopWidth: StyleSheet.hairlineWidth },
+  tab: { flex: 1, minHeight: 60, alignItems: 'center', justifyContent: 'center', gap: 3, paddingTop: 6, paddingBottom: 4 },
+  tabPill: { width: 56, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  tabCenter: { width: 44, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  tabLabel: { fontSize: 12, lineHeight: 15 },
+
+  searchBox: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 12, borderWidth: 1, paddingHorizontal: 14, minHeight: 48, marginBottom: 12 },
+  searchInput: { flex: 1, fontSize: 15, paddingVertical: 10 },
+
+  notifItem: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingVertical: 12, paddingHorizontal: 4, borderBottomWidth: StyleSheet.hairlineWidth },
+  notifIcon: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
 });

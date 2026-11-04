@@ -24,7 +24,8 @@
     "age": "Imyaka",
     "lastCheck": "Isuzuma rya Nyuma",
     "prev": "Ibibanza",
-    "next": "Ibikurikira"
+    "next": "Ibikurikira",
+    "back": "Subira inyuma"
   },
   "nav": {
     "dashboard": "Ahabanza",
@@ -49,7 +50,8 @@
       "system": "Sisitemu"
     },
     "assistant": "Umufasha wa AI",
-    "calendar": "Kalendari"
+    "calendar": "Kalendari",
+    "home": "Ahabanza"
   },
   "auth": {
     "brandName": "LivestockPro",

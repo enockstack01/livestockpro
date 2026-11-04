@@ -258,39 +258,35 @@ export function AlertsCard({ items }) {
   );
 }
 
-/* One action per row: coloured icon, the full action name, and a chevron. */
-function ActionRow({ a, onPress, last }) {
-  const { t } = useTranslation();
-  const { colors } = useTheme();
-  const c = useToneColor(a.tone);
-  return (
-    <Pressable onPress={onPress} accessibilityRole="button" style={({ pressed }) => [styles.row, !last && { borderBottomWidth: 1, borderBottomColor: colors.border }, pressed && { backgroundColor: colors.bg }]}>
-      <View style={[styles.actionIcon, { backgroundColor: c.bg }]}>
-        <Icon name={a.icon} size={15} color={c.fg} />
-      </View>
-      <Text style={{ flex: 1, fontSize: 13.5, fontWeight: '600', color: colors.text }} numberOfLines={1}>{t(a.fullKey)}</Text>
-      <Icon name={a.noAdd ? 'chevron-right' : 'plus'} size={12} color={colors.textLight} />
-    </Pressable>
-  );
-}
-
+/* Shortcuts under the greeting, as in the CropManager app: a round forest
+   icon and a label on a small card, scrolling sideways. Each opens its
+   page's Add form (Reports just opens). */
 export function QuickActions() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const go = useGo();
   return (
-    <Card>
-      <CardHeader title={t('dashboardFeed.quickActions')} icon="bolt" iconColor={colors.purple} />
-      <CardBody style={{ paddingVertical: 8 }}>
-        {QUICK_ACTIONS.map((a, i) => (
-          <ActionRow key={a.key} a={a} last={i === QUICK_ACTIONS.length - 1} onPress={() => go(a.noAdd ? a.path : `${a.path}?new=1`)} />
-        ))}
-      </CardBody>
-    </Card>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, marginHorizontal: -16, marginBottom: 20 }} contentContainerStyle={{ gap: 10, paddingHorizontal: 16 }}>
+      {QUICK_ACTIONS.map((a) => (
+        <Pressable
+          key={a.key}
+          onPress={() => go(a.noAdd ? a.path : `${a.path}?new=1`)}
+          accessibilityRole="button"
+          accessibilityLabel={t(a.fullKey)}
+          style={({ pressed }) => [styles.quickTile, { backgroundColor: colors.card, borderColor: colors.border, transform: [{ scale: pressed ? 0.96 : 1 }] }]}
+        >
+          <View style={[styles.quickIcon, { backgroundColor: colors.forest }]}><Icon name={a.icon} size={16} color="#FFFFFF" /></View>
+          <Text style={[styles.quickLabel, { color: colors.text }]} numberOfLines={2}>{t(a.labelKey)}</Text>
+        </Pressable>
+      ))}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  quickTile: { width: 96, alignItems: 'center', gap: 8, paddingVertical: 14, paddingHorizontal: 6, borderRadius: 16, borderWidth: 1 },
+  quickIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  quickLabel: { fontSize: 13, fontWeight: '700', textAlign: 'center' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 9, paddingHorizontal: 4, borderRadius: 8 },
   chartBlock: { paddingHorizontal: 4, paddingTop: 4, paddingBottom: 14, marginBottom: 4, borderBottomWidth: 1 },
   chartHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 },

@@ -35,6 +35,7 @@ export default function RecordListScreen({ config }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const { width } = useBreakpoint();
+  const phone = width < 600;
   const repo = useRepository();
   const { lastSyncedAt, syncing, triggerSync } = useSync();
   const showToast = useToast();
@@ -204,12 +205,12 @@ export default function RecordListScreen({ config }) {
         </FilterBar>
       ) : null}
 
-      <Card>
-        <CardBody flush>
+      <TableFrame cards={phone}>
           <DataTable
+            cards={phone}
             rows={pageRows}
             columns={[firstCol, ...columns.slice(1)]}
-            summary={(r) => { const v = page.summary(t)(r); return { ...v, title: <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}><Text style={{ fontSize: 13, fontWeight: '600', color: colors.text, flexShrink: 1 }} numberOfLines={2}>{v.title || '—'}</Text>{pendingDot(r)}</View> }; }}
+            summary={(r) => { const v = page.summary(t)(r); return { ...v, title: <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}><Text style={{ fontSize: phone ? 16 : 13, lineHeight: phone ? 22 : undefined, fontWeight: phone ? '700' : '600', color: colors.text, flexShrink: 1 }} numberOfLines={2}>{v.title || '—'}</Text>{pendingDot(r)}</View> }; }}
             onRowPress={setViewRow}
             actionsLabel={t('adminDashboard.colActions')}
             actions={(r) => (
@@ -223,13 +224,11 @@ export default function RecordListScreen({ config }) {
               ? <EmptyState icon="magnifying-glass" title={t('records.noMatches')} message={t('records.tryDifferent')} />
               : (
                 <View>
-                  <EmptyState icon={page.emptyIcon} title={t('common.noneFound', { label })} message={t('records.emptyListWeb', { label: label.toLowerCase() })} />
-                  <View style={{ alignItems: 'center', marginTop: -16, marginBottom: 32 }}><Button icon="plus" title={t(page.addKey)} onPress={openAdd} /></View>
+                  <EmptyState icon={page.emptyIcon} title={t('common.noneFound', { label })} message={t('records.emptyListWeb', { label: label.toLowerCase() })} actionLabel={t(page.addKey)} onAction={openAdd} />
                 </View>
               )}
           />
-        </CardBody>
-      </Card>
+      </TableFrame>
 
       {pages > 1 ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingVertical: 16 }}>
@@ -279,6 +278,13 @@ export default function RecordListScreen({ config }) {
       {page.importable ? <CsvImportModal open={importOpen} onClose={() => setImportOpen(false)} onImported={load} /> : null}
     </Page>
   );
+}
+
+/* Tablets: the table in one bordered panel. Phones: each record is its own
+   card, so there is no panel around them. */
+function TableFrame({ cards, children }) {
+  if (cards) return <View>{children}</View>;
+  return <Card><CardBody flush>{children}</CardBody></Card>;
 }
 
 /* Placeholder shaped like the page (header, search, rows) while records load. */

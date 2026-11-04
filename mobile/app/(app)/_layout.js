@@ -8,12 +8,11 @@ import { useAccount } from '../../src/account/AccountProvider';
 import { useSplashReady } from '../../src/components/AppSplash';
 import { pendingJoinToken } from '../../src/lib/joinToken';
 
-/* Same frame as the web app (client/src/components/Layout.jsx): a green
-   sidebar + topbar around one page at a time. Pages are flat siblings
-   switched from the sidebar (like the web's routes) rather than a tab bar
-   or a push/pop stack; Android's back button returns to the dashboard
-   (handled in AppShell). Until an admin approves the account, the account
-   request / "request sent" screens stand in for the whole app. */
+/* The CropManager app's frame (src/ui/AppShell.js): a forest app bar and,
+   on phones, the bottom tabs with More; on tablets the sidebar. Pages are
+   flat siblings; Back (and Android's back button) returns to the page you
+   came from. Until an admin approves the account, the account request /
+   "request sent" screens stand in for the whole app. */
 export default function AppLayout() {
   const { isLoaded, isSignedIn } = useAuth();
   const { account, approved, loadError } = useAccount();
@@ -34,7 +33,7 @@ export default function AppLayout() {
   if (!approved) return <AccountGate />;
   /* Organization accounts and farmer accounts each stay on their own screens. */
   const isOrg = account && account.kind === 'organization';
-  if (isOrg && !pathname.startsWith('/organization') && !pathname.startsWith('/settings')) return <Redirect href="/organization" />;
+  if (isOrg && !pathname.startsWith('/organization') && !pathname.startsWith('/settings') && pathname !== '/more') return <Redirect href="/organization" />;
   if (!isOrg && pathname.startsWith('/organization')) return <Redirect href="/" />;
 
   return (
