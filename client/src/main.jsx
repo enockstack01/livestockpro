@@ -10,11 +10,7 @@ import { ThemeProvider, useTheme } from './theme/ThemeProvider.jsx';
 import './i18n';
 import './style.css';
 
-/* Clerk's production instance refuses localhost, so the local Vite dev
-   server keeps the development instance. */
-const PUBLISHABLE_KEY = import.meta.env.DEV
-  ? 'pk_test_YWJvdmUteWV0aS03MC5jbGVyay5hY2NvdW50cy5kZXYk'
-  : 'pk_live_Y2xlcmsubGl2ZXN0b2NrcHJvLmFncmljb2RlcnMuY29tJA';
+const PUBLISHABLE_KEY = 'pk_test_ZXRlcm5hbC13YWhvby04NTcxLmNsZXJrLmFjY291bnRzLmRldiQ';
 
 /* ClerkProvider needs to sit inside ThemeProvider (not the other way around)
    so its global `appearance` can react to the current theme — this is what

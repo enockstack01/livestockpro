@@ -9,7 +9,7 @@
       "distribution": "internal",
       "env": {
         "EXPO_PUBLIC_API_URL": "http://192.168.1.100:3001",
-        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_YWJvdmUteWV0aS03MC5jbGVyay5hY2NvdW50cy5kZXYk"
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_ZXRlcm5hbC13YWhvby04NTcxLmNsZXJrLmFjY291bnRzLmRldiQ"
       }
     },
     "preview": {
@@ -17,14 +17,14 @@
       "android": { "buildType": "apk" },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://livestock.agricoders.com",
-        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_live_Y2xlcmsubGl2ZXN0b2NrcHJvLmFncmljb2RlcnMuY29tJA"
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_ZXRlcm5hbC13YWhvby04NTcxLmNsZXJrLmFjY291bnRzLmRldiQ"
       }
     },
     "production": {
       "autoIncrement": true,
       "env": {
         "EXPO_PUBLIC_API_URL": "https://livestock.agricoders.com",
-        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_live_Y2xlcmsubGl2ZXN0b2NrcHJvLmFncmljb2RlcnMuY29tJA"
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_ZXRlcm5hbC13YWhvby04NTcxLmNsZXJrLmFjY291bnRzLmRldiQ"
       }
     }
   },
