@@ -726,7 +726,16 @@
     "holdAccountTitle": "Hagarika Konti by’agateganyo",
     "holdAccountConfirm": "Guhagarika {{email}} by’agateganyo? Azashobora kwinjira ariko ntazakoresha urubuga kugeza yongeye gufungurirwa. Amakuru ye arabikwa.",
     "rejectAccountTitle": "Anga Ubusabe",
-    "rejectAccountConfirm": "Kwanga ubusabe bwa konti bwa {{email}}? Azashobora kubuhindura akongera akabwohereza."
+    "rejectAccountConfirm": "Kwanga ubusabe bwa konti bwa {{email}}? Azashobora kubuhindura akongera akabwohereza.",
+    "selectAll": "Hitamo byose",
+    "selectNone": "Kuraho guhitamo",
+    "approveSelected": "Emeza ibyahiswemo ({{count}})",
+    "selectRequest": "Hitamo {{name}}",
+    "bulkApproved": "Konti {{count}} zemejwe.",
+    "bulkApprovedSome": "{{done}} zemejwe, {{failed}} ntizashoboye kwemezwa.",
+    "registeredBy": "Yanditswe na {{name}}",
+    "importedBy": "Yongewe n’urubuga muri {{name}}",
+    "joinedThrough": "Yinjiye akoresheje ihuza rya {{name}}"
   },
   "oneHealth": {
     "title": "Ubwenge bwa Ubuzima Bumwe",
@@ -1401,7 +1410,15 @@
       "BAD_LOGO": "Iyo foto ntishobora gukoreshwa nk’ikirango. Gerageza indi foto.",
       "REASON_REQUIRED": "Andika impamvu yo guhindura umubare ntarengwa.",
       "LAST_ADMIN": "Ikigo kigomba kugira nibura umuyobozi umwe.",
-      "NO_DETAIL_ACCESS": "Uyu mworozi ntiyatanze uburenganzira bwo kureba amakuru ye arambuye."
+      "NO_DETAIL_ACCESS": "Uyu mworozi ntiyatanze uburenganzira bwo kureba amakuru ye arambuye.",
+      "EMAIL_IS_ORG_ACCOUNT": "Iyi imeri ni iya konti y’ikigo, si iy’umworozi.",
+      "FARMER_ALREADY_IN_ORG": "Uyu mworozi asanzwe ari mu kigo cyawe.",
+      "FARMER_IN_OTHER_ORG": "Uyu mworozi asanzwe ari mu kindi kigo.",
+      "ALREADY_INVITED": "Uyu mworozi asanzwe afite ubutumire butegereje.",
+      "INVITE_FAILED": "Imeri y’ubutumire ntiyashoboye koherezwa. Ongera ugerageze.",
+      "ORG_LIMIT_REACHED": "Ikigo cyawe cyageze ku mubare ntarengwa w’aborozi. Saba umuyobozi w’urubuga kuwongera.",
+      "BAD_EMAIL": "Andika imeri nyayo.",
+      "FARMER_NAME_REQUIRED": "Andika izina ry’umworozi."
     },
     "dash": {
       "overview": "Incamake",
@@ -1465,7 +1482,8 @@
         "pending_consent": "Ategereje kwemera",
         "left": "Yavuyemo",
         "removed": "Yakuwemo",
-        "declined": "Yanze"
+        "declined": "Yanze",
+        "rejected": "Konti yanzwe"
       },
       "empty": "Nta borozi barimo",
       "emptyHint": "Kora ihuza ry'ubutumire maze urisangize aborozi bawe.",
@@ -1690,6 +1708,28 @@
       "offline": "Ukeneye interineti ku bijyanye n'ikigo.",
       "shareUnavailable": "Gusangiza ntibishoboka kuri iki gikoresho.",
       "share": "Sangiza"
+    },
+    "enrol": {
+      "button": "Andika umworozi",
+      "title": "Andika umworozi",
+      "intro": "Andika amakuru y’umworozi. Azakira imeri imufasha gushyiraho ijambobanga rye kandi ahuzwe n’ikigo cyawe.",
+      "email": "Aderesi ya imeri",
+      "submit": "Ohereza ubutumire",
+      "required": "Andika izina na imeri by’umworozi.",
+      "after": "Konti y’umworozi isuzumwa n’umuyobozi w’urubuga, kandi umworozi abyemera mbere y’uko incamake y’ubworozi bwe isangizwa. Ubutumire bufata umwanya umwe mu mubare w’aborozi wemerewe.",
+      "invited": "Ubutumire bwoherejwe kuri {{email}}.",
+      "asked": "{{email}} asanzwe afite konti kandi yasabwe muri porogaramu kwinjira.",
+      "waitingTitle": "Ubutumire butegereje ({{count}})",
+      "sentOn": "Bwoherejwe",
+      "cancel": "Hagarika",
+      "cancelled": "Ubutumire kuri {{email}} bwahagaritswe.",
+      "accountHint": "Umworozi azashobora gukoresha porogaramu umuyobozi namara kwemeza konti.",
+      "account": {
+        "pending": "Itegereje kwemezwa",
+        "approved": "Yemejwe",
+        "on_hold": "Konti yahagaritswe by’agateganyo",
+        "rejected": "Konti yanzwe"
+      }
     }
   },
   "notifications": {

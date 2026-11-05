@@ -1,9 +1,9 @@
 const express = require('express');
 const crypto = require('crypto');
 const { getDb } = require('../db');
-const { requireAuth, getRole, primaryEmail, clerkClient } = require('../authMiddleware');
+const { requireAuth, getRole, primaryEmail, verifiedPrimaryEmail, clerkClient } = require('../authMiddleware');
 const { ACCOUNT_TYPES, CURRENCY_RE, DEFAULT_CURRENCY, accounts, getAccount, forgetApproval } = require('../lib/accounts');
-const { activeMembership, farmerLink } = require('../lib/orgs');
+const { activeMembership, farmerLink, claimFarmerInvite } = require('../lib/orgs');
 const { ensureLivestockId } = require('../lib/livestockId');
 
 const router = express.Router();
@@ -49,6 +49,15 @@ async function orgSummary(userId) {
 /* GET /api/account — the caller's own account status. */
 router.get('/', async (req, res) => {
   try {
+    /* A first visit by a farmer an organization registered by email: their
+       invitation becomes their account request and organization link. */
+    if (!(await getAccount(req.user.id))) {
+      try {
+        await claimFarmerInvite(req.user.id, verifiedPrimaryEmail(await clerkClient.users.getUser(req.user.id)));
+      } catch (err) {
+        console.error('Claiming a farmer invitation failed:', err.message);
+      }
+    }
     const [account, role, org, livestockId] = await Promise.all([getAccount(req.user.id), getRole(req.user.id), orgSummary(req.user.id), ensureLivestockId(req.user.id)]);
     res.json({ data: toClient(account, role, org, livestockId), error: null });
   } catch (err) {

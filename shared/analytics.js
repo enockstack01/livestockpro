@@ -164,7 +164,8 @@ export function computeFarmAnalytics(data, { months = 12, lang = 'en', enumLabel
      stat   — the figure alone
    viz.figure is the headline text; viz.sub an optional short qualifier.
    Each finding only appears when the farm has the data behind it; tone
-   (good/warn/bad/info) drives the icon and color. */
+   (good/warn/bad/info) +
+   drives the icon and color. */
 function computeInsights({ enumLabel, animals, living, health, breeding, production, feeding, finance, feedingInRange, financeInRange, tasks, conditionNames, rangeStart, lang }) {
   const out = [];
   const today = todayIso();

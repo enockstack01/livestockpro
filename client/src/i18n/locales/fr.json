@@ -726,7 +726,16 @@
     "holdAccountTitle": "Suspendre le compte",
     "holdAccountConfirm": "Suspendre {{email}} ? La personne pourra se connecter mais pas utiliser la plateforme avant réactivation. Ses données sont conservées.",
     "rejectAccountTitle": "Refuser la demande",
-    "rejectAccountConfirm": "Refuser la demande de compte de {{email}} ? La personne pourra la modifier et la renvoyer."
+    "rejectAccountConfirm": "Refuser la demande de compte de {{email}} ? La personne pourra la modifier et la renvoyer.",
+    "selectAll": "Tout sélectionner",
+    "selectNone": "Effacer la sélection",
+    "approveSelected": "Approuver la sélection ({{count}})",
+    "selectRequest": "Sélectionner {{name}}",
+    "bulkApproved": "{{count}} comptes approuvés.",
+    "bulkApprovedSome": "{{done}} approuvés, {{failed}} n’ont pas pu l’être.",
+    "registeredBy": "Inscrit par {{name}}",
+    "importedBy": "Ajouté par la plateforme à {{name}}",
+    "joinedThrough": "A rejoint via le lien de {{name}}"
   },
   "oneHealth": {
     "title": "Renseignement Une seule santé",
@@ -1401,7 +1410,15 @@
       "BAD_LOGO": "Cette image ne peut pas servir de logo. Veuillez essayer une autre image.",
       "REASON_REQUIRED": "Veuillez indiquer la raison du changement de limite.",
       "LAST_ADMIN": "Une organisation doit avoir au moins un administrateur.",
-      "NO_DETAIL_ACCESS": "Cet éleveur n'a pas autorisé la consultation de ses registres détaillés."
+      "NO_DETAIL_ACCESS": "Cet éleveur n'a pas autorisé la consultation de ses registres détaillés.",
+      "EMAIL_IS_ORG_ACCOUNT": "Cet e-mail appartient à un compte d’organisation, pas à un éleveur.",
+      "FARMER_ALREADY_IN_ORG": "Cet éleveur fait déjà partie de votre organisation.",
+      "FARMER_IN_OTHER_ORG": "Cet éleveur appartient déjà à une autre organisation.",
+      "ALREADY_INVITED": "Cet éleveur a déjà une invitation en attente.",
+      "INVITE_FAILED": "L’e-mail d’invitation n’a pas pu être envoyé. Réessayez.",
+      "ORG_LIMIT_REACHED": "Votre organisation a atteint sa limite d’éleveurs. Demandez à l’administrateur de la plateforme de l’augmenter.",
+      "BAD_EMAIL": "Saisissez une adresse e-mail valide.",
+      "FARMER_NAME_REQUIRED": "Saisissez le nom de l’éleveur."
     },
     "dash": {
       "overview": "Vue d'ensemble",
@@ -1465,7 +1482,8 @@
         "pending_consent": "En attente de consentement",
         "left": "Parti",
         "removed": "Retiré",
-        "declined": "Refusé"
+        "declined": "Refusé",
+        "rejected": "Compte refusé"
       },
       "empty": "Aucun éleveur pour l'instant",
       "emptyHint": "Générez un lien d'invitation et partagez-le avec vos éleveurs.",
@@ -1690,6 +1708,28 @@
       "offline": "Une connexion est nécessaire pour les écrans de l'organisation.",
       "shareUnavailable": "Le partage n'est pas disponible sur cet appareil.",
       "share": "Partager"
+    },
+    "enrol": {
+      "button": "Inscrire un éleveur",
+      "title": "Inscrire un éleveur",
+      "intro": "Saisissez les informations de l’éleveur. Il reçoit un e-mail pour créer son mot de passe et il est rattaché à votre organisation.",
+      "email": "Adresse e-mail",
+      "submit": "Envoyer l’invitation",
+      "required": "Saisissez le nom et l’adresse e-mail de l’éleveur.",
+      "after": "Le compte de l’éleveur est vérifié par l’administrateur de la plateforme, et l’éleveur donne son accord avant que son résumé ne vous soit partagé. L’invitation réserve une place dans votre limite d’éleveurs.",
+      "invited": "Invitation envoyée à {{email}}.",
+      "asked": "{{email}} a déjà un compte et a été invité dans l’application à rejoindre l’organisation.",
+      "waitingTitle": "Invitations en attente ({{count}})",
+      "sentOn": "Envoyée le",
+      "cancel": "Annuler",
+      "cancelled": "Invitation à {{email}} annulée.",
+      "accountHint": "L’éleveur pourra utiliser l’application quand l’administrateur aura approuvé le compte.",
+      "account": {
+        "pending": "En attente d’approbation",
+        "approved": "Approuvé",
+        "on_hold": "Compte en attente",
+        "rejected": "Compte refusé"
+      }
     }
   },
   "notifications": {

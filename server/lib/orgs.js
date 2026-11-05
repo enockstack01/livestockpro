@@ -11,6 +11,8 @@ const { sendPushToUser } = require('./pushNotify');
      organization_members  staff of an organization (org_admin, org_staff)
      referral_links        6 hour join links; only the token hash is stored
      farmer_organization   which organization a farmer belongs to, with history
+     farmer_invites        farmers an organization registered by email, until
+                           they first sign in
      audit_logs            every important action
      notifications         in-app notifications (bell), also sent as push
      farmer_stats          per farmer summaries the dashboards read, refreshed
@@ -300,6 +302,172 @@ async function joinOrganization({ userId, token, consent, detailAccess = false, 
   return { org: fresh, membershipId: rowId, accountStatus };
 }
 
+/* ---------- Farmers registered by an organization ----------
+   Staff enter a farmer's details and email. With no account for that email
+   yet, Clerk emails an invitation to set a password (farmer_invites row,
+   status 'invited'); the farmer's first visit to the app claims it: the
+   account request is filled in from the details, marked as registered by
+   the organization, and linked with status 'pending_consent'. A farmer who
+   already has an account gets the same in-app request at once. Either way
+   the place in the limit is taken straight away, the account still waits
+   for a system admin, and nothing is shared until the farmer accepts.
+   An invitation nobody claims within INVITE_DAYS frees its place. */
+const INVITE_DAYS = 30;
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const APP_URL = () => (process.env.APP_URL || 'https://livestock.agricoders.com').replace(/\/$/, '');
+
+/* Takes one place in the organization's limit, or explains why not (to
+   the staff member registering the farmer). */
+async function reservePlace(org) {
+  const r = await col('organizations').updateOne(
+    { _id: org._id, status: 'active', $expr: { $lt: ['$active_farmers', '$max_farmers'] } },
+    { $inc: { active_farmers: 1 }, $set: { updated_at: nowIso() } }
+  );
+  if (!r.modifiedCount) {
+    const fresh = await col('organizations').findOne({ _id: org._id });
+    if (fresh && fresh.status !== 'active') throw new OrgError(403, 'ORG_READ_ONLY', 'This organization is not active, so it is read only.');
+    throw new OrgError(409, 'ORG_LIMIT_REACHED', 'Your organization has reached its farmer limit. Ask the platform administrator to raise it.');
+  }
+}
+const freePlace = (orgId) => col('organizations').updateOne({ _id: orgId, active_farmers: { $gt: 0 } }, { $inc: { active_farmers: -1 }, $set: { updated_at: nowIso() } });
+
+/* Invitations past INVITE_DAYS give their place back. */
+async function expireFarmerInvites(orgId) {
+  const cutoff = new Date(Date.now() - INVITE_DAYS * 86400000).toISOString();
+  const stale = await col('farmer_invites').find({ organization_id: orgId, status: 'invited', created_at: { $lt: cutoff } }).toArray();
+  for (const inv of stale) {
+    const r = await col('farmer_invites').updateOne({ _id: inv._id, status: 'invited' }, { $set: { status: 'expired', ended_at: nowIso() } });
+    if (r.modifiedCount) await freePlace(orgId);
+  }
+}
+
+/* details: { full_name, email, phone, district, sector, cell }.
+   Returns { result: 'invited' | 'pending_consent', id }. */
+async function registerFarmer({ org, by, details, clerkClient }) {
+  const email = String(details.email || '').trim().toLowerCase();
+  if (!EMAIL_RE.test(email)) throw new OrgError(400, 'BAD_EMAIL', 'Please enter a valid email address.');
+  if (!details.full_name) throw new OrgError(400, 'FARMER_NAME_REQUIRED', 'Please enter the farmer\'s name.');
+  await expireFarmerInvites(org._id);
+  if (await col('farmer_invites').findOne({ email, status: 'invited' })) throw new OrgError(409, 'ALREADY_INVITED', 'This farmer already has an invitation waiting.');
+
+  let userId = null;
+  const account = await col('accounts').findOne({ email });
+  if (account) userId = account._id;
+  else {
+    try {
+      const found = await clerkClient.users.getUserList({ emailAddress: [email], limit: 1 });
+      userId = found.data && found.data[0] ? found.data[0].id : null;
+    } catch { /* treated as a new farmer */ }
+  }
+  const now = nowIso();
+
+  if (userId) {
+    if (await isOrgAccount(userId)) throw new OrgError(409, 'EMAIL_IS_ORG_ACCOUNT', 'This email belongs to an organization account, not a farmer.');
+    const current = await farmerLink(userId);
+    if (current) throw new OrgError(409, current.org._id === org._id ? 'FARMER_ALREADY_IN_ORG' : 'FARMER_IN_OTHER_ORG', current.org._id === org._id ? 'This farmer is already in your organization.' : 'This farmer already belongs to another organization.');
+    await reservePlace(org);
+    const id = uuid();
+    try {
+      await col('farmer_organization').insertOne({ _id: id, farmer_id: userId, organization_id: org._id, referral_link_id: null, status: 'pending_consent', consent_given_at: null, consent_source: 'organization_registered', registered_by: by, detail_access: false, joined_at: now, ended_at: null });
+    } catch (err) {
+      await freePlace(org._id);
+      if (err && err.code === 11000) throw new OrgError(409, 'FARMER_IN_OTHER_ORG', 'This farmer already belongs to another organization.');
+      throw err;
+    }
+    await notify(userId, 'orgInvite', { name: org.name }, '/settings');
+    refreshFarmerStats(userId).catch(() => {});
+    return { result: 'pending_consent', id };
+  }
+
+  await reservePlace(org);
+  const id = uuid();
+  let invitation;
+  try {
+    invitation = await clerkClient.invitations.createInvitation({ emailAddress: email, redirectUrl: `${APP_URL()}/`, expiresInDays: INVITE_DAYS, notify: true, ignoreExisting: true, publicMetadata: { farmer_invite_id: id } });
+  } catch (err) {
+    await freePlace(org._id);
+    const msg = (err && err.errors && err.errors[0] && err.errors[0].longMessage) || (err && err.message) || 'unknown error';
+    throw new OrgError(502, 'INVITE_FAILED', `The invitation email could not be sent: ${msg}`);
+  }
+  const keep = (v, max = 80) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
+  try {
+    await col('farmer_invites').insertOne({
+      _id: id, organization_id: org._id, email, full_name: keep(details.full_name, 120), phone: keep(details.phone, 40),
+      district: keep(details.district), sector: keep(details.sector), cell: keep(details.cell),
+      clerk_invitation_id: invitation && invitation.id, status: 'invited', invited_by: by, created_at: now
+    });
+  } catch (err) {
+    await freePlace(org._id);
+    if (invitation && invitation.id) clerkClient.invitations.revokeInvitation(invitation.id).catch(() => {});
+    if (err && err.code === 11000) throw new OrgError(409, 'ALREADY_INVITED', 'This farmer already has an invitation waiting.');
+    throw err;
+  }
+  return { result: 'invited', id };
+}
+
+async function revokeFarmerInvite({ org, inviteId, by, clerkClient }) {
+  const inv = await col('farmer_invites').findOneAndUpdate(
+    { _id: String(inviteId), organization_id: org._id, status: 'invited' },
+    { $set: { status: 'revoked', ended_at: nowIso(), ended_by: by } },
+    { returnDocument: 'before' }
+  );
+  const before = inv && (inv.value !== undefined ? inv.value : inv);
+  if (!before || !before._id) return null;
+  await freePlace(org._id);
+  if (before.clerk_invitation_id) clerkClient.invitations.revokeInvitation(before.clerk_invitation_id).catch(() => {});
+  return before;
+}
+
+/* Called when a user's account is first loaded: an invitation waiting for
+   their email becomes their account request and organization link. */
+async function claimFarmerInvite(userId, email) {
+  const address = String(email || '').toLowerCase();
+  if (!address) return null;
+  const now = nowIso();
+  const inv = await col('farmer_invites').findOneAndUpdate(
+    { email: address, status: 'invited' },
+    { $set: { status: 'claimed', claimed_by: userId, claimed_at: now } },
+    { returnDocument: 'before' }
+  );
+  const invite = inv && (inv.value !== undefined ? inv.value : inv);
+  if (!invite || !invite._id) return null;
+  const org = await col('organizations').findOne({ _id: invite.organization_id });
+  if (!org || (await isOrgAccount(userId)) || (await farmerLink(userId))) {
+    // Nowhere to put them any more: the place goes back.
+    if (org) await freePlace(org._id);
+    await col('farmer_invites').updateOne({ _id: invite._id }, { $set: { status: 'unusable' } });
+    return null;
+  }
+  try {
+    await col('farmer_organization').insertOne({ _id: uuid(), farmer_id: userId, organization_id: org._id, referral_link_id: null, status: 'pending_consent', consent_given_at: null, consent_source: 'organization_registered', registered_by: invite.invited_by, detail_access: false, joined_at: now, ended_at: null });
+  } catch (err) {
+    await freePlace(org._id);
+    await col('farmer_invites').updateOne({ _id: invite._id }, { $set: { status: 'unusable' } });
+    if (err && err.code === 11000) return null;
+    throw err;
+  }
+  await col('accounts').updateOne(
+    { _id: userId },
+    {
+      $set: {
+        status: 'pending', joined_via: 'organization', account_type: 'farmer', email: address,
+        full_name: invite.full_name, phone: invite.phone, location: [invite.cell, invite.sector, invite.district].filter(Boolean).join(', '),
+        submitted_at: now, review_note: '', updated_at: now
+      },
+      $setOnInsert: { user_id: userId, currency: 'RWF', created_at: now }
+    },
+    { upsert: true }
+  );
+  await col('profiles').updateOne(
+    { user_id: userId, deleted_at: null },
+    { $set: { district: invite.district, sector: invite.sector, cell: invite.cell, phone: invite.phone, updated_at: now }, $setOnInsert: { _id: uuid(), user_id: userId, farm_name: invite.full_name, created_at: now } },
+    { upsert: true }
+  );
+  await notifyOrgAdmins(org._id, 'farmerJoined', { name: org.name, farmer: invite.full_name || address }, '/organization/farmers');
+  refreshFarmerStats(userId).catch(() => {});
+  return { org, invite };
+}
+
 /* Notifications at 80 percent and 100 percent of the limit. */
 async function usageNotices(org, before) {
   if (!org || !org.max_farmers) return;
@@ -453,5 +621,6 @@ module.exports = {
   newToken, hashToken, linkState, joinError, findLink,
   activeMembership, farmerLink, hasFarmData, isOrgAccount, requireOrgRole,
   joinOrganization, endFarmerLink, usageNotices, refreshFarmerStats, refreshAllFarmerStats, startStatsJob, farmerName,
+  registerFarmer, revokeFarmerInvite, claimFarmerInvite, expireFarmerInvites,
   col, nowIso, uuid
 };

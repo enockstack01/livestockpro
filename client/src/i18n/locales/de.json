@@ -726,7 +726,16 @@
     "holdAccountTitle": "Konto pausieren",
     "holdAccountConfirm": "{{email}} pausieren? Die Anmeldung bleibt möglich, die Plattform aber bis zur Reaktivierung gesperrt. Die Daten bleiben erhalten.",
     "rejectAccountTitle": "Antrag ablehnen",
-    "rejectAccountConfirm": "Kontoantrag von {{email}} ablehnen? Er kann aktualisiert und erneut gesendet werden."
+    "rejectAccountConfirm": "Kontoantrag von {{email}} ablehnen? Er kann aktualisiert und erneut gesendet werden.",
+    "selectAll": "Alle auswählen",
+    "selectNone": "Auswahl aufheben",
+    "approveSelected": "Auswahl freigeben ({{count}})",
+    "selectRequest": "{{name}} auswählen",
+    "bulkApproved": "{{count}} Konten freigegeben.",
+    "bulkApprovedSome": "{{done}} freigegeben, {{failed}} konnten nicht freigegeben werden.",
+    "registeredBy": "Registriert von {{name}}",
+    "importedBy": "Von der Plattform zu {{name}} hinzugefügt",
+    "joinedThrough": "Über den Link von {{name}} beigetreten"
   },
   "oneHealth": {
     "title": "One-Health-Analyse",
@@ -1401,7 +1410,15 @@
       "BAD_LOGO": "Dieses Bild kann nicht als Logo verwendet werden. Bitte versuchen Sie ein anderes Bild.",
       "REASON_REQUIRED": "Bitte geben Sie einen Grund für die Limitänderung an.",
       "LAST_ADMIN": "Eine Organisation braucht mindestens einen Administrator.",
-      "NO_DETAIL_ACCESS": "Dieser Landwirt hat keine Erlaubnis für detaillierte Daten erteilt."
+      "NO_DETAIL_ACCESS": "Dieser Landwirt hat keine Erlaubnis für detaillierte Daten erteilt.",
+      "EMAIL_IS_ORG_ACCOUNT": "Diese E-Mail gehört zu einem Organisationskonto, nicht zu einem Landwirt.",
+      "FARMER_ALREADY_IN_ORG": "Dieser Landwirt ist bereits in Ihrer Organisation.",
+      "FARMER_IN_OTHER_ORG": "Dieser Landwirt gehört bereits zu einer anderen Organisation.",
+      "ALREADY_INVITED": "Für diesen Landwirt wartet bereits eine Einladung.",
+      "INVITE_FAILED": "Die Einladungs-E-Mail konnte nicht gesendet werden. Bitte erneut versuchen.",
+      "ORG_LIMIT_REACHED": "Ihre Organisation hat ihr Landwirt-Limit erreicht. Bitten Sie den Plattform-Administrator, es zu erhöhen.",
+      "BAD_EMAIL": "Bitte eine gültige E-Mail-Adresse eingeben.",
+      "FARMER_NAME_REQUIRED": "Bitte den Namen des Landwirts eingeben."
     },
     "dash": {
       "overview": "Überblick",
@@ -1465,7 +1482,8 @@
         "pending_consent": "Wartet auf Zustimmung",
         "left": "Ausgetreten",
         "removed": "Entfernt",
-        "declined": "Abgelehnt"
+        "declined": "Abgelehnt",
+        "rejected": "Konto abgelehnt"
       },
       "empty": "Noch keine Landwirte",
       "emptyHint": "Erstellen Sie einen Einladungslink und teilen Sie ihn mit Ihren Landwirten.",
@@ -1690,6 +1708,28 @@
       "offline": "Für die Organisationsansichten ist eine Verbindung nötig.",
       "shareUnavailable": "Teilen ist auf diesem Gerät nicht verfügbar.",
       "share": "Teilen"
+    },
+    "enrol": {
+      "button": "Landwirt registrieren",
+      "title": "Landwirt registrieren",
+      "intro": "Geben Sie die Daten des Landwirts ein. Er erhält eine E-Mail, um sein eigenes Passwort festzulegen, und wird mit Ihrer Organisation verknüpft.",
+      "email": "E-Mail-Adresse",
+      "submit": "Einladung senden",
+      "required": "Geben Sie Name und E-Mail-Adresse des Landwirts ein.",
+      "after": "Das Konto des Landwirts wird vom Plattform-Administrator geprüft, und der Landwirt stimmt zu, bevor seine Hofübersicht mit Ihnen geteilt wird. Die Einladung belegt einen Platz in Ihrem Landwirt-Limit.",
+      "invited": "Einladung an {{email}} gesendet.",
+      "asked": "{{email}} hat bereits ein Konto und wurde in der App zum Beitritt aufgefordert.",
+      "waitingTitle": "Offene Einladungen ({{count}})",
+      "sentOn": "Gesendet",
+      "cancel": "Zurückziehen",
+      "cancelled": "Einladung an {{email}} zurückgezogen.",
+      "accountHint": "Der Landwirt kann die App nutzen, sobald der Administrator das Konto freigibt.",
+      "account": {
+        "pending": "Wartet auf Freigabe",
+        "approved": "Freigegeben",
+        "on_hold": "Konto pausiert",
+        "rejected": "Konto abgelehnt"
+      }
     }
   },
   "notifications": {

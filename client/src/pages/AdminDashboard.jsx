@@ -123,6 +123,8 @@ export default function AdminDashboard() {
   const [accountTarget, setAccountTarget] = useState(null);
   const [accountNote, setAccountNote] = useState('');
   const [requestFilter, setRequestFilter] = useState('pending');
+  const [selected, setSelected] = useState(() => new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
 
   const isSuperAdmin = role === 'super_admin';
 
@@ -239,6 +241,23 @@ export default function AdminDashboard() {
     setAccountTarget(null);
     await loadAll(true);
   }
+
+  /* Approve every selected pending request in one go. */
+  async function approveSelected() {
+    const ids = [...selected];
+    if (!ids.length) return;
+    setBulkBusy(true);
+    let failed = 0;
+    for (const id of ids) {
+      const { error } = await api.setAccountStatus(id, 'approved', '');
+      if (error) failed += 1;
+    }
+    setBulkBusy(false);
+    setSelected(new Set());
+    showToast(failed ? t('adminDashboard.bulkApprovedSome', { done: ids.length - failed, failed }) : t('adminDashboard.bulkApproved', { count: ids.length }), failed ? 'error' : 'success');
+    await loadAll(true);
+  }
+  const toggleSelected = (id) => setSelected((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
 
   async function changeRole(userId, newRole) {
     setBusyId(userId);
@@ -397,13 +416,23 @@ export default function AdminDashboard() {
           {tab === 'requests' && (
             <div className="admin-fade-in">
               <div className="filter-bar">
-                <select className="form-control" value={requestFilter} onChange={(e) => setRequestFilter(e.target.value)}>
+                <select className="form-control" value={requestFilter} onChange={(e) => { setRequestFilter(e.target.value); setSelected(new Set()); }}>
                   <option value="pending">{t('account.status.pending')}</option>
                   <option value="on_hold">{t('account.status.on_hold')}</option>
                   <option value="rejected">{t('account.status.rejected')}</option>
                   <option value="approved">{t('account.status.approved')}</option>
                   <option value="all">{t('adminDashboard.allRequests')}</option>
                 </select>
+                {requestFilter === 'pending' && requests.length ? (
+                  <>
+                    <button className="btn btn-secondary" onClick={() => setSelected(selected.size === requests.length ? new Set() : new Set(requests.map((u) => u.id)))}>
+                      <i className="fas fa-check-double"></i> {selected.size === requests.length ? t('adminDashboard.selectNone') : t('adminDashboard.selectAll')}
+                    </button>
+                    <button className="btn btn-primary" disabled={!selected.size || bulkBusy} onClick={approveSelected}>
+                      <i className={`fas ${bulkBusy ? 'fa-spinner fa-spin' : 'fa-user-check'}`}></i> {t('adminDashboard.approveSelected', { count: selected.size })}
+                    </button>
+                  </>
+                ) : null}
               </div>
               {requests.length === 0 ? (
                 <div className="card"><div className="empty-state"><i className="fas fa-inbox"></i><h3>{t('adminDashboard.noRequests')}</h3><p>{t('adminDashboard.noRequestsHint')}</p></div></div>
@@ -416,6 +445,7 @@ export default function AdminDashboard() {
                       <div key={u.id} className="card request-card">
                         <div className="card-body">
                           <div className="request-card-head">
+                            {requestFilter === 'pending' ? <input type="checkbox" className="request-select" checked={selected.has(u.id)} onChange={() => toggleSelected(u.id)} aria-label={t('adminDashboard.selectRequest', { name: r.fullName || u.email })} /> : null}
                             <div className="summary-icon green"><i className={`fas fa-${ACCOUNT_TYPE_ICONS[type] || 'user'}`}></i></div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <h4>{r.fullName || u.email}</h4>
@@ -423,6 +453,9 @@ export default function AdminDashboard() {
                             </div>
                             <span className={`badge ${ACCOUNT_BADGE[u.accountStatus]}`}>{t(`account.status.${u.accountStatus}`)}</span>
                           </div>
+                          {u.organization ? (
+                            <div className="request-org"><i className="fas fa-people-roof"></i> {t(u.organization.via === 'organization_registered' ? 'adminDashboard.registeredBy' : u.organization.via === 'bulk_import' ? 'adminDashboard.importedBy' : 'adminDashboard.joinedThrough', { name: u.organization.name })}</div>
+                          ) : null}
                           <div className="request-fields">
                             <div><span>{t('account.accountType')}</span>{t(`account.types.${type}`)}</div>
                             <div><span>{t('account.farmName')}</span>{r.farmName || '—'}</div>

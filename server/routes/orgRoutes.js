@@ -4,7 +4,8 @@ const { forgetApproval } = require('../lib/accounts');
 const { publicAuditRows } = require('../lib/livestockId');
 const {
   ORG_TYPES, MEMBER_ROLES, FARMER_COLLECTIONS, OrgError, sendOrgError, getSettings, audit, notify, notifyOrgAdmins,
-  newToken, hashToken, linkState, activeMembership, farmerLink, hasFarmData, requireOrgRole, endFarmerLink, col, nowIso, uuid
+  newToken, hashToken, linkState, activeMembership, farmerLink, hasFarmData, requireOrgRole, endFarmerLink, col, nowIso, uuid,
+  registerFarmer, revokeFarmerInvite, expireFarmerInvites
 } = require('../lib/orgs');
 const { computeDashboard, farmerList } = require('../lib/orgDashboard');
 
@@ -334,6 +335,45 @@ function filtersFrom(q) {
 router.get('/:id/farmers', requireOrgRole(ANY), async (req, res) => {
   try {
     res.json({ data: await farmerList(req.org, filtersFrom(req.query)), error: null });
+  } catch (err) {
+    sendOrgError(res, err);
+  }
+});
+
+/* POST /api/organizations/:id/farmers/register
+   { full_name, email, phone, district, sector, cell }: staff register a
+   farmer. A new farmer gets an email to set a password; one who already has
+   an account is asked in the app (lib/orgs.js registerFarmer). */
+router.post('/:id/farmers/register', requireOrgRole(ANY, { write: true }), async (req, res) => {
+  try {
+    const b = req.body || {};
+    const details = { full_name: text(b.full_name, 120), email: text(b.email, 160), phone: text(b.phone, 40), district: text(b.district, 80), sector: text(b.sector, 80), cell: text(b.cell, 80) };
+    const out = await registerFarmer({ org: req.org, by: req.user.id, details, clerkClient });
+    await audit(req, 'farmer.register', { targetType: 'farmer', targetId: out.id, organizationId: req.org._id, details: { email: details.email.toLowerCase(), name: details.full_name, result: out.result } });
+    res.status(201).json({ data: out, error: null });
+  } catch (err) {
+    sendOrgError(res, err);
+  }
+});
+
+/* Farmers registered by email who have not signed in yet. */
+router.get('/:id/farmer-invites', requireOrgRole(ANY), async (req, res) => {
+  try {
+    await expireFarmerInvites(req.org._id);
+    const list = await col('farmer_invites').find({ organization_id: req.org._id, status: 'invited' }).sort({ created_at: -1 }).limit(500).toArray();
+    res.json({ data: list.map((i) => ({ id: i._id, email: i.email, full_name: i.full_name, phone: i.phone, district: i.district, sector: i.sector, cell: i.cell, created_at: i.created_at })), error: null });
+  } catch (err) {
+    sendOrgError(res, err);
+  }
+});
+
+/* Cancel an invitation that has not been used; its place is freed. */
+router.delete('/:id/farmer-invites/:inviteId', requireOrgRole(ANY, { write: true }), async (req, res) => {
+  try {
+    const inv = await revokeFarmerInvite({ org: req.org, inviteId: req.params.inviteId, by: req.user.id, clerkClient });
+    if (!inv) throw new OrgError(404, 'INVITE_NOT_FOUND', 'This invitation is no longer waiting.');
+    await audit(req, 'farmer.invite_cancel', { targetType: 'farmer', targetId: inv._id, organizationId: req.org._id, details: { email: inv.email } });
+    res.json({ data: { ok: true }, error: null });
   } catch (err) {
     sendOrgError(res, err);
   }

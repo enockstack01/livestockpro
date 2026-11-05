@@ -726,7 +726,16 @@
     "holdAccountTitle": "Put account on hold",
     "holdAccountConfirm": "Put {{email}} on hold? They can still sign in but can't use the platform until re-activated. Their data is kept.",
     "rejectAccountTitle": "Reject request",
-    "rejectAccountConfirm": "Reject the account request from {{email}}? They'll be able to update and resubmit it."
+    "rejectAccountConfirm": "Reject the account request from {{email}}? They'll be able to update and resubmit it.",
+    "selectAll": "Select all",
+    "selectNone": "Clear selection",
+    "approveSelected": "Approve selected ({{count}})",
+    "selectRequest": "Select {{name}}",
+    "bulkApproved": "{{count}} accounts approved.",
+    "bulkApprovedSome": "{{done}} approved, {{failed}} could not be approved.",
+    "registeredBy": "Registered by {{name}}",
+    "importedBy": "Added by the platform to {{name}}",
+    "joinedThrough": "Joined through {{name}}'s link"
   },
   "oneHealth": {
     "title": "One Health intelligence",
@@ -1401,7 +1410,15 @@
       "BAD_LOGO": "That picture could not be used as a logo. Please try another picture.",
       "REASON_REQUIRED": "Please enter a reason for changing the farmer limit.",
       "LAST_ADMIN": "An organization needs at least one admin.",
-      "NO_DETAIL_ACCESS": "This farmer has not given permission to view their detailed records."
+      "NO_DETAIL_ACCESS": "This farmer has not given permission to view their detailed records.",
+      "EMAIL_IS_ORG_ACCOUNT": "This email belongs to an organization account, not a farmer.",
+      "FARMER_ALREADY_IN_ORG": "This farmer is already in your organization.",
+      "FARMER_IN_OTHER_ORG": "This farmer already belongs to another organization.",
+      "ALREADY_INVITED": "This farmer already has an invitation waiting.",
+      "INVITE_FAILED": "The invitation email could not be sent. Please try again.",
+      "ORG_LIMIT_REACHED": "Your organization has reached its farmer limit. Ask the platform administrator to raise it.",
+      "BAD_EMAIL": "Please enter a valid email address.",
+      "FARMER_NAME_REQUIRED": "Please enter the farmer's name."
     },
     "dash": {
       "overview": "Overview",
@@ -1465,7 +1482,8 @@
         "pending_consent": "Waiting for consent",
         "left": "Left",
         "removed": "Removed",
-        "declined": "Declined"
+        "declined": "Declined",
+        "rejected": "Account rejected"
       },
       "empty": "No farmers yet",
       "emptyHint": "Generate a referral link and share it with your farmers.",
@@ -1690,6 +1708,28 @@
       "offline": "You need a connection for organization screens.",
       "shareUnavailable": "Sharing is not available on this device.",
       "share": "Share"
+    },
+    "enrol": {
+      "button": "Register a farmer",
+      "title": "Register a farmer",
+      "intro": "Enter the farmer's details. They get an email to set their own password and are linked to your organization.",
+      "email": "Email address",
+      "submit": "Send invitation",
+      "required": "Enter the farmer's name and email address.",
+      "after": "The farmer's account is checked by the platform administrator, and the farmer agrees before their farm summary is shared with you. The invitation holds one place in your farmer limit.",
+      "invited": "Invitation sent to {{email}}.",
+      "asked": "{{email}} already has an account and has been asked in the app to join.",
+      "waitingTitle": "Invitations waiting ({{count}})",
+      "sentOn": "Sent",
+      "cancel": "Cancel",
+      "cancelled": "Invitation to {{email}} cancelled.",
+      "accountHint": "The farmer can use the app once the platform administrator approves the account.",
+      "account": {
+        "pending": "Waiting for approval",
+        "approved": "Approved",
+        "on_hold": "Account on hold",
+        "rejected": "Account rejected"
+      }
     }
   },
   "notifications": {

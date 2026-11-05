@@ -1,3 +1,4 @@
+import { Asset } from 'expo-asset';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { loadTensorflowModel } from 'react-native-fast-tflite';
 import jpeg from 'jpeg-js';
@@ -16,10 +17,22 @@ export const available = Boolean(MODEL.installed);
 
 let modelPromise = null;
 
+/* A release build packs the model as an Android resource, whose name is not
+   a URL the TFLite loader can open (it reads the file with java.net.URL).
+   expo-asset copies it to a real file once, and that file:// path works in
+   development and release builds alike. */
+async function modelFileUrl() {
+  const asset = Asset.fromModule(require('../../assets/models/model.tflite'));
+  await asset.downloadAsync();
+  const url = asset.localUri || asset.uri;
+  if (!url || !/^(file|https?):\/\//.test(url)) throw new Error('The on-phone model file could not be opened.');
+  return url;
+}
+
 function loadModel() {
   if (!MODEL.installed) return Promise.reject(new Error('No on-phone model is installed in this build.'));
   // [] = the default CPU delegate, which works on every phone.
-  if (!modelPromise) modelPromise = loadTensorflowModel(require('../../assets/models/model.tflite'), []).catch((err) => { modelPromise = null; throw err; });
+  if (!modelPromise) modelPromise = modelFileUrl().then((url) => loadTensorflowModel({ url }, [])).catch((err) => { modelPromise = null; throw err; });
   return modelPromise;
 }
 

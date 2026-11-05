@@ -20,6 +20,82 @@ import { fmtDate } from '../../../../shared/format';
    removal with a reason. */
 
 const NUMBER_COLUMNS = [6, 8];
+const ACCOUNT_TONE = { pending: 'orange', on_hold: 'gray', rejected: 'red' };
+const EMPTY_FARMER = { full_name: '', email: '', phone: '', district: '', sector: '', cell: '' };
+
+/* Staff register a farmer by email (twin of the web's RegisterFarmer): a new
+   farmer is emailed an invitation to set a password; one with an account is
+   asked in the app. A system admin still approves the account. */
+function RegisterFarmerModal({ open, onClose, orgId, onDone }) {
+  const { t } = useTranslation();
+  const api = useApi();
+  const showToast = useToast();
+  const { colors } = useTheme();
+  const [form, setForm] = useState(EMPTY_FARMER);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const set = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
+  async function submit() {
+    if (!form.full_name.trim() || !form.email.trim()) { setError(t('org.enrol.required')); return; }
+    setBusy(true);
+    setError('');
+    const { data, error: err } = await api.http('POST', `/organizations/${orgId}/farmers/register`, form);
+    setBusy(false);
+    if (err) { setError(orgErrorText(t, err)); return; }
+    showToast(t(data.result === 'invited' ? 'org.enrol.invited' : 'org.enrol.asked', { email: form.email.trim() }), 'success');
+    setForm(EMPTY_FARMER);
+    onDone();
+    onClose();
+  }
+  return (
+    <Modal open={open} onClose={onClose} title={t('org.enrol.title')}
+      footer={<><Button title={t('common.cancel')} variant="secondary" onPress={onClose} /><Button title={t('org.enrol.submit')} icon="user-plus" loading={busy} disabled={busy} onPress={submit} /></>}>
+      <Muted style={{ marginBottom: 12 }}>{t('org.enrol.intro')}</Muted>
+      <FormGroup label={`${t('account.fullName')} *`}><Input value={form.full_name} onChangeText={set('full_name')} /></FormGroup>
+      <FormGroup label={`${t('org.enrol.email')} *`}><Input value={form.email} onChangeText={set('email')} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} /></FormGroup>
+      <FormGroup label={t('settings.phoneNumber')}><Input value={form.phone} onChangeText={set('phone')} keyboardType="phone-pad" /></FormGroup>
+      <FormGroup label={t('org.fields.district')}><Input value={form.district} onChangeText={set('district')} /></FormGroup>
+      <View style={{ flexDirection: 'row', gap: 10 }}>
+        <FormGroup label={t('org.fields.sector')} style={{ flex: 1 }}><Input value={form.sector} onChangeText={set('sector')} /></FormGroup>
+        <FormGroup label={t('org.fields.cell')} style={{ flex: 1 }}><Input value={form.cell} onChangeText={set('cell')} /></FormGroup>
+      </View>
+      <Muted style={{ fontSize: 12 }}>{t('org.enrol.after')}</Muted>
+      {error ? <Text style={{ color: colors.red, marginTop: 8 }}>{error}</Text> : null}
+    </Modal>
+  );
+}
+
+/* Farmers registered by email who have not signed in yet. */
+function WaitingInvites({ orgId, invites, readOnly, onChange }) {
+  const { t, i18n } = useTranslation();
+  const api = useApi();
+  const showToast = useToast();
+  const { colors } = useTheme();
+  if (!invites.length) return null;
+  async function cancel(inv) {
+    const { error } = await api.http('DELETE', `/organizations/${orgId}/farmer-invites/${inv.id}`);
+    if (error) { showToast(orgErrorText(t, error), 'error'); return; }
+    showToast(t('org.enrol.cancelled', { email: inv.email }), 'success');
+    onChange();
+  }
+  return (
+    <Card style={{ marginBottom: 14 }}>
+      <CardHeader title={t('org.enrol.waitingTitle', { count: invites.length })} icon="envelope-open-text" />
+      <CardBody flush>
+        {invites.map((inv, i) => (
+          <View key={inv.id} style={[styles.inviteRow, i < invites.length - 1 && { borderBottomWidth: 1, borderBottomColor: colors.border }]}>
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Text style={{ fontWeight: '800', color: colors.text }} numberOfLines={1}>{inv.full_name}</Text>
+              <Muted numberOfLines={1}>{inv.email}</Muted>
+              <Muted>{t('org.enrol.sentOn')}: {new Date(inv.created_at).toLocaleDateString(i18n.language)}</Muted>
+            </View>
+            {!readOnly ? <Button title={t('org.enrol.cancel')} icon="xmark" variant="secondary" size="sm" onPress={() => cancel(inv)} /> : null}
+          </View>
+        ))}
+      </CardBody>
+    </Card>
+  );
+}
 
 /* The farmer list as an export document (same columns as the web's CSV and
    Excel export). */
@@ -57,6 +133,8 @@ export default function OrgFarmersScreen() {
   const [reason, setReason] = useState('');
   const [busy, setBusy] = useState(false);
   const list = useOrgData(api, orgId ? `/organizations/${orgId}/farmers${ids !== null ? `?ids=${encodeURIComponent(ids)}` : ''}` : null);
+  const invites = useOrgData(api, orgId ? `/organizations/${orgId}/farmer-invites` : null);
+  const [registering, setRegistering] = useState(false);
   const sp = (s) => t(`enums.species.${s}`, { defaultValue: s });
 
   const rows = useMemo(() => {
@@ -81,8 +159,11 @@ export default function OrgFarmersScreen() {
     <Page refreshing={list.loading && Boolean(list.data)} onRefresh={list.reload}>
       <PageHeader title={t('org.farmers.title')} subtitle={label ? t('org.farmers.filteredBy', { label }) : t('org.farmers.subtitle', { count: (list.data || []).length })}>
         <ExportButton disabled={!rows.length} build={() => farmerExportDoc(t, rows, sp, { orgName: name, filtersText })} />
-        {!readOnly ? <Button title={t('org.links.generate')} icon="link" size="sm" onPress={() => router.push('/organization/links')} /> : null}
+        {!readOnly ? <Button title={t('org.links.generate')} icon="link" variant="secondary" size="sm" onPress={() => router.push('/organization/links')} /> : null}
+        {!readOnly ? <Button title={t('org.enrol.button')} icon="user-plus" size="sm" onPress={() => setRegistering(true)} /> : null}
       </PageHeader>
+      <WaitingInvites orgId={orgId} invites={invites.data || []} readOnly={readOnly} onChange={() => { invites.reload(); list.reload(); }} />
+      <RegisterFarmerModal open={registering} onClose={() => setRegistering(false)} orgId={orgId} onDone={() => { invites.reload(); list.reload(); }} />
       <Input value={q} onChangeText={setQ} placeholder={t('org.farmers.searchPlaceholder')} style={{ marginBottom: 10 }} />
       {districts.length ? (
         <View style={{ marginBottom: 12 }}>
@@ -104,7 +185,10 @@ export default function OrgFarmersScreen() {
                 <Muted>{[f.district, f.sector, f.cell].filter(Boolean).join(' · ') || t('org.dash.noLocation')}</Muted>
                 {f.phone ? <Muted>{f.phone}</Muted> : null}
               </View>
-              {f.status === 'active' ? <Pill tone="green" label={t('org.farmers.status.active')} /> : <Pill tone="orange" label={t(`org.farmers.status.${f.status}`)} />}
+              <View style={{ alignItems: 'flex-end', gap: 4 }}>
+                {f.status === 'active' ? <Pill tone="green" label={t('org.farmers.status.active')} /> : <Pill tone="orange" label={t(`org.farmers.status.${f.status}`)} />}
+                {f.account_status && f.account_status !== 'approved' ? <Pill tone={ACCOUNT_TONE[f.account_status] || 'gray'} label={t(`org.enrol.account.${f.account_status}`)} /> : null}
+              </View>
             </View>
             <View style={[styles.stats, { borderTopColor: colors.border }]}>
               <Stat label={t('org.farmers.colHerd')} value={f.herd_size} />
@@ -205,5 +289,6 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, padding: 14 },
   stats: { flexDirection: 'row', gap: 8, borderTopWidth: 1, paddingHorizontal: 14, paddingVertical: 10 },
   actions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 8, borderTopWidth: 1, paddingHorizontal: 14, paddingVertical: 10 },
-  recRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingVertical: 11 }
+  recRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingVertical: 11 },
+  inviteRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingVertical: 11 }
 });

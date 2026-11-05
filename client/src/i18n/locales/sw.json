@@ -726,7 +726,16 @@
     "holdAccountTitle": "Sitisha Akaunti",
     "holdAccountConfirm": "Sitisha {{email}}? Ataweza kuingia lakini hatatumia jukwaa hadi akaunti iwashwe tena. Data yake inahifadhiwa.",
     "rejectAccountTitle": "Kataa Ombi",
-    "rejectAccountConfirm": "Kataa ombi la akaunti la {{email}}? Ataweza kulisasisha na kulituma tena."
+    "rejectAccountConfirm": "Kataa ombi la akaunti la {{email}}? Ataweza kulisasisha na kulituma tena.",
+    "selectAll": "Chagua zote",
+    "selectNone": "Futa uchaguzi",
+    "approveSelected": "Idhinisha zilizochaguliwa ({{count}})",
+    "selectRequest": "Chagua {{name}}",
+    "bulkApproved": "Akaunti {{count}} zimeidhinishwa.",
+    "bulkApprovedSome": "{{done}} zimeidhinishwa, {{failed}} hazikuweza.",
+    "registeredBy": "Amesajiliwa na {{name}}",
+    "importedBy": "Ameongezwa na jukwaa kwa {{name}}",
+    "joinedThrough": "Alijiunga kupitia kiungo cha {{name}}"
   },
   "oneHealth": {
     "title": "Akili ya Afya Moja",
@@ -1401,7 +1410,15 @@
       "BAD_LOGO": "Picha hiyo haiwezi kutumika kama nembo. Tafadhali jaribu picha nyingine.",
       "REASON_REQUIRED": "Tafadhali andika sababu ya kubadilisha kikomo cha wafugaji.",
       "LAST_ADMIN": "Shirika linahitaji angalau msimamizi mmoja.",
-      "NO_DETAIL_ACCESS": "Mfugaji huyu hajatoa ruhusa ya kuona kumbukumbu zake za kina."
+      "NO_DETAIL_ACCESS": "Mfugaji huyu hajatoa ruhusa ya kuona kumbukumbu zake za kina.",
+      "EMAIL_IS_ORG_ACCOUNT": "Barua pepe hii ni ya akaunti ya shirika, si ya mfugaji.",
+      "FARMER_ALREADY_IN_ORG": "Mfugaji huyu tayari yuko kwenye shirika lako.",
+      "FARMER_IN_OTHER_ORG": "Mfugaji huyu tayari yuko kwenye shirika jingine.",
+      "ALREADY_INVITED": "Mfugaji huyu tayari ana mwaliko unaosubiri.",
+      "INVITE_FAILED": "Barua pepe ya mwaliko haikuweza kutumwa. Jaribu tena.",
+      "ORG_LIMIT_REACHED": "Shirika lako limefikia kikomo cha wafugaji. Muombe msimamizi wa jukwaa akiongeze.",
+      "BAD_EMAIL": "Weka barua pepe sahihi.",
+      "FARMER_NAME_REQUIRED": "Weka jina la mfugaji."
     },
     "dash": {
       "overview": "Muhtasari",
@@ -1465,7 +1482,8 @@
         "pending_consent": "Anasubiri ridhaa",
         "left": "Ameondoka",
         "removed": "Ameondolewa",
-        "declined": "Amekataa"
+        "declined": "Amekataa",
+        "rejected": "Akaunti imekataliwa"
       },
       "empty": "Bado hakuna wafugaji",
       "emptyHint": "Tengeneza kiungo cha mwaliko na uwashirikishe wafugaji wako.",
@@ -1690,6 +1708,28 @@
       "offline": "Unahitaji mtandao kwa skrini za shirika.",
       "shareUnavailable": "Kushiriki hakupatikani kwenye kifaa hiki.",
       "share": "Shiriki"
+    },
+    "enrol": {
+      "button": "Sajili mfugaji",
+      "title": "Sajili mfugaji",
+      "intro": "Weka taarifa za mfugaji. Atapokea barua pepe ya kuweka nenosiri lake na ataunganishwa na shirika lako.",
+      "email": "Barua pepe",
+      "submit": "Tuma mwaliko",
+      "required": "Weka jina na barua pepe ya mfugaji.",
+      "after": "Akaunti ya mfugaji hukaguliwa na msimamizi wa jukwaa, na mfugaji hukubali kabla muhtasari wa shamba lake haujashirikiwa nawe. Mwaliko unashikilia nafasi moja katika kikomo chako cha wafugaji.",
+      "invited": "Mwaliko umetumwa kwa {{email}}.",
+      "asked": "{{email}} tayari ana akaunti na ameombwa kwenye programu ajiunge.",
+      "waitingTitle": "Mialiko inayosubiri ({{count}})",
+      "sentOn": "Imetumwa",
+      "cancel": "Ghairi",
+      "cancelled": "Mwaliko kwa {{email}} umeghairiwa.",
+      "accountHint": "Mfugaji ataweza kutumia programu msimamizi akiidhinisha akaunti.",
+      "account": {
+        "pending": "Inasubiri idhini",
+        "approved": "Imeidhinishwa",
+        "on_hold": "Akaunti imesimamishwa",
+        "rejected": "Akaunti imekataliwa"
+      }
     }
   },
   "notifications": {

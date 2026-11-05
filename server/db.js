@@ -41,6 +41,9 @@ async function ensureIndexes(database) {
     database.collection('referral_links').createIndex({ organization_id: 1, created_at: -1 }),
     database.collection('farmer_organization').createIndex({ farmer_id: 1 }, { unique: true, partialFilterExpression: { status: { $in: ['active', 'pending_consent'] } } }),
     database.collection('farmer_organization').createIndex({ organization_id: 1, status: 1 }),
+    // Farmers registered by an organization: one waiting invitation per email.
+    database.collection('farmer_invites').createIndex({ email: 1 }, { unique: true, partialFilterExpression: { status: 'invited' } }),
+    database.collection('farmer_invites').createIndex({ organization_id: 1, status: 1 }),
     database.collection('audit_logs').createIndex({ at: -1 }),
     database.collection('audit_logs').createIndex({ organization_id: 1, at: -1 }),
     database.collection('notifications').createIndex({ user_id: 1, created_at: -1 }),

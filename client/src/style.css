@@ -442,6 +442,27 @@ table {
   word-break: break-all;
 }
 
+.request-card-head .request-select {
+  width: 18px;
+  height: 18px;
+  margin-top: 10px;
+  flex-shrink: 0;
+  accent-color: var(--leaf);
+}
+
+/* Which organization a farmer came through (link, registration or import). */
+.request-org {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--forest);
+}
+.request-org i { color: var(--leaf); margin-right: 6px; }
+:root[data-theme='dark'] .request-org { color: var(--text); }
+
 .request-fields {
   display: grid;
   grid-template-columns: 1fr 1fr;

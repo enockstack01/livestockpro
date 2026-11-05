@@ -726,7 +726,16 @@
     "holdAccountTitle": "Suspender conta",
     "holdAccountConfirm": "Suspender {{email}}? A pessoa poderá entrar, mas não usar a plataforma até ser reativada. Os dados são mantidos.",
     "rejectAccountTitle": "Recusar solicitação",
-    "rejectAccountConfirm": "Recusar a solicitação de conta de {{email}}? A pessoa poderá atualizá-la e reenviá-la."
+    "rejectAccountConfirm": "Recusar a solicitação de conta de {{email}}? A pessoa poderá atualizá-la e reenviá-la.",
+    "selectAll": "Selecionar tudo",
+    "selectNone": "Limpar seleção",
+    "approveSelected": "Aprovar selecionadas ({{count}})",
+    "selectRequest": "Selecionar {{name}}",
+    "bulkApproved": "{{count}} contas aprovadas.",
+    "bulkApprovedSome": "{{done}} aprovadas, {{failed}} não puderam ser aprovadas.",
+    "registeredBy": "Registado por {{name}}",
+    "importedBy": "Adicionado pela plataforma a {{name}}",
+    "joinedThrough": "Juntou-se pela ligação de {{name}}"
   },
   "oneHealth": {
     "title": "Inteligência de Uma Só Saúde",
@@ -1401,7 +1410,15 @@
       "BAD_LOGO": "Essa imagem não pode ser usada como logótipo. Experimente outra imagem.",
       "REASON_REQUIRED": "Indique o motivo da alteração do limite.",
       "LAST_ADMIN": "Uma organização precisa de pelo menos um administrador.",
-      "NO_DETAIL_ACCESS": "Este criador não deu permissão para ver os registos detalhados."
+      "NO_DETAIL_ACCESS": "Este criador não deu permissão para ver os registos detalhados.",
+      "EMAIL_IS_ORG_ACCOUNT": "Este e-mail pertence a uma conta de organização, não a um criador.",
+      "FARMER_ALREADY_IN_ORG": "Este criador já está na sua organização.",
+      "FARMER_IN_OTHER_ORG": "Este criador já pertence a outra organização.",
+      "ALREADY_INVITED": "Este criador já tem um convite pendente.",
+      "INVITE_FAILED": "Não foi possível enviar o e-mail de convite. Tente de novo.",
+      "ORG_LIMIT_REACHED": "A sua organização atingiu o limite de criadores. Peça ao administrador da plataforma para o aumentar.",
+      "BAD_EMAIL": "Introduza um e-mail válido.",
+      "FARMER_NAME_REQUIRED": "Introduza o nome do criador."
     },
     "dash": {
       "overview": "Visão geral",
@@ -1465,7 +1482,8 @@
         "pending_consent": "A aguardar consentimento",
         "left": "Saiu",
         "removed": "Removido",
-        "declined": "Recusou"
+        "declined": "Recusou",
+        "rejected": "Conta rejeitada"
       },
       "empty": "Ainda sem criadores",
       "emptyHint": "Gere um link de convite e partilhe-o com os seus criadores.",
@@ -1690,6 +1708,28 @@
       "offline": "Precisa de ligação para os ecrãs da organização.",
       "shareUnavailable": "A partilha não está disponível neste dispositivo.",
       "share": "Partilhar"
+    },
+    "enrol": {
+      "button": "Registar um criador",
+      "title": "Registar um criador",
+      "intro": "Introduza os dados do criador. Ele recebe um e-mail para criar a sua palavra-passe e fica ligado à sua organização.",
+      "email": "Endereço de e-mail",
+      "submit": "Enviar convite",
+      "required": "Introduza o nome e o e-mail do criador.",
+      "after": "O administrador da plataforma verifica a conta do criador, e o criador dá o seu consentimento antes de o resumo ser partilhado convosco. O convite reserva um lugar no seu limite de criadores.",
+      "invited": "Convite enviado para {{email}}.",
+      "asked": "{{email}} já tem conta e foi convidado na app a juntar-se.",
+      "waitingTitle": "Convites pendentes ({{count}})",
+      "sentOn": "Enviado",
+      "cancel": "Cancelar",
+      "cancelled": "Convite para {{email}} cancelado.",
+      "accountHint": "O criador poderá usar a app quando o administrador aprovar a conta.",
+      "account": {
+        "pending": "À espera de aprovação",
+        "approved": "Aprovada",
+        "on_hold": "Conta em espera",
+        "rejected": "Conta rejeitada"
+      }
     }
   },
   "notifications": {

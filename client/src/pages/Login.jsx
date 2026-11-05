@@ -13,7 +13,9 @@ const appearance = { elements: { header: { display: 'none' }, footerAction: { di
 export default function Login() {
   const { t } = useTranslation();
   const { isLoaded, isSignedIn } = useAuth();
-  const [showSignUp, setShowSignUp] = useState(false);
+  /* An invitation email (an organization registered this farmer) opens
+     here with a Clerk ticket: go straight to creating the account. */
+  const [showSignUp, setShowSignUp] = useState(() => typeof window !== 'undefined' && /[?&]__clerk_ticket=/.test(window.location.search));
   const navigate = useNavigate();
 
   useEffect(() => {

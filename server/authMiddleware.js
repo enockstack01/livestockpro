@@ -74,4 +74,4 @@ function requireRole(minRole) {
   };
 }
 
-module.exports = { requireAuth, requireRole, getRole, roleOf, roleFromEmail, primaryEmail, clerkClient };
+module.exports = { requireAuth, requireRole, getRole, roleOf, roleFromEmail, primaryEmail, verifiedPrimaryEmail, clerkClient };

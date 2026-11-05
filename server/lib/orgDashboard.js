@@ -138,7 +138,11 @@ async function computeDashboard(org, filters = {}) {
 
 async function farmerList(org, filters = {}) {
   const rows = (await orgFarmers(org._id, { includePending: true })).filter((r) => matchesFilters(r.stats, filters));
-  let list = rows.map(farmerRow);
+  /* Each farmer's own account review (pending, approved, on_hold), so the
+     organization can see who can already use the app. */
+  const accounts = await col('accounts').find({ _id: { $in: rows.map((r) => r.link.farmer_id) } }, { projection: { status: 1 } }).toArray();
+  const statusOf = new Map(accounts.map((a) => [a._id, a.status]));
+  let list = rows.map((r) => ({ ...farmerRow(r), account_status: statusOf.get(r.link.farmer_id) || 'pending', source: r.link.consent_source || 'referral_link' }));
   if (filters.ids && filters.ids.length) {
     const set = new Set(filters.ids);
     list = list.filter((r) => set.has(r.farmer_id));

@@ -99,7 +99,8 @@
       "expo-web-browser",
       "expo-localization",
       "./plugins/withGradleJdk17",
-      "react-native-fast-tflite"
+      "react-native-fast-tflite",
+      "expo-asset"
     ],
     "extra": {
       "router": {},

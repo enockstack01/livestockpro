@@ -726,7 +726,16 @@
     "holdAccountTitle": "Pausar cuenta",
     "holdAccountConfirm": "¿Pausar a {{email}}? Podrá iniciar sesión pero no usar la plataforma hasta que se reactive. Sus datos se conservan.",
     "rejectAccountTitle": "Rechazar solicitud",
-    "rejectAccountConfirm": "¿Rechazar la solicitud de cuenta de {{email}}? Podrá actualizarla y reenviarla."
+    "rejectAccountConfirm": "¿Rechazar la solicitud de cuenta de {{email}}? Podrá actualizarla y reenviarla.",
+    "selectAll": "Seleccionar todo",
+    "selectNone": "Borrar selección",
+    "approveSelected": "Aprobar seleccionadas ({{count}})",
+    "selectRequest": "Seleccionar a {{name}}",
+    "bulkApproved": "{{count}} cuentas aprobadas.",
+    "bulkApprovedSome": "{{done}} aprobadas, {{failed}} no se pudieron aprobar.",
+    "registeredBy": "Registrado por {{name}}",
+    "importedBy": "Añadido por la plataforma a {{name}}",
+    "joinedThrough": "Se unió con el enlace de {{name}}"
   },
   "oneHealth": {
     "title": "Inteligencia de Una Sola Salud",
@@ -1401,7 +1410,15 @@
       "BAD_LOGO": "Esa imagen no se puede usar como logotipo. Prueba con otra imagen.",
       "REASON_REQUIRED": "Indique el motivo del cambio de límite.",
       "LAST_ADMIN": "Una organización necesita al menos un administrador.",
-      "NO_DETAIL_ACCESS": "Este ganadero no ha dado permiso para ver sus registros detallados."
+      "NO_DETAIL_ACCESS": "Este ganadero no ha dado permiso para ver sus registros detallados.",
+      "EMAIL_IS_ORG_ACCOUNT": "Este correo pertenece a una cuenta de organización, no a un ganadero.",
+      "FARMER_ALREADY_IN_ORG": "Este ganadero ya está en su organización.",
+      "FARMER_IN_OTHER_ORG": "Este ganadero ya pertenece a otra organización.",
+      "ALREADY_INVITED": "Este ganadero ya tiene una invitación pendiente.",
+      "INVITE_FAILED": "No se pudo enviar el correo de invitación. Inténtelo de nuevo.",
+      "ORG_LIMIT_REACHED": "Su organización alcanzó su límite de ganaderos. Pida al administrador de la plataforma que lo amplíe.",
+      "BAD_EMAIL": "Introduzca un correo válido.",
+      "FARMER_NAME_REQUIRED": "Introduzca el nombre del ganadero."
     },
     "dash": {
       "overview": "Resumen",
@@ -1465,7 +1482,8 @@
         "pending_consent": "Esperando consentimiento",
         "left": "Se fue",
         "removed": "Retirado",
-        "declined": "Rechazó"
+        "declined": "Rechazó",
+        "rejected": "Cuenta rechazada"
       },
       "empty": "Aún no hay ganaderos",
       "emptyHint": "Genere un enlace de invitación y compártalo con sus ganaderos.",
@@ -1690,6 +1708,28 @@
       "offline": "Necesita conexión para las pantallas de la organización.",
       "shareUnavailable": "Compartir no está disponible en este dispositivo.",
       "share": "Compartir"
+    },
+    "enrol": {
+      "button": "Registrar un ganadero",
+      "title": "Registrar un ganadero",
+      "intro": "Introduzca los datos del ganadero. Recibirá un correo para crear su contraseña y quedará vinculado a su organización.",
+      "email": "Correo electrónico",
+      "submit": "Enviar invitación",
+      "required": "Introduzca el nombre y el correo del ganadero.",
+      "after": "El administrador de la plataforma revisa la cuenta del ganadero, y el ganadero da su consentimiento antes de compartir su resumen con ustedes. La invitación reserva una plaza en su límite de ganaderos.",
+      "invited": "Invitación enviada a {{email}}.",
+      "asked": "{{email}} ya tiene una cuenta y se le ha pedido en la app que se una.",
+      "waitingTitle": "Invitaciones pendientes ({{count}})",
+      "sentOn": "Enviada",
+      "cancel": "Cancelar",
+      "cancelled": "Invitación a {{email}} cancelada.",
+      "accountHint": "El ganadero podrá usar la app cuando el administrador apruebe la cuenta.",
+      "account": {
+        "pending": "Esperando aprobación",
+        "approved": "Aprobada",
+        "on_hold": "Cuenta en espera",
+        "rejected": "Cuenta rechazada"
+      }
     }
   },
   "notifications": {

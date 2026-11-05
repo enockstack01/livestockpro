@@ -11,7 +11,8 @@ import AuthBrand from '../components/AuthBrand.jsx';
    checked on the server when the page opens and again when the farmer
    submits. Signed out, the farmer creates an account (or signs in) and comes
    straight back here; signed in, they agree to share their farm summary and
-   join. Joining through a link approves the account at once. */
+   join. Joining links the farmer to the organization; their account still
+   waits for a system admin's approval, like every account. */
 const appearance = { elements: { header: { display: 'none' }, footerAction: { display: 'none' } } };
 
 export default function Join() {

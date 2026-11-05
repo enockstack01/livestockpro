@@ -726,7 +726,16 @@
     "holdAccountTitle": "暂停账户",
     "holdAccountConfirm": "暂停 {{email}}？对方仍可登录，但在重新激活前无法使用平台。其数据会被保留。",
     "rejectAccountTitle": "拒绝申请",
-    "rejectAccountConfirm": "拒绝 {{email}} 的账户申请？对方可以更新后重新提交。"
+    "rejectAccountConfirm": "拒绝 {{email}} 的账户申请？对方可以更新后重新提交。",
+    "selectAll": "全选",
+    "selectNone": "清除选择",
+    "approveSelected": "批准所选（{{count}}）",
+    "selectRequest": "选择 {{name}}",
+    "bulkApproved": "已批准 {{count}} 个账户。",
+    "bulkApprovedSome": "已批准 {{done}} 个，{{failed}} 个未能批准。",
+    "registeredBy": "由 {{name}} 登记",
+    "importedBy": "由平台添加到 {{name}}",
+    "joinedThrough": "通过 {{name}} 的链接加入"
   },
   "oneHealth": {
     "title": "同一健康智能分析",
@@ -1401,7 +1410,15 @@
       "BAD_LOGO": "该图片无法用作标志，请尝试其他图片。",
       "REASON_REQUIRED": "请填写更改上限的原因。",
       "LAST_ADMIN": "机构至少需要一名管理员。",
-      "NO_DETAIL_ACCESS": "该养殖户未授权查看其详细记录。"
+      "NO_DETAIL_ACCESS": "该养殖户未授权查看其详细记录。",
+      "EMAIL_IS_ORG_ACCOUNT": "该邮箱属于机构账户，不是养殖户。",
+      "FARMER_ALREADY_IN_ORG": "该养殖户已在贵机构中。",
+      "FARMER_IN_OTHER_ORG": "该养殖户已属于其他机构。",
+      "ALREADY_INVITED": "该养殖户已有一个等待中的邀请。",
+      "INVITE_FAILED": "邀请邮件发送失败，请重试。",
+      "ORG_LIMIT_REACHED": "贵机构已达到养殖户上限，请联系平台管理员提高上限。",
+      "BAD_EMAIL": "请输入有效的电子邮箱。",
+      "FARMER_NAME_REQUIRED": "请输入养殖户的姓名。"
     },
     "dash": {
       "overview": "概况",
@@ -1465,7 +1482,8 @@
         "pending_consent": "等待同意",
         "left": "已退出",
         "removed": "已移除",
-        "declined": "已拒绝"
+        "declined": "已拒绝",
+        "rejected": "账户被拒绝"
       },
       "empty": "暂无养殖户",
       "emptyHint": "生成邀请链接并分享给您的养殖户。",
@@ -1690,6 +1708,28 @@
       "offline": "机构页面需要网络连接。",
       "shareUnavailable": "此设备不支持分享。",
       "share": "分享"
+    },
+    "enrol": {
+      "button": "登记养殖户",
+      "title": "登记养殖户",
+      "intro": "填写养殖户的信息。养殖户会收到一封设置密码的邮件，并与贵机构关联。",
+      "email": "电子邮箱",
+      "submit": "发送邀请",
+      "required": "请填写养殖户的姓名和电子邮箱。",
+      "after": "养殖户的账户由平台管理员审核，养殖户同意后才会与你们共享其农场概况。邀请会占用贵机构养殖户名额中的一个。",
+      "invited": "已向 {{email}} 发送邀请。",
+      "asked": "{{email}} 已有账户，已在应用中请其加入。",
+      "waitingTitle": "等待中的邀请（{{count}}）",
+      "sentOn": "发送于",
+      "cancel": "取消",
+      "cancelled": "已取消发给 {{email}} 的邀请。",
+      "accountHint": "平台管理员批准账户后，养殖户即可使用应用。",
+      "account": {
+        "pending": "等待批准",
+        "approved": "已批准",
+        "on_hold": "账户已暂停",
+        "rejected": "账户被拒绝"
+      }
     }
   },
   "notifications": {

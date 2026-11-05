@@ -2,7 +2,7 @@ const express = require('express');
 const { getDb } = require('../db');
 const { requireAuth, requireRole, getRole, roleOf, roleFromEmail, primaryEmail, clerkClient } = require('../authMiddleware');
 const { ACCOUNT_STATUSES, accounts, getAccount, forgetApproval } = require('../lib/accounts');
-const { farmerLink, endFarmerLink } = require('../lib/orgs');
+const { farmerLink, endFarmerLink, notifyOrgAdmins } = require('../lib/orgs');
 const { livestockIdsFor } = require('../lib/livestockId');
 
 const router = express.Router();
@@ -149,6 +149,11 @@ router.get('/users', async (req, res) => {
     const usageDocs = await db.collection('ai_usage').find({ day: today, user_id: { $in: sorted.map((u) => u.id) } }).toArray();
     const aiUsedById = new Map(usageDocs.map((d) => [d.user_id, d.total || 0]));
     const livestockIds = await livestockIdsFor(sorted.map((u) => u.id));
+    /* The organization each farmer came through (link or registration), so a
+       reviewer can see who vouches for them. */
+    const orgLinks = await db.collection('farmer_organization').find({ farmer_id: { $in: sorted.map((u) => u.id) }, status: { $in: ['active', 'pending_consent'] } }).toArray();
+    const orgNames = new Map((await db.collection('organizations').find({ _id: { $in: [...new Set(orgLinks.map((l) => l.organization_id))] } }, { projection: { name: 1 } }).toArray()).map((o) => [o._id, o.name]));
+    const orgByUser = new Map(orgLinks.map((l) => [l.farmer_id, { id: l.organization_id, name: orgNames.get(l.organization_id) || '', via: l.consent_source || 'referral_link' }]));
 
     const users = await Promise.all(sorted.map(async (u) => {
       const [profile, ...counts] = await Promise.all([
@@ -185,6 +190,7 @@ router.get('/users', async (req, res) => {
         } : null,
         reviewNote: (account && account.review_note) || '',
         reviewedAt: (account && account.reviewed_at) || null,
+        organization: orgByUser.get(u.id) || null,
         aiUsedToday: aiUsedById.get(u.id) || 0,
         aiDailyLimit: account && Number.isFinite(account.ai_daily_limit) ? account.ai_daily_limit : null
       };
@@ -249,6 +255,15 @@ router.patch('/users/:id/account', async (req, res) => {
     if (status === 'approved') {
       const target = await clerkClient.users.getUser(targetId);
       if (target.banned) await clerkClient.users.unbanUser(targetId);
+    }
+    /* A rejected farmer leaves their organization: the place in its limit is
+       freed and they stop appearing on its dashboard. */
+    if (status === 'rejected') {
+      const orgLink = await farmerLink(targetId);
+      if (orgLink) {
+        await endFarmerLink(targetId, orgLink.org._id, 'rejected', req.user.id);
+        await notifyOrgAdmins(orgLink.org._id, 'farmerLeft', { name: orgLink.org.name, farmer: (await accounts().findOne({ _id: targetId }, { projection: { full_name: 1 } }) || {}).full_name || 'A farmer' }, '/organization/farmers');
+      }
     }
     res.json({ data: { id: targetId, status }, error: null });
   } catch (err) {
