@@ -83,7 +83,7 @@ export function SplashHost({ children }) {
                 Livestock<Animated.Text style={{ color: '#FFFFFF' }}>Pro</Animated.Text>
               </Animated.Text>
               <Animated.Text style={styles.tagline}>{t('splash.tagline', { defaultValue: 'Know your herd, protect its health, grow its value' })}</Animated.Text>
-              <Animated.Text style={styles.byline}>{t('brand.byline', { defaultValue: 'LivestockPro · by Agricoders' })}</Animated.Text>
+              <Animated.Text style={styles.byline}>{t('brand.by', { defaultValue: 'by Agricoders' })}</Animated.Text>
               <View style={styles.track}>
                 <Animated.View style={[styles.bar, { transform: [{ translateX: progress.interpolate({ inputRange: [0, 1], outputRange: [-48, 120] }) }] }]} />
               </View>
