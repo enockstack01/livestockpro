@@ -1265,7 +1265,9 @@
         "healthy": "Semble en bonne santé",
         "lumpy_skin_disease": "Dermatose nodulaire contagieuse",
         "foot_and_mouth_disease": "Fièvre aphteuse"
-      }
+      },
+      "uploaded": "Photo envoyée",
+      "checked": "Photo analysée"
     },
     "device": {
       "title": "Vérifié sur ce téléphone",

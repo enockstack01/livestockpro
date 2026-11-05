@@ -1265,7 +1265,9 @@
         "healthy": "स्वस्थ दिखता है",
         "lumpy_skin_disease": "लम्पी स्किन रोग",
         "foot_and_mouth_disease": "खुरपका-मुँहपका रोग"
-      }
+      },
+      "uploaded": "अपलोड की गई फ़ोटो",
+      "checked": "जाँची गई फ़ोटो"
     },
     "device": {
       "title": "इस फ़ोन पर जाँचा गया",

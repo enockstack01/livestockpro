@@ -13,7 +13,7 @@ import { IMAGE_ACCEPT, decodeImage, drawToDataUrl } from '../../lib/imageFile.js
 
 export const MAX_PHOTOS = 3;
 const FULL_SIDE = 1568;
-const THUMB_SIDE = 320;
+const THUMB_SIDE = 480; // sharp enough to show at full card width in the report
 
 function fromSource(source, width, height) {
   const full = drawToDataUrl({ source, width, height }, FULL_SIDE, { quality: 0.85 });

@@ -1265,7 +1265,9 @@
         "healthy": "يبدو سليماً",
         "lumpy_skin_disease": "مرض الجلد العقدي",
         "foot_and_mouth_disease": "الحمى القلاعية"
-      }
+      },
+      "uploaded": "الصورة المرفوعة",
+      "checked": "الصورة المفحوصة"
     },
     "device": {
       "title": "تم الفحص على هذا الهاتف",

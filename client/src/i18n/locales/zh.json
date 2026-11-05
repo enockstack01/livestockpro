@@ -1265,7 +1265,9 @@
         "healthy": "看起来健康",
         "lumpy_skin_disease": "牛结节性皮肤病",
         "foot_and_mouth_disease": "口蹄疫"
-      }
+      },
+      "uploaded": "上传的照片",
+      "checked": "已检查的照片"
     },
     "device": {
       "title": "已在本手机上检查",

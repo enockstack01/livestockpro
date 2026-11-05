@@ -1265,7 +1265,9 @@
         "healthy": "Risa n’irizima",
         "lumpy_skin_disease": "Indwara y’uruhu y’ibibyimba (LSD)",
         "foot_and_mouth_disease": "Indwara y’uburenge"
-      }
+      },
+      "uploaded": "Ifoto yoherejwe",
+      "checked": "Ifoto yasuzumwe"
     },
     "device": {
       "title": "Byasuzumiwe kuri iyi telefone",

@@ -1265,7 +1265,9 @@
         "healthy": "Anaonekana mzima",
         "lumpy_skin_disease": "Ugonjwa wa ngozi wa uvimbe (LSD)",
         "foot_and_mouth_disease": "Ugonjwa wa miguu na midomo"
-      }
+      },
+      "uploaded": "Picha iliyopakiwa",
+      "checked": "Picha iliyokaguliwa"
     },
     "device": {
       "title": "Imekaguliwa kwenye simu hii",

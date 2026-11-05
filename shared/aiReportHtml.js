@@ -58,38 +58,30 @@ function caseDetails(c, t) {
   return `<div class="case avoid"><h3>${esc(t('ai.pdf.caseDetails'))}</h3><div class="kv-grid">${cells}${wide}</div></div>`;
 }
 
-/* The camera photos the diagnosis looked at, with what the AI saw in them. */
-function photosBlock(r, caseInfo) {
+/* The photos the farmer sent, each next to the same photo as the screening
+   model checked it, with the disease name on the box (report.vision).
+   Marked preliminary: the detections are never a diagnosis. */
+function photosBlock(r, t, caseInfo) {
   const photos = (caseInfo && Array.isArray(caseInfo.photos) ? caseInfo.photos : []).filter((p) => /^data:image\/(jpeg|png|webp);base64,/.test(p));
-  if (!photos.length && !r.photo_findings) return '';
-  const imgs = photos.length ? `<div class="ph-row">${photos.map((p) => `<img src="${p}" alt="">`).join('')}</div>` : '';
-  return { imgs, findings: r.photo_findings ? para(r.photo_findings) : '' };
-}
-
-/* The photo screening model's hints (report.vision), with its boxes drawn
-   over the photos. Marked preliminary: they are never a diagnosis. */
-function screeningBlock(r, t, caseInfo) {
   const v = r.vision;
-  if (!v) return '';
+  if (!photos.length && !v) return '';
   const tv = (k, o) => t(`ai.vision.${k}`, o);
-  if (!v.available) return `<div class="photos avoid"><h3>${esc(tv('title'))}</h3><p class="callout">${esc(tv('unavailable'))}</p></div>`;
+  const checked = v && v.available;
   const label = (l) => t(`ai.vision.labels.${l}`, { defaultValue: String(l).replace(/_/g, ' ') });
-  const pct = (c) => `${Math.round(Number(c) * 100)}%`;
-  const dets = v.detections || [];
-  const photos = (caseInfo && Array.isArray(caseInfo.photos) ? caseInfo.photos : []).filter((p) => /^data:image\/(jpeg|png|webp);base64,/.test(p));
-  const shots = photos.map((src, i) => {
-    const boxes = dets.filter((d) => d.photo === i + 1);
-    if (!boxes.length) return '';
-    const marks = boxes.map((d) => {
+  const num = (i) => (photos.length > 1 ? ` ${i + 1}` : '');
+  const pairs = photos.map((src, i) => {
+    const boxes = (checked ? v.detections || [] : []).filter((d) => d.photo === i + 1).sort((a, b) => b.confidence - a.confidence);
+    // Labels of boxes that start at the same corner stack instead of covering each other.
+    const marks = boxes.map((d, j) => {
+      const stack = boxes.slice(0, j).filter((o) => Math.abs(o.box[0] - d.box[0]) < 0.04 && Math.abs(o.box[1] - d.box[1]) < 0.04).length;
       const [x1, y1, x2, y2] = d.box.map((n) => Number(n) * 100);
-      return `<span class="bx${d.label === 'healthy' ? ' bx-ok' : ''}" style="left:${x1}%;top:${y1}%;width:${x2 - x1}%;height:${y2 - y1}%"><em>${esc(label(d.label))} ${pct(d.confidence)}</em></span>`;
+      return `<span class="bx${d.label === 'healthy' ? ' bx-ok' : ''}" style="left:${x1}%;top:${y1}%;width:${x2 - x1}%;height:${y2 - y1}%"><em style="top:${stack * 1.6}em">${esc(label(d.label))}</em></span>`;
     }).join('');
-    return `<div class="shot"><img src="${src}" alt="">${marks}</div>`;
+    const shot = (inner, caption) => `<figure class="shot"><div class="frame"><img src="${src}" alt="">${inner}</div><figcaption>${esc(caption)}</figcaption></figure>`;
+    return `<div class="pair">${shot('', tv('uploaded') + num(i))}${checked ? shot(marks, tv('checked') + num(i)) : ''}</div>`;
   }).join('');
-  const items = dets.length
-    ? list(dets.map((d) => `${photos.length > 1 ? `${tv('photo', { n: d.photo })}: ` : ''}${label(d.label)} · ${tv('confidence', { pct: pct(d.confidence) })}`))
-    : para(tv('none'));
-  return `<div class="photos avoid"><h3>${esc(tv('title'))} ${pill('medium', tv('preliminary'))}</h3>${shots ? `<div class="ph-row">${shots}</div>` : ''}${items}${r.screening_note ? `<p><strong>${esc(tv('compare'))}:</strong> ${esc(r.screening_note)}</p>` : ''}<p class="small">${esc(tv('hint'))}</p></div>`;
+  const note = checked && !(v.detections || []).length ? `<p class="small">${esc(tv('none'))}</p>` : v && !v.available ? `<p class="small">${esc(tv('unavailable'))}</p>` : '';
+  return `<div class="photos avoid"><h3>${esc(t('ai.pdf.photos'))}${checked ? ` ${pill('medium', tv('preliminary'))}` : ''}</h3>${pairs}${note}</div>`;
 }
 
 function diagnosisBody(r, t, caseInfo) {
@@ -117,11 +109,7 @@ function diagnosisBody(r, t, caseInfo) {
       { label: t('ai.pdf.notifiable'), value: pill(r.notifiable ? 'yes' : 'no', r.notifiable ? yes : no) }
     ]),
     caseDetails(caseInfo, t),
-    (() => {
-      const p = photosBlock(r, caseInfo);
-      return p ? `<div class="photos avoid"><h3>${esc(t('ai.pdf.photos'))}</h3>${p.imgs}${p.findings}</div>` : '';
-    })(),
-    screeningBlock(r, t, caseInfo),
+    photosBlock(r, t, caseInfo),
     `<div class="summary avoid"><h3>${esc(t('ai.pdf.summary'))}</h3>${para(r.summary)}${r.see_vet_reason ? `<p class="callout"><strong>${esc(tr('seeVet'))}:</strong> ${esc(r.see_vet_reason)}</p>` : ''}</div>`,
     sections([
       { title: tr('likely'), body: conditions },
@@ -217,12 +205,13 @@ const CSS = `
   .case, .summary, .review { border: 1px solid #DFE2DF; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; }
   .case h3, .summary h3, .review h3, .photos h3 { color: #1B5E20; font-size: 11.5pt; margin: 0 0 6px; }
   .photos { margin: 0 0 12px; }
-  .photos .ph-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 8px; }
-  .photos .ph-row img { width: 46mm; height: 34mm; object-fit: cover; border: 1px solid #DFE2DF; border-radius: 4px; }
-  .photos .shot { position: relative; display: inline-block; line-height: 0; }
-  .photos .shot img { width: auto; height: 40mm; object-fit: fill; }
+  .photos .pair { display: flex; gap: 6mm; margin: 4px 0 8px; break-inside: avoid; page-break-inside: avoid; }
+  .photos .shot { margin: 0; width: 80mm; }
+  .photos .frame { position: relative; line-height: 0; border: 1px solid #DFE2DF; border-radius: 4px; overflow: hidden; }
+  .photos .frame img { width: 100%; height: auto; display: block; }
+  .photos figcaption { margin-top: 3px; text-align: center; color: #5B6B5D; font-size: 8.5pt; font-weight: 700; }
   .bx { position: absolute; border: 2px solid #F9A825; box-sizing: border-box; }
-  .bx em { position: absolute; left: -2px; top: -2px; background: #F9A825; color: #1C2B1E; font-style: normal; font-size: 7.5pt; font-weight: 700; line-height: 1.4; padding: 0 3px; white-space: nowrap; }
+  .bx em { position: absolute; left: 0; top: 0; background: #F9A825; color: #1C2B1E; font-style: normal; font-size: 9pt; font-weight: 700; line-height: 1.6; padding: 0 5px; white-space: nowrap; }
   .bx-ok { border-color: #2E7D32; }
   .bx-ok em { background: #2E7D32; color: #FFFFFF; }
   .kv-grid { display: flex; flex-wrap: wrap; gap: 6px 0; }

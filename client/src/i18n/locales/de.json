@@ -1265,7 +1265,9 @@
         "healthy": "Wirkt gesund",
         "lumpy_skin_disease": "Lumpy-Skin-Krankheit",
         "foot_and_mouth_disease": "Maul- und Klauenseuche"
-      }
+      },
+      "uploaded": "Hochgeladenes Foto",
+      "checked": "Geprüftes Foto"
     },
     "device": {
       "title": "Auf diesem Telefon geprüft",

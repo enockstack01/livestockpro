@@ -1265,7 +1265,9 @@
         "healthy": "Looks healthy",
         "lumpy_skin_disease": "Lumpy skin disease",
         "foot_and_mouth_disease": "Foot and mouth disease"
-      }
+      },
+      "uploaded": "Uploaded photo",
+      "checked": "Checked photo"
     },
     "device": {
       "title": "Checked on this phone",

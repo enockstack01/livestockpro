@@ -157,40 +157,48 @@ function Section({ icon, title, children }) {
 const Bullets = ({ items }) => (items && items.length ? <ul className="ai-list">{items.map((x, i) => <li key={i}>{x}</li>)}</ul> : null);
 
 const visionLabel = (t, label) => t(`ai.vision.labels.${label}`, { defaultValue: String(label).replace(/_/g, ' ') });
-const pct = (v) => `${Math.round(Number(v) * 100)}%`;
 
-/* The photo screening model's hints (report.vision, server/lib/vision.js),
-   its boxes drawn over the photos. Hints only: never shown as a diagnosis. */
-function Screening({ vision, photos, note }) {
+/* Boxes for one photo, each labelled with the disease name. Labels of boxes
+   that start at the same corner (whole-animal boxes usually do) are stacked
+   so they never cover each other; the most confident comes first. */
+export function photoBoxes(vision, n) {
+  const boxes = ((vision && vision.detections) || []).filter((d) => d.photo === n).sort((a, b) => b.confidence - a.confidence);
+  return boxes.map((d, i) => ({ ...d, stack: boxes.slice(0, i).filter((o) => Math.abs(o.box[0] - d.box[0]) < 0.04 && Math.abs(o.box[1] - d.box[1]) < 0.04).length }));
+}
+
+/* The photos the farmer sent, each next to the same photo as the screening
+   model checked it, with the disease name on the box (report.vision,
+   server/lib/vision.js). Marked preliminary: never shown as a diagnosis. */
+function PhotoReview({ photos, vision }) {
   const { t } = useTranslation();
-  if (!vision) return null;
-  if (!vision.available) return <p className="ai-note ai-screening-off"><i className="fas fa-circle-info"></i> {t('ai.vision.unavailable')}</p>;
-  const dets = vision.detections || [];
-  const shots = (photos || []).map((src, i) => ({ src, n: i + 1, boxes: dets.filter((d) => d.photo === i + 1) })).filter((p) => p.boxes.length);
+  const checked = vision && vision.available;
+  if (!(photos && photos.length) && !vision) return null;
   return (
-    <div className="ai-screening">
-      <h4><i className="fas fa-crosshairs"></i> {t('ai.vision.title')} <span className="badge badge-orange">{t('ai.vision.preliminary')}</span></h4>
-      {shots.length ? (
-        <div className="ai-photo-strip">
-          {shots.map((p) => (
-            <div className="ai-screen-photo" key={p.n}>
-              <img src={p.src} alt={t('ai.photo.alt', { n: p.n })} />
-              {p.boxes.map((d, j) => (
-                <span key={j} className={`ai-box ai-box-${d.label}`} style={{ left: `${d.box[0] * 100}%`, top: `${d.box[1] * 100}%`, width: `${(d.box[2] - d.box[0]) * 100}%`, height: `${(d.box[3] - d.box[1]) * 100}%` }}>
-                  <em>{visionLabel(t, d.label)} {pct(d.confidence)}</em>
-                </span>
-              ))}
-            </div>
-          ))}
+    <div className="ai-photo-findings">
+      <h4><i className="fas fa-camera"></i> {t('ai.pdf.photos')}{checked ? <span className="badge badge-orange">{t('ai.vision.preliminary')}</span> : null}</h4>
+      {(photos || []).map((src, i) => (
+        <div className="ai-photo-pair" key={i}>
+          <figure>
+            <div className="ai-pair-img"><img src={src} alt={t('ai.photo.alt', { n: i + 1 })} /></div>
+            <figcaption>{t('ai.vision.uploaded')}{photos.length > 1 ? ` ${i + 1}` : ''}</figcaption>
+          </figure>
+          {checked ? (
+            <figure>
+              <div className="ai-pair-img">
+                <img src={src} alt={t('ai.photo.alt', { n: i + 1 })} />
+                {photoBoxes(vision, i + 1).map((d, j) => (
+                  <span key={j} className={`ai-box ai-box-${d.label}`} style={{ left: `${d.box[0] * 100}%`, top: `${d.box[1] * 100}%`, width: `${(d.box[2] - d.box[0]) * 100}%`, height: `${(d.box[3] - d.box[1]) * 100}%` }}>
+                    <em style={{ top: `calc(${d.stack} * 1.6em)` }}>{visionLabel(t, d.label)}</em>
+                  </span>
+                ))}
+              </div>
+              <figcaption>{t('ai.vision.checked')}{photos.length > 1 ? ` ${i + 1}` : ''}</figcaption>
+            </figure>
+          ) : null}
         </div>
-      ) : null}
-      {dets.length ? (
-        <ul className="ai-list">
-          {dets.map((d, i) => <li key={i}>{(photos || []).length > 1 ? `${t('ai.vision.photo', { n: d.photo })}: ` : ''}<strong>{visionLabel(t, d.label)}</strong> · {t('ai.vision.confidence', { pct: pct(d.confidence) })}</li>)}
-        </ul>
-      ) : <p>{t('ai.vision.none')}</p>}
-      {note ? <p><strong>{t('ai.vision.compare')}:</strong> {note}</p> : null}
-      <p className="ai-muted">{t('ai.vision.hint')}</p>
+      ))}
+      {checked && !(vision.detections || []).length ? <p className="ai-muted">{t('ai.vision.none')}</p> : null}
+      {vision && !vision.available ? <p className="ai-muted">{t('ai.vision.unavailable')}</p> : null}
     </div>
   );
 }
@@ -201,14 +209,7 @@ export function DiagnosisView({ report: r, photos }) {
   const z = r.zoonotic || {};
   return (
     <div className="ai-report">
-      {(photos && photos.length) || r.photo_findings ? (
-        <div className="ai-photo-findings">
-          <h4><i className="fas fa-camera"></i> {t('ai.pdf.photos')}</h4>
-          {photos && photos.length ? <div className="ai-photo-strip">{photos.map((src, i) => <div className="ai-photo-thumb" key={i}><img src={src} alt={t('ai.photo.alt', { n: i + 1 })} /></div>)}</div> : null}
-          {r.photo_findings ? <p>{r.photo_findings}</p> : null}
-        </div>
-      ) : null}
-      <Screening vision={r.vision} photos={photos} note={r.screening_note} />
+      <PhotoReview photos={photos} vision={r.vision} />
       <div className="ai-badges">
         <Pill value={r.urgency}>{tr('urgency')}: {tr(`urgencyLevels.${r.urgency}`)}</Pill>
         {r.see_vet ? <Pill value="urgent"><i className="fas fa-user-doctor"></i> {tr('seeVet')}</Pill> : <Pill value="routine">{tr('seeVetNo')}</Pill>}

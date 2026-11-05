@@ -162,58 +162,89 @@ function Note({ children, danger }) {
 }
 
 export const visionLabel = (t, label) => t(`ai.vision.labels.${label}`, { defaultValue: String(label).replace(/_/g, ' ') });
-const pct = (v) => `${Math.round(Number(v) * 100)}%`;
 
-/* A photo with the screening model's boxes over it; boxes are fractions of
-   the photo, so the photo keeps its own shape. */
-export function BoxedPhoto({ src, boxes, aspect, width = 150 }) {
+/* Boxes for one photo, most confident first. Labels of boxes that start at
+   the same corner (whole-animal boxes usually do) are stacked so they never
+   cover each other. */
+function photoBoxes(vision, n) {
+  const boxes = ((vision && vision.detections) || []).filter((d) => d.photo === n).sort((a, b) => b.confidence - a.confidence);
+  return boxes.map((d, i) => ({ ...d, stack: boxes.slice(0, i).filter((o) => Math.abs(o.box[0] - d.box[0]) < 0.04 && Math.abs(o.box[1] - d.box[1]) < 0.04).length }));
+}
+
+/* The photo's own width / height: from the screening result when there is
+   one, otherwise read from the picture. */
+function usePhotoAspect(src, size) {
+  const [aspect, setAspect] = useState(size && size.width && size.height ? size.width / size.height : null);
+  useEffect(() => {
+    if (aspect || !src) return;
+    Image.getSize(src, (w, h) => { if (w && h) setAspect(w / h); }, () => setAspect(4 / 3));
+  }, [src, aspect]);
+  return aspect || 4 / 3;
+}
+
+const LABEL_HEIGHT = 20;
+
+/* A photo at its own shape, with the screening boxes and the disease name
+   on each box when `boxes` is given. */
+function FramedPhoto({ src, boxes, aspect, width, caption }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   return (
-    <View style={{ width, height: width / (aspect || 4 / 3), borderRadius: 8, overflow: 'hidden', borderWidth: 1, borderColor: colors.border }}>
-      <Image source={{ uri: src }} style={StyleSheet.absoluteFill} resizeMode="stretch" />
-      {boxes.map((d, j) => {
-        const ok = d.label === 'healthy';
-        const tone = ok ? colors.leaf : colors.orange;
-        return (
-          <View key={j} pointerEvents="none" style={{ position: 'absolute', left: `${d.box[0] * 100}%`, top: `${d.box[1] * 100}%`, width: `${(d.box[2] - d.box[0]) * 100}%`, height: `${(d.box[3] - d.box[1]) * 100}%`, borderWidth: 2, borderColor: tone }}>
-            <Text numberOfLines={1} style={{ alignSelf: 'flex-start', backgroundColor: tone, color: ok ? '#FFFFFF' : '#1C2B1E', fontSize: 9.5, fontWeight: '700', paddingHorizontal: 3 }}>{visionLabel(t, d.label)} {pct(d.confidence)}</Text>
-          </View>
-        );
-      })}
+    <View style={{ width }}>
+      <View style={{ width, height: width / aspect, borderRadius: 8, overflow: 'hidden', borderWidth: 1, borderColor: colors.border, backgroundColor: colors.bg }}>
+        <Image source={{ uri: src }} style={StyleSheet.absoluteFill} resizeMode="stretch" accessibilityLabel={caption} />
+        {(boxes || []).map((d, j) => {
+          const ok = d.label === 'healthy';
+          const tone = ok ? colors.leaf : colors.orange;
+          return (
+            <View key={j} pointerEvents="none" style={{ position: 'absolute', left: `${d.box[0] * 100}%`, top: `${d.box[1] * 100}%`, width: `${(d.box[2] - d.box[0]) * 100}%`, height: `${(d.box[3] - d.box[1]) * 100}%`, borderWidth: 3, borderColor: tone, borderRadius: 4 }}>
+              <Text numberOfLines={1} style={{ position: 'absolute', left: 0, top: d.stack * LABEL_HEIGHT, height: LABEL_HEIGHT, lineHeight: LABEL_HEIGHT, maxWidth: '100%', backgroundColor: tone, color: ok ? '#FFFFFF' : '#1C2B1E', fontSize: 13, fontWeight: '700', paddingHorizontal: 7, borderBottomRightRadius: 4 }}>{visionLabel(t, d.label)}</Text>
+            </View>
+          );
+        })}
+      </View>
+      <Text style={{ marginTop: 5, textAlign: 'center', fontSize: 12.5, fontWeight: '700', color: colors.textLight }}>{caption}</Text>
     </View>
   );
 }
 
-/* The photo screening model's hints (report.vision, server/lib/vision.js).
-   Hints only: never shown as a diagnosis. */
-function Screening({ vision, photos, note }) {
+/* One uploaded photo next to the same photo as the screening model checked
+   it: side by side on a tablet, one above the other on a phone, both as
+   wide as there is room for so the farmer can see it is the same picture. */
+function PhotoPair({ src, n, total, vision, width }) {
+  const { t } = useTranslation();
+  const size = vision && vision.photos && vision.photos[n - 1];
+  const aspect = usePhotoAspect(src, size);
+  const checked = vision && vision.available;
+  const num = total > 1 ? ` ${n}` : '';
+  const side = checked && width >= 520;
+  const w = side ? (width - 12) / 2 : width;
+  return (
+    <View style={{ flexDirection: side ? 'row' : 'column', gap: 12, marginTop: 10 }}>
+      <FramedPhoto src={src} aspect={aspect} width={w} caption={t('ai.vision.uploaded') + num} />
+      {checked ? <FramedPhoto src={src} aspect={aspect} width={w} boxes={photoBoxes(vision, n)} caption={t('ai.vision.checked') + num} /> : null}
+    </View>
+  );
+}
+
+/* The photos the farmer sent and, when the screening ran, the checked
+   copies with the disease name on them (report.vision). Marked preliminary:
+   the detections are never a diagnosis. */
+export function PhotoReview({ photos, vision }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  if (!vision) return null;
-  if (!vision.available) return <View style={{ marginBottom: 12 }}><Note>{t('ai.vision.unavailable')}</Note></View>;
-  const dets = vision.detections || [];
-  const sizes = vision.photos || [];
-  const shots = (photos || []).map((src, i) => ({ src, n: i + 1, boxes: dets.filter((d) => d.photo === i + 1) })).filter((p) => p.boxes.length);
+  const [width, setWidth] = useState(0);
+  if (!(photos && photos.length) && !vision) return null;
+  const checked = vision && vision.available;
   return (
-    <View style={[styles.photoBox, { borderColor: colors.border }]}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-        <Text style={{ color: colors.primary, fontWeight: '800', fontSize: 14 }}>{t('ai.vision.title')}</Text>
-        <Pill value="soon">{t('ai.vision.preliminary')}</Pill>
+    <View style={[styles.photoBox, { borderColor: colors.border }]} onLayout={(e) => setWidth(e.nativeEvent.layout.width - 26)}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <Text style={{ color: colors.primary, fontWeight: '800', fontSize: 14 }}>{t('ai.pdf.photos')}</Text>
+        {checked ? <Pill value="soon">{t('ai.vision.preliminary')}</Pill> : null}
       </View>
-      {shots.length ? (
-        <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
-          {shots.map((p) => {
-            const s = sizes[p.n - 1];
-            return <BoxedPhoto key={p.n} src={p.src} boxes={p.boxes} aspect={s && s.width && s.height ? s.width / s.height : undefined} />;
-          })}
-        </View>
-      ) : null}
-      {dets.length ? (
-        <Bullets items={dets.map((d) => `${(photos || []).length > 1 ? `${t('ai.vision.photo', { n: d.photo })}: ` : ''}${visionLabel(t, d.label)} · ${t('ai.vision.confidence', { pct: pct(d.confidence) })}`)} />
-      ) : <Para>{t('ai.vision.none')}</Para>}
-      {note ? <Para>{`${t('ai.vision.compare')}: ${note}`}</Para> : null}
-      <Muted style={{ marginTop: 6, fontSize: 12 }}>{t('ai.vision.hint')}</Muted>
+      {width > 0 ? (photos || []).map((src, i) => <PhotoPair key={i} src={src} n={i + 1} total={photos.length} vision={vision} width={width} />) : null}
+      {checked && !(vision.detections || []).length ? <Muted style={{ marginTop: 8 }}>{t('ai.vision.none')}</Muted> : null}
+      {vision && !vision.available ? <Muted style={{ marginTop: 8 }}>{t('ai.vision.unavailable')}</Muted> : null}
     </View>
   );
 }
@@ -225,18 +256,7 @@ function DiagnosisView({ r, photos }) {
   const z = r.zoonotic || {};
   return (
     <View>
-      {(photos && photos.length) || r.photo_findings ? (
-        <View style={[styles.photoBox, { borderColor: colors.border }]}>
-          <Text style={{ color: colors.primary, fontWeight: '800', fontSize: 14, marginBottom: 6 }}>{t('ai.pdf.photos')}</Text>
-          {photos && photos.length ? (
-            <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
-              {photos.map((src, i) => <Image key={i} source={{ uri: src }} style={styles.photoThumb} accessibilityLabel={t('ai.photo.alt', { n: i + 1 })} />)}
-            </View>
-          ) : null}
-          {r.photo_findings ? <Text selectable style={{ color: colors.text, fontSize: 14, lineHeight: 20 }}>{r.photo_findings}</Text> : null}
-        </View>
-      ) : null}
-      <Screening vision={r.vision} photos={photos} note={r.screening_note} />
+      <PhotoReview photos={photos} vision={r.vision} />
       <View style={styles.pills}>
         <Pill value={r.urgency}>{tr('urgency')}: {tr(`urgencyLevels.${r.urgency}`)}</Pill>
         {r.see_vet ? <Pill value="urgent">{tr('seeVet')}</Pill> : <Pill value="routine">{tr('seeVetNo')}</Pill>}
@@ -522,18 +542,12 @@ export function DeviceResult({ result, onDone }) {
         <Text style={[styles.reportTitle, { color: colors.primaryDark }]}>{t('ai.device.title')}</Text>
         <Pill value="soon">{t('ai.vision.preliminary')}</Pill>
       </View>
-      <Muted style={{ marginBottom: 10 }}>{t('ai.device.intro')}</Muted>
-      <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
-        {thumbs.map((src, i) => {
-          const s = (vision.photos || [])[i];
-          return <BoxedPhoto key={i} src={src} boxes={dets.filter((d) => d.photo === i + 1)} aspect={s ? s.width / s.height : undefined} />;
-        })}
-      </View>
+      <Muted style={{ marginBottom: 4 }}>{t('ai.device.intro')}</Muted>
+      <PhotoReview photos={thumbs} vision={vision} />
       {labels.length ? labels.map((label) => {
-        const best = Math.max(...dets.filter((d) => d.label === label).map((d) => d.confidence));
         const guide = findDisease(label);
         return (
-          <Boxed key={label} title={visionLabel(t, label)} pill={<Pill value={label === 'healthy' ? 'routine' : 'soon'}>{pct(best)}</Pill>}>
+          <Boxed key={label} title={visionLabel(t, label)}>
             {guide && label !== 'healthy' ? (
               <View style={{ gap: 6, marginTop: 4 }}>
                 {guide.notifiable ? <Note danger>{t('ai.device.reportable')}</Note> : null}
@@ -545,9 +559,8 @@ export function DeviceResult({ result, onDone }) {
             ) : null}
           </Boxed>
         );
-      }) : <Para>{t('ai.vision.none')}</Para>}
-      <Muted style={{ marginVertical: 8, fontSize: 12 }}>{t('ai.vision.hint')}</Muted>
-      <Note>{t('ai.device.queued')}</Note>
+      }) : null}
+      <View style={{ marginTop: 8 }}><Note>{t('ai.device.queued')}</Note></View>
       <Muted style={{ marginTop: 8, fontSize: 11.5 }}>{GUIDE_DISCLAIMER}</Muted>
       <View style={{ marginTop: 10 }}><Note danger>{t('ai.vetNotice')}</Note></View>
       <Button title={t('ai.diagnose.again')} icon="rotate" variant="secondary" onPress={onDone} style={{ marginTop: 16 }} />
@@ -583,7 +596,7 @@ function DeviceScans({ onOpen }) {
           <Pressable key={r.id} disabled={!done} onPress={() => onOpen(r.report_id)} accessibilityRole="button" style={({ pressed }) => [styles.earlier, { borderColor: colors.border, backgroundColor: pressed ? colors.bg : colors.card }]}>
             <Icon name={done ? 'file-medical' : 'mobile-screen'} size={14} color={colors.primary} />
             <View style={{ flex: 1, minWidth: 0 }}>
-              <Text style={{ color: colors.text, fontSize: 13 }} numberOfLines={2}>{r.summary || (top ? `${visionLabel(t, top.label)} ${pct(top.confidence)}` : t('ai.vision.none'))}</Text>
+              <Text style={{ color: colors.text, fontSize: 13 }} numberOfLines={2}>{r.summary || (top ? visionLabel(t, top.label) : t('ai.vision.none'))}</Text>
               <Text style={{ color: colors.textLight, fontSize: 11.5 }}>{new Date(r.created_at).toLocaleString(i18n.language)} · {done ? t('ai.device.checked') : r.status === 'failed' ? r.last_error : r.last_error ? t('ai.device.retry') : t('ai.device.waiting')}</Text>
             </View>
           </Pressable>
@@ -823,7 +836,6 @@ export default function AssistantScreen() {
 const styles = StyleSheet.create({
   photoBox: { borderWidth: 1, borderRadius: 10, padding: 12, marginBottom: 12 },
   earlier: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10 },
-  photoThumb: { width: 96, height: 72, borderRadius: 8 },
   chatThumb: { width: 110, height: 82, borderRadius: 8 },
   pill: { borderRadius: 999, paddingHorizontal: 9, paddingVertical: 3, alignSelf: 'flex-start' },
   pillText: { fontSize: 11, fontWeight: '700' },

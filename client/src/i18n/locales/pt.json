@@ -1265,7 +1265,9 @@
         "healthy": "Parece saudável",
         "lumpy_skin_disease": "Dermatose nodular contagiosa",
         "foot_and_mouth_disease": "Febre aftosa"
-      }
+      },
+      "uploaded": "Foto enviada",
+      "checked": "Foto analisada"
     },
     "device": {
       "title": "Verificado neste telemóvel",
