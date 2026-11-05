@@ -89,15 +89,19 @@ app.use(helmet({
       scriptSrc: ["'self'", ...CLERK_FAPI_ORIGIN, 'https://challenges.cloudflare.com', 'https://*.protect.clerk.com'],
       styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com'],
       fontSrc: ["'self'", 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com'],
+      /* blob: is how a photo the user picks is opened before it is shrunk
+         (client/src/lib/imageFile.js); without it every upload fails as
+         "That picture could not be read". */
       imgSrc: [
-        "'self'", 'data:',
+        "'self'", 'data:', 'blob:',
         'https://img.clerk.com',
         'https://tile.openstreetmap.org',
         'https://*.tile.openstreetmap.org',
         'https://server.arcgisonline.com',
         'https://*.basemaps.cartocdn.com',
       ],
-      connectSrc: ["'self'", ...CLERK_FAPI_ORIGIN, 'https://*.protect.clerk.com'],
+      // data: and blob: for turning a picked photo into a JPEG file (toJpegFile).
+      connectSrc: ["'self'", ...CLERK_FAPI_ORIGIN, 'https://*.protect.clerk.com', 'data:', 'blob:'],
       workerSrc: ["'self'", 'blob:'],
       frameSrc: ['https://challenges.cloudflare.com', 'https://*.protect.clerk.com']
     }
@@ -185,6 +189,7 @@ connect()
     startStatsJob();
     app.listen(PORT, () => {
       console.log(`LivestockPro server running at http://localhost:${PORT}`);
+      console.log(`AI key: ${require('./lib/ai').keyFingerprint()}`);
     });
   })
   .catch((err) => {

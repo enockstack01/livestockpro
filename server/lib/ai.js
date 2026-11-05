@@ -13,8 +13,17 @@ const FALLBACK_BETA = 'server-side-fallback-2026-07-01';
 let client = null;
 
 /* AI_API_KEY; the older variable name still works so existing deployments
-   keep running. */
-const apiKey = () => process.env.AI_API_KEY || process.env.ANTHROPIC_API_KEY || '';
+   keep running. Spaces, line breaks and quotes pasted around the value in a
+   hosting dashboard are ignored. */
+const cleanKey = (v) => String(v || '').trim().replace(/^(['"])(.*)\1$/, '$2').trim();
+const apiKey = () => cleanKey(process.env.AI_API_KEY) || cleanKey(process.env.ANTHROPIC_API_KEY);
+
+/* A safe fingerprint for the logs ("sk-ant-…a1b2, 108 characters"), to
+   compare with the key list in the Anthropic console without showing it. */
+function keyFingerprint() {
+  const k = apiKey();
+  return k ? `${k.slice(0, 7)}…${k.slice(-4)}, ${k.length} characters` : 'not set';
+}
 
 function isConfigured() {
   return Boolean(apiKey());
@@ -62,6 +71,7 @@ const VET_NOTICE = 'LivestockPro AI supports, and does not replace, a qualified 
 function mapApiError(err) {
   if (err instanceof AiError) return err;
   if (err instanceof Anthropic.AuthenticationError || err instanceof Anthropic.PermissionDeniedError) {
+    console.error(`AI key rejected (${err.status}): ${err.message}. Key in use: ${keyFingerprint()}`);
     return new AiError(503, 'AI_KEY_INVALID', 'The AI service rejected the server key. An administrator needs to check the AI key.');
   }
   if (err instanceof Anthropic.RateLimitError) return new AiError(429, 'AI_BUSY', 'The AI service is busy. Please try again in a minute.');
@@ -139,4 +149,4 @@ function imageBlocks(images) {
   });
 }
 
-module.exports = { imageBlocks, MAX_IMAGES, getClient, AiError, isConfigured, ask, textOf, brandVoice, languageName, VET_NOTICE, mapApiError };
+module.exports = { imageBlocks, MAX_IMAGES, getClient, AiError, isConfigured, ask, textOf, brandVoice, languageName, VET_NOTICE, mapApiError, keyFingerprint };
