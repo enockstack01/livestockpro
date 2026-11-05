@@ -1251,6 +1251,36 @@
       "noCamera": "Die Kamera konnte nicht geöffnet werden. Erlauben Sie den Kamerazugriff im Browser oder laden Sie ein Foto hoch.",
       "tip": "Halten Sie die Kamera nah an die betroffene Stelle, bei gutem Licht und ruhig.",
       "defaultQuestion": "Was sehen Sie auf diesem Foto? Hat dieses Tier ein gesundheitliches Problem und was soll ich tun?"
+    },
+    "vision": {
+      "title": "Fotoprüfung",
+      "preliminary": "Vorläufig",
+      "hint": "Automatische Prüfung durch ein Entwicklungsmodell, das das ganze Tier betrachtet. Sie liefert nur Hinweise, ist keine Diagnose und kann falsch sein: Ein Tierarzt muss bestätigen.",
+      "unavailable": "Die automatische Fotoprüfung war für diesen Bericht nicht verfügbar. Die Diagnose stützt sich daher nur auf die Fotos, die Symptome und die Aufzeichnungen.",
+      "none": "Das Prüfmodell hat auf den Fotos nichts erkannt. Das heißt nicht, dass das Tier gesund ist.",
+      "photo": "Foto {{n}}",
+      "confidence": "{{pct}} Sicherheit",
+      "compare": "Vergleich mit den Fotos",
+      "labels": {
+        "healthy": "Wirkt gesund",
+        "lumpy_skin_disease": "Lumpy-Skin-Krankheit",
+        "foot_and_mouth_disease": "Maul- und Klauenseuche"
+      }
+    },
+    "device": {
+      "title": "Auf diesem Telefon geprüft",
+      "intro": "Keine Verbindung, daher hat das Telefon die Fotos mit seinem eigenen kleinen Modell geprüft. Das ist ein vorläufiger Hinweis, keine Diagnose.",
+      "queued": "Auf diesem Telefon gespeichert. Sobald Sie wieder online sind, sendet LivestockPro den Fall zur vollständigen KI-Diagnose und das Online-Modell prüft die Fotos erneut.",
+      "needPhoto": "Keine Verbindung. Machen Sie ein Foto, um es auf diesem Telefon zu prüfen, oder versuchen Sie es online erneut.",
+      "failed": "Das Telefon konnte das Foto nicht prüfen: {{message}}",
+      "reportable": "Möglicherweise meldepflichtige Krankheit. Isolieren Sie das Tier und informieren Sie den Amtstierarzt.",
+      "doNow": "Was jetzt zu tun ist",
+      "seeVet": "Wann der Tierarzt kommen sollte",
+      "waiting": "Wartet auf die Online-Prüfung",
+      "checked": "Online geprüft",
+      "retry": "Wird erneut versucht",
+      "pendingCount": "Fälle, die auf die Online-Prüfung warten: {{count}}",
+      "earlier": "Auf diesem Telefon geprüft"
     }
   },
   "org": {

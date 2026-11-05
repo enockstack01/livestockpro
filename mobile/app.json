@@ -98,7 +98,8 @@
       "expo-font",
       "expo-web-browser",
       "expo-localization",
-      "./plugins/withGradleJdk17"
+      "./plugins/withGradleJdk17",
+      "react-native-fast-tflite"
     ],
     "extra": {
       "router": {},

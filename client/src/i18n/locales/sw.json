@@ -1251,6 +1251,36 @@
       "noCamera": "Kamera haikuweza kufunguka. Ruhusu kamera kwenye kivinjari chako, au pakia picha badala yake.",
       "tip": "Shikilia kamera karibu na sehemu iliyoathirika, kwenye mwanga mzuri, bila kutikisika.",
       "defaultQuestion": "Unaona nini kwenye picha hii? Je, mnyama huyu ana tatizo la afya, na nifanye nini?"
+    },
+    "vision": {
+      "title": "Uchunguzi wa picha",
+      "preliminary": "Wa awali",
+      "hint": "Uchunguzi wa kiotomatiki kwa modeli inayoendelezwa inayoangalia mnyama mzima. Unatoa dalili tu, si utambuzi na unaweza kukosea: daktari wa mifugo lazima athibitishe.",
+      "unavailable": "Uchunguzi wa kiotomatiki wa picha haukupatikana kwa ripoti hii, kwa hiyo utambuzi unategemea picha, dalili na kumbukumbu pekee.",
+      "none": "Modeli ya uchunguzi haikutambua chochote kwenye picha. Hiyo haimaanishi mnyama ana afya.",
+      "photo": "Picha {{n}}",
+      "confidence": "uhakika {{pct}}",
+      "compare": "Jinsi inavyolingana na picha",
+      "labels": {
+        "healthy": "Anaonekana mzima",
+        "lumpy_skin_disease": "Ugonjwa wa ngozi wa uvimbe (LSD)",
+        "foot_and_mouth_disease": "Ugonjwa wa miguu na midomo"
+      }
+    },
+    "device": {
+      "title": "Imekaguliwa kwenye simu hii",
+      "intro": "Hakuna mtandao, kwa hiyo simu imekagua picha kwa modeli yake ndogo. Hii ni dalili ya awali, si utambuzi.",
+      "queued": "Imehifadhiwa kwenye simu hii. Ukirudi mtandaoni LivestockPro itatuma kesi hii kwa utambuzi kamili wa AI na modeli ya mtandaoni itakagua picha tena.",
+      "needPhoto": "Hakuna mtandao. Piga picha ili ikaguliwe kwenye simu hii, au jaribu tena ukiwa mtandaoni.",
+      "failed": "Simu haikuweza kukagua picha: {{message}}",
+      "reportable": "Huenda ni ugonjwa unaopaswa kuripotiwa. Mtenge mnyama na wasiliana na daktari wa mifugo wa sekta.",
+      "doNow": "Cha kufanya sasa",
+      "seeVet": "Wakati wa kumwita daktari wa mifugo",
+      "waiting": "Inasubiri ukaguzi wa mtandaoni",
+      "checked": "Imekaguliwa mtandaoni",
+      "retry": "Itajaribu tena",
+      "pendingCount": "Kesi zinazosubiri ukaguzi wa mtandaoni: {{count}}",
+      "earlier": "Zilizokaguliwa kwenye simu hii"
     }
   },
   "org": {

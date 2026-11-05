@@ -1251,6 +1251,36 @@
       "noCamera": "La caméra n’a pas pu s’ouvrir. Autorisez l’accès à la caméra dans votre navigateur ou importez une photo.",
       "tip": "Tenez la caméra près de la zone atteinte, avec une bonne lumière, sans bouger.",
       "defaultQuestion": "Que voyez-vous sur cette photo ? Cet animal a-t-il un problème de santé et que dois-je faire ?"
+    },
+    "vision": {
+      "title": "Analyse des photos",
+      "preliminary": "Préliminaire",
+      "hint": "Analyse automatique par un modèle en développement qui regarde l’animal entier. Elle donne seulement des indices, ce n’est pas un diagnostic et elle peut se tromper : un vétérinaire doit confirmer.",
+      "unavailable": "L’analyse automatique des photos n’était pas disponible pour ce rapport ; le diagnostic repose donc seulement sur les photos, les symptômes et les fiches.",
+      "none": "Le modèle d’analyse n’a rien reconnu sur les photos. Cela ne veut pas dire que l’animal est en bonne santé.",
+      "photo": "Photo {{n}}",
+      "confidence": "confiance {{pct}}",
+      "compare": "Comparaison avec les photos",
+      "labels": {
+        "healthy": "Semble en bonne santé",
+        "lumpy_skin_disease": "Dermatose nodulaire contagieuse",
+        "foot_and_mouth_disease": "Fièvre aphteuse"
+      }
+    },
+    "device": {
+      "title": "Vérifié sur ce téléphone",
+      "intro": "Pas de connexion : le téléphone a vérifié les photos avec son propre petit modèle. C’est un indice préliminaire, pas un diagnostic.",
+      "queued": "Enregistré sur ce téléphone. Dès que vous serez en ligne, LivestockPro enverra ce cas pour un diagnostic IA complet et le modèle en ligne vérifiera à nouveau les photos.",
+      "needPhoto": "Pas de connexion. Prenez une photo pour la vérifier sur ce téléphone, ou réessayez une fois en ligne.",
+      "failed": "Le téléphone n’a pas pu vérifier la photo : {{message}}",
+      "reportable": "Maladie à déclaration obligatoire possible. Isolez l’animal et contactez le vétérinaire de secteur.",
+      "doNow": "Que faire maintenant",
+      "seeVet": "Quand appeler le vétérinaire",
+      "waiting": "En attente de la vérification en ligne",
+      "checked": "Vérifié en ligne",
+      "retry": "Nouvel essai prévu",
+      "pendingCount": "Cas en attente de la vérification en ligne : {{count}}",
+      "earlier": "Vérifiés sur ce téléphone"
     }
   },
   "org": {

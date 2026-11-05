@@ -156,6 +156,45 @@ function Section({ icon, title, children }) {
 
 const Bullets = ({ items }) => (items && items.length ? <ul className="ai-list">{items.map((x, i) => <li key={i}>{x}</li>)}</ul> : null);
 
+const visionLabel = (t, label) => t(`ai.vision.labels.${label}`, { defaultValue: String(label).replace(/_/g, ' ') });
+const pct = (v) => `${Math.round(Number(v) * 100)}%`;
+
+/* The photo screening model's hints (report.vision, server/lib/vision.js),
+   its boxes drawn over the photos. Hints only: never shown as a diagnosis. */
+function Screening({ vision, photos, note }) {
+  const { t } = useTranslation();
+  if (!vision) return null;
+  if (!vision.available) return <p className="ai-note ai-screening-off"><i className="fas fa-circle-info"></i> {t('ai.vision.unavailable')}</p>;
+  const dets = vision.detections || [];
+  const shots = (photos || []).map((src, i) => ({ src, n: i + 1, boxes: dets.filter((d) => d.photo === i + 1) })).filter((p) => p.boxes.length);
+  return (
+    <div className="ai-screening">
+      <h4><i className="fas fa-crosshairs"></i> {t('ai.vision.title')} <span className="badge badge-orange">{t('ai.vision.preliminary')}</span></h4>
+      {shots.length ? (
+        <div className="ai-photo-strip">
+          {shots.map((p) => (
+            <div className="ai-screen-photo" key={p.n}>
+              <img src={p.src} alt={t('ai.photo.alt', { n: p.n })} />
+              {p.boxes.map((d, j) => (
+                <span key={j} className={`ai-box ai-box-${d.label}`} style={{ left: `${d.box[0] * 100}%`, top: `${d.box[1] * 100}%`, width: `${(d.box[2] - d.box[0]) * 100}%`, height: `${(d.box[3] - d.box[1]) * 100}%` }}>
+                  <em>{visionLabel(t, d.label)} {pct(d.confidence)}</em>
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {dets.length ? (
+        <ul className="ai-list">
+          {dets.map((d, i) => <li key={i}>{(photos || []).length > 1 ? `${t('ai.vision.photo', { n: d.photo })}: ` : ''}<strong>{visionLabel(t, d.label)}</strong> · {t('ai.vision.confidence', { pct: pct(d.confidence) })}</li>)}
+        </ul>
+      ) : <p>{t('ai.vision.none')}</p>}
+      {note ? <p><strong>{t('ai.vision.compare')}:</strong> {note}</p> : null}
+      <p className="ai-muted">{t('ai.vision.hint')}</p>
+    </div>
+  );
+}
+
 export function DiagnosisView({ report: r, photos }) {
   const { t } = useTranslation();
   const tr = (k, o) => t(`ai.report.${k}`, o);
@@ -169,6 +208,7 @@ export function DiagnosisView({ report: r, photos }) {
           {r.photo_findings ? <p>{r.photo_findings}</p> : null}
         </div>
       ) : null}
+      <Screening vision={r.vision} photos={photos} note={r.screening_note} />
       <div className="ai-badges">
         <Pill value={r.urgency}>{tr('urgency')}: {tr(`urgencyLevels.${r.urgency}`)}</Pill>
         {r.see_vet ? <Pill value="urgent"><i className="fas fa-user-doctor"></i> {tr('seeVet')}</Pill> : <Pill value="routine">{tr('seeVetNo')}</Pill>}

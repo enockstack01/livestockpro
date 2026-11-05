@@ -1251,6 +1251,36 @@
       "noCamera": "Kamera ntiyafungutse. Emerera mushakisha gukoresha kamera, cyangwa wohereze ifoto.",
       "tip": "Egereza kamera igice cyafashwe, ahari urumuri ruhagije, kandi ntunyeganyege.",
       "defaultQuestion": "Ubona iki kuri iyi foto? Iri tungo rifite ikibazo cy’ubuzima, kandi nkore iki?"
+    },
+    "vision": {
+      "title": "Isuzuma ry’amafoto",
+      "preliminary": "Iby’ibanze",
+      "hint": "Isuzuma rikorwa n’imashini, hakoreshejwe icyitegererezo kikiri mu igerageza kireba itungo ryose. Gitanga ibimenyetso gusa, si isuzuma rya muganga kandi gishobora kwibeshya: veterineri agomba kubyemeza.",
+      "unavailable": "Isuzuma ry’amafoto rikorwa n’imashini ntiryabonetse kuri iyi raporo, bityo isuzuma rishingiye ku mafoto, ibimenyetso n’inyandiko gusa.",
+      "none": "Icyitegererezo nticyagize icyo kibona ku mafoto. Ibyo ntibivuze ko itungo ari rizima.",
+      "photo": "Ifoto {{n}}",
+      "confidence": "icyizere {{pct}}",
+      "compare": "Uko bihura n’amafoto",
+      "labels": {
+        "healthy": "Risa n’irizima",
+        "lumpy_skin_disease": "Indwara y’uruhu y’ibibyimba (LSD)",
+        "foot_and_mouth_disease": "Indwara y’uburenge"
+      }
+    },
+    "device": {
+      "title": "Byasuzumiwe kuri iyi telefone",
+      "intro": "Nta murandasi, bityo telefone yasuzumye amafoto ikoresheje icyitegererezo cyayo gito. Iki ni ikimenyetso cy’ibanze, si isuzuma.",
+      "queued": "Byabitswe kuri iyi telefone. Nugaruka ku murandasi, LivestockPro izohereza iki kibazo ngo gisuzumwe byuzuye na AI, kandi icyitegererezo cyo kuri murandasi kizongera gusuzuma amafoto.",
+      "needPhoto": "Nta murandasi. Fata ifoto isuzumirwe kuri iyi telefone, cyangwa wongere ugerageze uri ku murandasi.",
+      "failed": "Telefone ntiyashoboye gusuzuma ifoto: {{message}}",
+      "reportable": "Ishobora kuba indwara igomba kumenyeshwa. Tandukanya itungo n’ayandi kandi uhamagare veterineri w’umurenge.",
+      "doNow": "Icyo gukora ubu",
+      "seeVet": "Igihe cyo guhamagara veterineri",
+      "waiting": "Bitegereje isuzuma kuri murandasi",
+      "checked": "Byasuzumwe kuri murandasi",
+      "retry": "Bizongera kugeragezwa",
+      "pendingCount": "Ibibazo bitegereje isuzuma kuri murandasi: {{count}}",
+      "earlier": "Byasuzumiwe kuri iyi telefone"
     }
   },
   "org": {

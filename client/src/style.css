@@ -2690,6 +2690,20 @@ a { color: var(--leaf); }
 .ai-photo-findings h4 i { color: var(--leaf); margin-right: 6px; }
 .ai-photo-findings p { margin-top: 8px; font-size: 14px; }
 :root[data-theme='dark'] .ai-photo-findings h4 { color: var(--text); }
+/* Photo screening boxes: the photo keeps its own shape so the boxes line up. */
+.ai-screening { border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 14px; }
+.ai-screening h4 { color: var(--forest); font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ai-screening h4 i { color: var(--leaf); }
+.ai-screening p { margin-top: 8px; font-size: 14px; }
+.ai-screening .ai-photo-strip { margin-bottom: 4px; }
+.ai-screen-photo { position: relative; display: inline-block; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); line-height: 0; }
+.ai-screen-photo img { height: 140px; width: auto; max-width: 100%; display: block; }
+.ai-box { position: absolute; border: 2px solid var(--amber); border-radius: 3px; box-sizing: border-box; }
+.ai-box.ai-box-healthy { border-color: var(--leaf); }
+.ai-box em { position: absolute; left: -2px; top: -2px; background: var(--amber); color: #1C2B1E; font-style: normal; font-size: 10.5px; font-weight: 700; line-height: 1.4; padding: 0 4px; border-radius: 3px 0 3px 0; white-space: nowrap; }
+.ai-box.ai-box-healthy em { background: var(--leaf); color: #FFFFFF; }
+.ai-screening-off { margin-bottom: 14px; }
+:root[data-theme='dark'] .ai-screening h4 { color: var(--text); }
 
 /* ---------- Admin AI tab (components/admin/AdminAi.jsx) ---------- */
 .ai-admin-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }

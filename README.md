@@ -42,10 +42,22 @@ records, feeding, breeding, production, finances, and tasks.
    # AI_REQUESTS_PER_MINUTE=5  AI_REQUESTS_PER_HOUR=25
    # AI_DAILY_LIMIT=50  AI_DAILY_DIAGNOSE=10  AI_DAILY_ADVISOR=5
    # AI_DAILY_CHAT=40  AI_DAILY_BRIEF=10  AI_ADMIN_MULTIPLIER=3
+   # Starting model until a super admin picks one in the AI tab (a model
+   # saved there wins over this).
+   AI_MODEL=claude-haiku-5-5
+
+   # Photo screening (server/lib/vision.js): the livestock detector Space
+   # from livestock-models/space, checked before the AI reads the photos.
+   # HF_TOKEN is a read token for the Space while it is private. Only the
+   # server holds it; the apps never call the Space.
+   VISION_API_URL=https://<owner>-<space>.hf.space
+   HF_TOKEN=hf_...
    ```
 
    Without `AI_API_KEY` the app runs normally and the AI features show
-   "AI is not set up yet".
+   "AI is not set up yet". Without `VISION_API_URL` diagnoses run on the AI
+   alone; when the Space is set but cannot be reached, the report says the
+   photo screening was not available.
 
    > If your network/DNS can't resolve `mongodb+srv://` SRV records (some
    > sandboxed or corporate networks block this), use the non-SRV standard
@@ -82,7 +94,8 @@ from the repo root, no separate static site needed:
 - **Start Command:** `npm start`
 - **Environment variables** (Render → your service → Environment): `MONGODB_URI`,
   `MONGODB_DB`, `CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, and optionally
-  `SUPER_ADMIN_EMAILS` and `AI_API_KEY` (turns on the AI features). `.env` is git-ignored and never deployed — these must
+  `SUPER_ADMIN_EMAILS`, `AI_API_KEY` (turns on the AI features), `AI_MODEL`,
+  `VISION_API_URL` and `HF_TOKEN` (photo screening). `.env` is git-ignored and never deployed — these must
   be set directly in the platform's dashboard, or the server exits immediately
   on boot (`MONGODB_URI is not set`, from `server/db.js`).
 - If MongoDB Atlas is used, add the platform's outbound IPs (or `0.0.0.0/0`

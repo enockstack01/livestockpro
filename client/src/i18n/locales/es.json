@@ -1251,6 +1251,36 @@
       "noCamera": "No se pudo abrir la cámara. Permita el acceso a la cámara en su navegador o suba una foto.",
       "tip": "Acerque la cámara a la zona afectada, con buena luz, y manténgala quieta.",
       "defaultQuestion": "¿Qué ve en esta foto? ¿Tiene este animal un problema de salud y qué debo hacer?"
+    },
+    "vision": {
+      "title": "Análisis de fotos",
+      "preliminary": "Preliminar",
+      "hint": "Análisis automático de un modelo en desarrollo que mira el animal entero. Solo da pistas, no es un diagnóstico y puede equivocarse: un veterinario debe confirmarlo.",
+      "unavailable": "El análisis automático de fotos no estuvo disponible para este informe, así que el diagnóstico se basa solo en las fotos, los síntomas y los registros.",
+      "none": "El modelo de análisis no reconoció nada en las fotos. Eso no significa que el animal esté sano.",
+      "photo": "Foto {{n}}",
+      "confidence": "confianza {{pct}}",
+      "compare": "Cómo se compara con las fotos",
+      "labels": {
+        "healthy": "Parece sano",
+        "lumpy_skin_disease": "Dermatosis nodular contagiosa",
+        "foot_and_mouth_disease": "Fiebre aftosa"
+      }
+    },
+    "device": {
+      "title": "Revisado en este teléfono",
+      "intro": "Sin conexión, así que el teléfono revisó las fotos con su propio modelo pequeño. Es una pista preliminar, no un diagnóstico.",
+      "queued": "Guardado en este teléfono. Cuando vuelva a tener conexión, LivestockPro enviará este caso para un diagnóstico completo con IA y el modelo en línea revisará las fotos de nuevo.",
+      "needPhoto": "Sin conexión. Tome una foto para revisarla en este teléfono, o inténtelo de nuevo cuando tenga conexión.",
+      "failed": "El teléfono no pudo revisar la foto: {{message}}",
+      "reportable": "Posible enfermedad de declaración obligatoria. Aísle al animal y contacte al veterinario oficial de la zona.",
+      "doNow": "Qué hacer ahora",
+      "seeVet": "Cuándo llamar al veterinario",
+      "waiting": "Esperando la revisión en línea",
+      "checked": "Revisado en línea",
+      "retry": "Se volverá a intentar",
+      "pendingCount": "Casos esperando la revisión en línea: {{count}}",
+      "earlier": "Revisados en este teléfono"
     }
   },
   "org": {

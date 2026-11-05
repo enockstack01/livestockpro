@@ -1251,6 +1251,36 @@
       "noCamera": "Não foi possível abrir a câmara. Permita o acesso à câmara no navegador ou carregue uma fotografia.",
       "tip": "Aproxime a câmara da zona afetada, com boa luz, e mantenha-a firme.",
       "defaultQuestion": "O que vê nesta fotografia? Este animal tem um problema de saúde e o que devo fazer?"
+    },
+    "vision": {
+      "title": "Análise das fotos",
+      "preliminary": "Preliminar",
+      "hint": "Análise automática de um modelo em desenvolvimento que olha para o animal inteiro. Dá apenas pistas, não é um diagnóstico e pode errar: um veterinário deve confirmar.",
+      "unavailable": "A análise automática das fotos não esteve disponível para este relatório, por isso o diagnóstico baseia-se apenas nas fotos, nos sintomas e nos registos.",
+      "none": "O modelo de análise não reconheceu nada nas fotos. Isso não significa que o animal esteja saudável.",
+      "photo": "Foto {{n}}",
+      "confidence": "confiança {{pct}}",
+      "compare": "Como se compara com as fotos",
+      "labels": {
+        "healthy": "Parece saudável",
+        "lumpy_skin_disease": "Dermatose nodular contagiosa",
+        "foot_and_mouth_disease": "Febre aftosa"
+      }
+    },
+    "device": {
+      "title": "Verificado neste telemóvel",
+      "intro": "Sem ligação, por isso o telemóvel verificou as fotos com o seu próprio modelo pequeno. É uma pista preliminar, não um diagnóstico.",
+      "queued": "Guardado neste telemóvel. Quando voltar a ter ligação, o LivestockPro envia este caso para um diagnóstico completo com IA e o modelo online verifica as fotos de novo.",
+      "needPhoto": "Sem ligação. Tire uma foto para a verificar neste telemóvel, ou tente de novo quando tiver ligação.",
+      "failed": "O telemóvel não conseguiu verificar a foto: {{message}}",
+      "reportable": "Possível doença de declaração obrigatória. Isole o animal e contacte o veterinário oficial da zona.",
+      "doNow": "O que fazer agora",
+      "seeVet": "Quando chamar o veterinário",
+      "waiting": "À espera da verificação online",
+      "checked": "Verificado online",
+      "retry": "Vai tentar de novo",
+      "pendingCount": "Casos à espera da verificação online: {{count}}",
+      "earlier": "Verificados neste telemóvel"
     }
   },
   "org": {

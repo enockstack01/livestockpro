@@ -5,7 +5,13 @@ import { useLocalSearchParams } from 'expo-router';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { File, Paths } from 'expo-file-system';
+import NetInfo from '@react-native-community/netinfo';
+import { useSQLiteContext } from 'expo-sqlite';
+import { useAuth } from '@clerk/expo';
 import Icon from '../components/Icon';
+import { available as deviceModelAvailable, detectPhotos } from '../ml/detector';
+import { findDisease, GUIDE_DISCLAIMER } from '../ml/diseases';
+import { listScans, queueScan, subscribeScans } from '../sync/aiScans';
 import { useApi } from '../api/client';
 import { useRepository } from '../db/repository';
 import { useToast } from '../lib/toast';
@@ -155,6 +161,63 @@ function Note({ children, danger }) {
   );
 }
 
+export const visionLabel = (t, label) => t(`ai.vision.labels.${label}`, { defaultValue: String(label).replace(/_/g, ' ') });
+const pct = (v) => `${Math.round(Number(v) * 100)}%`;
+
+/* A photo with the screening model's boxes over it; boxes are fractions of
+   the photo, so the photo keeps its own shape. */
+export function BoxedPhoto({ src, boxes, aspect, width = 150 }) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  return (
+    <View style={{ width, height: width / (aspect || 4 / 3), borderRadius: 8, overflow: 'hidden', borderWidth: 1, borderColor: colors.border }}>
+      <Image source={{ uri: src }} style={StyleSheet.absoluteFill} resizeMode="stretch" />
+      {boxes.map((d, j) => {
+        const ok = d.label === 'healthy';
+        const tone = ok ? colors.leaf : colors.orange;
+        return (
+          <View key={j} pointerEvents="none" style={{ position: 'absolute', left: `${d.box[0] * 100}%`, top: `${d.box[1] * 100}%`, width: `${(d.box[2] - d.box[0]) * 100}%`, height: `${(d.box[3] - d.box[1]) * 100}%`, borderWidth: 2, borderColor: tone }}>
+            <Text numberOfLines={1} style={{ alignSelf: 'flex-start', backgroundColor: tone, color: ok ? '#FFFFFF' : '#1C2B1E', fontSize: 9.5, fontWeight: '700', paddingHorizontal: 3 }}>{visionLabel(t, d.label)} {pct(d.confidence)}</Text>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+/* The photo screening model's hints (report.vision, server/lib/vision.js).
+   Hints only: never shown as a diagnosis. */
+function Screening({ vision, photos, note }) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  if (!vision) return null;
+  if (!vision.available) return <View style={{ marginBottom: 12 }}><Note>{t('ai.vision.unavailable')}</Note></View>;
+  const dets = vision.detections || [];
+  const sizes = vision.photos || [];
+  const shots = (photos || []).map((src, i) => ({ src, n: i + 1, boxes: dets.filter((d) => d.photo === i + 1) })).filter((p) => p.boxes.length);
+  return (
+    <View style={[styles.photoBox, { borderColor: colors.border }]}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+        <Text style={{ color: colors.primary, fontWeight: '800', fontSize: 14 }}>{t('ai.vision.title')}</Text>
+        <Pill value="soon">{t('ai.vision.preliminary')}</Pill>
+      </View>
+      {shots.length ? (
+        <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+          {shots.map((p) => {
+            const s = sizes[p.n - 1];
+            return <BoxedPhoto key={p.n} src={p.src} boxes={p.boxes} aspect={s && s.width && s.height ? s.width / s.height : undefined} />;
+          })}
+        </View>
+      ) : null}
+      {dets.length ? (
+        <Bullets items={dets.map((d) => `${(photos || []).length > 1 ? `${t('ai.vision.photo', { n: d.photo })}: ` : ''}${visionLabel(t, d.label)} · ${t('ai.vision.confidence', { pct: pct(d.confidence) })}`)} />
+      ) : <Para>{t('ai.vision.none')}</Para>}
+      {note ? <Para>{`${t('ai.vision.compare')}: ${note}`}</Para> : null}
+      <Muted style={{ marginTop: 6, fontSize: 12 }}>{t('ai.vision.hint')}</Muted>
+    </View>
+  );
+}
+
 function DiagnosisView({ r, photos }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
@@ -173,6 +236,7 @@ function DiagnosisView({ r, photos }) {
           {r.photo_findings ? <Text selectable style={{ color: colors.text, fontSize: 14, lineHeight: 20 }}>{r.photo_findings}</Text> : null}
         </View>
       ) : null}
+      <Screening vision={r.vision} photos={photos} note={r.screening_note} />
       <View style={styles.pills}>
         <Pill value={r.urgency}>{tr('urgency')}: {tr(`urgencyLevels.${r.urgency}`)}</Pill>
         {r.see_vet ? <Pill value="urgent">{tr('seeVet')}</Pill> : <Pill value="routine">{tr('seeVetNo')}</Pill>}
@@ -443,6 +507,92 @@ export function AdvisorCard({ disabled }) {
   );
 }
 
+/* What the on-phone model found with no connection (src/ml): labelled
+   preliminary, with the offline first-response guide for each flag, and
+   the note that the case goes for the full online check later. */
+export function DeviceResult({ result, onDone }) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  const { vision, thumbs } = result;
+  const dets = vision.detections || [];
+  const labels = [...new Set(dets.map((d) => d.label))].sort((a, b) => (a === 'healthy') - (b === 'healthy'));
+  return (
+    <Card><CardBody>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+        <Text style={[styles.reportTitle, { color: colors.primaryDark }]}>{t('ai.device.title')}</Text>
+        <Pill value="soon">{t('ai.vision.preliminary')}</Pill>
+      </View>
+      <Muted style={{ marginBottom: 10 }}>{t('ai.device.intro')}</Muted>
+      <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+        {thumbs.map((src, i) => {
+          const s = (vision.photos || [])[i];
+          return <BoxedPhoto key={i} src={src} boxes={dets.filter((d) => d.photo === i + 1)} aspect={s ? s.width / s.height : undefined} />;
+        })}
+      </View>
+      {labels.length ? labels.map((label) => {
+        const best = Math.max(...dets.filter((d) => d.label === label).map((d) => d.confidence));
+        const guide = findDisease(label);
+        return (
+          <Boxed key={label} title={visionLabel(t, label)} pill={<Pill value={label === 'healthy' ? 'routine' : 'soon'}>{pct(best)}</Pill>}>
+            {guide && label !== 'healthy' ? (
+              <View style={{ gap: 6, marginTop: 4 }}>
+                {guide.notifiable ? <Note danger>{t('ai.device.reportable')}</Note> : null}
+                <Text style={{ fontSize: 12, fontWeight: '700', color: colors.textLight }}>{t('ai.device.doNow')}</Text>
+                <Bullets items={guide.do_now} />
+                <Text style={{ fontSize: 12, fontWeight: '700', color: colors.textLight }}>{t('ai.device.seeVet')}</Text>
+                <Para>{guide.see_vet}</Para>
+              </View>
+            ) : null}
+          </Boxed>
+        );
+      }) : <Para>{t('ai.vision.none')}</Para>}
+      <Muted style={{ marginVertical: 8, fontSize: 12 }}>{t('ai.vision.hint')}</Muted>
+      <Note>{t('ai.device.queued')}</Note>
+      <Muted style={{ marginTop: 8, fontSize: 11.5 }}>{GUIDE_DISCLAIMER}</Muted>
+      <View style={{ marginTop: 10 }}><Note danger>{t('ai.vetNotice')}</Note></View>
+      <Button title={t('ai.diagnose.again')} icon="rotate" variant="secondary" onPress={onDone} style={{ marginTop: 16 }} />
+    </CardBody></Card>
+  );
+}
+
+/* Cases checked on this phone: waiting for the online check, or done (tap
+   to open the full report). */
+function DeviceScans({ onOpen }) {
+  const { t, i18n } = useTranslation();
+  const { colors } = useTheme();
+  const db = useSQLiteContext();
+  const { userId } = useAuth();
+  const [rows, setRows] = useState([]);
+  useEffect(() => {
+    let live = true;
+    const load = () => listScans(db, userId).then((r) => { if (live) setRows(r); }).catch(() => {});
+    load();
+    const off = subscribeScans(load);
+    return () => { live = false; off(); };
+  }, [db, userId]);
+  if (!rows.length) return null;
+  const waiting = rows.filter((r) => r.status === 'pending').length;
+  return (
+    <View style={{ marginTop: 18, gap: 6 }}>
+      <Text style={{ fontWeight: '800', color: colors.text }}>{t('ai.device.earlier')}</Text>
+      {waiting ? <Muted>{t('ai.device.pendingCount', { count: waiting })}</Muted> : null}
+      {rows.map((r) => {
+        const top = (r.preliminary.detections || []).slice().sort((a, b) => b.confidence - a.confidence)[0];
+        const done = r.status === 'done';
+        return (
+          <Pressable key={r.id} disabled={!done} onPress={() => onOpen(r.report_id)} accessibilityRole="button" style={({ pressed }) => [styles.earlier, { borderColor: colors.border, backgroundColor: pressed ? colors.bg : colors.card }]}>
+            <Icon name={done ? 'file-medical' : 'mobile-screen'} size={14} color={colors.primary} />
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Text style={{ color: colors.text, fontSize: 13 }} numberOfLines={2}>{r.summary || (top ? `${visionLabel(t, top.label)} ${pct(top.confidence)}` : t('ai.vision.none'))}</Text>
+              <Text style={{ color: colors.textLight, fontSize: 11.5 }}>{new Date(r.created_at).toLocaleString(i18n.language)} · {done ? t('ai.device.checked') : r.status === 'failed' ? r.last_error : r.last_error ? t('ai.device.retry') : t('ai.device.waiting')}</Text>
+            </View>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
 function DiagnoseTab({ disabled, recordId }) {
   const { t, i18n } = useTranslation();
   const { colors } = useTheme();
@@ -457,7 +607,10 @@ function DiagnoseTab({ disabled, recordId }) {
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(null);
   const [earlier, setEarlier] = useState([]);
+  const [deviceResult, setDeviceResult] = useState(null);
   const photos = usePhotos();
+  const db = useSQLiteContext();
+  const { userId } = useAuth();
 
   useEffect(() => {
     let live = true;
@@ -492,13 +645,41 @@ function DiagnoseTab({ disabled, recordId }) {
     }
     if (animal) { body.animal_id = animal.id; body.tag_id = animal.tag_id; }
     else if (species) body.species = species;
-    const { data, error } = await api.aiDiagnose(body);
+    const net = await NetInfo.fetch().catch(() => null);
+    const offline = net && (net.isConnected === false || net.isInternetReachable === false);
+    const { data, error } = offline ? { error: { networkError: true } } : await api.aiDiagnose(body);
+    if (error && error.networkError) { await runOnPhone(body); return; }
     setBusy(false);
     if (error) { showToast(aiErrorText(t, error, i18n.language), 'error'); return; }
     photos.clear();
     setSaved(data);
     if (record) setEarlier((list) => [data, ...list]);
   }
+
+  /* No connection: the on-phone model checks the photos now, and the whole
+     request waits on the phone for the online diagnosis (src/sync/aiScans.js). */
+  async function runOnPhone(body) {
+    if (!deviceModelAvailable) { setBusy(false); showToast(t('ai.offline'), 'error'); return; }
+    if (!photos.photos.length) { setBusy(false); showToast(t('ai.device.needPhoto'), 'error'); return; }
+    try {
+      const vision = await detectPhotos(photos.photos.map((p) => ({ uri: p.fullUri || p.uri, width: p.width, height: p.height })));
+      const thumbs = photos.photos.map((p) => p.thumb);
+      await queueScan(db, userId, { request: body, preliminary: vision, summary: animal ? animal.tag_id : null });
+      photos.clear();
+      setDeviceResult({ vision, thumbs });
+    } catch (e) {
+      showToast(t('ai.device.failed', { message: e.message }), 'error');
+    }
+    setBusy(false);
+  }
+
+  async function openReport(id) {
+    const { data, error } = await api.aiReport(id);
+    if (error) { showToast(aiErrorText(t, error, i18n.language), 'error'); return; }
+    setSaved(data);
+  }
+
+  if (deviceResult) return <DeviceResult result={deviceResult} onDone={() => setDeviceResult(null)} />;
 
   if (saved) {
     return (
@@ -550,6 +731,7 @@ function DiagnoseTab({ disabled, recordId }) {
                 ))}
               </View>
             ) : null}
+            <DeviceScans onOpen={openReport} />
           </>
         )}
       </CardBody>

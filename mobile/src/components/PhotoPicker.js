@@ -29,7 +29,8 @@ async function shrink(asset, side, compress) {
 
 async function prepare(asset) {
   const [full, thumb] = await Promise.all([shrink(asset, FULL_SIDE, 0.85), shrink(asset, THUMB_SIDE, 0.7)]);
-  return { media_type: 'image/jpeg', data: full.base64, thumb: `data:image/jpeg;base64,${thumb.base64}`, uri: thumb.uri };
+  // The full file and its size let the on-phone detector check it with no connection.
+  return { media_type: 'image/jpeg', data: full.base64, thumb: `data:image/jpeg;base64,${thumb.base64}`, uri: thumb.uri, fullUri: full.uri, width: full.width, height: full.height };
 }
 
 /* State for the photos of one request: { photos, add, remove, clear, payload }. */

@@ -1251,6 +1251,36 @@
       "noCamera": "The camera could not be opened. Allow camera access in your browser, or upload a photo instead.",
       "tip": "Hold the camera close to the affected area, in good light, and keep it steady.",
       "defaultQuestion": "What can you see in this photo? Does this animal have a health problem, and what should I do?"
+    },
+    "vision": {
+      "title": "Photo screening",
+      "preliminary": "Preliminary",
+      "hint": "Automatic screening by a development model that looks at the whole animal. It gives hints only, is not a diagnosis and can be wrong: a vet must confirm.",
+      "unavailable": "Automatic photo screening was not available for this report, so the diagnosis is based on the photos, the symptoms and the records only.",
+      "none": "The screening model recognised nothing in the photos. That does not mean the animal is healthy.",
+      "photo": "Photo {{n}}",
+      "confidence": "{{pct}} confidence",
+      "compare": "How it compares with the photos",
+      "labels": {
+        "healthy": "Looks healthy",
+        "lumpy_skin_disease": "Lumpy skin disease",
+        "foot_and_mouth_disease": "Foot and mouth disease"
+      }
+    },
+    "device": {
+      "title": "Checked on this phone",
+      "intro": "No connection, so the phone checked the photos with its own small model. This is a preliminary hint, not a diagnosis.",
+      "queued": "Saved on this phone. When you are back online LivestockPro sends this case for a full AI diagnosis and the online model checks the photos again.",
+      "needPhoto": "No connection. Take a photo to check it on this phone, or try again when you are online.",
+      "failed": "The phone could not check the photo: {{message}}",
+      "reportable": "Possible reportable disease. Isolate the animal and contact the sector veterinary officer.",
+      "doNow": "What to do now",
+      "seeVet": "When to call the vet",
+      "waiting": "Waiting for the online check",
+      "checked": "Checked online",
+      "retry": "Will try again",
+      "pendingCount": "Cases waiting for the online check: {{count}}",
+      "earlier": "Checked on this phone"
     }
   },
   "org": {

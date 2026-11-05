@@ -23,6 +23,8 @@ config.resolver.nodeModulesPaths = [
 // cross-origin-isolated pages to use. Native (iOS/Android) doesn't touch any
 // of this — only `expo start --web` needs it.
 config.resolver.assetExts.push('wasm');
+// The on-phone livestock detector (src/ml/detector.native.js) is bundled as an asset.
+config.resolver.assetExts.push('tflite');
 config.server.enhanceMiddleware = (middleware) => (req, res, next) => {
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
   res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');

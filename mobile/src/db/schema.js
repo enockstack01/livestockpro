@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import { SCHEMAS, SYNCED_TABLES } from '../lib/shared';
 
 export const DB_NAME = 'livestockpro.db';
-const DATABASE_VERSION = 4;
+const DATABASE_VERSION = 5;
 
 /* Fields known to hold numbers, so their SQLite column gets NUMERIC affinity
    (matters for correct ORDER BY / range comparisons — SQLite is otherwise
@@ -73,8 +73,30 @@ export async function migrateDbIfNeeded(db) {
     version = 4;
   }
 
+  /* v5: diagnosis photos checked on the phone with no connection, waiting
+     to be sent for the full online diagnosis (src/sync/aiScans.js). */
+  if (version < 5) {
+    await db.execAsync(AI_SCANS_SQL);
+    version = 5;
+  }
+
   await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION};`);
 }
+
+const AI_SCANS_SQL = `
+  CREATE TABLE IF NOT EXISTS ai_scans (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    request TEXT,
+    preliminary TEXT NOT NULL,
+    summary TEXT,
+    report_id TEXT,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    last_error TEXT
+  );
+`;
 
 /* The v1 schema: one table per synced collection plus the sync bookkeeping. */
 async function createSchema(db) {
@@ -112,7 +134,8 @@ async function createSchema(db) {
    just before signing out is silently destroyed with no way to recover it. */
 export async function getPendingSyncCount(db) {
   const row = await db.getFirstAsync('SELECT COUNT(*) as c FROM sync_queue');
-  return row ? row.c : 0;
+  const scans = await db.getFirstAsync("SELECT COUNT(*) as c FROM ai_scans WHERE status = 'pending'");
+  return (row ? row.c : 0) + (scans ? scans.c : 0);
 }
 
 /* Sign-out safety: wipes every row (not the tables themselves) so a second
@@ -122,5 +145,5 @@ export async function wipeLocalData(db) {
   for (const table of SYNCED_TABLES) {
     await db.runAsync(`DELETE FROM ${table};`);
   }
-  await db.execAsync('DELETE FROM sync_queue; DELETE FROM sync_meta; DELETE FROM scheduled_notifications;');
+  await db.execAsync('DELETE FROM sync_queue; DELETE FROM sync_meta; DELETE FROM scheduled_notifications; DELETE FROM ai_scans;');
 }

@@ -66,6 +66,32 @@ function photosBlock(r, caseInfo) {
   return { imgs, findings: r.photo_findings ? para(r.photo_findings) : '' };
 }
 
+/* The photo screening model's hints (report.vision), with its boxes drawn
+   over the photos. Marked preliminary: they are never a diagnosis. */
+function screeningBlock(r, t, caseInfo) {
+  const v = r.vision;
+  if (!v) return '';
+  const tv = (k, o) => t(`ai.vision.${k}`, o);
+  if (!v.available) return `<div class="photos avoid"><h3>${esc(tv('title'))}</h3><p class="callout">${esc(tv('unavailable'))}</p></div>`;
+  const label = (l) => t(`ai.vision.labels.${l}`, { defaultValue: String(l).replace(/_/g, ' ') });
+  const pct = (c) => `${Math.round(Number(c) * 100)}%`;
+  const dets = v.detections || [];
+  const photos = (caseInfo && Array.isArray(caseInfo.photos) ? caseInfo.photos : []).filter((p) => /^data:image\/(jpeg|png|webp);base64,/.test(p));
+  const shots = photos.map((src, i) => {
+    const boxes = dets.filter((d) => d.photo === i + 1);
+    if (!boxes.length) return '';
+    const marks = boxes.map((d) => {
+      const [x1, y1, x2, y2] = d.box.map((n) => Number(n) * 100);
+      return `<span class="bx${d.label === 'healthy' ? ' bx-ok' : ''}" style="left:${x1}%;top:${y1}%;width:${x2 - x1}%;height:${y2 - y1}%"><em>${esc(label(d.label))} ${pct(d.confidence)}</em></span>`;
+    }).join('');
+    return `<div class="shot"><img src="${src}" alt="">${marks}</div>`;
+  }).join('');
+  const items = dets.length
+    ? list(dets.map((d) => `${photos.length > 1 ? `${tv('photo', { n: d.photo })}: ` : ''}${label(d.label)} · ${tv('confidence', { pct: pct(d.confidence) })}`))
+    : para(tv('none'));
+  return `<div class="photos avoid"><h3>${esc(tv('title'))} ${pill('medium', tv('preliminary'))}</h3>${shots ? `<div class="ph-row">${shots}</div>` : ''}${items}${r.screening_note ? `<p><strong>${esc(tv('compare'))}:</strong> ${esc(r.screening_note)}</p>` : ''}<p class="small">${esc(tv('hint'))}</p></div>`;
+}
+
 function diagnosisBody(r, t, caseInfo) {
   const tr = (k, o) => t(`ai.report.${k}`, o);
   const yes = t('ai.pdf.yes');
@@ -95,6 +121,7 @@ function diagnosisBody(r, t, caseInfo) {
       const p = photosBlock(r, caseInfo);
       return p ? `<div class="photos avoid"><h3>${esc(t('ai.pdf.photos'))}</h3>${p.imgs}${p.findings}</div>` : '';
     })(),
+    screeningBlock(r, t, caseInfo),
     `<div class="summary avoid"><h3>${esc(t('ai.pdf.summary'))}</h3>${para(r.summary)}${r.see_vet_reason ? `<p class="callout"><strong>${esc(tr('seeVet'))}:</strong> ${esc(r.see_vet_reason)}</p>` : ''}</div>`,
     sections([
       { title: tr('likely'), body: conditions },
@@ -192,6 +219,12 @@ const CSS = `
   .photos { margin: 0 0 12px; }
   .photos .ph-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 8px; }
   .photos .ph-row img { width: 46mm; height: 34mm; object-fit: cover; border: 1px solid #DFE2DF; border-radius: 4px; }
+  .photos .shot { position: relative; display: inline-block; line-height: 0; }
+  .photos .shot img { width: auto; height: 40mm; object-fit: fill; }
+  .bx { position: absolute; border: 2px solid #F9A825; box-sizing: border-box; }
+  .bx em { position: absolute; left: -2px; top: -2px; background: #F9A825; color: #1C2B1E; font-style: normal; font-size: 7.5pt; font-weight: 700; line-height: 1.4; padding: 0 3px; white-space: nowrap; }
+  .bx-ok { border-color: #2E7D32; }
+  .bx-ok em { background: #2E7D32; color: #FFFFFF; }
   .kv-grid { display: flex; flex-wrap: wrap; gap: 6px 0; }
   .kv { width: 33.33%; padding-right: 10px; }
   .kv-wide { width: 100%; }
