@@ -73,8 +73,8 @@ export async function migrateDbIfNeeded(db) {
     version = 4;
   }
 
-  /* v5: diagnosis photos checked on the phone with no connection, waiting
-     to be sent for the full online diagnosis (src/sync/aiScans.js). */
+  /* v5: photos checked on the phone with the embedded detector, kept so
+     an earlier check can be opened again (src/sync/aiScans.js). */
   if (version < 5) {
     await db.execAsync(AI_SCANS_SQL);
     version = 5;
@@ -134,8 +134,7 @@ async function createSchema(db) {
    just before signing out is silently destroyed with no way to recover it. */
 export async function getPendingSyncCount(db) {
   const row = await db.getFirstAsync('SELECT COUNT(*) as c FROM sync_queue');
-  const scans = await db.getFirstAsync("SELECT COUNT(*) as c FROM ai_scans WHERE status = 'pending'");
-  return (row ? row.c : 0) + (scans ? scans.c : 0);
+  return row ? row.c : 0;
 }
 
 /* Sign-out safety: wipes every row (not the tables themselves) so a second

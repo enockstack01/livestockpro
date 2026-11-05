@@ -1270,19 +1270,19 @@
       "checked": "Geprüftes Foto"
     },
     "device": {
-      "title": "Auf diesem Telefon geprüft",
-      "intro": "Keine Verbindung, daher hat das Telefon die Fotos mit seinem eigenen kleinen Modell geprüft. Das ist ein vorläufiger Hinweis, keine Diagnose.",
-      "queued": "Auf diesem Telefon gespeichert. Sobald Sie wieder online sind, sendet LivestockPro den Fall zur vollständigen KI-Diagnose und das Online-Modell prüft die Fotos erneut.",
-      "needPhoto": "Keine Verbindung. Machen Sie ein Foto, um es auf diesem Telefon zu prüfen, oder versuchen Sie es online erneut.",
+      "title": "Befunde der Krankheitserkennung",
+      "intro": "Auf diesem Telefon mit dem eingebauten Modell geprüft, ohne Internet. Das sind Befunde der Krankheitserkennung, keine Diagnose.",
+      "needPhoto": "Fügen Sie zuerst ein Foto hinzu: Das eingebaute Modell prüft Fotos auf Krankheiten.",
       "failed": "Das Telefon konnte das Foto nicht prüfen: {{message}}",
       "reportable": "Möglicherweise meldepflichtige Krankheit. Isolieren Sie das Tier und informieren Sie den Amtstierarzt.",
       "doNow": "Was jetzt zu tun ist",
       "seeVet": "Wann der Tierarzt kommen sollte",
-      "waiting": "Wartet auf die Online-Prüfung",
-      "checked": "Online geprüft",
-      "retry": "Wird erneut versucht",
-      "pendingCount": "Fälle, die auf die Online-Prüfung warten: {{count}}",
-      "earlier": "Auf diesem Telefon geprüft"
+      "earlier": "Auf diesem Telefon geprüft",
+      "findings": "Befunde",
+      "run": "Auf diesem Telefon prüfen",
+      "runHint": "Funktioniert ohne Internet: Das eingebaute Modell sucht auf den Fotos nach Krankheiten und zeigt seine Befunde.",
+      "again": "Anderes Foto prüfen",
+      "nothing": "Nichts erkannt"
     }
   },
   "org": {

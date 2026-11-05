@@ -1270,19 +1270,19 @@
       "checked": "Ifoto yasuzumwe"
     },
     "device": {
-      "title": "Byasuzumiwe kuri iyi telefone",
-      "intro": "Nta murandasi, bityo telefone yasuzumye amafoto ikoresheje icyitegererezo cyayo gito. Iki ni ikimenyetso cy’ibanze, si isuzuma.",
-      "queued": "Byabitswe kuri iyi telefone. Nugaruka ku murandasi, LivestockPro izohereza iki kibazo ngo gisuzumwe byuzuye na AI, kandi icyitegererezo cyo kuri murandasi kizongera gusuzuma amafoto.",
-      "needPhoto": "Nta murandasi. Fata ifoto isuzumirwe kuri iyi telefone, cyangwa wongere ugerageze uri ku murandasi.",
+      "title": "Ibyagaragaye mu gushakisha indwara",
+      "intro": "Byasuzumiwe kuri iyi telefone hakoreshejwe icyitegererezo kiyirimo, nta murandasi. Ibi ni ibyagaragaye mu gushakisha indwara, si isuzuma.",
+      "needPhoto": "Banza wongeremo ifoto: icyitegererezo kiri muri telefone gisuzuma indwara ku mafoto.",
       "failed": "Telefone ntiyashoboye gusuzuma ifoto: {{message}}",
       "reportable": "Ishobora kuba indwara igomba kumenyeshwa. Tandukanya itungo n’ayandi kandi uhamagare veterineri w’umurenge.",
       "doNow": "Icyo gukora ubu",
       "seeVet": "Igihe cyo guhamagara veterineri",
-      "waiting": "Bitegereje isuzuma kuri murandasi",
-      "checked": "Byasuzumwe kuri murandasi",
-      "retry": "Bizongera kugeragezwa",
-      "pendingCount": "Ibibazo bitegereje isuzuma kuri murandasi: {{count}}",
-      "earlier": "Byasuzumiwe kuri iyi telefone"
+      "earlier": "Byasuzumiwe kuri iyi telefone",
+      "findings": "Ibyagaragaye",
+      "run": "Suzumira kuri iyi telefone",
+      "runHint": "Bikora nta murandasi: icyitegererezo kiri muri telefone gishakisha indwara ku mafoto kikerekana ibyo cyabonye.",
+      "again": "Suzuma indi foto",
+      "nothing": "Nta cyamenyekanye"
     }
   },
   "org": {

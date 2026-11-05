@@ -1270,19 +1270,19 @@
       "checked": "Checked photo"
     },
     "device": {
-      "title": "Checked on this phone",
-      "intro": "No connection, so the phone checked the photos with its own small model. This is a preliminary hint, not a diagnosis.",
-      "queued": "Saved on this phone. When you are back online LivestockPro sends this case for a full AI diagnosis and the online model checks the photos again.",
-      "needPhoto": "No connection. Take a photo to check it on this phone, or try again when you are online.",
+      "title": "Disease detection findings",
+      "intro": "Checked on this phone with the built-in model, no internet needed. These are disease detection findings, not a diagnosis.",
+      "needPhoto": "Add a photo first: the built-in model checks photos for disease.",
       "failed": "The phone could not check the photo: {{message}}",
       "reportable": "Possible reportable disease. Isolate the animal and contact the sector veterinary officer.",
       "doNow": "What to do now",
       "seeVet": "When to call the vet",
-      "waiting": "Waiting for the online check",
-      "checked": "Checked online",
-      "retry": "Will try again",
-      "pendingCount": "Cases waiting for the online check: {{count}}",
-      "earlier": "Checked on this phone"
+      "earlier": "Checked on this phone",
+      "findings": "Findings",
+      "run": "Check on this phone",
+      "runHint": "Works without internet: the built-in model looks for disease in the photos and shows its findings.",
+      "again": "Check another photo",
+      "nothing": "Nothing recognised"
     }
   },
   "org": {

@@ -111,9 +111,6 @@ export function useApi() {
       const qs = new URLSearchParams(Object.entries(params).filter(([, v]) => v != null && v !== '')).toString();
       return request(getToken, '/ai/reports' + (qs ? '?' + qs : ''));
     },
-    async aiReport(id) {
-      return request(getToken, '/ai/reports/' + encodeURIComponent(id));
-    },
     async aiDeleteReport(id) {
       return request(getToken, '/ai/reports/' + encodeURIComponent(id), { method: 'DELETE' });
     },

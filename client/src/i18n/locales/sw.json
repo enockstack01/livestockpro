@@ -1270,19 +1270,19 @@
       "checked": "Picha iliyokaguliwa"
     },
     "device": {
-      "title": "Imekaguliwa kwenye simu hii",
-      "intro": "Hakuna mtandao, kwa hiyo simu imekagua picha kwa modeli yake ndogo. Hii ni dalili ya awali, si utambuzi.",
-      "queued": "Imehifadhiwa kwenye simu hii. Ukirudi mtandaoni LivestockPro itatuma kesi hii kwa utambuzi kamili wa AI na modeli ya mtandaoni itakagua picha tena.",
-      "needPhoto": "Hakuna mtandao. Piga picha ili ikaguliwe kwenye simu hii, au jaribu tena ukiwa mtandaoni.",
+      "title": "Matokeo ya kugundua ugonjwa",
+      "intro": "Imekaguliwa kwenye simu hii kwa modeli iliyojengwa ndani, bila intaneti. Haya ni matokeo ya kugundua ugonjwa, si utambuzi.",
+      "needPhoto": "Ongeza picha kwanza: modeli iliyojengwa ndani hukagua picha kutafuta ugonjwa.",
       "failed": "Simu haikuweza kukagua picha: {{message}}",
       "reportable": "Huenda ni ugonjwa unaopaswa kuripotiwa. Mtenge mnyama na wasiliana na daktari wa mifugo wa sekta.",
       "doNow": "Cha kufanya sasa",
       "seeVet": "Wakati wa kumwita daktari wa mifugo",
-      "waiting": "Inasubiri ukaguzi wa mtandaoni",
-      "checked": "Imekaguliwa mtandaoni",
-      "retry": "Itajaribu tena",
-      "pendingCount": "Kesi zinazosubiri ukaguzi wa mtandaoni: {{count}}",
-      "earlier": "Zilizokaguliwa kwenye simu hii"
+      "earlier": "Zilizokaguliwa kwenye simu hii",
+      "findings": "Matokeo",
+      "run": "Kagua kwenye simu hii",
+      "runHint": "Inafanya kazi bila intaneti: modeli iliyojengwa ndani inatafuta ugonjwa kwenye picha na kuonyesha matokeo yake.",
+      "again": "Kagua picha nyingine",
+      "nothing": "Hakuna kilichotambuliwa"
     }
   },
   "org": {

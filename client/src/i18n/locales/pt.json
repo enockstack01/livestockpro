@@ -1270,19 +1270,19 @@
       "checked": "Foto analisada"
     },
     "device": {
-      "title": "Verificado neste telemóvel",
-      "intro": "Sem ligação, por isso o telemóvel verificou as fotos com o seu próprio modelo pequeno. É uma pista preliminar, não um diagnóstico.",
-      "queued": "Guardado neste telemóvel. Quando voltar a ter ligação, o LivestockPro envia este caso para um diagnóstico completo com IA e o modelo online verifica as fotos de novo.",
-      "needPhoto": "Sem ligação. Tire uma foto para a verificar neste telemóvel, ou tente de novo quando tiver ligação.",
+      "title": "Resultados da deteção de doenças",
+      "intro": "Verificado neste telemóvel com o modelo integrado, sem internet. São resultados de deteção de doenças, não um diagnóstico.",
+      "needPhoto": "Adicione primeiro uma foto: o modelo integrado procura doenças nas fotos.",
       "failed": "O telemóvel não conseguiu verificar a foto: {{message}}",
       "reportable": "Possível doença de declaração obrigatória. Isole o animal e contacte o veterinário oficial da zona.",
       "doNow": "O que fazer agora",
       "seeVet": "Quando chamar o veterinário",
-      "waiting": "À espera da verificação online",
-      "checked": "Verificado online",
-      "retry": "Vai tentar de novo",
-      "pendingCount": "Casos à espera da verificação online: {{count}}",
-      "earlier": "Verificados neste telemóvel"
+      "earlier": "Verificados neste telemóvel",
+      "findings": "Resultados",
+      "run": "Verificar neste telemóvel",
+      "runHint": "Funciona sem internet: o modelo integrado procura doenças nas fotos e mostra os resultados.",
+      "again": "Verificar outra foto",
+      "nothing": "Nada reconhecido"
     }
   },
   "org": {

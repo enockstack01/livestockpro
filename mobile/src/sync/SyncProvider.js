@@ -5,7 +5,6 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { useAuth } from '@clerk/expo';
 import { useApi } from '../api/client';
 import { runSync } from './syncEngine';
-import { flushScans } from './aiScans';
 import { rescheduleReminders } from '../notifications/scheduler';
 import { registerForPushNotifications } from '../notifications/registerPushToken';
 import { useAccount } from '../account/AccountProvider';
@@ -19,7 +18,7 @@ const SyncContext = createContext(null);
 export function SyncProvider({ children }) {
   const db = useSQLiteContext();
   const api = useApi();
-  const { isSignedIn, userId } = useAuth();
+  const { isSignedIn } = useAuth();
   /* Nothing to sync (and every data call would be refused) until an admin
      has approved the account — see src/account/AccountProvider.js. */
   const { approved, account } = useAccount();
@@ -36,15 +35,12 @@ export function SyncProvider({ children }) {
       const result = await runSync(db, api);
       setState({ syncing: false, lastSyncedAt: new Date().toISOString(), lastError: null, failedCount: result.push.failed });
       await rescheduleReminders(db);
-      /* Diagnosis photos checked on the phone while offline get their full
-         online diagnosis now (src/sync/aiScans.js). */
-      await flushScans(db, api, userId).catch(() => {});
     } catch (err) {
       setState((s) => ({ ...s, syncing: false, lastError: err.message }));
     } finally {
       runningRef.current = false;
     }
-  }, [db, api, enabled, userId]);
+  }, [db, api, enabled]);
 
   useEffect(() => {
     if (!enabled) return;

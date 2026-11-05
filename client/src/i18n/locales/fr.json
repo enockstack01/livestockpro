@@ -1270,19 +1270,19 @@
       "checked": "Photo analysée"
     },
     "device": {
-      "title": "Vérifié sur ce téléphone",
-      "intro": "Pas de connexion : le téléphone a vérifié les photos avec son propre petit modèle. C’est un indice préliminaire, pas un diagnostic.",
-      "queued": "Enregistré sur ce téléphone. Dès que vous serez en ligne, LivestockPro enverra ce cas pour un diagnostic IA complet et le modèle en ligne vérifiera à nouveau les photos.",
-      "needPhoto": "Pas de connexion. Prenez une photo pour la vérifier sur ce téléphone, ou réessayez une fois en ligne.",
+      "title": "Résultats de détection de maladie",
+      "intro": "Vérifié sur ce téléphone avec le modèle intégré, sans internet. Ce sont des résultats de détection de maladie, pas un diagnostic.",
+      "needPhoto": "Ajoutez d’abord une photo : le modèle intégré recherche les maladies sur les photos.",
       "failed": "Le téléphone n’a pas pu vérifier la photo : {{message}}",
       "reportable": "Maladie à déclaration obligatoire possible. Isolez l’animal et contactez le vétérinaire de secteur.",
       "doNow": "Que faire maintenant",
       "seeVet": "Quand appeler le vétérinaire",
-      "waiting": "En attente de la vérification en ligne",
-      "checked": "Vérifié en ligne",
-      "retry": "Nouvel essai prévu",
-      "pendingCount": "Cas en attente de la vérification en ligne : {{count}}",
-      "earlier": "Vérifiés sur ce téléphone"
+      "earlier": "Vérifiés sur ce téléphone",
+      "findings": "Résultats",
+      "run": "Vérifier sur ce téléphone",
+      "runHint": "Fonctionne sans internet : le modèle intégré recherche les maladies sur les photos et affiche ses résultats.",
+      "again": "Vérifier une autre photo",
+      "nothing": "Rien de reconnu"
     }
   },
   "org": {
