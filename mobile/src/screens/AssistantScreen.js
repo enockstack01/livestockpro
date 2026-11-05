@@ -645,8 +645,11 @@ function DiagnoseTab({ disabled, recordId }) {
     }
     if (animal) { body.animal_id = animal.id; body.tag_id = animal.tag_id; }
     else if (species) body.species = species;
+    /* Only a phone with no network at all skips the server; "internet not
+       reachable" can be reported briefly while connected, so a failed
+       request falls back to the phone instead. */
     const net = await NetInfo.fetch().catch(() => null);
-    const offline = net && (net.isConnected === false || net.isInternetReachable === false);
+    const offline = net && net.isConnected === false;
     const { data, error } = offline ? { error: { networkError: true } } : await api.aiDiagnose(body);
     if (error && error.networkError) { await runOnPhone(body); return; }
     setBusy(false);
