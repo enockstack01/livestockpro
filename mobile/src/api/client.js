@@ -2,26 +2,40 @@ import { useAuth } from '@clerk/expo';
 import { useMemo } from 'react';
 import { setAiUsage } from '../../../shared/aiUsage';
 import { getDeviceId } from '../lib/deviceId';
+import { isOffline } from '../lib/connectivity';
 
 /* Absolute URL required on native (no page origin to be relative to, unlike
    client/src/lib/api.js's '/api'). Set per environment in .env / EAS build
    profiles — see mobile/.env.example. */
 const API_BASE = (process.env.EXPO_PUBLIC_API_URL || '').replace(/\/$/, '') + '/api';
 
+const networkError = () => ({ data: null, error: { message: 'Network error: could not reach the server.', networkError: true } });
+// Offline, Clerk can keep trying to refresh the token; do not wait for it forever.
+const TOKEN_WAIT_MS = 10000;
+
 async function request(getToken, path, options = {}) {
+  // Offline mode (src/lib/connectivity): answer at once instead of waiting on the network.
+  if (isOffline()) return networkError();
   let headers = { 'Content-Type': 'application/json', 'X-Device-Id': await getDeviceId() };
+  let timer;
   try {
-    const token = await getToken();
+    const token = await Promise.race([
+      getToken(),
+      new Promise((_, reject) => { timer = setTimeout(() => reject(Object.assign(new Error('timeout'), { timeout: true })), TOKEN_WAIT_MS); })
+    ]);
     if (token) headers.Authorization = 'Bearer ' + token;
-  } catch {
+  } catch (err) {
+    if (err && err.timeout) return networkError();
     /* not signed in */
+  } finally {
+    clearTimeout(timer);
   }
 
   let res;
   try {
     res = await fetch(API_BASE + path, { ...options, headers });
   } catch {
-    return { data: null, error: { message: 'Network error: could not reach the server.', networkError: true } };
+    return networkError();
   }
 
   let json = null;

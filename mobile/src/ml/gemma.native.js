@@ -1,5 +1,7 @@
 import { AppState } from 'react-native';
 import * as FileSystem from 'expo-file-system/legacy';
+import * as SecureStore from 'expo-secure-store';
+import { connectivity, subscribeConnectivity } from '../lib/connectivity';
 import { DIAGNOSIS_SCHEMA, SAMPLING, chatMessages, diagnosisMessages } from './offlinePrompts';
 
 /* The offline AI: Gemma 3 1B (instruction tuned, 4-bit GGUF, 722 MB) run on
@@ -7,9 +9,11 @@ import { DIAGNOSIS_SCHEMA, SAMPLING, chatMessages, diagnosisMessages } from './o
    Online, Claude Haiku on the server does this work; offline, Gemma writes
    the diagnosis and answers questions from the phone's own records.
 
-   The model is not in the APK: Settings downloads it once (Wi-Fi advised)
-   from a fixed revision of the Hugging Face repository, checks its size and
-   keeps it in the app's files. llama.rn ships 64-bit ARM libraries only, so
+   The model is not in the APK: the app downloads it by itself on Wi-Fi
+   after it is installed (startAutoDownload, no sign in needed), from a fixed
+   revision of the Hugging Face repository, carrying on where it stopped
+   after a dropped connection or a restart. Its size is checked and it is
+   kept in the app's files. Settings can also start it on mobile data. llama.rn ships 64-bit ARM libraries only, so
    on 32-bit phones the offline AI is not offered (supported() is false). */
 
 export const GEMMA = {
@@ -71,57 +75,128 @@ export async function refreshStatus() {
   if (!supported()) return setState({ status: 'unsupported' });
   if (state.status === 'downloading') return state;
   const info = await FileSystem.getInfoAsync(PATH).catch(() => ({ exists: false }));
-  return setState({ status: info.exists && info.size === GEMMA.bytes ? 'ready' : 'absent', progress: info.exists ? 1 : 0, error: null });
+  if (info.exists && info.size === GEMMA.bytes) return setState({ status: 'ready', progress: 1, error: null });
+  const part = await partSize();
+  return setState({ status: state.status === 'error' ? 'error' : 'absent', progress: part / GEMMA.bytes });
+}
+
+async function partSize() {
+  const info = await FileSystem.getInfoAsync(PART).catch(() => ({ exists: false }));
+  return info.exists && info.size < GEMMA.bytes ? info.size : 0;
 }
 
 let download = null;
+let cancelled = false;
+const pause = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/* Downloads the model, carrying on from a partial file (the downloader
+   resumes with an HTTP range; a fresh one each time, so the offset always
+   matches the bytes already saved). */
 export async function startDownload() {
   if (!supported()) throw new Error('This phone cannot run the offline AI.');
-  if (download) return;
-  const free = await FileSystem.getFreeDiskStorageAsync().catch(() => Infinity);
-  if (free < GEMMA.bytes + SPARE_BYTES) throw new Error(`Not enough free space: the offline AI needs about ${Math.ceil((GEMMA.bytes + SPARE_BYTES) / 1e6)} MB.`);
-  await FileSystem.makeDirectoryAsync(DIR, { intermediates: true }).catch(() => {});
-  await FileSystem.deleteAsync(PART, { idempotent: true }).catch(() => {});
-  setState({ status: 'downloading', progress: 0, error: null });
-  download = FileSystem.createDownloadResumable(GEMMA.url, PART, {}, ({ totalBytesWritten }) => {
-    setState({ progress: Math.min(1, totalBytesWritten / GEMMA.bytes) });
-  });
+  if (download || state.status === 'ready') return;
+  cancelled = false;
+  download = true;
   try {
-    let result;
-    try {
-      result = await download.downloadAsync();
-    } catch (err) {
-      // A dropped connection: carry on from where it stopped, a few times.
-      for (let i = 0; download && i < 3; i++) {
-        await new Promise((r) => setTimeout(r, 3000 * (i + 1)));
-        if (!download) break;
-        try { result = await download.resumeAsync(); break; } catch (again) { err = again; }
+    const free = await FileSystem.getFreeDiskStorageAsync().catch(() => Infinity);
+    const have = await partSize();
+    if (free < GEMMA.bytes - have + SPARE_BYTES) throw new Error(`Not enough free space: the offline AI needs about ${Math.ceil((GEMMA.bytes - have + SPARE_BYTES) / 1e6)} MB.`);
+    await FileSystem.makeDirectoryAsync(DIR, { intermediates: true }).catch(() => {});
+    if (!have) await FileSystem.deleteAsync(PART, { idempotent: true }).catch(() => {});
+    setState({ status: 'downloading', progress: have / GEMMA.bytes, error: null });
+    let lastError = null;
+    // A dropped connection: carry on from where it stopped, a few times.
+    for (let attempt = 0; attempt < 4 && !cancelled; attempt++) {
+      if (attempt) await pause(3000 * attempt);
+      const from = await partSize();
+      download = FileSystem.createDownloadResumable(GEMMA.url, PART, {}, ({ totalBytesWritten }) => {
+        setState({ progress: Math.min(1, totalBytesWritten / GEMMA.bytes) });
+      }, from ? String(from) : undefined);
+      try {
+        const result = await download.downloadAsync();
+        if (cancelled) return;
+        if (result && result.status >= 400) throw new Error(`The download failed (HTTP ${result.status}).`);
+        lastError = null;
+        break;
+      } catch (err) {
+        lastError = err;
       }
-      if (download && !result) throw err;
     }
-    if (!download) return; // cancelled
+    if (cancelled) return;
+    if (lastError) throw lastError;
     const info = await FileSystem.getInfoAsync(PART);
-    if (!result || !info.exists || info.size !== GEMMA.bytes) throw new Error('The download was incomplete. Please try again.');
+    if (!info.exists || info.size !== GEMMA.bytes) {
+      // A wrong size cannot be carried on from: start again next time.
+      await FileSystem.deleteAsync(PART, { idempotent: true }).catch(() => {});
+      throw new Error('The download was incomplete. Please try again.');
+    }
     await FileSystem.moveAsync({ from: PART, to: PATH });
-    setState({ status: 'ready', progress: 1 });
+    setState({ status: 'ready', progress: 1, error: null });
   } catch (err) {
-    if (download) setState({ status: 'error', error: err.message || String(err) });
-    await FileSystem.deleteAsync(PART, { idempotent: true }).catch(() => {});
+    // The partial file is kept, so the next try carries on from it.
+    if (!cancelled) setState({ status: 'error', error: err.message || String(err), progress: (await partSize()) / GEMMA.bytes });
   } finally {
     download = null;
   }
 }
 
+/* ---------- Automatic download ---------- */
+
+// Set when the person cancels or removes the model, so it is not fetched again by itself.
+const AUTO_OFF_KEY = 'lp_offline_ai_auto_off';
+const RETRY_MS = 2 * 60 * 1000;
+let autoOff = null;
+let autoStarted = false;
+let lastAutoTry = 0;
+
+async function setAutoOff(off) {
+  autoOff = off;
+  await (off ? SecureStore.setItemAsync(AUTO_OFF_KEY, '1') : SecureStore.deleteItemAsync(AUTO_OFF_KEY)).catch(() => {});
+}
+
+/* Whether the app is waiting for Wi-Fi to fetch the model by itself. */
+export const waitingForWifi = () => autoOff === false && state.status !== 'ready' && state.status !== 'downloading' && !connectivity().wifi;
+
+async function autoTry() {
+  if (autoOff !== false || download || !connectivity().wifi) return;
+  if (Date.now() - lastAutoTry < RETRY_MS && state.status === 'error') return;
+  const s = await refreshStatus();
+  if (s.status !== 'absent' && s.status !== 'error') return;
+  lastAutoTry = Date.now();
+  startDownload().catch(() => {});
+}
+
+/* Called once when the app starts (app/_layout.js): fetches the model on
+   Wi-Fi as soon as it can, and again whenever Wi-Fi comes back. Mobile data
+   is not used by itself, as 722 MB can cost a farmer a lot. */
+export async function startAutoDownload() {
+  if (autoStarted || !supported()) return;
+  autoStarted = true;
+  autoOff = Boolean(await SecureStore.getItemAsync(AUTO_OFF_KEY).catch(() => null));
+  await refreshStatus();
+  subscribeConnectivity(() => { autoTry(); setState({}); });
+  setInterval(autoTry, RETRY_MS);
+  autoTry();
+}
+
+/* The Download button in Settings: any connection, and automatic again. */
+export async function downloadNow() {
+  await setAutoOff(false);
+  return startDownload();
+}
+
 export async function cancelDownload() {
+  cancelled = true;
+  await setAutoOff(true);
   const d = download;
   download = null;
-  if (d) await d.pauseAsync().catch(() => {});
+  if (d && d.pauseAsync) await d.pauseAsync().catch(() => {});
   await FileSystem.deleteAsync(PART, { idempotent: true }).catch(() => {});
-  setState({ status: 'absent', progress: 0 });
+  setState({ status: 'absent', progress: 0, error: null });
 }
 
 export async function removeModel() {
+  await setAutoOff(true);
   await stop();
   if (current) await current.catch(() => {});
   await unload(true);

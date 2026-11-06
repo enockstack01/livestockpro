@@ -29,10 +29,11 @@ export function OrgStaffScreen() {
 
   async function invite() {
     setBusy(true);
-    const { error } = await api.http('POST', `/organizations/${orgId}/members`, { email: email.trim(), role });
+    const { data, error } = await api.http('POST', `/organizations/${orgId}/members`, { email: email.trim(), role });
     setBusy(false);
     if (error) { showToast(orgErrorText(t, error), 'error'); return; }
-    showToast(t('org.staff.invited', { email: email.trim() }), 'success');
+    if (data && data.invite === 'failed') showToast(t('org.inviteEmail.failed', { email: email.trim() }), 'error');
+    else showToast(t('org.staff.invited', { email: email.trim() }), 'success');
     setEmail('');
     members.reload();
   }

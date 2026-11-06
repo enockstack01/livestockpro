@@ -1315,7 +1315,16 @@
       "writingWords": "Escribiendo el diagnóstico sin conexión: {{count}} palabras por ahora",
       "starting": "Iniciando la IA sin conexión...",
       "takesAMinute": "Puede tardar de uno a tres minutos en un teléfono.",
-      "reportNote": "Escrito sin conexión en este teléfono por {{model}}, con la revisión de fotos, los síntomas y los registros de este animal. Es preliminar: repítalo con la IA en línea cuando tenga conexión y confirme con un veterinario."
+      "reportNote": "Escrito sin conexión en este teléfono por {{model}}, con la revisión de fotos, los síntomas y los registros de este animal. Es preliminar: repítalo con la IA en línea cuando tenga conexión y confirme con un veterinario.",
+      "partly": "{{pct}} % descargado hasta ahora: continúa desde ahí.",
+      "waitingWifi": "Esperando Wi-Fi: la IA sin conexión ({{mb}} MB) se descarga sola cuando este teléfono está conectado a Wi-Fi.",
+      "downloadOnData": "Descargar ahora con datos móviles",
+      "modeOn": "Estás sin conexión: Preguntar y Diagnóstico usan la IA sin conexión de este teléfono, con tus registros guardados en el teléfono.",
+      "modeGuest": "La IA sin conexión de este teléfono está lista. No ve ningún registro de la granja hasta que inicies sesión.",
+      "modeDownloading": "La IA sin conexión todavía se está descargando ({{pct}} %). Mientras tanto, Diagnóstico puede revisar fotos en este teléfono.",
+      "modeUnsupported": "Este teléfono no puede ejecutar la IA sin conexión. Diagnóstico puede revisar fotos en este teléfono.",
+      "modeMissing": "La IA sin conexión ({{mb}} MB) aún no está en este teléfono: se descarga sola con Wi-Fi. Mientras tanto, Diagnóstico puede revisar fotos en este teléfono.",
+      "poweredBy": "IA sin conexión en este teléfono: Gemma 3 1B y el detector de enfermedades de LivestockPro"
     }
   },
   "org": {
@@ -1720,7 +1729,12 @@
         "organization_account": "Cuenta de organización",
         "already_member": "Ya es miembro",
         "other_organization": "En otra organización",
-        "limit_reached": "Límite alcanzado"
+        "limit_reached": "Límite alcanzado",
+        "invited": "Correo de invitación enviado",
+        "already_invited": "Ya invitado",
+        "blocked": "Cuenta en espera o no aprobada",
+        "invite_failed": "No se pudo enviar el correo",
+        "error": "No se pudo añadir"
       },
       "auditSearch": "Correo, nombre o id",
       "actionGroups": {
@@ -1739,7 +1753,8 @@
       "defaultMax": "Límite de ganaderos por defecto para nuevas organizaciones",
       "defaultMaxHint": "Se puede cambiar en cada organización.",
       "settingsSaved": "Ajustes guardados",
-      "superOnly": "Solo un superadministrador puede cambiar los ajustes del sistema."
+      "superOnly": "Solo un superadministrador puede cambiar los ajustes del sistema.",
+      "createdInvited": "Organización creada. Se envió una invitación a {{email}}."
     },
     "mobile": {
       "offline": "Necesita conexión para las pantallas de la organización.",
@@ -1767,6 +1782,9 @@
         "on_hold": "Cuenta en espera",
         "rejected": "Cuenta rechazada"
       }
+    },
+    "inviteEmail": {
+      "failed": "{{email}} fue invitado, pero no se pudo enviar el correo. Verá la invitación al iniciar sesión con esta dirección."
     }
   },
   "notifications": {
@@ -1974,5 +1992,11 @@
       "newborns_one": "{{count}} cría",
       "newborns_other": "{{count}} crías"
     }
+  },
+  "offlineMode": {
+    "title": "Modo sin conexión",
+    "subtitle": "LivestockPro de Agricoders",
+    "intro": "No hay internet, así que el inicio de sesión y todo lo que necesita el servidor están en pausa. El asistente de IA funciona en este teléfono. La aplicación vuelve a la normalidad sola cuando vuelvas a tener conexión.",
+    "banner": "Modo sin conexión: tus registros se guardan en este teléfono y la IA funciona en el teléfono. Las funciones en línea vuelven al reconectarte."
   }
 }

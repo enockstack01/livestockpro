@@ -351,6 +351,29 @@ async function reservePlace(org) {
 }
 const freePlace = (orgId) => col('organizations').updateOne({ _id: orgId, active_farmers: { $gt: 0 } }, { $inc: { active_farmers: -1 }, $set: { updated_at: nowIso() } });
 
+/* Tells someone they were invited: a bell notification when they already
+   have an account, otherwise an email from Clerk with a link to sign up
+   (the invitation waits for that email address). Returns 'notified',
+   'emailed' or 'failed'; a failed email does not undo the invitation. */
+async function inviteByEmail({ clerkClient, email, notice, vars, link, metadata }) {
+  let user = null;
+  try {
+    const found = await clerkClient.users.getUserList({ emailAddress: [email], limit: 1 });
+    user = found.data && found.data[0];
+  } catch { /* treated as a new person */ }
+  if (user) {
+    await notify(user.id, notice, vars, link);
+    return 'notified';
+  }
+  try {
+    await clerkClient.invitations.createInvitation({ emailAddress: email, redirectUrl: `${APP_URL()}/`, expiresInDays: INVITE_DAYS, notify: true, ignoreExisting: true, publicMetadata: metadata || {} });
+    return 'emailed';
+  } catch (err) {
+    console.error('Invitation email failed:', (err && err.errors && err.errors[0] && err.errors[0].longMessage) || (err && err.message));
+    return 'failed';
+  }
+}
+
 /* Invitations past INVITE_DAYS give their place back. */
 async function expireFarmerInvites(orgId) {
   const cutoff = new Date(Date.now() - INVITE_DAYS * 86400000).toISOString();
@@ -643,6 +666,6 @@ module.exports = {
   newToken, hashToken, linkState, joinError, findLink,
   activeMembership, farmerLink, hasFarmData, isOrgAccount, isBlockedAccount, requireOrgRole,
   joinOrganization, endFarmerLink, usageNotices, refreshFarmerStats, refreshAllFarmerStats, startStatsJob, farmerName,
-  registerFarmer, revokeFarmerInvite, claimFarmerInvite, expireFarmerInvites,
+  registerFarmer, revokeFarmerInvite, claimFarmerInvite, expireFarmerInvites, inviteByEmail,
   col, nowIso, uuid
 };

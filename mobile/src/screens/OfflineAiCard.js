@@ -8,7 +8,8 @@ import { useToast } from '../lib/toast';
 import { Button, Card, CardBody, CardHeader, Muted } from '../ui/kit';
 
 /* Settings: the offline AI (Gemma 3 1B with the YOLO11n detector, src/ml).
-   Downloaded once (about 722 MB, Wi-Fi advised), then the diagnosis and
+   The app downloads it by itself on Wi-Fi (about 722 MB); here it can be
+   fetched now on mobile data, stopped or removed. Then the diagnosis and
    Ask LivestockPro work on the phone with no internet. */
 export default function OfflineAiCard() {
   const { t } = useTranslation();
@@ -35,7 +36,7 @@ export default function OfflineAiCard() {
     if (net && net.isConnected === false) { showToast(t('ai.offline'), 'error'); return; }
     // Advise Wi-Fi: a large download on mobile data can be costly.
     if (net && net.type === 'cellular') showToast(t('ai.local.onMobileData', { mb }), 'info');
-    gemma.startDownload().catch((e) => showToast(t('ai.local.failed', { message: e.message }), 'error'));
+    gemma.downloadNow().catch((e) => showToast(t('ai.local.failed', { message: e.message }), 'error'));
   }
 
   return (
@@ -60,8 +61,11 @@ export default function OfflineAiCard() {
         ) : (
           <>
             {s.status === 'error' ? <Text style={{ color: colors.red, marginBottom: 8 }}>{t('ai.local.failed', { message: s.error || '' })}</Text> : null}
-            <Muted style={{ marginBottom: 10, fontSize: 12 }}>{t('ai.local.needs', { mb })}</Muted>
-            <Button title={t('ai.local.download', { mb })} icon="download" size="sm" onPress={start} style={{ alignSelf: 'flex-start' }} />
+            {s.progress > 0 ? <Text style={{ color: colors.text, fontWeight: '700', marginBottom: 6 }}>{t('ai.local.partly', { pct: Math.round(s.progress * 100) })}</Text> : null}
+            {gemma.waitingForWifi() ? (
+              <Text style={{ color: colors.text, marginBottom: 8 }}>{t('ai.local.waitingWifi', { mb })}</Text>
+            ) : <Muted style={{ marginBottom: 10, fontSize: 12 }}>{t('ai.local.needs', { mb })}</Muted>}
+            <Button title={gemma.waitingForWifi() ? t('ai.local.downloadOnData') : t('ai.local.download', { mb })} icon="download" size="sm" onPress={start} style={{ alignSelf: 'flex-start' }} />
           </>
         )}
         <Muted style={{ marginTop: 12, fontSize: 11.5 }}>{t('ai.local.limits')}</Muted>

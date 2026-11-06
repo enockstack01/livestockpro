@@ -1315,7 +1315,16 @@
       "writingWords": "Irimo kwandika isuzuma idakeneye murandasi: amagambo {{count}} kugeza ubu",
       "starting": "Iratangiza AI idakeneye murandasi...",
       "takesAMinute": "Bishobora gutwara umunota umwe kugeza kuri itatu kuri telefone.",
-      "reportNote": "Byanditswe nta murandasi kuri iyi telefone na {{model}}, hakoreshejwe isuzuma ry’amafoto, ibimenyetso n’inyandiko z’iri tungo. Ni iby’ibanze: ongera usuzume na AI yo kuri murandasi uri ku murandasi, kandi byemeze na veterineri."
+      "reportNote": "Byanditswe nta murandasi kuri iyi telefone na {{model}}, hakoreshejwe isuzuma ry’amafoto, ibimenyetso n’inyandiko z’iri tungo. Ni iby’ibanze: ongera usuzume na AI yo kuri murandasi uri ku murandasi, kandi byemeze na veterineri.",
+      "partly": "{{pct}}% bimaze gukururwa: bizakomereza aho byari bigeze.",
+      "waitingWifi": "Hategerejwe Wi-Fi: AI ikora nta murandasi ({{mb}} MB) izikurura ubwayo iyi telefoni nigera kuri Wi-Fi.",
+      "downloadOnData": "Kurura ubu ukoresheje interineti ya telefoni",
+      "modeOn": "Nta murandasi ufite: Baza na Isuzuma bikoresha AI iri kuri iyi telefoni, hamwe n’amakuru yawe abitswe kuri telefoni.",
+      "modeGuest": "AI ikora nta murandasi iri kuri iyi telefoni yiteguye. Ntibona amakuru y’ubworozi kugeza winjiye.",
+      "modeDownloading": "AI ikora nta murandasi iracyakururwa ({{pct}}%). Mu gihe itaraboneka, Isuzuma rishobora gusuzuma amafoto kuri iyi telefoni.",
+      "modeUnsupported": "Iyi telefoni ntishobora gukoresha AI ikora nta murandasi. Isuzuma rishobora gusuzuma amafoto kuri iyi telefoni.",
+      "modeMissing": "AI ikora nta murandasi ({{mb}} MB) ntiraba kuri iyi telefoni: izikurura ubwayo kuri Wi-Fi. Mu gihe itaraboneka, Isuzuma rishobora gusuzuma amafoto kuri iyi telefoni.",
+      "poweredBy": "AI ikora nta murandasi kuri iyi telefoni: Gemma 3 1B n’igikoresho cya LivestockPro gitahura indwara"
     }
   },
   "org": {
@@ -1720,7 +1729,12 @@
         "organization_account": "Konti y'ikigo",
         "already_member": "Asanzwe arimo",
         "other_organization": "Ari mu kindi kigo",
-        "limit_reached": "Umubare wagezweho"
+        "limit_reached": "Umubare wagezweho",
+        "invited": "Imeyili y’ubutumire yoherejwe",
+        "already_invited": "Yaramaze gutumirwa",
+        "blocked": "Konti yahagaritswe cyangwa ntiyemejwe",
+        "invite_failed": "Imeyili ntiyashoboye koherezwa",
+        "error": "Ntibyashobotse kongerwamo"
       },
       "auditSearch": "Imeri, izina cyangwa nimero",
       "actionGroups": {
@@ -1739,7 +1753,8 @@
       "defaultMax": "Umubare ntarengwa usanzwe ku bigo bishya",
       "defaultMaxHint": "Ushobora guhindurwa kuri buri kigo.",
       "settingsSaved": "Igenamiterere ryabitswe",
-      "superOnly": "Umuyobozi mukuru wenyine ni we ushobora guhindura igenamiterere rya sisitemu."
+      "superOnly": "Umuyobozi mukuru wenyine ni we ushobora guhindura igenamiterere rya sisitemu.",
+      "createdInvited": "Ikigo cyashyizweho. Ubutumire bwoherejwe kuri {{email}}."
     },
     "mobile": {
       "offline": "Ukeneye interineti ku bijyanye n'ikigo.",
@@ -1767,6 +1782,9 @@
         "on_hold": "Konti yahagaritswe by’agateganyo",
         "rejected": "Konti yanzwe"
       }
+    },
+    "inviteEmail": {
+      "failed": "{{email}} yatumiwe, ariko imeyili ntiyashoboye koherezwa. Azabona ubutumire niyinjira akoresheje iyi aderesi."
     }
   },
   "notifications": {
@@ -1974,5 +1992,11 @@
       "newborns_one": "icyana {{count}}",
       "newborns_other": "ibyana {{count}}"
     }
+  },
+  "offlineMode": {
+    "title": "Gukora nta murandasi",
+    "subtitle": "LivestockPro ya Agricoders",
+    "intro": "Nta murandasi uhari, bityo kwinjira n’ibisaba seriveri byahagaritswe. Umufasha wa AI akora kuri iyi telefoni. Porogaramu isubira uko isanzwe ubwayo umaze kubona murandasi.",
+    "banner": "Gukora nta murandasi: amakuru yawe abikwa kuri iyi telefoni kandi AI ikora kuri telefoni. Ibisaba murandasi bigaruka wongeye kubona murandasi."
   }
 }

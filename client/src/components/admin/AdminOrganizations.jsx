@@ -133,9 +133,11 @@ function CreateOrg({ onClose, onCreated }) {
   const [max, setMax] = useState('');
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
   async function save() {
-    const { error } = await api.http('POST', '/admin/organizations', { ...form, admin_email: adminEmail, max_farmers: max === '' ? undefined : Number(max) });
+    const { data, error } = await api.http('POST', '/admin/organizations', { ...form, admin_email: adminEmail, max_farmers: max === '' ? undefined : Number(max) });
     if (error) { showToast(orgErrorText(t, error), 'error'); return; }
-    showToast(t('org.admin.createdNote', { email: adminEmail }), 'success');
+    // The admin is emailed (or told in the app when they have an account).
+    if (data && data.invite === 'failed') showToast(t('org.inviteEmail.failed', { email: adminEmail }), 'error');
+    else showToast(t('org.admin.createdInvited', { email: adminEmail }), 'success');
     onCreated();
   }
   return (
@@ -233,7 +235,7 @@ function OrgDetail({ id, isSuper, onClose, onChanged }) {
                 <button className="btn btn-primary btn-sm mt-16" disabled={o.status !== 'active'} onClick={runImport}><i className="fas fa-upload"></i> {t('org.admin.importRun', { count: emailsFromCsv(importText).length })}</button>
                 {importResult ? (
                   <ul className="org-import-result">
-                    {importResult.map((r) => <li key={r.email}><span>{r.email}</span><span className={`badge ${r.result === 'pending_consent' ? 'badge-green' : 'badge-gray'}`}>{t(`org.admin.importResults.${r.result}`)}</span></li>)}
+                    {importResult.map((r) => <li key={r.email}><span>{r.email}</span><span className={`badge ${r.result === 'pending_consent' || r.result === 'invited' ? 'badge-green' : 'badge-gray'}`}>{t(`org.admin.importResults.${r.result}`)}</span></li>)}
                   </ul>
                 ) : null}
               </div>

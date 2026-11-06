@@ -1315,7 +1315,16 @@
       "writingWords": "A escrever o diagnóstico offline: {{count}} palavras até agora",
       "starting": "A iniciar a IA offline...",
       "takesAMinute": "Pode demorar de um a três minutos num telemóvel.",
-      "reportNote": "Escrito offline neste telemóvel por {{model}}, com a verificação de fotos, os sintomas e os registos deste animal. É preliminar: repita com a IA online quando tiver ligação e confirme com um veterinário."
+      "reportNote": "Escrito offline neste telemóvel por {{model}}, com a verificação de fotos, os sintomas e os registos deste animal. É preliminar: repita com a IA online quando tiver ligação e confirme com um veterinário.",
+      "partly": "{{pct}}% transferido até agora: continua a partir daí.",
+      "waitingWifi": "À espera de Wi-Fi: a IA offline ({{mb}} MB) é transferida automaticamente quando este telefone está ligado ao Wi-Fi.",
+      "downloadOnData": "Transferir agora com dados móveis",
+      "modeOn": "Está offline: Perguntar e Diagnóstico usam a IA offline deste telefone, com os seus registos guardados no telefone.",
+      "modeGuest": "A IA offline deste telefone está pronta. Não vê nenhum registo da exploração até iniciar sessão.",
+      "modeDownloading": "A IA offline ainda está a ser transferida ({{pct}}%). Até estar pronta, o Diagnóstico pode verificar fotos neste telefone.",
+      "modeUnsupported": "Este telefone não consegue executar a IA offline. O Diagnóstico pode verificar fotos neste telefone.",
+      "modeMissing": "A IA offline ({{mb}} MB) ainda não está neste telefone: é transferida automaticamente no Wi-Fi. Até lá, o Diagnóstico pode verificar fotos neste telefone.",
+      "poweredBy": "IA offline neste telefone: Gemma 3 1B e o detetor de doenças LivestockPro"
     }
   },
   "org": {
@@ -1720,7 +1729,12 @@
         "organization_account": "Conta de organização",
         "already_member": "Já é membro",
         "other_organization": "Noutra organização",
-        "limit_reached": "Limite atingido"
+        "limit_reached": "Limite atingido",
+        "invited": "E-mail de convite enviado",
+        "already_invited": "Já convidado",
+        "blocked": "Conta em espera ou não aprovada",
+        "invite_failed": "Não foi possível enviar o e-mail",
+        "error": "Não foi possível adicionar"
       },
       "auditSearch": "Email, nome ou id",
       "actionGroups": {
@@ -1739,7 +1753,8 @@
       "defaultMax": "Limite de criadores predefinido para novas organizações",
       "defaultMaxHint": "Pode ser alterado em cada organização.",
       "settingsSaved": "Definições guardadas",
-      "superOnly": "Só um superadministrador pode alterar as definições do sistema."
+      "superOnly": "Só um superadministrador pode alterar as definições do sistema.",
+      "createdInvited": "Organização criada. Foi enviado um convite para {{email}}."
     },
     "mobile": {
       "offline": "Precisa de ligação para os ecrãs da organização.",
@@ -1767,6 +1782,9 @@
         "on_hold": "Conta em espera",
         "rejected": "Conta rejeitada"
       }
+    },
+    "inviteEmail": {
+      "failed": "{{email}} foi convidado, mas não foi possível enviar o e-mail. Verá o convite ao iniciar sessão com este endereço."
     }
   },
   "notifications": {
@@ -1974,5 +1992,11 @@
       "newborns_one": "{{count}} cria",
       "newborns_other": "{{count}} crias"
     }
+  },
+  "offlineMode": {
+    "title": "Modo offline",
+    "subtitle": "LivestockPro da Agricoders",
+    "intro": "Não há internet, por isso o início de sessão e tudo o que precisa do servidor estão em pausa. O assistente de IA funciona neste telefone. A aplicação volta ao normal sozinha quando voltar a estar online.",
+    "banner": "Modo offline: os seus registos são guardados neste telefone e a IA funciona no telefone. As funções online voltam quando voltar a ligar-se."
   }
 }

@@ -5,7 +5,7 @@ const { publicAuditRows } = require('../lib/livestockId');
 const {
   ORG_TYPES, MEMBER_ROLES, FARMER_COLLECTIONS, OrgError, sendOrgError, getSettings, audit, notify, notifyOrgAdmins,
   newToken, hashToken, linkState, activeMembership, farmerLink, hasFarmData, requireOrgRole, endFarmerLink, col, nowIso, uuid,
-  registerFarmer, revokeFarmerInvite, expireFarmerInvites
+  registerFarmer, revokeFarmerInvite, expireFarmerInvites, inviteByEmail
 } = require('../lib/orgs');
 const { computeDashboard, farmerList } = require('../lib/orgDashboard');
 const { notifyAdmins } = require('../lib/platformAdmins');
@@ -230,14 +230,10 @@ router.post('/:id/members', requireOrgRole(ADMIN, { write: true }), async (req, 
     }
     const id = uuid();
     await col('organization_members').insertOne({ _id: id, organization_id: req.org._id, user_id: null, email, role, status: 'invited', invited_by: req.user.id, created_at: nowIso() });
-    /* Tell them in the app if they already have an account. */
-    try {
-      const found = await clerkClient.users.getUserList({ emailAddress: [email], limit: 1 });
-      const u = found.data && found.data[0];
-      if (u) await notify(u.id, 'staffInvite', { name: req.org.name, role }, '/organization');
-    } catch { /* invitation still stands */ }
-    await audit(req, 'member.invite', { targetType: 'member', targetId: id, organizationId: req.org._id, details: { email, role } });
-    res.status(201).json({ data: { id, email, role, status: 'invited' }, error: null });
+    /* In the app if they already have an account, otherwise by email. */
+    const invite = await inviteByEmail({ clerkClient, email, notice: 'staffInvite', vars: { name: req.org.name, role }, link: '/organization', metadata: { staff_invite_id: id } });
+    await audit(req, 'member.invite', { targetType: 'member', targetId: id, organizationId: req.org._id, details: { email, role, invite } });
+    res.status(201).json({ data: { id, email, role, status: 'invited', invite }, error: null });
   } catch (err) {
     sendOrgError(res, err);
   }

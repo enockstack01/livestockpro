@@ -1315,7 +1315,16 @@
       "writingWords": "Rédaction du diagnostic hors ligne : {{count}} mots pour l’instant",
       "starting": "Démarrage de l’IA hors ligne...",
       "takesAMinute": "Cela peut prendre une à trois minutes sur un téléphone.",
-      "reportNote": "Rédigé hors ligne sur ce téléphone par {{model}}, à partir de la vérification des photos, des symptômes et des fiches de cet animal. C’est préliminaire : refaites-le avec l’IA en ligne une fois connecté et confirmez avec un vétérinaire."
+      "reportNote": "Rédigé hors ligne sur ce téléphone par {{model}}, à partir de la vérification des photos, des symptômes et des fiches de cet animal. C’est préliminaire : refaites-le avec l’IA en ligne une fois connecté et confirmez avec un vétérinaire.",
+      "partly": "{{pct}} % déjà téléchargé : le téléchargement reprend à partir de là.",
+      "waitingWifi": "En attente du Wi-Fi : l’IA hors ligne ({{mb}} Mo) se télécharge seule quand ce téléphone est connecté au Wi-Fi.",
+      "downloadOnData": "Télécharger maintenant avec les données mobiles",
+      "modeOn": "Vous êtes hors ligne : Demander et Diagnostic utilisent l’IA hors ligne de ce téléphone, avec vos registres enregistrés sur le téléphone.",
+      "modeGuest": "L’IA hors ligne de ce téléphone est prête. Elle ne voit aucun registre de ferme tant que vous n’êtes pas connecté.",
+      "modeDownloading": "L’IA hors ligne est encore en téléchargement ({{pct}} %). En attendant, Diagnostic peut toujours vérifier des photos sur ce téléphone.",
+      "modeUnsupported": "Ce téléphone ne peut pas faire fonctionner l’IA hors ligne. Diagnostic peut toujours vérifier des photos sur ce téléphone.",
+      "modeMissing": "L’IA hors ligne ({{mb}} Mo) n’est pas encore sur ce téléphone : elle se télécharge seule en Wi-Fi. En attendant, Diagnostic peut toujours vérifier des photos sur ce téléphone.",
+      "poweredBy": "IA hors ligne sur ce téléphone : Gemma 3 1B et le détecteur de maladies LivestockPro"
     }
   },
   "org": {
@@ -1720,7 +1729,12 @@
         "organization_account": "Compte d'organisation",
         "already_member": "Déjà membre",
         "other_organization": "Dans une autre organisation",
-        "limit_reached": "Limite atteinte"
+        "limit_reached": "Limite atteinte",
+        "invited": "E-mail d’invitation envoyé",
+        "already_invited": "Déjà invité",
+        "blocked": "Compte en attente ou non approuvé",
+        "invite_failed": "L’e-mail n’a pas pu être envoyé",
+        "error": "Ajout impossible"
       },
       "auditSearch": "E-mail, nom ou identifiant",
       "actionGroups": {
@@ -1739,7 +1753,8 @@
       "defaultMax": "Limite d'éleveurs par défaut",
       "defaultMaxHint": "Modifiable pour chaque organisation.",
       "settingsSaved": "Paramètres enregistrés",
-      "superOnly": "Seul un super administrateur peut modifier les paramètres système."
+      "superOnly": "Seul un super administrateur peut modifier les paramètres système.",
+      "createdInvited": "Organisation créée. Une invitation a été envoyée à {{email}}."
     },
     "mobile": {
       "offline": "Une connexion est nécessaire pour les écrans de l'organisation.",
@@ -1767,6 +1782,9 @@
         "on_hold": "Compte en attente",
         "rejected": "Compte refusé"
       }
+    },
+    "inviteEmail": {
+      "failed": "{{email}} a été invité, mais l’e-mail n’a pas pu être envoyé. La personne verra l’invitation en se connectant avec cette adresse."
     }
   },
   "notifications": {
@@ -1974,5 +1992,11 @@
       "newborns_one": "{{count}} nouveau-né",
       "newborns_other": "{{count}} nouveau-nés"
     }
+  },
+  "offlineMode": {
+    "title": "Mode hors ligne",
+    "subtitle": "LivestockPro par Agricoders",
+    "intro": "Il n’y a pas d’internet : la connexion et tout ce qui a besoin du serveur sont en pause. L’assistant IA fonctionne sur ce téléphone. L’application revient à la normale toute seule dès que vous êtes de nouveau en ligne.",
+    "banner": "Mode hors ligne : vos registres sont enregistrés sur ce téléphone et l’IA fonctionne sur le téléphone. Les fonctions en ligne reviennent dès la reconnexion."
   }
 }

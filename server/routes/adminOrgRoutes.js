@@ -2,8 +2,9 @@ const express = require('express');
 const { requireAuth, requireRole, primaryEmail, clerkClient } = require('../authMiddleware');
 const { forgetApproval } = require('../lib/accounts');
 const {
-  ORG_STATUSES, OrgError, sendOrgError, getSettings, updateSettings, audit, notify, notifyOrgAdmins,
-  activeMembership, farmerLink, hasFarmData, refreshFarmerStats, col, nowIso, uuid
+  ORG_STATUSES, OrgError, sendOrgError, getSettings, updateSettings, audit, notifyOrgAdmins,
+  activeMembership, farmerLink, hasFarmData, col, nowIso, uuid,
+  registerFarmer, inviteByEmail
 } = require('../lib/orgs');
 const { farmerList } = require('../lib/orgDashboard');
 const { publicAuditRows } = require('../lib/livestockId');
@@ -37,7 +38,8 @@ router.get('/organizations', async (req, res) => {
 });
 
 /* POST /api/admin/organizations: create an organization directly, active
-   straight away, with an invitation for its first admin. */
+   straight away, with an invitation for its first admin: emailed when they
+   have no account yet, a bell notification when they do. */
 router.post('/organizations', async (req, res) => {
   try {
     const body = req.body || {};
@@ -51,9 +53,11 @@ router.post('/organizations', async (req, res) => {
     const now = nowIso();
     const orgId = uuid();
     await col('organizations').insertOne({ _id: orgId, ...fields, status: 'active', max_farmers: max, active_farmers: 0, created_by: req.user.id, approved_by: req.user.id, created_at: now, updated_at: now, approved_at: now });
-    await col('organization_members').insertOne({ _id: uuid(), organization_id: orgId, user_id: null, email: adminEmail, role: 'org_admin', status: 'invited', invited_by: req.user.id, created_at: now });
-    await audit(req, 'organization.create', { targetType: 'organization', targetId: orgId, organizationId: orgId, details: { name: fields.name, max_farmers: max, admin_email: adminEmail } });
-    res.status(201).json({ data: orgOut(await col('organizations').findOne({ _id: orgId })), error: null });
+    const memberId = uuid();
+    await col('organization_members').insertOne({ _id: memberId, organization_id: orgId, user_id: null, email: adminEmail, role: 'org_admin', status: 'invited', invited_by: req.user.id, created_at: now });
+    const invite = await inviteByEmail({ clerkClient, email: adminEmail, notice: 'staffInvite', vars: { name: fields.name, role: 'org_admin' }, link: '/organization', metadata: { staff_invite_id: memberId } });
+    await audit(req, 'organization.create', { targetType: 'organization', targetId: orgId, organizationId: orgId, details: { name: fields.name, max_farmers: max, admin_email: adminEmail, invite } });
+    res.status(201).json({ data: { ...orgOut(await col('organizations').findOne({ _id: orgId })), invite }, error: null });
   } catch (err) {
     if (err && err.code === 11000) return res.status(409).json({ error: { message: 'An organization with this name already exists.', code: 'NAME_TAKEN' } });
     sendOrgError(res, err);
@@ -169,10 +173,15 @@ router.delete('/organizations/:id', superOnly, async (req, res) => {
   }
 });
 
-/* POST /api/admin/organizations/:id/import  { rows: [{ email }] }
-   Attach existing farmers in bulk (CSV import). Each farmer takes a place in
-   the limit straight away but nothing is shared until they accept in the
-   app; declining frees the place. Returns one result per row. */
+/* POST /api/admin/organizations/:id/import  { rows: [{ email, full_name? }] }
+   Register farmers in bulk (CSV import), the same way an organization
+   registers one (lib/orgs.js registerFarmer): a farmer with an account is
+   asked to accept in the app, anyone else gets an invitation email to sign
+   up. Each takes a place in the limit. Returns one result per row. */
+const IMPORT_RESULT = {
+  EMAIL_IS_ORG_ACCOUNT: 'organization_account', FARMER_ALREADY_IN_ORG: 'already_member', FARMER_IN_OTHER_ORG: 'other_organization',
+  ORG_LIMIT_REACHED: 'limit_reached', ALREADY_INVITED: 'already_invited', FARMER_ACCOUNT_BLOCKED: 'blocked', INVITE_FAILED: 'invite_failed', BAD_EMAIL: 'invalid_email'
+};
 router.post('/organizations/:id/import', async (req, res) => {
   try {
     const org = await col('organizations').findOne({ _id: String(req.params.id) });
@@ -185,37 +194,18 @@ router.post('/organizations/:id/import', async (req, res) => {
       const email = text(row && row.email, 160).toLowerCase();
       const out = { email, result: '' };
       results.push(out);
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { out.result = 'invalid_email'; continue; }
-      const account = await col('accounts').findOne({ email });
-      let userId = account && account._id;
-      if (!userId) {
-        try {
-          const found = await clerkClient.users.getUserList({ emailAddress: [email], limit: 1 });
-          userId = found.data && found.data[0] && found.data[0].id;
-        } catch { /* not found */ }
-      }
-      if (!userId) { out.result = 'no_account'; continue; }
-      if (await activeMembership(userId)) { out.result = 'organization_account'; continue; }
-      const current = await farmerLink(userId);
-      if (current) { out.result = current.org._id === org._id ? 'already_member' : 'other_organization'; continue; }
-      const reserved = await col('organizations').updateOne(
-        { _id: org._id, status: 'active', $expr: { $lt: ['$active_farmers', '$max_farmers'] } },
-        { $inc: { active_farmers: 1 } }
-      );
-      if (!reserved.modifiedCount) { out.result = 'limit_reached'; continue; }
-      const now = nowIso();
+      // The farmer's real name comes with their sign up; until then the address stands in.
+      const fullName = text(row && (row.full_name || row.name), 120) || email.split('@')[0];
       try {
-        await col('farmer_organization').insertOne({ _id: uuid(), farmer_id: userId, organization_id: org._id, referral_link_id: null, status: 'pending_consent', consent_given_at: null, consent_source: 'bulk_import', imported_by: req.user.id, detail_access: false, joined_at: now, ended_at: null });
-      } catch {
-        await col('organizations').updateOne({ _id: org._id }, { $inc: { active_farmers: -1 } });
-        out.result = 'other_organization';
-        continue;
+        const r = await registerFarmer({ org, by: req.user.id, details: { email, full_name: fullName }, clerkClient });
+        out.result = r.result;
+      } catch (err) {
+        out.result = (err instanceof OrgError && IMPORT_RESULT[err.code]) || 'error';
+        if (out.result === 'error') console.error('Farmer import row failed:', err && err.message);
       }
-      await notify(userId, 'orgInvite', { name: org.name }, '/settings');
-      refreshFarmerStats(userId).catch(() => {});
-      out.result = 'pending_consent';
     }
-    await audit(req, 'organization.import', { targetType: 'organization', targetId: org._id, organizationId: org._id, details: { rows: rows.length, added: results.filter((r) => r.result === 'pending_consent').length } });
+    const count = (r) => results.filter((x) => x.result === r).length;
+    await audit(req, 'organization.import', { targetType: 'organization', targetId: org._id, organizationId: org._id, details: { rows: rows.length, added: count('pending_consent') + count('invited'), invited: count('invited') } });
     res.json({ data: results, error: null });
   } catch (err) {
     sendOrgError(res, err);

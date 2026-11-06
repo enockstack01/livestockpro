@@ -117,23 +117,28 @@ export function diagnosisMessages({ language, facts, vision, photoCount, referen
 
 /* Chat: the online rules, with the farm's own records from the phone (in
    place of the online tools) put right before the farmer's latest question
-   so a small model uses them. history: [{ role, content }]. */
+   so a small model uses them. history: [{ role, content }]. snapshot null:
+   nobody is signed in (offline mode), so there are no farm records. */
 export function chatMessages({ language, snapshot, vision, history }) {
   const rules = [
     brandVoice(language),
-    'You answer questions from the farmer about their own farm, and general livestock husbandry questions.',
-    'Answer questions about this farm from farm_records only. Quote the actual numbers you find. Keep answers short: a few sentences or a short list.',
+    snapshot
+      ? 'You answer questions from the farmer about their own farm, and general livestock husbandry questions.'
+      : 'You answer general livestock husbandry and animal health questions.',
+    snapshot
+      ? 'Answer questions about this farm from farm_records only. Quote the actual numbers you find. Keep answers short: a few sentences or a short list.'
+      : 'The farmer is not signed in, so you have no farm records. If they ask about their own animals or figures, say that signing in when they are back online gives answers from their records. Keep answers short: a few sentences or a short list.',
     `For animal health questions, give practical first steps, then say clearly when to call a vet. ${VET_NOTICE}`,
     vision ? `The farmer sent photos. You cannot see them; you get the screening detections in photo_screening.\n${VISION_RULES}` : null,
     DATA_NOTE
   ].filter(Boolean).join('\n\n');
   const turns = history.slice(-8);
   const last = turns[turns.length - 1];
-  const context = [asData('farm_records', snapshot), vision ? asData('photo_screening', visionFacts(vision)) : null].filter(Boolean).join('\n\n');
+  const context = [snapshot ? asData('farm_records', snapshot) : null, vision ? asData('photo_screening', visionFacts(vision)) : null].filter(Boolean).join('\n\n');
   return [
     { role: 'system', content: rules },
     ...turns.slice(0, -1),
-    { role: 'user', content: `${context}\n\nFarmer's question: ${last.content}\n\nAnswer from farm_records. ${answerIn(language)}` }
+    { role: 'user', content: `${context ? `${context}\n\n` : ''}Farmer's question: ${last.content}\n\n${snapshot ? 'Answer from farm_records. ' : ''}${answerIn(language)}` }
   ];
 }
 

@@ -21,6 +21,7 @@ import { ConsentRequest, useMyOrganization } from '../screens/org/MyOrganization
 import { accountDisplayName } from '../../../shared/account';
 import { useAccount } from '../account/AccountProvider';
 import { useBreakpoint } from './layout';
+import { useConnectivity } from '../lib/connectivity';
 import { LanguagePanel, SearchPanel } from './HeaderTools';
 import { AppBarTitleContext, Button, Modal } from './kit';
 
@@ -244,6 +245,7 @@ export default function AppShell({ children }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const notifItems = useNotifications(t, isOrg);
+  const { online } = useConnectivity();
   const local = useReadNotifications(user?.id);
   const readIds = new Set([...local.readIds, ...notifItems.filter((n) => n.serverRead).map((n) => n.id)]);
   const markRead = (id) => { local.markRead(id); const n = notifItems.find((x) => x.id === id); if (n && n.serverId) api.http('POST', '/notifications/read', { ids: [n.serverId] }); };
@@ -324,6 +326,14 @@ export default function AppShell({ children }) {
             ) : null}
           </View>
         </View>
+
+        {/* Offline mode: records stay on the phone and the AI uses the on-phone models. */}
+        {online === false ? (
+          <View style={[baseStyles.offlineBar, { backgroundColor: colors.primaryLight, borderBottomColor: colors.border }]} accessibilityRole="alert">
+            <Icon name="wifi" size={13} color={colors.heading} />
+            <Text style={{ flex: 1, color: colors.text, fontSize: 12.5 }}>{t('offlineMode.banner')}</Text>
+          </View>
+        ) : null}
 
         <AppBarTitleContext.Provider value={title}>
           <View style={{ flex: 1 }}>{children}</View>
@@ -519,6 +529,7 @@ const baseStyles = StyleSheet.create({
   syncRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8, paddingLeft: 20, paddingRight: 20 },
   syncText: { color: 'rgba(255,255,255,0.6)', fontSize: 11, flex: 1 },
 
+  offlineBar: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingVertical: 7, borderBottomWidth: 1 },
   appBar: { height: 56, flexDirection: 'row', alignItems: 'center', paddingRight: 4, gap: 2 },
   appBarTitle: { flex: 1, color: '#FFFFFF', fontSize: 21, fontWeight: '700' },
   barBtn: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },

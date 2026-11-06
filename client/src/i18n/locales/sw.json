@@ -1315,7 +1315,16 @@
       "writingWords": "Inaandika utambuzi bila mtandao: maneno {{count}} hadi sasa",
       "starting": "Inaanzisha AI bila mtandao...",
       "takesAMinute": "Hii inaweza kuchukua dakika moja hadi tatu kwenye simu.",
-      "reportNote": "Imeandikwa bila mtandao kwenye simu hii na {{model}}, kwa kutumia ukaguzi wa picha, dalili na kumbukumbu za mnyama huyu. Ni ya awali: rudia na AI ya mtandaoni ukiunganishwa, na thibitisha na daktari wa mifugo."
+      "reportNote": "Imeandikwa bila mtandao kwenye simu hii na {{model}}, kwa kutumia ukaguzi wa picha, dalili na kumbukumbu za mnyama huyu. Ni ya awali: rudia na AI ya mtandaoni ukiunganishwa, na thibitisha na daktari wa mifugo.",
+      "partly": "{{pct}}% imeshapakuliwa: itaendelea kutoka hapo.",
+      "waitingWifi": "Inasubiri Wi-Fi: AI ya nje ya mtandao ({{mb}} MB) itajipakua yenyewe simu hii ikiwa kwenye Wi-Fi.",
+      "downloadOnData": "Pakua sasa kwa data ya simu",
+      "modeOn": "Huna mtandao: Uliza na Uchunguzi zinatumia AI ya nje ya mtandao iliyo kwenye simu hii, pamoja na kumbukumbu zako zilizo kwenye simu.",
+      "modeGuest": "AI ya nje ya mtandao kwenye simu hii iko tayari. Haioni kumbukumbu zozote za shamba hadi uingie.",
+      "modeDownloading": "AI ya nje ya mtandao bado inapakuliwa ({{pct}}%). Hadi itakapokuwa tayari, Uchunguzi bado unaweza kukagua picha kwenye simu hii.",
+      "modeUnsupported": "Simu hii haiwezi kuendesha AI ya nje ya mtandao. Uchunguzi bado unaweza kukagua picha kwenye simu hii.",
+      "modeMissing": "AI ya nje ya mtandao ({{mb}} MB) bado haijawa kwenye simu hii: itajipakua yenyewe kwenye Wi-Fi. Hadi hapo, Uchunguzi bado unaweza kukagua picha kwenye simu hii.",
+      "poweredBy": "AI ya nje ya mtandao kwenye simu hii: Gemma 3 1B na kitambua magonjwa cha LivestockPro"
     }
   },
   "org": {
@@ -1720,7 +1729,12 @@
         "organization_account": "Akaunti ya shirika",
         "already_member": "Tayari ni mwanachama",
         "other_organization": "Yuko shirika jingine",
-        "limit_reached": "Kikomo kimefikiwa"
+        "limit_reached": "Kikomo kimefikiwa",
+        "invited": "Barua pepe ya mwaliko imetumwa",
+        "already_invited": "Ameshaalikwa",
+        "blocked": "Akaunti imesimamishwa au haijaidhinishwa",
+        "invite_failed": "Barua pepe haikuweza kutumwa",
+        "error": "Haikuweza kuongezwa"
       },
       "auditSearch": "Barua pepe, jina au kitambulisho",
       "actionGroups": {
@@ -1739,7 +1753,8 @@
       "defaultMax": "Kikomo cha kawaida cha wafugaji kwa mashirika mapya",
       "defaultMaxHint": "Kinaweza kubadilishwa kwa kila shirika.",
       "settingsSaved": "Mipangilio imehifadhiwa",
-      "superOnly": "Msimamizi mkuu pekee ndiye anaweza kubadilisha mipangilio ya mfumo."
+      "superOnly": "Msimamizi mkuu pekee ndiye anaweza kubadilisha mipangilio ya mfumo.",
+      "createdInvited": "Shirika limeundwa. Mwaliko umetumwa kwa {{email}}."
     },
     "mobile": {
       "offline": "Unahitaji mtandao kwa skrini za shirika.",
@@ -1767,6 +1782,9 @@
         "on_hold": "Akaunti imesimamishwa",
         "rejected": "Akaunti imekataliwa"
       }
+    },
+    "inviteEmail": {
+      "failed": "{{email}} amealikwa, lakini barua pepe haikuweza kutumwa. Ataona mwaliko akiingia kwa anwani hii."
     }
   },
   "notifications": {
@@ -1974,5 +1992,11 @@
       "newborns_one": "mtoto {{count}}",
       "newborns_other": "watoto {{count}}"
     }
+  },
+  "offlineMode": {
+    "title": "Hali ya nje ya mtandao",
+    "subtitle": "LivestockPro na Agricoders",
+    "intro": "Hakuna intaneti, kwa hiyo kuingia na kila kinachohitaji seva vimesimamishwa. Msaidizi wa AI unafanya kazi kwenye simu hii. Programu itarudi kawaida yenyewe ukipata mtandao tena.",
+    "banner": "Hali ya nje ya mtandao: kumbukumbu zako zinahifadhiwa kwenye simu hii na AI inafanya kazi kwenye simu. Huduma za mtandaoni zitarudi ukiunganishwa tena."
   }
 }

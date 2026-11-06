@@ -1315,7 +1315,16 @@
       "writingWords": "正在撰写离线诊断：已写 {{count}} 个词",
       "starting": "正在启动离线 AI...",
       "takesAMinute": "在手机上可能需要一到三分钟。",
-      "reportNote": "由 {{model}} 在本手机上离线撰写，依据照片检查、症状和这头动物的记录。这是初步结果：联网后请用在线 AI 再检查一次，并与兽医确认。"
+      "reportNote": "由 {{model}} 在本手机上离线撰写，依据照片检查、症状和这头动物的记录。这是初步结果：联网后请用在线 AI 再检查一次，并与兽医确认。",
+      "partly": "已下载 {{pct}}%：会从这里继续。",
+      "waitingWifi": "正在等待 Wi-Fi：此手机连接 Wi-Fi 后，离线 AI（{{mb}} MB）会自动下载。",
+      "downloadOnData": "立即使用移动数据下载",
+      "modeOn": "您已离线：“提问”和“诊断”使用此手机上的离线 AI，并使用保存在手机上的记录。",
+      "modeGuest": "此手机上的离线 AI 已就绪。登录之前，它看不到任何农场记录。",
+      "modeDownloading": "离线 AI 仍在下载中（{{pct}}%）。在它就绪之前，“诊断”仍可在此手机上检查照片。",
+      "modeUnsupported": "此手机无法运行离线 AI。“诊断”仍可在此手机上检查照片。",
+      "modeMissing": "离线 AI（{{mb}} MB）尚未在此手机上：连接 Wi-Fi 后会自动下载。在此之前，“诊断”仍可在此手机上检查照片。",
+      "poweredBy": "此手机上的离线 AI：Gemma 3 1B 和 LivestockPro 疾病检测器"
     }
   },
   "org": {
@@ -1720,7 +1729,12 @@
         "organization_account": "机构账户",
         "already_member": "已是成员",
         "other_organization": "在其他机构",
-        "limit_reached": "已达上限"
+        "limit_reached": "已达上限",
+        "invited": "已发送邀请邮件",
+        "already_invited": "已邀请",
+        "blocked": "账户已暂停或未获批准",
+        "invite_failed": "邮件未能发送",
+        "error": "无法添加"
       },
       "auditSearch": "邮箱、名称或编号",
       "actionGroups": {
@@ -1739,7 +1753,8 @@
       "defaultMax": "新机构的默认养殖户上限",
       "defaultMaxHint": "可按机构单独更改。",
       "settingsSaved": "设置已保存",
-      "superOnly": "仅超级管理员可更改系统设置。"
+      "superOnly": "仅超级管理员可更改系统设置。",
+      "createdInvited": "组织已创建。邀请已发送至 {{email}}。"
     },
     "mobile": {
       "offline": "机构页面需要网络连接。",
@@ -1767,6 +1782,9 @@
         "on_hold": "账户已暂停",
         "rejected": "账户被拒绝"
       }
+    },
+    "inviteEmail": {
+      "failed": "已邀请 {{email}}，但邮件未能发送。对方使用此地址登录时会看到邀请。"
     }
   },
   "notifications": {
@@ -1969,5 +1987,11 @@
       "birth": "出生：{{tag}}",
       "newborns_other": "{{count}} 头幼畜"
     }
+  },
+  "offlineMode": {
+    "title": "离线模式",
+    "subtitle": "Agricoders 出品的 LivestockPro",
+    "intro": "当前没有网络，因此登录和所有需要服务器的功能已暂停。AI 助手在此手机上运行。重新联网后，应用会自动恢复正常。",
+    "banner": "离线模式：您的记录保存在此手机上，AI 在手机上运行。重新连接后，在线功能会恢复。"
   }
 }

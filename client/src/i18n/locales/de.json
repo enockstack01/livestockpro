@@ -1315,7 +1315,16 @@
       "writingWords": "Offline-Diagnose wird geschrieben: bisher {{count}} Wörter",
       "starting": "Offline-KI wird gestartet...",
       "takesAMinute": "Das kann auf einem Telefon ein bis drei Minuten dauern.",
-      "reportNote": "Offline auf diesem Telefon von {{model}} geschrieben, mit der Fotoprüfung, den Symptomen und den Aufzeichnungen dieses Tiers. Vorläufig: Wiederholen Sie es mit der Online-KI, sobald Sie verbunden sind, und bestätigen Sie es mit einem Tierarzt."
+      "reportNote": "Offline auf diesem Telefon von {{model}} geschrieben, mit der Fotoprüfung, den Symptomen und den Aufzeichnungen dieses Tiers. Vorläufig: Wiederholen Sie es mit der Online-KI, sobald Sie verbunden sind, und bestätigen Sie es mit einem Tierarzt.",
+      "partly": "Bisher {{pct}} % heruntergeladen: Es geht von dort aus weiter.",
+      "waitingWifi": "Warten auf WLAN: Die Offline-KI ({{mb}} MB) lädt sich von selbst herunter, sobald dieses Telefon im WLAN ist.",
+      "downloadOnData": "Jetzt über mobile Daten herunterladen",
+      "modeOn": "Sie sind offline: Fragen und Diagnose nutzen die Offline-KI auf diesem Telefon, mit Ihren auf dem Telefon gespeicherten Daten.",
+      "modeGuest": "Die Offline-KI auf diesem Telefon ist bereit. Sie sieht keine Betriebsdaten, bis Sie sich anmelden.",
+      "modeDownloading": "Die Offline-KI wird noch heruntergeladen ({{pct}} %). Bis dahin kann die Diagnose Fotos auf diesem Telefon prüfen.",
+      "modeUnsupported": "Dieses Telefon kann die Offline-KI nicht ausführen. Die Diagnose kann Fotos auf diesem Telefon prüfen.",
+      "modeMissing": "Die Offline-KI ({{mb}} MB) ist noch nicht auf diesem Telefon: Sie lädt sich im WLAN von selbst herunter. Bis dahin kann die Diagnose Fotos auf diesem Telefon prüfen.",
+      "poweredBy": "Offline-KI auf diesem Telefon: Gemma 3 1B und der LivestockPro-Krankheitsdetektor"
     }
   },
   "org": {
@@ -1720,7 +1729,12 @@
         "organization_account": "Organisationskonto",
         "already_member": "Bereits Mitglied",
         "other_organization": "In anderer Organisation",
-        "limit_reached": "Limit erreicht"
+        "limit_reached": "Limit erreicht",
+        "invited": "Einladungs-E-Mail gesendet",
+        "already_invited": "Bereits eingeladen",
+        "blocked": "Konto zurückgestellt oder nicht genehmigt",
+        "invite_failed": "E-Mail konnte nicht gesendet werden",
+        "error": "Konnte nicht hinzugefügt werden"
       },
       "auditSearch": "E-Mail, Name oder ID",
       "actionGroups": {
@@ -1739,7 +1753,8 @@
       "defaultMax": "Standardlimit für neue Organisationen",
       "defaultMaxHint": "Kann je Organisation geändert werden.",
       "settingsSaved": "Einstellungen gespeichert",
-      "superOnly": "Nur ein Superadministrator kann Systemeinstellungen ändern."
+      "superOnly": "Nur ein Superadministrator kann Systemeinstellungen ändern.",
+      "createdInvited": "Organisation erstellt. Eine Einladung wurde an {{email}} gesendet."
     },
     "mobile": {
       "offline": "Für die Organisationsansichten ist eine Verbindung nötig.",
@@ -1767,6 +1782,9 @@
         "on_hold": "Konto pausiert",
         "rejected": "Konto abgelehnt"
       }
+    },
+    "inviteEmail": {
+      "failed": "{{email}} wurde eingeladen, aber die E-Mail konnte nicht gesendet werden. Die Einladung erscheint bei der Anmeldung mit dieser Adresse."
     }
   },
   "notifications": {
@@ -1974,5 +1992,11 @@
       "newborns_one": "{{count}} Jungtier",
       "newborns_other": "{{count}} Jungtiere"
     }
+  },
+  "offlineMode": {
+    "title": "Offline-Modus",
+    "subtitle": "LivestockPro von Agricoders",
+    "intro": "Es gibt kein Internet, daher sind die Anmeldung und alles, was den Server braucht, pausiert. Der KI-Assistent arbeitet auf diesem Telefon. Die App kehrt von selbst zum Normalbetrieb zurück, sobald Sie wieder online sind.",
+    "banner": "Offline-Modus: Ihre Daten werden auf diesem Telefon gespeichert und die KI läuft auf dem Telefon. Online-Funktionen kommen zurück, sobald Sie wieder verbunden sind."
   }
 }

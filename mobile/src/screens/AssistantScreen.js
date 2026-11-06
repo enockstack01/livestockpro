@@ -5,7 +5,6 @@ import { useLocalSearchParams } from 'expo-router';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { File, Paths } from 'expo-file-system';
-import NetInfo from '@react-native-community/netinfo';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useAuth } from '@clerk/expo';
 import Icon from '../components/Icon';
@@ -17,6 +16,7 @@ import { diagnosisFacts, farmSnapshot, offlineReport, referenceFor } from '../ml
 import { useApi } from '../api/client';
 import { useRepository } from '../db/repository';
 import { useToast } from '../lib/toast';
+import { isOffline, useConnectivity } from '../lib/connectivity';
 import { printHtml } from '../lib/printReport';
 import PhotoPicker, { usePhotos } from '../components/PhotoPicker';
 import { useTheme } from '../theme/ThemeProvider';
@@ -25,8 +25,13 @@ import { aiReportFileName, aiReportHtml } from '../../../shared/aiReportHtml';
 import { aiResetTime, getAiUsage, subscribeAiUsage } from '../../../shared/aiUsage';
 
 /* Mobile twin of client/src/pages/Assistant.jsx: Ask LivestockPro, the farm
-   advisor, AI diagnosis and saved reports. AI runs on the server, so these
-   need a connection; everything else in the app keeps working offline. */
+   advisor, AI diagnosis and saved reports. Online the AI runs on the server;
+   offline, Ask and Diagnose use the models on the phone (src/ml) and the
+   other tabs, which need the server, are hidden. guest: offline with nobody
+   signed in (src/screens/OfflineMode.js), so no farm records are read. */
+
+// On-phone checks made in offline mode without signing in.
+const GUEST_ID = 'offline-guest';
 
 export function useAiStatus() {
   const api = useApi();
@@ -421,7 +426,7 @@ function Notice({ children, error }) {
   );
 }
 
-function AskTab({ disabled }) {
+function AskTab({ disabled, guest }) {
   const { t, i18n } = useTranslation();
   const { colors } = useTheme();
   const api = useApi();
@@ -450,8 +455,7 @@ function AskTab({ disabled }) {
     photos.clear();
     setError('');
     setBusy(true);
-    const net = await NetInfo.fetch().catch(() => null);
-    const offline = net && net.isConnected === false;
+    const offline = guest || isOffline();
     const { data, error: err } = offline ? { error: { networkError: true } } : await api.aiChat({ messages: next.map(({ role, content }) => ({ role, content })), language: i18n.language, images: extra.images });
     if (err && err.networkError && (await gemma.ready())) { await answerOffline(next, shots); return; }
     setBusy(false);
@@ -464,7 +468,7 @@ function AskTab({ disabled }) {
     setLocal(true);
     try {
       const [snapshot, vision] = await Promise.all([
-        farmSnapshot(repo),
+        guest ? null : farmSnapshot(repo),
         shots.length && deviceModelAvailable ? detectPhotos(shots.map((p) => ({ uri: p.fullUri || p.uri, width: p.width, height: p.height }))).catch(() => null) : null
       ]);
       const history = next.map(({ role, content }) => ({ role, content }));
@@ -606,11 +610,12 @@ export function DeviceResult({ result, onDone, doneLabel }) {
 }
 
 /* Earlier checks made on this phone; tap one to see its findings again. */
-function DeviceScans({ onOpen }) {
+function DeviceScans({ onOpen, guest }) {
   const { t, i18n } = useTranslation();
   const { colors } = useTheme();
   const db = useSQLiteContext();
-  const { userId } = useAuth();
+  const auth = useAuth();
+  const userId = guest ? GUEST_ID : auth.userId;
   const [rows, setRows] = useState([]);
   useEffect(() => {
     let live = true;
@@ -642,7 +647,7 @@ function DeviceScans({ onOpen }) {
   );
 }
 
-function DiagnoseTab({ disabled, recordId }) {
+function DiagnoseTab({ disabled, recordId, guest }) {
   const { t, i18n } = useTranslation();
   const { colors } = useTheme();
   const api = useApi();
@@ -660,10 +665,13 @@ function DiagnoseTab({ disabled, recordId }) {
   const [localWords, setLocalWords] = useState(null);
   const photos = usePhotos();
   const db = useSQLiteContext();
-  const { userId } = useAuth();
+  const auth = useAuth();
+  const userId = guest ? GUEST_ID : auth.userId;
+  const { online } = useConnectivity();
 
   useEffect(() => {
     let live = true;
+    if (guest) return undefined; // nobody signed in: no records
     if (recordId) api.aiReports({ kind: 'diagnosis', record_id: recordId, limit: 5 }).then(({ data }) => { if (live) setEarlier(data || []); });
     (async () => {
       const list = await repo.list('animals', { order: 'tag_id ASC' });
@@ -698,8 +706,7 @@ function DiagnoseTab({ disabled, recordId }) {
     /* Only a phone with no network at all skips the server; "internet not
        reachable" can be reported briefly while connected, so a failed
        request falls back to the phone instead. */
-    const net = await NetInfo.fetch().catch(() => null);
-    const offline = net && net.isConnected === false;
+    const offline = guest || isOffline();
     const { data, error } = offline ? { error: { networkError: true } } : await api.aiDiagnose(body);
     if (error && error.networkError) {
       setBusy(false);
@@ -788,14 +795,14 @@ function DiagnoseTab({ disabled, recordId }) {
         ) : <Working label={t('ai.diagnose.working')} />) : (
           <>
             <Muted style={{ marginBottom: 12 }}>{t('ai.diagnose.intro')}</Muted>
-            <FormGroup label={t('ai.diagnose.animal')}>
+            {!guest ? <FormGroup label={t('ai.diagnose.animal')}>
               <Select
                 value={animalId}
                 onChange={setAnimalId}
                 placeholder={t('ai.diagnose.chooseAnimal')}
                 options={[{ value: '', label: t('ai.diagnose.chooseAnimal') }, ...animals.map((a) => ({ value: a.id, label: `${a.tag_id}${a.name ? ` · ${a.name}` : ''}${a.species ? ` · ${t(`enums.species.${a.species}`, a.species)}` : ''}` }))]}
               />
-            </FormGroup>
+            </FormGroup> : null}
             {!animal ? (
               <FormGroup label={t('ai.diagnose.species')}>
                 <Input value={species} onChangeText={setSpecies} placeholder={t('ai.diagnose.speciesHint')} />
@@ -808,7 +815,7 @@ function DiagnoseTab({ disabled, recordId }) {
               <PhotoPicker state={photos} disabled={disabled && !deviceModelAvailable} />
             </FormGroup>
             <Note danger>{t('ai.vetNotice')}</Note>
-            <AiUsageMeter kind="diagnose" style={{ marginTop: 12 }} />
+            {!guest && online !== false ? <AiUsageMeter kind="diagnose" style={{ marginTop: 12 }} /> : null}
             <Button title={t('ai.diagnose.run')} icon="wand-magic-sparkles" onPress={run} disabled={disabled || (!symptoms.trim() && !photos.photos.length)} style={{ marginTop: 14 }} block />
             {deviceModelAvailable ? (
               <>
@@ -828,7 +835,7 @@ function DiagnoseTab({ disabled, recordId }) {
                 ))}
               </View>
             ) : null}
-            <DeviceScans onOpen={(scan) => (scan.report ? setSaved({ ...scan.report, scanId: scan.id }) : setDeviceResult(scan))} />
+            <DeviceScans guest={guest} onOpen={(scan) => (scan.report ? setSaved({ ...scan.report, scanId: scan.id }) : setDeviceResult(scan))} />
           </>
         )}
       </CardBody>
@@ -889,28 +896,69 @@ function ReportsTab() {
 }
 
 const TABS = ['ask', 'advisor', 'diagnose', 'reports'];
+// Offline only the on-phone models answer: the advisor and saved reports need the server.
+const OFFLINE_TABS = ['ask', 'diagnose'];
+
+/* What offline mode says about the offline AI: ready, downloading, or not
+   on this phone yet. */
+function OfflineAiNotice({ guest }) {
+  const { t } = useTranslation();
+  const [s, setS] = useState({ status: 'unknown', progress: 0 });
+  useEffect(() => {
+    const off = gemma.subscribe(setS);
+    gemma.refreshStatus();
+    return off;
+  }, []);
+  const mb = Math.round(gemma.GEMMA.bytes / 1e6);
+  const text = s.status === 'ready' ? t(guest ? 'ai.local.modeGuest' : 'ai.local.modeOn')
+    : s.status === 'downloading' ? t('ai.local.modeDownloading', { pct: Math.round(s.progress * 100) })
+      : s.status === 'unsupported' ? t('ai.local.modeUnsupported')
+        : t('ai.local.modeMissing', { mb });
+  return <Notice>{text}</Notice>;
+}
 
 export default function AssistantScreen() {
   const { t } = useTranslation();
   const params = useLocalSearchParams();
   const [tab, setTab] = useState(TABS.includes(params.tab) ? params.tab : 'ask');
   const configured = useAiStatus();
+  const { online } = useConnectivity();
+  const offline = online === false;
+  const tabs = offline ? OFFLINE_TABS : TABS;
+  const shown = tabs.includes(tab) ? tab : 'ask';
 
   useEffect(() => { if (TABS.includes(params.tab)) setTab(params.tab); }, [params.tab, params.record]);
 
   return (
     <Page>
       <PageHeader title={t('ai.title')} subtitle={t('ai.subtitle')} />
-      {configured === false ? <Notice>{t('ai.notConfigured')}</Notice> : null}
-      {configured ? <AiUsageMeter style={{ marginBottom: 14 }} /> : null}
-      <Tabs items={TABS.map((k) => ({ value: k, label: t(`ai.tabs.${k}`) }))} value={tab} onChange={setTab} />
+      {offline ? <OfflineAiNotice /> : null}
+      {!offline && configured === false ? <Notice>{t('ai.notConfigured')}</Notice> : null}
+      {!offline && configured ? <AiUsageMeter style={{ marginBottom: 14 }} /> : null}
+      <Tabs items={tabs.map((k) => ({ value: k, label: t(`ai.tabs.${k}`) }))} value={shown} onChange={setTab} />
       <View style={{ height: 14 }} />
-      {tab === 'ask' ? <AskTab disabled={configured === false} /> : null}
-      {tab === 'advisor' ? <AdvisorCard disabled={configured === false} /> : null}
-      {tab === 'diagnose' ? <DiagnoseTab disabled={configured === false} recordId={params.record ? String(params.record) : null} /> : null}
-      {tab === 'reports' ? <ReportsTab /> : null}
-      <Muted style={{ textAlign: 'center', marginTop: 16, fontSize: 11 }}>{t('ai.poweredBy')}</Muted>
+      {shown === 'ask' ? <AskTab disabled={!offline && configured === false} /> : null}
+      {shown === 'advisor' ? <AdvisorCard disabled={configured === false} /> : null}
+      {shown === 'diagnose' ? <DiagnoseTab disabled={!offline && configured === false} recordId={params.record ? String(params.record) : null} /> : null}
+      {shown === 'reports' ? <ReportsTab /> : null}
+      <Muted style={{ textAlign: 'center', marginTop: 16, fontSize: 11 }}>{offline ? t('ai.local.poweredBy') : t('ai.poweredBy')}</Muted>
     </Page>
+  );
+}
+
+/* Offline mode with nobody signed in (src/screens/OfflineMode.js): Ask and
+   Diagnose with the on-phone models only, and no farm records. */
+export function OfflineAssistant() {
+  const { t } = useTranslation();
+  const [tab, setTab] = useState('ask');
+  return (
+    <>
+      <OfflineAiNotice guest />
+      <Tabs items={OFFLINE_TABS.map((k) => ({ value: k, label: t(`ai.tabs.${k}`) }))} value={tab} onChange={setTab} />
+      <View style={{ height: 14 }} />
+      {tab === 'ask' ? <AskTab guest /> : <DiagnoseTab guest />}
+      <Muted style={{ textAlign: 'center', marginTop: 16, fontSize: 11 }}>{t('ai.local.poweredBy')}</Muted>
+    </>
   );
 }
 

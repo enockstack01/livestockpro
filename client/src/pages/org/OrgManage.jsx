@@ -20,9 +20,10 @@ export function OrgStaff() {
 
   async function invite(e) {
     e.preventDefault();
-    const { error } = await api.http('POST', `/organizations/${orgId}/members`, { email, role });
+    const { data, error } = await api.http('POST', `/organizations/${orgId}/members`, { email, role });
     if (error) { showToast(orgErrorText(t, error), 'error'); return; }
-    showToast(t('org.staff.invited', { email }), 'success');
+    if (data && data.invite === 'failed') showToast(t('org.inviteEmail.failed', { email }), 'error');
+    else showToast(t('org.staff.invited', { email }), 'success');
     setEmail('');
     members.reload();
   }

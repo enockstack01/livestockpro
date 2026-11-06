@@ -1315,7 +1315,16 @@
       "writingWords": "Writing the offline diagnosis: {{count}} words so far",
       "starting": "Starting the offline AI...",
       "takesAMinute": "This can take one to three minutes on a phone.",
-      "reportNote": "Written offline on this phone by {{model}}, using the photo check, the symptoms and this animal's records. It is preliminary: check it again with the online AI when you are connected, and confirm with a vet."
+      "reportNote": "Written offline on this phone by {{model}}, using the photo check, the symptoms and this animal's records. It is preliminary: check it again with the online AI when you are connected, and confirm with a vet.",
+      "partly": "{{pct}}% downloaded so far: it carries on from there.",
+      "waitingWifi": "Waiting for Wi-Fi: the offline AI ({{mb}} MB) downloads by itself when this phone is on Wi-Fi.",
+      "downloadOnData": "Download now with mobile data",
+      "modeOn": "You are offline: Ask and Diagnose use the offline AI on this phone, with your records on the phone.",
+      "modeGuest": "The offline AI on this phone is ready. It does not see any farm records until you sign in.",
+      "modeDownloading": "The offline AI is still downloading ({{pct}}%). Until it is ready, Diagnose can still check photos on this phone.",
+      "modeUnsupported": "This phone cannot run the offline AI. Diagnose can still check photos on this phone.",
+      "modeMissing": "The offline AI ({{mb}} MB) is not on this phone yet: it downloads by itself on Wi-Fi. Until then, Diagnose can still check photos on this phone.",
+      "poweredBy": "Offline AI on this phone: Gemma 3 1B and the LivestockPro disease detector"
     }
   },
   "org": {
@@ -1720,7 +1729,12 @@
         "organization_account": "Organization account",
         "already_member": "Already a member",
         "other_organization": "In another organization",
-        "limit_reached": "Limit reached"
+        "limit_reached": "Limit reached",
+        "invited": "Invitation email sent",
+        "already_invited": "Already invited",
+        "blocked": "Account on hold or not approved",
+        "invite_failed": "Email could not be sent",
+        "error": "Could not be added"
       },
       "auditSearch": "Email, name or id",
       "actionGroups": {
@@ -1739,7 +1753,8 @@
       "defaultMax": "Default farmer limit for new organizations",
       "defaultMaxHint": "Can be changed per organization.",
       "settingsSaved": "Settings saved",
-      "superOnly": "Only a super admin can change system settings."
+      "superOnly": "Only a super admin can change system settings.",
+      "createdInvited": "Organization created. An invitation was sent to {{email}}."
     },
     "mobile": {
       "offline": "You need a connection for organization screens.",
@@ -1767,6 +1782,9 @@
         "on_hold": "Account on hold",
         "rejected": "Account rejected"
       }
+    },
+    "inviteEmail": {
+      "failed": "{{email}} was invited, but the email could not be sent. They will see the invitation when they sign in with this address."
     }
   },
   "notifications": {
@@ -1974,5 +1992,11 @@
       "newborns_one": "{{count}} newborn",
       "newborns_other": "{{count}} newborns"
     }
+  },
+  "offlineMode": {
+    "title": "Offline mode",
+    "subtitle": "LivestockPro by Agricoders",
+    "intro": "There is no internet, so signing in and everything that needs the server are paused. The AI assistant works on this phone. The app goes back to normal by itself when you are online again.",
+    "banner": "Offline mode: your records are saved on this phone and the AI runs on the phone. Online features come back when you reconnect."
   }
 }
