@@ -1295,7 +1295,7 @@
     },
     "local": {
       "title": "IA offline",
-      "intro": "Transfira {{model}} ({{mb}} MB) uma vez para ter o diagnóstico com IA e Perguntar ao LivestockPro sem internet. Funciona com a verificação de fotos neste telemóvel.",
+      "intro": "Transfira uma vez a IA offline ({{mb}} MB) para ter o diagnóstico com IA e Perguntar ao LivestockPro sem internet. Funciona com a verificação de fotos neste telefone.",
       "ready": "A IA offline está pronta neste telemóvel.",
       "remove": "Remover ({{mb}} MB)",
       "downloading": "A transferir: {{pct}}% de {{mb}} MB",
@@ -1304,8 +1304,8 @@
       "download": "Transferir IA offline ({{mb}} MB)",
       "failed": "A IA offline não conseguiu terminar: {{message}}",
       "limits": "A IA offline é um modelo pequeno que funciona neste telemóvel. É mais lenta do que a IA online e erra mais, sobretudo em línguas que não o inglês. Confirme sempre com um veterinário.",
-      "terms": "Termos de Utilização do Gemma",
-      "unsupported": "Este telemóvel não consegue executar a IA offline (precisa de um telemóvel de 64 bits). A verificação de fotos neste telemóvel continua a funcionar.",
+      "terms": "Licença do modelo de IA offline",
+      "unsupported": "Este telemóvel não consegue executar a IA offline (precisa de um telemóvel de 64 bits com pelo menos 6 GB de memória). A verificação de fotos neste telemóvel continua a funcionar.",
       "onMobileData": "Está a usar dados móveis: a IA offline é uma transferência de {{mb}} MB.",
       "assistant": "IA do LivestockPro (offline)",
       "writing": "A escrever neste telemóvel...",
@@ -1315,7 +1315,7 @@
       "writingWords": "A escrever o diagnóstico offline: {{count}} palavras até agora",
       "starting": "A iniciar a IA offline...",
       "takesAMinute": "Pode demorar de um a três minutos num telemóvel.",
-      "reportNote": "Escrito offline neste telemóvel por {{model}}, com a verificação de fotos, os sintomas e os registos deste animal. É preliminar: repita com a IA online quando tiver ligação e confirme com um veterinário.",
+      "reportNote": "Escrito offline neste telefone pela IA offline, com a verificação de fotos, os sintomas e os registos deste animal. É preliminar: verifique-o novamente com a IA online quando estiver ligado e confirme com um veterinário.",
       "partly": "{{pct}}% transferido até agora: continua a partir daí.",
       "waitingWifi": "À espera de Wi-Fi: a IA offline ({{mb}} MB) é transferida automaticamente quando este telefone está ligado ao Wi-Fi.",
       "downloadOnData": "Transferir agora com dados móveis",
@@ -1324,7 +1324,14 @@
       "modeDownloading": "A IA offline ainda está a ser transferida ({{pct}}%). Até estar pronta, o Diagnóstico pode verificar fotos neste telefone.",
       "modeUnsupported": "Este telefone não consegue executar a IA offline. O Diagnóstico pode verificar fotos neste telefone.",
       "modeMissing": "A IA offline ({{mb}} MB) ainda não está neste telefone: é transferida automaticamente no Wi-Fi. Até lá, o Diagnóstico pode verificar fotos neste telefone.",
-      "poweredBy": "IA offline neste telefone: Gemma 3 1B e o detetor de doenças LivestockPro"
+      "poweredBy": "IA LivestockPro offline neste telefone",
+      "stillDownloading": "A IA offline ainda está a ser transferida ({{pct}}%). Termina no Wi-Fi.",
+      "addPhotoMeanwhile": "Entretanto, adicione uma foto para a verificar neste telefone.",
+      "test": "Testar a IA offline",
+      "testing": "A testar…",
+      "testOk": "A IA offline funciona neste telefone: respondeu em {{seconds}} segundos.",
+      "testFailed": "A IA offline não funcionou neste telefone: {{message}}",
+      "lastProblem": "Último problema ({{date}}): {{message}}"
     }
   },
   "org": {

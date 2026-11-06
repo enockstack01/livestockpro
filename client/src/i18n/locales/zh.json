@@ -1295,7 +1295,7 @@
     },
     "local": {
       "title": "离线 AI",
-      "intro": "下载一次 {{model}}（{{mb}} MB），即可在没有网络时使用 AI 诊断和“问 LivestockPro”。它与本手机上的照片检查一起工作。",
+      "intro": "下载一次离线 AI（{{mb}} MB），即可在没有网络时使用 AI 诊断和“询问 LivestockPro”。它与此手机上的照片检查配合使用。",
       "ready": "离线 AI 已在本手机上就绪。",
       "remove": "删除（{{mb}} MB）",
       "downloading": "正在下载：{{mb}} MB 中的 {{pct}}%",
@@ -1304,8 +1304,8 @@
       "download": "下载离线 AI（{{mb}} MB）",
       "failed": "离线 AI 未能完成：{{message}}",
       "limits": "离线 AI 是在本手机上运行的小模型。它比在线 AI 慢，出错更多，尤其是英语以外的语言。请务必与兽医确认。",
-      "terms": "Gemma 使用条款",
-      "unsupported": "本手机无法运行离线 AI（需要 64 位手机）。本手机上的照片检查仍可使用。",
+      "terms": "离线 AI 模型许可",
+      "unsupported": "本手机无法运行离线 AI（需要内存至少 6 GB 的 64 位手机）。本手机上的照片检查仍可使用。",
       "onMobileData": "你正在使用移动数据：离线 AI 下载大小为 {{mb}} MB。",
       "assistant": "LivestockPro AI（离线）",
       "writing": "正在本手机上撰写...",
@@ -1315,7 +1315,7 @@
       "writingWords": "正在撰写离线诊断：已写 {{count}} 个词",
       "starting": "正在启动离线 AI...",
       "takesAMinute": "在手机上可能需要一到三分钟。",
-      "reportNote": "由 {{model}} 在本手机上离线撰写，依据照片检查、症状和这头动物的记录。这是初步结果：联网后请用在线 AI 再检查一次，并与兽医确认。",
+      "reportNote": "由此手机上的离线 AI 离线撰写，依据照片检查、症状和这头动物的记录。这只是初步结果：联网后请用在线 AI 再次检查，并请兽医确认。",
       "partly": "已下载 {{pct}}%：会从这里继续。",
       "waitingWifi": "正在等待 Wi-Fi：此手机连接 Wi-Fi 后，离线 AI（{{mb}} MB）会自动下载。",
       "downloadOnData": "立即使用移动数据下载",
@@ -1324,7 +1324,14 @@
       "modeDownloading": "离线 AI 仍在下载中（{{pct}}%）。在它就绪之前，“诊断”仍可在此手机上检查照片。",
       "modeUnsupported": "此手机无法运行离线 AI。“诊断”仍可在此手机上检查照片。",
       "modeMissing": "离线 AI（{{mb}} MB）尚未在此手机上：连接 Wi-Fi 后会自动下载。在此之前，“诊断”仍可在此手机上检查照片。",
-      "poweredBy": "此手机上的离线 AI：Gemma 3 1B 和 LivestockPro 疾病检测器"
+      "poweredBy": "此手机上的离线 LivestockPro AI",
+      "stillDownloading": "离线 AI 仍在下载中（{{pct}}%），连接 Wi-Fi 后即可完成。",
+      "addPhotoMeanwhile": "在此期间，可添加照片在此手机上检查。",
+      "test": "测试离线 AI",
+      "testing": "正在测试…",
+      "testOk": "离线 AI 可在此手机上运行：它在 {{seconds}} 秒内作答。",
+      "testFailed": "离线 AI 未能在此手机上运行：{{message}}",
+      "lastProblem": "上次问题（{{date}}）：{{message}}"
     }
   },
   "org": {

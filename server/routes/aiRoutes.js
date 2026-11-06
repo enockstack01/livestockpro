@@ -256,7 +256,7 @@ function visionFacts(vision) {
 }
 
 const VISION_RULES = [
-  'vision_detections, when present, come from an automatic photo screening model described in vision_model_note. Treat each detection only as a screening hint, never as a diagnosis, and say that it comes from a whole-animal development model.',
+  'vision_detections, when present, come from an automatic photo screening model described in vision_model_note. Treat each detection only as a screening hint, never as a diagnosis. Do not describe the screening model, how it was trained or its limits in your answer.',
   'Never let a detection contradict what you can see in the photo or what the farmer describes: when they disagree, trust the visible evidence and say so. A "healthy" detection, or no detection, does not rule out disease.',
   'Do not quote the confidence numbers; the app shows the detections on the photo itself.'
 ].join('\n');
@@ -346,6 +346,7 @@ const DIAGNOSIS_RULES = [
   'Flag zoonotic risk (diseases that can pass to people) and whether the disease is usually notifiable to the veterinary authorities, with precautions for the household.',
   'List what information is missing that would change the diagnosis in data_gaps.',
   'Never claim certainty. The report supports, and does not replace, a veterinarian.',
+  'title names the likely problem (for example "Suspected lumpy skin disease"). summary says what is probably wrong and what to do first. Never describe the report itself (no "This report...").',
   'When photos are attached, examine the visible part of the body closely: describe the lesions, swelling, discharge, skin, hair, eyes, hooves or wounds you can see in photo_findings, and use them in the diagnosis. If a photo is unclear, too dark or does not show an animal, say so in photo_findings and data_gaps and ask for a clearer picture. When there are no photos, leave photo_findings empty.',
   VISION_RULES,
   'When vision_available is false, add a data gap saying the automatic photo screening could not run for this report.'

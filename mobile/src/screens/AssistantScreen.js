@@ -394,7 +394,7 @@ export function SavedReport({ saved, subtitle, onDelete }) {
     <View>
       <Text style={[styles.reportTitle, { color: colors.primaryDark }]}>{saved.title}</Text>
       <Muted style={{ marginBottom: 10 }}>{subtitle ? `${subtitle} · ` : ''}{t('ai.report.generated', { date: new Date(saved.created_at).toLocaleString(i18n.language) })}</Muted>
-      {saved.offline ? <View style={{ marginBottom: 10 }}><Note>{t('ai.local.reportNote', { model: (saved.report && saved.report.offline && saved.report.offline.model) || 'Gemma 3 1B' })}</Note></View> : null}
+      {saved.offline ? <View style={{ marginBottom: 10 }}><Note>{t('ai.local.reportNote')}</Note></View> : null}
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 6 }}>
         {Platform.OS !== 'web' ? <Button title={downloading ? t('ai.report.downloading') : t('ai.report.download')} icon="file-arrow-down" size="sm" onPress={download} loading={downloading} disabled={downloading} /> : null}
         <Button title={t('ai.report.print')} icon="print" variant="secondary" size="sm" onPress={print} />
@@ -457,9 +457,15 @@ function AskTab({ disabled, guest }) {
     setBusy(true);
     const offline = guest || isOffline();
     const { data, error: err } = offline ? { error: { networkError: true } } : await api.aiChat({ messages: next.map(({ role, content }) => ({ role, content })), language: i18n.language, images: extra.images });
-    if (err && err.networkError && (await gemma.ready())) { await answerOffline(next, shots); return; }
+    const ai = err && err.networkError ? await gemma.refreshStatus() : null;
+    if (ai && ai.status === 'ready') { await answerOffline(next, shots); return; }
     setBusy(false);
-    if (err) { setError(err.networkError && gemma.supported() ? t('ai.local.chatNeedsModel') : aiErrorText(t, err, i18n.language)); return; }
+    if (ai) {
+      setError(ai.status === 'downloading' ? t('ai.local.stillDownloading', { pct: Math.round(ai.progress * 100) })
+        : ai.status === 'unsupported' ? t('ai.local.modeUnsupported') : t('ai.local.chatNeedsModel'));
+      return;
+    }
+    if (err) { setError(aiErrorText(t, err, i18n.language)); return; }
     setMessages([...next, { role: 'assistant', content: data.reply }]);
     setTimeout(() => scroll.current && scroll.current.scrollToEnd({ animated: true }), 50);
   }
@@ -712,9 +718,13 @@ function DiagnoseTab({ disabled, recordId, guest }) {
       setBusy(false);
       /* No internet: the offline AI writes the diagnosis on the phone; without
          it, the embedded detector still gives its findings for the photos. */
-      if (await gemma.ready()) { await diagnoseOffline(); return; }
-      if (deviceModelAvailable && photos.photos.length) { await checkOnPhone(); return; }
-      showToast(gemma.supported() ? t('ai.local.diagnoseNeedsModel') : deviceModelAvailable ? t('ai.device.needPhoto') : t('ai.offline'), 'error');
+      const ai = await gemma.refreshStatus();
+      if (ai.status === 'ready') { await diagnoseOffline(); return; }
+      // Why the offline AI cannot write the report yet; the photo check still runs.
+      const why = ai.status === 'downloading' ? t('ai.local.stillDownloading', { pct: Math.round(ai.progress * 100) })
+        : ai.status === 'unsupported' ? t('ai.local.modeUnsupported') : t('ai.local.diagnoseNeedsModel');
+      if (deviceModelAvailable && photos.photos.length) { showToast(why, 'info'); await checkOnPhone(); return; }
+      showToast(deviceModelAvailable && ai.status === 'downloading' ? `${why} ${t('ai.local.addPhotoMeanwhile')}` : why, 'error');
       return;
     }
     setBusy(false);
@@ -748,11 +758,13 @@ function DiagnoseTab({ disabled, recordId, guest }) {
   async function diagnoseOffline() {
     setBusy(true);
     setLocalWords(0);
+    const shots = photos.photos.slice();
+    let checked = null;
     try {
-      const shots = photos.photos.slice();
       const vision = shots.length && deviceModelAvailable
         ? await detectPhotos(shots.map((p) => ({ uri: p.fullUri || p.uri, width: p.width, height: p.height }))).catch(() => ({ available: false, detections: [] }))
         : null;
+      checked = vision;
       const facts = await diagnosisFacts(repo, { animal, record, symptoms: symptoms.trim(), species });
       const data = await gemma.diagnose({
         language: i18n.language, facts, vision, photoCount: shots.length, reference: referenceFor(vision),
@@ -764,7 +776,16 @@ function DiagnoseTab({ disabled, recordId, guest }) {
       photos.clear();
       setSaved({ ...report, scanId });
     } catch (e) {
-      if (!e.stopped) showToast(t('ai.local.failed', { message: e.message }), 'error');
+      if (!e.stopped) {
+        showToast(t('ai.local.failed', { message: e.message }), 'error');
+        // The report could not be written: the photo findings are still shown.
+        if (checked && checked.available) {
+          const thumbs = shots.map((p) => p.thumb);
+          await saveScan(db, userId, { vision: checked, thumbs, summary: animal ? animal.tag_id : null }).catch(() => {});
+          photos.clear();
+          setDeviceResult({ vision: checked, thumbs });
+        }
+      }
     }
     setLocalWords(null);
     setBusy(false);

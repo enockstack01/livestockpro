@@ -1,5 +1,93 @@
 import { findDisease } from './diseases';
-import { VET_NOTICE } from './offlinePrompts';
+import { DIAGNOSIS_SCHEMA, VET_NOTICE } from './offlinePrompts';
+
+/* Reads the offline AI's report. A small model on a slow phone can stop at
+   its length limit in the middle of the report, so a cut off report is
+   closed where it stopped and anything missing gets a safe default (see a
+   vet) instead of the whole diagnosis failing. */
+export function parseReport(text) {
+  const s = String(text || '');
+  const start = s.indexOf('{');
+  if (start < 0) throw new Error('The offline AI did not write a report. Please try again.');
+  const body = s.slice(start);
+  let data;
+  let cut = false;
+  try {
+    data = JSON.parse(body.slice(0, body.lastIndexOf('}') + 1));
+  } catch {
+    data = salvage(body);
+    cut = true;
+  }
+  const out = withDefaults(data, DIAGNOSIS_SCHEMA);
+  if (cut) out.data_gaps = [...out.data_gaps, 'The offline report was cut short on this phone: check it again with the online AI.'];
+  return out;
+}
+
+/* Closes the cut off text; when it stopped somewhere that cannot simply be
+   closed (inside a property name), steps back to the last complete item. */
+function salvage(body) {
+  try { return JSON.parse(closeJson(body)); } catch { /* step back */ }
+  const commas = [];
+  let inString = false;
+  let escaped = false;
+  for (let i = 0; i < body.length; i++) {
+    const c = body[i];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (c === '\\') escaped = true;
+      else if (c === '"') inString = false;
+    } else if (c === '"') inString = true;
+    else if (c === ',') commas.push(i);
+  }
+  for (let k = commas.length - 1; k >= 0 && k >= commas.length - 200; k--) {
+    try { return JSON.parse(closeJson(body.slice(0, commas[k]))); } catch { /* further back */ }
+  }
+  throw new Error('The offline AI did not finish the report. Please try again.');
+}
+
+// Closes the strings, lists and objects left open where the text stopped.
+function closeJson(s) {
+  const open = [];
+  let inString = false;
+  let escaped = false;
+  for (const c of s) {
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (c === '\\') escaped = true;
+      else if (c === '"') inString = false;
+    } else if (c === '"') inString = true;
+    else if (c === '{') open.push('}');
+    else if (c === '[') open.push(']');
+    else if (c === '}' || c === ']') open.pop();
+  }
+  let out = escaped ? s.slice(0, -1) : s;
+  if (inString) out += '"';
+  // A key with no value yet, or a trailing comma, is dropped.
+  out = out.replace(/\s+$/, '').replace(/,?\s*"[^"]*"\s*:\s*$/, '').replace(/[,:]\s*$/, '');
+  return out + open.reverse().join('');
+}
+
+const SAFE = { see_vet: true, urgency: 'soon', notifiable: false, risk: 'low', likelihood: 'medium', prescription_only: true };
+
+function withDefaults(value, schema, key) {
+  if (schema.type === 'object') {
+    const src = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+    const out = {};
+    for (const [k, sub] of Object.entries(schema.properties)) out[k] = withDefaults(src[k], sub, k);
+    return out;
+  }
+  if (schema.type === 'array') {
+    // A list item cut off half way through is dropped rather than shown half empty.
+    const items = Array.isArray(value) ? value : [];
+    return items
+      .filter((v) => (schema.items.type === 'object' ? v && typeof v === 'object' && Object.keys(v).length : v !== '' && v != null))
+      .map((v) => withDefaults(v, schema.items))
+      .slice(0, schema.maxItems || items.length);
+  }
+  if (schema.enum) return schema.enum.includes(value) ? value : (SAFE[key] || schema.enum[0]);
+  if (schema.type === 'boolean') return typeof value === 'boolean' ? value : Boolean(SAFE[key]);
+  return typeof value === 'string' ? value : '';
+}
 
 /* What the offline AI (src/ml/gemma) is given, read from the phone's own
    database: the same case facts and farm snapshot the server builds for the
@@ -68,7 +156,7 @@ export function referenceFor(vision) {
   return labels.map(findDisease).filter(Boolean).map((d) => pick(d, ['label', 'title', 'notifiable', 'zoonotic', 'urgency', 'signs', 'do_now', 'see_vet']));
 }
 
-/* A 1B model can get basic facts wrong. When its most likely condition is
+/* A small model can get basic facts wrong. When its most likely condition is
    the disease the detector found, the guide's facts win: whether it is
    notifiable and whether it passes to people. */
 export function applyGuide(report, vision) {
@@ -84,9 +172,36 @@ export function applyGuide(report, vision) {
   return out;
 }
 
+/* A small model sometimes titles or sums up the report itself ("Animal
+   health assessment report", "This report details...") instead of saying
+   what is wrong. Those are replaced with its own findings: the likely
+   condition and the first step, which are in the farmer's language. */
+// "Report" or "assessment" in the app's languages.
+const REPORT_WORD = /(?:report|assessment|rapport|évaluation|informe|evaluación|relatório|avaliação|bericht|bewertung|ripoti|tathmini|raporo|isuzuma|تقرير|报告|评估|रिपोर्ट|मूल्यांकन)/i;
+// A summary that opens by talking about the report ("This report details...").
+const opensWithReport = (text) => REPORT_WORD.test(String(text).split(/\s+/).slice(0, 4).join(' '));
+// The names of the data the model was given, which it sometimes copies into the text.
+const DATA_LABEL = /\s*\(?\b(?:vision_[a-z_]+|farm_records|reference_guide|animal_case|photo_screening|photos_attached|symptoms_described_by_farmer|health_history|record_being_diagnosed)\b\)?/g;
+const withoutLabels = (v) => (typeof v === 'string' ? v.replace(DATA_LABEL, '').replace(/\s+([.,;:])/g, '$1').trim()
+  : Array.isArray(v) ? v.map(withoutLabels)
+    : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, withoutLabels(x)])) : v);
+
+export function tidyReport(input) {
+  const data = withoutLabels(input);
+  const top = data.likely_conditions && data.likely_conditions[0];
+  if (!top || !top.name) return data;
+  const out = { ...data };
+  if (!out.title || REPORT_WORD.test(out.title)) out.title = top.name;
+  if (!out.summary || opensWithReport(out.summary)) {
+    const first = (out.treatment_steps || [])[0];
+    out.summary = [top.why || top.name, first].filter(Boolean).join(' ');
+  }
+  return out;
+}
+
 /* The offline report in the saved-report shape the report views use. */
 export function offlineReport({ data, vision, thumbs, animal, symptoms, species, model }) {
-  const report = { ...applyGuide(data, vision), photo_findings: '', disclaimer: VET_NOTICE, offline: { model } };
+  const report = { ...applyGuide(tidyReport(data), vision), photo_findings: '', disclaimer: VET_NOTICE, offline: { model } };
   if (vision) report.vision = vision;
   const now = new Date().toISOString();
   return {

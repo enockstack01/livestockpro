@@ -1,33 +1,42 @@
 import { AppState } from 'react-native';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as SecureStore from 'expo-secure-store';
+import * as Device from 'expo-device';
 import { connectivity, subscribeConnectivity } from '../lib/connectivity';
-import { DIAGNOSIS_SCHEMA, SAMPLING, chatMessages, diagnosisMessages } from './offlinePrompts';
+import { DIAGNOSIS_SCHEMA, SAMPLING, chatMessages, cleanAnswer, diagnosisMessages } from './offlinePrompts';
+import { parseReport } from './offlineAi';
 
-/* The offline AI: Gemma 3 1B (instruction tuned, 4-bit GGUF, 722 MB) run on
-   the phone by llama.rn, next to the YOLO11n detector (src/ml/detector).
-   Online, Claude Haiku on the server does this work; offline, Gemma writes
-   the diagnosis and answers questions from the phone's own records.
+/* The offline AI: Gemma 4 E2B (instruction tuned, 4-bit Q4_0 GGUF from the
+   llama.cpp team, 2.8 GB, Apache 2.0) run on the phone by llama.rn, next to
+   the YOLO11n detector (src/ml/detector). Online, the server's AI does this
+   work; offline, this model writes the diagnosis and answers questions.
 
    The model is not in the APK: the app downloads it by itself on Wi-Fi
    after it is installed (startAutoDownload, no sign in needed), from a fixed
    revision of the Hugging Face repository, carrying on where it stopped
    after a dropped connection or a restart. Its size is checked and it is
-   kept in the app's files. Settings can also start it on mobile data. llama.rn ships 64-bit ARM libraries only, so
-   on 32-bit phones the offline AI is not offered (supported() is false). */
+   kept in the app's files. Settings can also start it on mobile data.
+   llama.rn ships 64-bit ARM libraries only, and the model needs a phone
+   with about 6 GB of memory; on other phones the offline AI is not offered
+   (supported() is false). */
 
+/* name is what the app shows: the model itself is not named to users. */
 export const GEMMA = {
-  name: 'Gemma 3 1B',
-  file: 'gemma-3-1b-it-Q4_0.gguf',
-  url: 'https://huggingface.co/unsloth/gemma-3-1b-it-GGUF/resolve/f0b45be0aac41bd6a100a4b5734cad5f67255bfb/gemma-3-1b-it-Q4_0.gguf',
-  bytes: 721918496,
-  sha256: '27ee88e03be02e9ba73def9a819d570d8ad73716e50769e87f374ae394b0276e',
-  terms: 'https://ai.google.dev/gemma/terms'
+  name: 'LivestockPro offline AI',
+  file: 'gemma-4-E2B-it-Q4_0.gguf',
+  url: 'https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF/resolve/6938c58e698502037401a5f19f6905f2fb2f7dee/gemma-4-E2B-it-Q4_0.gguf',
+  bytes: 2841481184,
+  sha256: '8e30dff3ac4c8434c49a7036fa15564bdbb6044e42bf04550bf1a096ad7e6a52',
+  terms: 'https://www.apache.org/licenses/LICENSE-2.0'
 };
 
 const DIR = `${FileSystem.documentDirectory}models/`;
 const PATH = `${DIR}${GEMMA.file}`;
 const PART = `${PATH}.part`;
+// The earlier, smaller offline model: removed to give its space back.
+const OLD_FILES = ['gemma-3-1b-it-Q4_0.gguf', 'gemma-3-1b-it-Q4_0.gguf.part'];
+// Phones sold with 6 GB report a little less; 4 GB phones cannot hold the model.
+const MIN_MEMORY_BYTES = 5e9;
 // Room for the file plus some to spare, so the phone is not left full.
 const SPARE_BYTES = 300 * 1024 * 1024;
 // Free the model's memory when it has not been used for a while.
@@ -41,11 +50,12 @@ function llama() {
   return llamaModule;
 }
 
-/* Whether this phone can run the offline AI at all (64-bit ARM build of
-   llama.rn present). */
+/* Whether this phone can run the offline AI at all: the 64-bit ARM build of
+   llama.rn is present and there is enough memory (unknown memory: allowed). */
 export function supported() {
   const m = llama();
   if (!m) return false;
+  if (Device.totalMemory && Device.totalMemory < MIN_MEMORY_BYTES) return false;
   try {
     const { NativeModules, TurboModuleRegistry } = require('react-native');
     return Boolean((TurboModuleRegistry && TurboModuleRegistry.get && TurboModuleRegistry.get('RNLlama')) || NativeModules.RNLlama);
@@ -168,10 +178,12 @@ async function autoTry() {
 
 /* Called once when the app starts (app/_layout.js): fetches the model on
    Wi-Fi as soon as it can, and again whenever Wi-Fi comes back. Mobile data
-   is not used by itself, as 722 MB can cost a farmer a lot. */
+   is not used by itself, as 2.8 GB can cost a farmer a lot. */
 export async function startAutoDownload() {
-  if (autoStarted || !supported()) return;
+  if (autoStarted) return;
   autoStarted = true;
+  for (const old of OLD_FILES) FileSystem.deleteAsync(DIR + old, { idempotent: true }).catch(() => {});
+  if (!supported()) return;
   autoOff = Boolean(await SecureStore.getItemAsync(AUTO_OFF_KEY).catch(() => null));
   await refreshStatus();
   subscribeConnectivity(() => { autoTry(); setState({}); });
@@ -248,7 +260,8 @@ function context() {
       if (!m || !supported()) throw new Error('This phone cannot run the offline AI.');
       const info = await FileSystem.getInfoAsync(PATH);
       if (!info.exists) throw new Error('The offline AI is not downloaded yet. Download it in Settings.');
-      return m.initLlama({ model: PATH, n_ctx: 4096, n_batch: 512, n_gpu_layers: 0, use_mlock: false });
+      // The largest diagnosis prompt is about 2,000 tokens; a report is up to 2,400 more.
+      return m.initLlama({ model: PATH, n_ctx: 5120, n_batch: 512, n_gpu_layers: 0, use_mlock: false });
     })().catch((err) => { contextPromise = null; throw err; });
   }
   touch();
@@ -276,17 +289,44 @@ function run(work) {
   running = {};
   stopRequested = false;
   current = (async () => {
+    let stage = 'load';
     try {
       const ctx = await context();
       if (stopRequested) throw stopped();
       running = ctx;
+      stage = 'write';
       return await work(ctx);
+    } catch (err) {
+      if (!err.stopped) noteProblem(stage, err);
+      throw err;
     } finally {
       current = null;
       finished();
     }
   })();
   return current;
+}
+
+/* The last thing that went wrong, kept on the phone so Settings can show it
+   (there is no other way to see an error on a farmer's phone). */
+const PROBLEM_KEY = 'lp_offline_ai_problem';
+function noteProblem(stage, err) {
+  const problem = { stage, message: String((err && err.message) || err).slice(0, 300), at: new Date().toISOString() };
+  SecureStore.setItemAsync(PROBLEM_KEY, JSON.stringify(problem)).catch(() => {});
+}
+export async function lastProblem() {
+  try { return JSON.parse(await SecureStore.getItemAsync(PROBLEM_KEY)); } catch { return null; }
+}
+
+/* Settings' check: loads the model and writes a few words.
+   Returns { seconds, text }, or throws what went wrong. */
+export function selfTest() {
+  const t0 = Date.now();
+  return run(async (ctx) => {
+    const res = await ctx.completion({ messages: [{ role: 'user', content: 'Reply with one short sentence: say hello to a farmer.' }], n_predict: 24, temperature: 0.2, enable_thinking: false });
+    await SecureStore.deleteItemAsync(PROBLEM_KEY).catch(() => {});
+    return { seconds: Math.round((Date.now() - t0) / 1000), text: String(res.text || '').trim() };
+  });
 }
 
 /* An offline diagnosis in the online report's shape (DIAGNOSIS_SCHEMA).
@@ -296,14 +336,21 @@ export function diagnose({ language, facts, vision, photoCount, reference, onPro
   return run(async (ctx) => {
     const res = await ctx.completion({
       messages: diagnosisMessages({ language, facts, vision, photoCount, reference }),
+      // No thinking first: on a phone it would add minutes before the report.
+      enable_thinking: false,
       response_format: { type: 'json_schema', json_schema: { strict: true, schema: DIAGNOSIS_SCHEMA } },
-      n_predict: 1500,
+      // A report is usually about 700 tokens; this leaves room inside the 5,120 context.
+      n_predict: 2400,
       temperature: SAMPLING.temperature,
       top_p: SAMPLING.top_p,
-      top_k: SAMPLING.top_k
-    }, (data) => { if (data.token && /s/.test(data.token)) onProgress && onProgress(++words); });
+      top_k: SAMPLING.top_k,
+      // A light penalty over the last 64 tokens stops repetition loops in
+      // Kinyarwanda without breaking the lists (1.15 was slower, no better).
+      penalty_repeat: 1.1,
+      penalty_last_n: 64
+    }, (data) => { if (data.token && /\s/.test(data.token)) onProgress && onProgress(++words); });
     if (res.interrupted || stopRequested) throw stopped();
-    return JSON.parse(res.text);
+    return parseReport(res.text);
   });
 }
 
@@ -312,10 +359,11 @@ export function chat({ language, snapshot, vision, history, onText }) {
   return run(async (ctx) => {
     const res = await ctx.completion({
       messages: chatMessages({ language, snapshot, vision, history }),
+      enable_thinking: false,
       n_predict: 400,
       ...SAMPLING
-    }, (data) => { if (onText && data.accumulated_text) onText(data.accumulated_text); });
+    }, (data) => { if (onText && data.accumulated_text) onText(cleanAnswer(data.accumulated_text)); });
     if (res.interrupted || stopRequested) throw stopped();
-    return res.text.trim();
+    return cleanAnswer(res.text);
   });
 }

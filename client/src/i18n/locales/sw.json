@@ -1295,7 +1295,7 @@
     },
     "local": {
       "title": "AI bila mtandao",
-      "intro": "Pakua {{model}} ({{mb}} MB) mara moja upate utambuzi wa AI na Uliza LivestockPro bila intaneti. Inafanya kazi pamoja na ukaguzi wa picha kwenye simu hii.",
+      "intro": "Pakua AI ya nje ya mtandao ({{mb}} MB) mara moja ili upate uchunguzi wa AI na Uliza LivestockPro bila intaneti. Inafanya kazi pamoja na ukaguzi wa picha kwenye simu hii.",
       "ready": "AI bila mtandao iko tayari kwenye simu hii.",
       "remove": "Ondoa ({{mb}} MB)",
       "downloading": "Inapakua: {{pct}}% ya {{mb}} MB",
@@ -1304,8 +1304,8 @@
       "download": "Pakua AI bila mtandao ({{mb}} MB)",
       "failed": "AI bila mtandao haikuweza kumaliza: {{message}}",
       "limits": "AI bila mtandao ni modeli ndogo inayoendeshwa kwenye simu hii. Ni polepole kuliko AI ya mtandaoni na hukosea zaidi, hasa kwa lugha zisizo Kiingereza. Thibitisha kila mara na daktari wa mifugo.",
-      "terms": "Masharti ya Matumizi ya Gemma",
-      "unsupported": "Simu hii haiwezi kuendesha AI bila mtandao (inahitaji simu ya biti 64). Ukaguzi wa picha kwenye simu hii bado unafanya kazi.",
+      "terms": "Leseni ya modeli ya AI ya nje ya mtandao",
+      "unsupported": "Simu hii haiwezi kuendesha AI bila mtandao (inahitaji simu ya biti 64 yenye kumbukumbu ya angalau GB 6). Ukaguzi wa picha kwenye simu hii bado unafanya kazi.",
       "onMobileData": "Uko kwenye data ya simu: AI bila mtandao ni upakuaji wa {{mb}} MB.",
       "assistant": "AI ya LivestockPro (bila mtandao)",
       "writing": "Inaandika kwenye simu hii...",
@@ -1315,7 +1315,7 @@
       "writingWords": "Inaandika utambuzi bila mtandao: maneno {{count}} hadi sasa",
       "starting": "Inaanzisha AI bila mtandao...",
       "takesAMinute": "Hii inaweza kuchukua dakika moja hadi tatu kwenye simu.",
-      "reportNote": "Imeandikwa bila mtandao kwenye simu hii na {{model}}, kwa kutumia ukaguzi wa picha, dalili na kumbukumbu za mnyama huyu. Ni ya awali: rudia na AI ya mtandaoni ukiunganishwa, na thibitisha na daktari wa mifugo.",
+      "reportNote": "Imeandikwa nje ya mtandao kwenye simu hii na AI ya nje ya mtandao, kwa kutumia ukaguzi wa picha, dalili na kumbukumbu za mnyama huyu. Ni ya awali: ikague tena kwa AI ya mtandaoni ukiunganishwa, na uthibitishe na daktari wa mifugo.",
       "partly": "{{pct}}% imeshapakuliwa: itaendelea kutoka hapo.",
       "waitingWifi": "Inasubiri Wi-Fi: AI ya nje ya mtandao ({{mb}} MB) itajipakua yenyewe simu hii ikiwa kwenye Wi-Fi.",
       "downloadOnData": "Pakua sasa kwa data ya simu",
@@ -1324,7 +1324,14 @@
       "modeDownloading": "AI ya nje ya mtandao bado inapakuliwa ({{pct}}%). Hadi itakapokuwa tayari, Uchunguzi bado unaweza kukagua picha kwenye simu hii.",
       "modeUnsupported": "Simu hii haiwezi kuendesha AI ya nje ya mtandao. Uchunguzi bado unaweza kukagua picha kwenye simu hii.",
       "modeMissing": "AI ya nje ya mtandao ({{mb}} MB) bado haijawa kwenye simu hii: itajipakua yenyewe kwenye Wi-Fi. Hadi hapo, Uchunguzi bado unaweza kukagua picha kwenye simu hii.",
-      "poweredBy": "AI ya nje ya mtandao kwenye simu hii: Gemma 3 1B na kitambua magonjwa cha LivestockPro"
+      "poweredBy": "AI ya LivestockPro ya nje ya mtandao kwenye simu hii",
+      "stillDownloading": "AI ya nje ya mtandao bado inapakuliwa ({{pct}}%). Itakamilika kwenye Wi-Fi.",
+      "addPhotoMeanwhile": "Wakati huo, ongeza picha ili ikaguliwe kwenye simu hii.",
+      "test": "Jaribu AI ya nje ya mtandao",
+      "testing": "Inajaribiwa…",
+      "testOk": "AI ya nje ya mtandao inafanya kazi kwenye simu hii: imejibu kwa sekunde {{seconds}}.",
+      "testFailed": "AI ya nje ya mtandao haikufanya kazi kwenye simu hii: {{message}}",
+      "lastProblem": "Tatizo la mwisho ({{date}}): {{message}}"
     }
   },
   "org": {

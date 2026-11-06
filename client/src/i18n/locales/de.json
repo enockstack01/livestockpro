@@ -1295,7 +1295,7 @@
     },
     "local": {
       "title": "Offline-KI",
-      "intro": "Laden Sie {{model}} ({{mb}} MB) einmal herunter, um die KI-Diagnose und LivestockPro fragen ohne Internet zu nutzen. Sie arbeitet mit der Fotoprüfung auf diesem Telefon.",
+      "intro": "Laden Sie die Offline-KI ({{mb}} MB) einmal herunter, um die KI-Diagnose und „LivestockPro fragen“ ohne Internet zu nutzen. Sie arbeitet mit der Fotoprüfung auf diesem Telefon.",
       "ready": "Die Offline-KI ist auf diesem Telefon bereit.",
       "remove": "Entfernen ({{mb}} MB)",
       "downloading": "Wird geladen: {{pct}} % von {{mb}} MB",
@@ -1304,8 +1304,8 @@
       "download": "Offline-KI herunterladen ({{mb}} MB)",
       "failed": "Die Offline-KI konnte nicht abschließen: {{message}}",
       "limits": "Die Offline-KI ist ein kleines Modell, das auf diesem Telefon läuft. Sie ist langsamer als die Online-KI und macht mehr Fehler, besonders in anderen Sprachen als Englisch. Bestätigen Sie immer mit einem Tierarzt.",
-      "terms": "Gemma-Nutzungsbedingungen",
-      "unsupported": "Dieses Telefon kann die Offline-KI nicht ausführen (es braucht ein 64-Bit-Telefon). Die Fotoprüfung auf diesem Telefon funktioniert weiterhin.",
+      "terms": "Lizenz des Offline-KI-Modells",
+      "unsupported": "Dieses Telefon kann die Offline-KI nicht ausführen (es braucht ein 64-Bit-Telefon mit mindestens 6 GB Arbeitsspeicher). Die Fotoprüfung auf diesem Telefon funktioniert weiterhin.",
       "onMobileData": "Sie nutzen mobile Daten: Die Offline-KI ist ein Download von {{mb}} MB.",
       "assistant": "LivestockPro-KI (offline)",
       "writing": "Wird auf diesem Telefon geschrieben...",
@@ -1315,7 +1315,7 @@
       "writingWords": "Offline-Diagnose wird geschrieben: bisher {{count}} Wörter",
       "starting": "Offline-KI wird gestartet...",
       "takesAMinute": "Das kann auf einem Telefon ein bis drei Minuten dauern.",
-      "reportNote": "Offline auf diesem Telefon von {{model}} geschrieben, mit der Fotoprüfung, den Symptomen und den Aufzeichnungen dieses Tiers. Vorläufig: Wiederholen Sie es mit der Online-KI, sobald Sie verbunden sind, und bestätigen Sie es mit einem Tierarzt.",
+      "reportNote": "Offline auf diesem Telefon von der Offline-KI erstellt, anhand der Fotoprüfung, der Symptome und der Daten dieses Tieres. Das Ergebnis ist vorläufig: Prüfen Sie es mit der Online-KI, sobald Sie verbunden sind, und bestätigen Sie es mit einem Tierarzt.",
       "partly": "Bisher {{pct}} % heruntergeladen: Es geht von dort aus weiter.",
       "waitingWifi": "Warten auf WLAN: Die Offline-KI ({{mb}} MB) lädt sich von selbst herunter, sobald dieses Telefon im WLAN ist.",
       "downloadOnData": "Jetzt über mobile Daten herunterladen",
@@ -1324,7 +1324,14 @@
       "modeDownloading": "Die Offline-KI wird noch heruntergeladen ({{pct}} %). Bis dahin kann die Diagnose Fotos auf diesem Telefon prüfen.",
       "modeUnsupported": "Dieses Telefon kann die Offline-KI nicht ausführen. Die Diagnose kann Fotos auf diesem Telefon prüfen.",
       "modeMissing": "Die Offline-KI ({{mb}} MB) ist noch nicht auf diesem Telefon: Sie lädt sich im WLAN von selbst herunter. Bis dahin kann die Diagnose Fotos auf diesem Telefon prüfen.",
-      "poweredBy": "Offline-KI auf diesem Telefon: Gemma 3 1B und der LivestockPro-Krankheitsdetektor"
+      "poweredBy": "Offline-LivestockPro-KI auf diesem Telefon",
+      "stillDownloading": "Die Offline-KI wird noch heruntergeladen ({{pct}} %). Sie wird im WLAN fertig.",
+      "addPhotoMeanwhile": "Fügen Sie bis dahin ein Foto hinzu, um es auf diesem Telefon zu prüfen.",
+      "test": "Offline-KI testen",
+      "testing": "Wird getestet…",
+      "testOk": "Die Offline-KI funktioniert auf diesem Telefon: Sie hat in {{seconds}} Sekunden geantwortet.",
+      "testFailed": "Die Offline-KI hat auf diesem Telefon nicht funktioniert: {{message}}",
+      "lastProblem": "Letztes Problem ({{date}}): {{message}}"
     }
   },
   "org": {

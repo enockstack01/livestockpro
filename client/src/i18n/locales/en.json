@@ -1295,7 +1295,7 @@
     },
     "local": {
       "title": "Offline AI",
-      "intro": "Download {{model}} ({{mb}} MB) once to get the AI diagnosis and Ask LivestockPro with no internet. It works with the photo check on this phone.",
+      "intro": "Download the offline AI ({{mb}} MB) once to get the AI diagnosis and Ask LivestockPro with no internet. It works with the photo check on this phone.",
       "ready": "Offline AI is ready on this phone.",
       "remove": "Remove ({{mb}} MB)",
       "downloading": "Downloading: {{pct}}% of {{mb}} MB",
@@ -1304,8 +1304,8 @@
       "download": "Download offline AI ({{mb}} MB)",
       "failed": "The offline AI could not finish: {{message}}",
       "limits": "The offline AI is a small model running on this phone. It is slower than the online AI and makes more mistakes, especially in languages other than English. Always confirm with a vet.",
-      "terms": "Gemma Terms of Use",
-      "unsupported": "This phone cannot run the offline AI (it needs a 64-bit phone). The photo check on this phone still works.",
+      "terms": "Offline AI model licence",
+      "unsupported": "This phone cannot run the offline AI (it needs a 64-bit phone with at least 6 GB of memory). The photo check on this phone still works.",
       "onMobileData": "You are on mobile data: the offline AI is a {{mb}} MB download.",
       "assistant": "LivestockPro AI (offline)",
       "writing": "Writing on this phone...",
@@ -1315,7 +1315,7 @@
       "writingWords": "Writing the offline diagnosis: {{count}} words so far",
       "starting": "Starting the offline AI...",
       "takesAMinute": "This can take one to three minutes on a phone.",
-      "reportNote": "Written offline on this phone by {{model}}, using the photo check, the symptoms and this animal's records. It is preliminary: check it again with the online AI when you are connected, and confirm with a vet.",
+      "reportNote": "Written offline on this phone by the offline AI, using the photo check, the symptoms and this animal's records. It is preliminary: check it again with the online AI when you are connected, and confirm with a vet.",
       "partly": "{{pct}}% downloaded so far: it carries on from there.",
       "waitingWifi": "Waiting for Wi-Fi: the offline AI ({{mb}} MB) downloads by itself when this phone is on Wi-Fi.",
       "downloadOnData": "Download now with mobile data",
@@ -1324,7 +1324,14 @@
       "modeDownloading": "The offline AI is still downloading ({{pct}}%). Until it is ready, Diagnose can still check photos on this phone.",
       "modeUnsupported": "This phone cannot run the offline AI. Diagnose can still check photos on this phone.",
       "modeMissing": "The offline AI ({{mb}} MB) is not on this phone yet: it downloads by itself on Wi-Fi. Until then, Diagnose can still check photos on this phone.",
-      "poweredBy": "Offline AI on this phone: Gemma 3 1B and the LivestockPro disease detector"
+      "poweredBy": "Offline LivestockPro AI on this phone",
+      "stillDownloading": "The offline AI is still downloading ({{pct}}%). It finishes on Wi-Fi.",
+      "addPhotoMeanwhile": "Meanwhile, add a photo to check it on this phone.",
+      "test": "Test the offline AI",
+      "testing": "Testing…",
+      "testOk": "The offline AI works on this phone: it answered in {{seconds}} seconds.",
+      "testFailed": "The offline AI did not work on this phone: {{message}}",
+      "lastProblem": "Last problem ({{date}}): {{message}}"
     }
   },
   "org": {

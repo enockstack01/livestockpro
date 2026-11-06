@@ -1295,7 +1295,7 @@
     },
     "local": {
       "title": "IA sin conexión",
-      "intro": "Descargue {{model}} ({{mb}} MB) una vez para tener el diagnóstico con IA y Preguntar a LivestockPro sin internet. Funciona junto con la revisión de fotos en este teléfono.",
+      "intro": "Descarga una vez la IA sin conexión ({{mb}} MB) para tener el diagnóstico con IA y Preguntar a LivestockPro sin internet. Funciona con la revisión de fotos en este teléfono.",
       "ready": "La IA sin conexión está lista en este teléfono.",
       "remove": "Eliminar ({{mb}} MB)",
       "downloading": "Descargando: {{pct}} % de {{mb}} MB",
@@ -1304,8 +1304,8 @@
       "download": "Descargar IA sin conexión ({{mb}} MB)",
       "failed": "La IA sin conexión no pudo terminar: {{message}}",
       "limits": "La IA sin conexión es un modelo pequeño que funciona en este teléfono. Es más lenta que la IA en línea y comete más errores, sobre todo en idiomas distintos del inglés. Confirme siempre con un veterinario.",
-      "terms": "Condiciones de uso de Gemma",
-      "unsupported": "Este teléfono no puede usar la IA sin conexión (necesita un teléfono de 64 bits). La revisión de fotos en este teléfono sigue funcionando.",
+      "terms": "Licencia del modelo de IA sin conexión",
+      "unsupported": "Este teléfono no puede usar la IA sin conexión (necesita un teléfono de 64 bits con al menos 6 GB de memoria). La revisión de fotos en este teléfono sigue funcionando.",
       "onMobileData": "Está usando datos móviles: la IA sin conexión es una descarga de {{mb}} MB.",
       "assistant": "IA de LivestockPro (sin conexión)",
       "writing": "Escribiendo en este teléfono...",
@@ -1315,7 +1315,7 @@
       "writingWords": "Escribiendo el diagnóstico sin conexión: {{count}} palabras por ahora",
       "starting": "Iniciando la IA sin conexión...",
       "takesAMinute": "Puede tardar de uno a tres minutos en un teléfono.",
-      "reportNote": "Escrito sin conexión en este teléfono por {{model}}, con la revisión de fotos, los síntomas y los registros de este animal. Es preliminar: repítalo con la IA en línea cuando tenga conexión y confirme con un veterinario.",
+      "reportNote": "Escrito sin conexión en este teléfono por la IA sin conexión, con la revisión de fotos, los síntomas y los registros de este animal. Es preliminar: revísalo de nuevo con la IA en línea cuando tengas conexión y confírmalo con un veterinario.",
       "partly": "{{pct}} % descargado hasta ahora: continúa desde ahí.",
       "waitingWifi": "Esperando Wi-Fi: la IA sin conexión ({{mb}} MB) se descarga sola cuando este teléfono está conectado a Wi-Fi.",
       "downloadOnData": "Descargar ahora con datos móviles",
@@ -1324,7 +1324,14 @@
       "modeDownloading": "La IA sin conexión todavía se está descargando ({{pct}} %). Mientras tanto, Diagnóstico puede revisar fotos en este teléfono.",
       "modeUnsupported": "Este teléfono no puede ejecutar la IA sin conexión. Diagnóstico puede revisar fotos en este teléfono.",
       "modeMissing": "La IA sin conexión ({{mb}} MB) aún no está en este teléfono: se descarga sola con Wi-Fi. Mientras tanto, Diagnóstico puede revisar fotos en este teléfono.",
-      "poweredBy": "IA sin conexión en este teléfono: Gemma 3 1B y el detector de enfermedades de LivestockPro"
+      "poweredBy": "IA de LivestockPro sin conexión en este teléfono",
+      "stillDownloading": "La IA sin conexión todavía se está descargando ({{pct}} %). Termina con Wi-Fi.",
+      "addPhotoMeanwhile": "Mientras tanto, añade una foto para revisarla en este teléfono.",
+      "test": "Probar la IA sin conexión",
+      "testing": "Probando…",
+      "testOk": "La IA sin conexión funciona en este teléfono: respondió en {{seconds}} segundos.",
+      "testFailed": "La IA sin conexión no funcionó en este teléfono: {{message}}",
+      "lastProblem": "Último problema ({{date}}): {{message}}"
     }
   },
   "org": {

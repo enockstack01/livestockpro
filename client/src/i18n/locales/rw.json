@@ -1295,7 +1295,7 @@
     },
     "local": {
       "title": "AI idakeneye murandasi",
-      "intro": "Kuramo {{model}} ({{mb}} MB) rimwe ubone isuzuma rya AI na Baza LivestockPro nta murandasi. Ikorana n’isuzuma ry’amafoto kuri iyi telefone.",
+      "intro": "Kurura rimwe AI ikora nta murandasi ({{mb}} MB) kugira ngo ubone isuzuma rya AI na Baza LivestockPro nta murandasi. Ikorana n’isuzuma ry’amafoto kuri iyi telefoni.",
       "ready": "AI idakeneye murandasi yiteguye kuri iyi telefone.",
       "remove": "Kuraho ({{mb}} MB)",
       "downloading": "Birimo gukururwa: {{pct}}% bya {{mb}} MB",
@@ -1304,8 +1304,8 @@
       "download": "Kuramo AI idakeneye murandasi ({{mb}} MB)",
       "failed": "AI idakeneye murandasi ntiyashoboye kurangiza: {{message}}",
       "limits": "AI idakeneye murandasi ni icyitegererezo gito gikora kuri iyi telefone. Iratinda kurusha AI yo kuri murandasi kandi ikora amakosa menshi, cyane cyane mu ndimi zitari Icyongereza. Buri gihe byemeze na veterineri.",
-      "terms": "Amabwiriza yo gukoresha Gemma",
-      "unsupported": "Iyi telefone ntishobora gukoresha AI idakeneye murandasi (bisaba telefone ya bits 64). Isuzuma ry’amafoto kuri iyi telefone rirakora.",
+      "terms": "Uruhushya rwa AI ikora nta murandasi",
+      "unsupported": "Iyi telefone ntishobora gukoresha AI idakeneye murandasi (bisaba telefone ya bits 64 ifite nibura GB 6 z’ububiko bw’akanya gato). Isuzuma ry’amafoto kuri iyi telefone rirakora.",
       "onMobileData": "Uri kuri interineti ya telefone: AI idakeneye murandasi ifite {{mb}} MB.",
       "assistant": "AI ya LivestockPro (idakeneye murandasi)",
       "writing": "Irimo kwandikira kuri iyi telefone...",
@@ -1315,7 +1315,7 @@
       "writingWords": "Irimo kwandika isuzuma idakeneye murandasi: amagambo {{count}} kugeza ubu",
       "starting": "Iratangiza AI idakeneye murandasi...",
       "takesAMinute": "Bishobora gutwara umunota umwe kugeza kuri itatu kuri telefone.",
-      "reportNote": "Byanditswe nta murandasi kuri iyi telefone na {{model}}, hakoreshejwe isuzuma ry’amafoto, ibimenyetso n’inyandiko z’iri tungo. Ni iby’ibanze: ongera usuzume na AI yo kuri murandasi uri ku murandasi, kandi byemeze na veterineri.",
+      "reportNote": "Byanditswe nta murandasi kuri iyi telefoni na AI ikora nta murandasi, hakoreshejwe isuzuma ry’amafoto, ibimenyetso n’amakuru y’iri tungo. Ni iby’ibanze: byongere usuzume na AI ikoresha murandasi umaze kubona murandasi, kandi ubyemeze na muganga w’amatungo.",
       "partly": "{{pct}}% bimaze gukururwa: bizakomereza aho byari bigeze.",
       "waitingWifi": "Hategerejwe Wi-Fi: AI ikora nta murandasi ({{mb}} MB) izikurura ubwayo iyi telefoni nigera kuri Wi-Fi.",
       "downloadOnData": "Kurura ubu ukoresheje interineti ya telefoni",
@@ -1324,7 +1324,14 @@
       "modeDownloading": "AI ikora nta murandasi iracyakururwa ({{pct}}%). Mu gihe itaraboneka, Isuzuma rishobora gusuzuma amafoto kuri iyi telefoni.",
       "modeUnsupported": "Iyi telefoni ntishobora gukoresha AI ikora nta murandasi. Isuzuma rishobora gusuzuma amafoto kuri iyi telefoni.",
       "modeMissing": "AI ikora nta murandasi ({{mb}} MB) ntiraba kuri iyi telefoni: izikurura ubwayo kuri Wi-Fi. Mu gihe itaraboneka, Isuzuma rishobora gusuzuma amafoto kuri iyi telefoni.",
-      "poweredBy": "AI ikora nta murandasi kuri iyi telefoni: Gemma 3 1B n’igikoresho cya LivestockPro gitahura indwara"
+      "poweredBy": "AI ya LivestockPro ikora nta murandasi kuri iyi telefoni",
+      "stillDownloading": "AI ikora nta murandasi iracyakururwa ({{pct}}%). Irangirira kuri Wi-Fi.",
+      "addPhotoMeanwhile": "Hagati aho, ongeramo ifoto kugira ngo isuzumirwe kuri iyi telefoni.",
+      "test": "Gerageza AI ikora nta murandasi",
+      "testing": "Biragenzurwa…",
+      "testOk": "AI ikora nta murandasi ikora kuri iyi telefoni: yasubije mu masegonda {{seconds}}.",
+      "testFailed": "AI ikora nta murandasi ntiyakoze kuri iyi telefoni: {{message}}",
+      "lastProblem": "Ikibazo cya nyuma ({{date}}): {{message}}"
     }
   },
   "org": {

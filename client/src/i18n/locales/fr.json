@@ -1295,7 +1295,7 @@
     },
     "local": {
       "title": "IA hors ligne",
-      "intro": "Téléchargez {{model}} ({{mb}} Mo) une fois pour obtenir le diagnostic IA et Demander à LivestockPro sans internet. Elle fonctionne avec la vérification des photos sur ce téléphone.",
+      "intro": "Téléchargez une fois l’IA hors ligne ({{mb}} Mo) pour obtenir le diagnostic IA et Demander à LivestockPro sans internet. Elle fonctionne avec la vérification des photos sur ce téléphone.",
       "ready": "L’IA hors ligne est prête sur ce téléphone.",
       "remove": "Supprimer ({{mb}} Mo)",
       "downloading": "Téléchargement : {{pct}} % de {{mb}} Mo",
@@ -1304,8 +1304,8 @@
       "download": "Télécharger l’IA hors ligne ({{mb}} Mo)",
       "failed": "L’IA hors ligne n’a pas pu terminer : {{message}}",
       "limits": "L’IA hors ligne est un petit modèle qui tourne sur ce téléphone. Elle est plus lente que l’IA en ligne et fait plus d’erreurs, surtout dans d’autres langues que l’anglais. Confirmez toujours avec un vétérinaire.",
-      "terms": "Conditions d’utilisation de Gemma",
-      "unsupported": "Ce téléphone ne peut pas exécuter l’IA hors ligne (il faut un téléphone 64 bits). La vérification des photos sur ce téléphone fonctionne toujours.",
+      "terms": "Licence du modèle d’IA hors ligne",
+      "unsupported": "Ce téléphone ne peut pas exécuter l’IA hors ligne (il faut un téléphone 64 bits avec au moins 6 Go de mémoire). La vérification des photos sur ce téléphone fonctionne toujours.",
       "onMobileData": "Vous êtes en données mobiles : l’IA hors ligne pèse {{mb}} Mo.",
       "assistant": "IA LivestockPro (hors ligne)",
       "writing": "Rédaction sur ce téléphone...",
@@ -1315,7 +1315,7 @@
       "writingWords": "Rédaction du diagnostic hors ligne : {{count}} mots pour l’instant",
       "starting": "Démarrage de l’IA hors ligne...",
       "takesAMinute": "Cela peut prendre une à trois minutes sur un téléphone.",
-      "reportNote": "Rédigé hors ligne sur ce téléphone par {{model}}, à partir de la vérification des photos, des symptômes et des fiches de cet animal. C’est préliminaire : refaites-le avec l’IA en ligne une fois connecté et confirmez avec un vétérinaire.",
+      "reportNote": "Rédigé hors ligne sur ce téléphone par l’IA hors ligne, à partir de la vérification des photos, des symptômes et des registres de cet animal. C’est un avis préliminaire : vérifiez-le avec l’IA en ligne une fois connecté et confirmez avec un vétérinaire.",
       "partly": "{{pct}} % déjà téléchargé : le téléchargement reprend à partir de là.",
       "waitingWifi": "En attente du Wi-Fi : l’IA hors ligne ({{mb}} Mo) se télécharge seule quand ce téléphone est connecté au Wi-Fi.",
       "downloadOnData": "Télécharger maintenant avec les données mobiles",
@@ -1324,7 +1324,14 @@
       "modeDownloading": "L’IA hors ligne est encore en téléchargement ({{pct}} %). En attendant, Diagnostic peut toujours vérifier des photos sur ce téléphone.",
       "modeUnsupported": "Ce téléphone ne peut pas faire fonctionner l’IA hors ligne. Diagnostic peut toujours vérifier des photos sur ce téléphone.",
       "modeMissing": "L’IA hors ligne ({{mb}} Mo) n’est pas encore sur ce téléphone : elle se télécharge seule en Wi-Fi. En attendant, Diagnostic peut toujours vérifier des photos sur ce téléphone.",
-      "poweredBy": "IA hors ligne sur ce téléphone : Gemma 3 1B et le détecteur de maladies LivestockPro"
+      "poweredBy": "IA LivestockPro hors ligne sur ce téléphone",
+      "stillDownloading": "L’IA hors ligne est encore en téléchargement ({{pct}} %). Elle se termine en Wi-Fi.",
+      "addPhotoMeanwhile": "En attendant, ajoutez une photo pour la vérifier sur ce téléphone.",
+      "test": "Tester l’IA hors ligne",
+      "testing": "Test en cours…",
+      "testOk": "L’IA hors ligne fonctionne sur ce téléphone : elle a répondu en {{seconds}} secondes.",
+      "testFailed": "L’IA hors ligne n’a pas fonctionné sur ce téléphone : {{message}}",
+      "lastProblem": "Dernier problème ({{date}}) : {{message}}"
     }
   },
   "org": {
