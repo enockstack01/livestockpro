@@ -1292,6 +1292,30 @@
       "runHint": "Inafanya kazi bila intaneti: modeli iliyojengwa ndani inatafuta ugonjwa kwenye picha na kuonyesha matokeo yake.",
       "again": "Kagua picha nyingine",
       "nothing": "Hakuna kilichotambuliwa"
+    },
+    "local": {
+      "title": "AI bila mtandao",
+      "intro": "Pakua {{model}} ({{mb}} MB) mara moja upate utambuzi wa AI na Uliza LivestockPro bila intaneti. Inafanya kazi pamoja na ukaguzi wa picha kwenye simu hii.",
+      "ready": "AI bila mtandao iko tayari kwenye simu hii.",
+      "remove": "Ondoa ({{mb}} MB)",
+      "downloading": "Inapakua: {{pct}}% ya {{mb}} MB",
+      "keepOpen": "Acha programu wazi hadi upakuaji ukamilike.",
+      "needs": "Inahitaji nafasi ya takriban {{mb}} MB na simu yenye kumbukumbu ya GB 4 au zaidi. Tumia Wi-Fi ukiweza.",
+      "download": "Pakua AI bila mtandao ({{mb}} MB)",
+      "failed": "AI bila mtandao haikuweza kumaliza: {{message}}",
+      "limits": "AI bila mtandao ni modeli ndogo inayoendeshwa kwenye simu hii. Ni polepole kuliko AI ya mtandaoni na hukosea zaidi, hasa kwa lugha zisizo Kiingereza. Thibitisha kila mara na daktari wa mifugo.",
+      "terms": "Masharti ya Matumizi ya Gemma",
+      "unsupported": "Simu hii haiwezi kuendesha AI bila mtandao (inahitaji simu ya biti 64). Ukaguzi wa picha kwenye simu hii bado unafanya kazi.",
+      "onMobileData": "Uko kwenye data ya simu: AI bila mtandao ni upakuaji wa {{mb}} MB.",
+      "assistant": "AI ya LivestockPro (bila mtandao)",
+      "writing": "Inaandika kwenye simu hii...",
+      "stop": "Simamisha",
+      "chatNeedsModel": "Hakuna intaneti. Pakua AI bila mtandao kwenye Mipangilio ili uulize maswali bila muunganisho.",
+      "diagnoseNeedsModel": "Hakuna intaneti. Pakua AI bila mtandao kwenye Mipangilio upate utambuzi bila muunganisho, au tumia Kagua kwenye simu hii kwa matokeo ya picha.",
+      "writingWords": "Inaandika utambuzi bila mtandao: maneno {{count}} hadi sasa",
+      "starting": "Inaanzisha AI bila mtandao...",
+      "takesAMinute": "Hii inaweza kuchukua dakika moja hadi tatu kwenye simu.",
+      "reportNote": "Imeandikwa bila mtandao kwenye simu hii na {{model}}, kwa kutumia ukaguzi wa picha, dalili na kumbukumbu za mnyama huyu. Ni ya awali: rudia na AI ya mtandaoni ukiunganishwa, na thibitisha na daktari wa mifugo."
     }
   },
   "org": {
@@ -1387,7 +1411,8 @@
       "state": {
         "already_member": "Tayari wewe ni mwanachama wa shirika hili.",
         "other_org": "Kwa sasa umeunganishwa na {{name}}. Ondoka kwanza kwenye Mipangilio, au wasiliana na msaada.",
-        "org_account": "Hii ni akaunti ya shirika. Tafadhali ingia kwa akaunti ya mfugaji ili ujiunge."
+        "org_account": "Hii ni akaunti ya shirika. Tafadhali ingia kwa akaunti ya mfugaji ili ujiunge.",
+        "account_blocked": "Akaunti yako imesimamishwa au haikuidhinishwa, kwa hiyo haiwezi kujiunga na shirika. Wasiliana na msimamizi wa jukwaa."
       },
       "openInApp": "Fungua kwenye programu ya LivestockPro",
       "pendingMessage": "Umeunganishwa na {{name}}. Msimamizi wa LivestockPro sasa anahitaji kuidhinisha akaunti yako. Utaarifiwa mara itakapoidhinishwa, kisha unaweza kuanza kurekodi mifugo yako."
@@ -1418,7 +1443,9 @@
       "INVITE_FAILED": "Barua pepe ya mwaliko haikuweza kutumwa. Jaribu tena.",
       "ORG_LIMIT_REACHED": "Shirika lako limefikia kikomo cha wafugaji. Muombe msimamizi wa jukwaa akiongeze.",
       "BAD_EMAIL": "Weka barua pepe sahihi.",
-      "FARMER_NAME_REQUIRED": "Weka jina la mfugaji."
+      "FARMER_NAME_REQUIRED": "Weka jina la mfugaji.",
+      "ACCOUNT_BLOCKED": "Akaunti yako imesimamishwa au haikuidhinishwa, kwa hiyo haiwezi kujiunga na shirika. Wasiliana na msimamizi wa jukwaa.",
+      "FARMER_ACCOUNT_BLOCKED": "Akaunti ya mfugaji huyu imesimamishwa au haikuidhinishwa. Wasiliana na msimamizi wa jukwaa."
     },
     "dash": {
       "overview": "Muhtasari",
@@ -1608,7 +1635,15 @@
       "settings_update": "Mipangilio ya mfumo imebadilishwa",
       "limitDetail": "{{from}} hadi {{to}}: {{reason}}",
       "expires": "Kinaisha {{time}}",
-      "importDetail": "Mistari {{rows}}, {{added}} wameongezwa"
+      "importDetail": "Mistari {{rows}}, {{added}} wameongezwa",
+      "account_status": "Akaunti imekaguliwa",
+      "user_ban": "Mtumiaji amezuiwa",
+      "user_unban": "Mtumiaji amefunguliwa",
+      "user_role": "Jukumu limebadilishwa",
+      "user_delete": "Akaunti imefutwa",
+      "user_ai_limit": "Kikomo cha AI kimebadilishwa",
+      "aiLimitDefault": "kurudi kwenye chaguo-msingi",
+      "aiLimitTo": "maombi {{limit}} kwa siku"
     },
     "my": {
       "title": "Shirika langu",
@@ -1693,7 +1728,9 @@
         "member": "Wafanyakazi",
         "link": "Viungo",
         "farmer": "Wafugaji",
-        "settings": "Mipangilio"
+        "settings": "Mipangilio",
+        "account": "Ukaguzi wa akaunti",
+        "user": "Watumiaji na majukumu"
       },
       "page": "Ukurasa {{page}} kati ya {{pages}}",
       "settingsTitle": "Mipangilio ya mfumo",
@@ -1776,6 +1813,30 @@
     "staffInvite": {
       "title": "Mwaliko wa shirika",
       "body": "Umealikwa kujiunga na {{name}}."
+    },
+    "accountRequest": {
+      "title": "Ombi jipya la akaunti",
+      "body": "{{name}} anasubiri idhini."
+    },
+    "accountRequestOrg": {
+      "title": "Akaunti mpya ya mfugaji ya kuidhinisha",
+      "body": "{{name}} alijiunga kupitia {{org}} na anasubiri idhini."
+    },
+    "orgRegistered": {
+      "title": "Shirika jipya la kuidhinisha",
+      "body": "{{name}} amesajili shirika na anasubiri idhini."
+    },
+    "accountApproved": {
+      "title": "Akaunti imeidhinishwa",
+      "body": "Akaunti yako ya LivestockPro iko hai. Karibu! {{note}}"
+    },
+    "accountOnHold": {
+      "title": "Akaunti imesimamishwa",
+      "body": "Akaunti yako ya LivestockPro imesimamishwa kwa muda. {{note}}"
+    },
+    "accountRejected": {
+      "title": "Ombi la akaunti halikuidhinishwa",
+      "body": "Ombi lako la akaunti ya LivestockPro halikuidhinishwa. {{note}}"
     }
   },
   "search": {

@@ -5,7 +5,7 @@ const { requireAuth } = require('../authMiddleware');
 const { forgetApproval, requireApproved } = require('../lib/accounts');
 const {
   OrgError, sendOrgError, audit, notifyOrgAdmins, findLink, linkState, joinError, joinOrganization,
-  farmerLink, endFarmerLink, isOrgAccount, refreshFarmerStats, col, nowIso
+  farmerLink, endFarmerLink, isOrgAccount, isBlockedAccount, refreshFarmerStats, col, nowIso
 } = require('../lib/orgs');
 
 /* Rate limits against token guessing: per IP and per device (the apps send
@@ -35,6 +35,7 @@ join.get('/:token', async (req, res) => {
     let me = null;
     if (auth && auth.userId) {
       if (await isOrgAccount(auth.userId)) me = { state: 'org_account' };
+      else if (await isBlockedAccount(auth.userId)) me = { state: 'account_blocked' };
       else {
         const current = await farmerLink(auth.userId);
         me = current ? { state: current.org._id === org._id ? 'already_member' : 'other_org', organization: current.org.name } : { state: 'can_join' };

@@ -11,7 +11,9 @@ import { useAuth } from '@clerk/expo';
 import Icon from '../components/Icon';
 import { available as deviceModelAvailable, detectPhotos } from '../ml/detector';
 import { findDisease, GUIDE_DISCLAIMER } from '../ml/diseases';
-import { listScans, saveScan, subscribeScans } from '../sync/aiScans';
+import { deleteScan, listScans, saveScan, subscribeScans } from '../sync/aiScans';
+import * as gemma from '../ml/gemma';
+import { diagnosisFacts, farmSnapshot, offlineReport, referenceFor } from '../ml/offlineAi';
 import { useApi } from '../api/client';
 import { useRepository } from '../db/repository';
 import { useToast } from '../lib/toast';
@@ -387,6 +389,7 @@ export function SavedReport({ saved, subtitle, onDelete }) {
     <View>
       <Text style={[styles.reportTitle, { color: colors.primaryDark }]}>{saved.title}</Text>
       <Muted style={{ marginBottom: 10 }}>{subtitle ? `${subtitle} · ` : ''}{t('ai.report.generated', { date: new Date(saved.created_at).toLocaleString(i18n.language) })}</Muted>
+      {saved.offline ? <View style={{ marginBottom: 10 }}><Note>{t('ai.local.reportNote', { model: (saved.report && saved.report.offline && saved.report.offline.model) || 'Gemma 3 1B' })}</Note></View> : null}
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 6 }}>
         {Platform.OS !== 'web' ? <Button title={downloading ? t('ai.report.downloading') : t('ai.report.download')} icon="file-arrow-down" size="sm" onPress={download} loading={downloading} disabled={downloading} /> : null}
         <Button title={t('ai.report.print')} icon="print" variant="secondary" size="sm" onPress={print} />
@@ -428,25 +431,57 @@ function AskTab({ disabled }) {
   const [error, setError] = useState('');
   const scroll = useRef(null);
   const photos = usePhotos();
+  const repo = useRepository();
+  const [local, setLocal] = useState(false);
   const examples = t('ai.ask.examples', { returnObjects: true });
 
-  /* A photo can go with a question, or on its own. */
+  /* A photo can go with a question, or on its own. Online the server's AI
+     answers; with no connection the offline AI on the phone does (Gemma,
+     src/ml/gemma), from the phone's own records. */
   async function send(text) {
     const withPhotos = photos.photos.length > 0;
     const q = (text || draft).trim() || (withPhotos ? t('ai.photo.defaultQuestion') : '');
     if (!q || busy) return;
     const extra = withPhotos ? photos.payload() : {};
+    const shots = photos.photos.slice();
     const next = [...messages, { role: 'user', content: q, thumbs: withPhotos ? photos.photos.map((p) => p.thumb) : undefined }];
     setMessages(next);
     setDraft('');
     photos.clear();
     setError('');
     setBusy(true);
-    const { data, error: err } = await api.aiChat({ messages: next.map(({ role, content }) => ({ role, content })), language: i18n.language, images: extra.images });
+    const net = await NetInfo.fetch().catch(() => null);
+    const offline = net && net.isConnected === false;
+    const { data, error: err } = offline ? { error: { networkError: true } } : await api.aiChat({ messages: next.map(({ role, content }) => ({ role, content })), language: i18n.language, images: extra.images });
+    if (err && err.networkError && (await gemma.ready())) { await answerOffline(next, shots); return; }
     setBusy(false);
-    if (err) { setError(aiErrorText(t, err, i18n.language)); return; }
+    if (err) { setError(err.networkError && gemma.supported() ? t('ai.local.chatNeedsModel') : aiErrorText(t, err, i18n.language)); return; }
     setMessages([...next, { role: 'assistant', content: data.reply }]);
     setTimeout(() => scroll.current && scroll.current.scrollToEnd({ animated: true }), 50);
+  }
+
+  async function answerOffline(next, shots) {
+    setLocal(true);
+    try {
+      const [snapshot, vision] = await Promise.all([
+        farmSnapshot(repo),
+        shots.length && deviceModelAvailable ? detectPhotos(shots.map((p) => ({ uri: p.fullUri || p.uri, width: p.width, height: p.height }))).catch(() => null) : null
+      ]);
+      const history = next.map(({ role, content }) => ({ role, content }));
+      const reply = { role: 'assistant', content: '', offline: true };
+      setMessages([...next, reply]);
+      const answer = await gemma.chat({
+        language: i18n.language, snapshot, vision, history,
+        onText: (partial) => setMessages([...next, { ...reply, content: partial }])
+      });
+      setMessages([...next, { ...reply, content: answer }]);
+      setTimeout(() => scroll.current && scroll.current.scrollToEnd({ animated: true }), 50);
+    } catch (e) {
+      setMessages(next);
+      if (!e.stopped) setError(t('ai.local.failed', { message: e.message }));
+    }
+    setLocal(false);
+    setBusy(false);
   }
 
   return (
@@ -468,7 +503,7 @@ function AskTab({ disabled }) {
           <ScrollView ref={scroll} style={{ maxHeight: 460 }} contentContainerStyle={{ gap: 10 }}>
             {messages.map((m, i) => (
               <View key={i} style={{ alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '92%' }}>
-                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textLight, marginBottom: 2, textAlign: m.role === 'user' ? 'right' : 'left' }}>{m.role === 'user' ? t('ai.ask.you') : t('ai.ask.assistant')}</Text>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textLight, marginBottom: 2, textAlign: m.role === 'user' ? 'right' : 'left' }}>{m.role === 'user' ? t('ai.ask.you') : m.offline ? t('ai.local.assistant') : t('ai.ask.assistant')}</Text>
                 <View style={[styles.bubble, m.role === 'user' ? { backgroundColor: colors.primary } : { backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border }]}>
                   {m.thumbs ? <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>{m.thumbs.map((src, j) => <Image key={j} source={{ uri: src }} style={styles.chatThumb} />)}</View> : null}
                   <Text selectable style={{ color: m.role === 'user' ? '#FFFFFF' : colors.text, fontSize: 14, lineHeight: 20 }}>{m.content}</Text>
@@ -477,7 +512,12 @@ function AskTab({ disabled }) {
             ))}
           </ScrollView>
         )}
-        {busy ? <Working /> : null}
+        {busy ? (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <View style={{ flex: 1 }}><Working label={local ? t('ai.local.writing') : undefined} /></View>
+            {local ? <Button title={t('ai.local.stop')} icon="stop" variant="secondary" size="sm" onPress={() => gemma.stop()} /> : null}
+          </View>
+        ) : null}
         {error ? <Notice error>{error}</Notice> : null}
         <View style={{ marginTop: 12, gap: 8 }}>
           <Input multiline value={draft} onChangeText={setDraft} placeholder={t('ai.ask.placeholder')} editable={!disabled} />
@@ -585,11 +625,13 @@ function DeviceScans({ onOpen }) {
       <Text style={{ fontWeight: '800', color: colors.text }}>{t('ai.device.earlier')}</Text>
       {rows.map((r) => {
         const names = [...new Set((r.vision.detections || []).slice().sort((a, b) => b.confidence - a.confidence).map((d) => visionLabel(t, d.label)))];
+        // An offline diagnosis (src/ml/gemma) shows its title; a photo check its findings.
+        const label = r.report ? r.report.title : names.length ? names.join(', ') : t('ai.device.nothing');
         return (
           <Pressable key={r.id} onPress={() => onOpen(r)} accessibilityRole="button" style={({ pressed }) => [styles.earlier, { borderColor: colors.border, backgroundColor: pressed ? colors.bg : colors.card }]}>
-            {r.thumbs[0] ? <Image source={{ uri: r.thumbs[0] }} style={{ width: 40, height: 40, borderRadius: 6 }} /> : <Icon name="mobile-screen" size={14} color={colors.primary} />}
+            {r.thumbs[0] ? <Image source={{ uri: r.thumbs[0] }} style={{ width: 40, height: 40, borderRadius: 6 }} /> : <Icon name={r.report ? 'file-medical' : 'mobile-screen'} size={14} color={colors.primary} />}
             <View style={{ flex: 1, minWidth: 0 }}>
-              <Text style={{ color: colors.text, fontSize: 13, fontWeight: '700' }} numberOfLines={2}>{names.length ? names.join(', ') : t('ai.device.nothing')}</Text>
+              <Text style={{ color: colors.text, fontSize: 13, fontWeight: '700' }} numberOfLines={2}>{label}</Text>
               <Text style={{ color: colors.textLight, fontSize: 11.5 }}>{r.summary ? `${r.summary} · ` : ''}{new Date(r.created_at).toLocaleString(i18n.language)}</Text>
             </View>
             <Icon name="chevron-right" size={12} color={colors.textLight} />
@@ -615,6 +657,7 @@ function DiagnoseTab({ disabled, recordId }) {
   const [saved, setSaved] = useState(null);
   const [earlier, setEarlier] = useState([]);
   const [deviceResult, setDeviceResult] = useState(null);
+  const [localWords, setLocalWords] = useState(null);
   const photos = usePhotos();
   const db = useSQLiteContext();
   const { userId } = useAuth();
@@ -660,9 +703,11 @@ function DiagnoseTab({ disabled, recordId }) {
     const { data, error } = offline ? { error: { networkError: true } } : await api.aiDiagnose(body);
     if (error && error.networkError) {
       setBusy(false);
-      // No internet: the embedded model can still give its findings for the photos.
+      /* No internet: the offline AI writes the diagnosis on the phone; without
+         it, the embedded detector still gives its findings for the photos. */
+      if (await gemma.ready()) { await diagnoseOffline(); return; }
       if (deviceModelAvailable && photos.photos.length) { await checkOnPhone(); return; }
-      showToast(deviceModelAvailable ? t('ai.device.needPhoto') : t('ai.offline'), 'error');
+      showToast(gemma.supported() ? t('ai.local.diagnoseNeedsModel') : deviceModelAvailable ? t('ai.device.needPhoto') : t('ai.offline'), 'error');
       return;
     }
     setBusy(false);
@@ -689,12 +734,42 @@ function DiagnoseTab({ disabled, recordId }) {
     setBusy(false);
   }
 
+  /* The offline diagnosis (like the online one, written on the phone): the
+     embedded detector checks the photos, then the offline AI (Gemma, rules
+     as online) writes the report from the detections, the symptoms and this
+     animal's records on the phone. It is kept on the phone. */
+  async function diagnoseOffline() {
+    setBusy(true);
+    setLocalWords(0);
+    try {
+      const shots = photos.photos.slice();
+      const vision = shots.length && deviceModelAvailable
+        ? await detectPhotos(shots.map((p) => ({ uri: p.fullUri || p.uri, width: p.width, height: p.height }))).catch(() => ({ available: false, detections: [] }))
+        : null;
+      const facts = await diagnosisFacts(repo, { animal, record, symptoms: symptoms.trim(), species });
+      const data = await gemma.diagnose({
+        language: i18n.language, facts, vision, photoCount: shots.length, reference: referenceFor(vision),
+        onProgress: (n) => setLocalWords(n)
+      });
+      const thumbs = shots.map((p) => p.thumb);
+      const report = offlineReport({ data, vision, thumbs, animal, symptoms: symptoms.trim(), species, model: gemma.GEMMA.name });
+      const scanId = await saveScan(db, userId, { vision: vision || { available: false, detections: [] }, thumbs, summary: report.title, report }).catch(() => null);
+      photos.clear();
+      setSaved({ ...report, scanId });
+    } catch (e) {
+      if (!e.stopped) showToast(t('ai.local.failed', { message: e.message }), 'error');
+    }
+    setLocalWords(null);
+    setBusy(false);
+  }
+
   if (deviceResult) return <DeviceResult result={deviceResult} onDone={() => setDeviceResult(null)} doneLabel={deviceResult.created_at ? t('ai.back') : undefined} />;
 
   if (saved) {
     return (
       <Card><CardBody>
-        <SavedReport saved={saved} subtitle={animal ? `${t('ai.report.animal')}: ${animal.tag_id}` : ''} />
+        <SavedReport saved={saved} subtitle={animal ? `${t('ai.report.animal')}: ${animal.tag_id}` : ''}
+          onDelete={saved.offline && saved.scanId ? async () => { await deleteScan(db, saved.scanId).catch(() => {}); setSaved(null); } : undefined} />
         <Button title={t('ai.diagnose.again')} icon="rotate" variant="secondary" onPress={() => setSaved(null)} style={{ marginTop: 16 }} />
       </CardBody></Card>
     );
@@ -704,7 +779,13 @@ function DiagnoseTab({ disabled, recordId }) {
     <Card>
       <CardHeader title={t('ai.diagnose.title') + (record && record.tag_id ? ` · ${record.tag_id}` : '')} icon="stethoscope" />
       <CardBody>
-        {busy ? <Working label={t('ai.diagnose.working')} /> : (
+        {busy ? (localWords !== null ? (
+          <View style={{ gap: 6 }}>
+            <Working label={localWords ? t('ai.local.writingWords', { count: localWords }) : t('ai.local.starting')} />
+            <Muted style={{ fontSize: 12 }}>{t('ai.local.takesAMinute')}</Muted>
+            <Button title={t('ai.local.stop')} icon="stop" variant="secondary" size="sm" onPress={() => gemma.stop()} style={{ alignSelf: 'flex-start' }} />
+          </View>
+        ) : <Working label={t('ai.diagnose.working')} />) : (
           <>
             <Muted style={{ marginBottom: 12 }}>{t('ai.diagnose.intro')}</Muted>
             <FormGroup label={t('ai.diagnose.animal')}>
@@ -747,7 +828,7 @@ function DiagnoseTab({ disabled, recordId }) {
                 ))}
               </View>
             ) : null}
-            <DeviceScans onOpen={(scan) => setDeviceResult(scan)} />
+            <DeviceScans onOpen={(scan) => (scan.report ? setSaved({ ...scan.report, scanId: scan.id }) : setDeviceResult(scan))} />
           </>
         )}
       </CardBody>

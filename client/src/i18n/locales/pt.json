@@ -1292,6 +1292,30 @@
       "runHint": "Funciona sem internet: o modelo integrado procura doenças nas fotos e mostra os resultados.",
       "again": "Verificar outra foto",
       "nothing": "Nada reconhecido"
+    },
+    "local": {
+      "title": "IA offline",
+      "intro": "Transfira {{model}} ({{mb}} MB) uma vez para ter o diagnóstico com IA e Perguntar ao LivestockPro sem internet. Funciona com a verificação de fotos neste telemóvel.",
+      "ready": "A IA offline está pronta neste telemóvel.",
+      "remove": "Remover ({{mb}} MB)",
+      "downloading": "A transferir: {{pct}}% de {{mb}} MB",
+      "keepOpen": "Mantenha a app aberta até a transferência terminar.",
+      "needs": "Precisa de cerca de {{mb}} MB de espaço e de um telemóvel com 4 GB de memória ou mais. Use Wi-Fi se puder.",
+      "download": "Transferir IA offline ({{mb}} MB)",
+      "failed": "A IA offline não conseguiu terminar: {{message}}",
+      "limits": "A IA offline é um modelo pequeno que funciona neste telemóvel. É mais lenta do que a IA online e erra mais, sobretudo em línguas que não o inglês. Confirme sempre com um veterinário.",
+      "terms": "Termos de Utilização do Gemma",
+      "unsupported": "Este telemóvel não consegue executar a IA offline (precisa de um telemóvel de 64 bits). A verificação de fotos neste telemóvel continua a funcionar.",
+      "onMobileData": "Está a usar dados móveis: a IA offline é uma transferência de {{mb}} MB.",
+      "assistant": "IA do LivestockPro (offline)",
+      "writing": "A escrever neste telemóvel...",
+      "stop": "Parar",
+      "chatNeedsModel": "Sem internet. Transfira a IA offline nas Definições para fazer perguntas sem ligação.",
+      "diagnoseNeedsModel": "Sem internet. Transfira a IA offline nas Definições para ter um diagnóstico sem ligação, ou use Verificar neste telemóvel para os resultados das fotos.",
+      "writingWords": "A escrever o diagnóstico offline: {{count}} palavras até agora",
+      "starting": "A iniciar a IA offline...",
+      "takesAMinute": "Pode demorar de um a três minutos num telemóvel.",
+      "reportNote": "Escrito offline neste telemóvel por {{model}}, com a verificação de fotos, os sintomas e os registos deste animal. É preliminar: repita com a IA online quando tiver ligação e confirme com um veterinário."
     }
   },
   "org": {
@@ -1387,7 +1411,8 @@
       "state": {
         "already_member": "Já é membro desta organização.",
         "other_org": "Está atualmente ligado a {{name}}. Saia primeiro nas Definições ou contacte o apoio.",
-        "org_account": "Esta é uma conta de organização. Inicie sessão com uma conta de criador para se juntar."
+        "org_account": "Esta é uma conta de organização. Inicie sessão com uma conta de criador para se juntar.",
+        "account_blocked": "A sua conta está em espera ou não foi aprovada, por isso não pode juntar-se a uma organização. Contacte o administrador da plataforma."
       },
       "openInApp": "Abrir na app LivestockPro",
       "pendingMessage": "Está ligado a {{name}}. Agora um administrador do LivestockPro precisa de aprovar a sua conta. Será avisado assim que for aprovada e poderá começar a registar o seu rebanho."
@@ -1418,7 +1443,9 @@
       "INVITE_FAILED": "Não foi possível enviar o e-mail de convite. Tente de novo.",
       "ORG_LIMIT_REACHED": "A sua organização atingiu o limite de criadores. Peça ao administrador da plataforma para o aumentar.",
       "BAD_EMAIL": "Introduza um e-mail válido.",
-      "FARMER_NAME_REQUIRED": "Introduza o nome do criador."
+      "FARMER_NAME_REQUIRED": "Introduza o nome do criador.",
+      "ACCOUNT_BLOCKED": "A sua conta está em espera ou não foi aprovada, por isso não pode juntar-se a uma organização. Contacte o administrador da plataforma.",
+      "FARMER_ACCOUNT_BLOCKED": "A conta deste criador está em espera ou não foi aprovada. Contacte o administrador da plataforma."
     },
     "dash": {
       "overview": "Visão geral",
@@ -1608,7 +1635,15 @@
       "settings_update": "Definições do sistema alteradas",
       "limitDetail": "{{from}} a {{to}}: {{reason}}",
       "expires": "Expira {{time}}",
-      "importDetail": "{{rows}} linhas, {{added}} adicionados"
+      "importDetail": "{{rows}} linhas, {{added}} adicionados",
+      "account_status": "Conta revista",
+      "user_ban": "Utilizador bloqueado",
+      "user_unban": "Utilizador desbloqueado",
+      "user_role": "Função alterada",
+      "user_delete": "Conta eliminada",
+      "user_ai_limit": "Limite de IA alterado",
+      "aiLimitDefault": "volta ao padrão",
+      "aiLimitTo": "{{limit}} pedidos por dia"
     },
     "my": {
       "title": "A minha organização",
@@ -1693,7 +1728,9 @@
         "member": "Equipa",
         "link": "Links",
         "farmer": "Criadores",
-        "settings": "Definições"
+        "settings": "Definições",
+        "account": "Revisões de contas",
+        "user": "Utilizadores e funções"
       },
       "page": "Página {{page}} de {{pages}}",
       "settingsTitle": "Definições do sistema",
@@ -1776,6 +1813,30 @@
     "staffInvite": {
       "title": "Convite de organização",
       "body": "Foi convidado para {{name}}."
+    },
+    "accountRequest": {
+      "title": "Novo pedido de conta",
+      "body": "{{name}} aguarda aprovação."
+    },
+    "accountRequestOrg": {
+      "title": "Nova conta de criador para aprovar",
+      "body": "{{name}} juntou-se através de {{org}} e aguarda aprovação."
+    },
+    "orgRegistered": {
+      "title": "Nova organização para aprovar",
+      "body": "{{name}} registou uma organização e aguarda aprovação."
+    },
+    "accountApproved": {
+      "title": "Conta aprovada",
+      "body": "A sua conta LivestockPro está ativa. Bem-vindo! {{note}}"
+    },
+    "accountOnHold": {
+      "title": "Conta em espera",
+      "body": "A sua conta LivestockPro foi colocada em espera. {{note}}"
+    },
+    "accountRejected": {
+      "title": "Pedido de conta não aprovado",
+      "body": "O seu pedido de conta LivestockPro não foi aprovado. {{note}}"
     }
   },
   "search": {

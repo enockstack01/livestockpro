@@ -79,13 +79,19 @@ function titleFor(pathname, sections, t) {
   return best ? t(best.it.labelKey) : '';
 }
 
+/* Notification links to pages only the website has (the admin panel) open
+   Home on the phone. */
+const WEB_ONLY_LINKS = /^\/(admin|onehealth)(\/|$)/;
+
 /* Server notifications (organization approvals, limit warnings, joins), a
    translation key plus values. */
 const SERVER_NOTIF = {
   orgApproved: ['circle-check', 'green'], orgSuspended: ['circle-pause', 'red'], orgReactivated: ['circle-play', 'green'],
   orgLimitChanged: ['gauge', 'blue'], orgUsage80: ['gauge-high', 'orange'], orgUsage100: ['gauge-high', 'red'],
   farmerJoined: ['user-plus', 'green'], farmerLeft: ['user-minus', 'orange'], farmerRemoved: ['user-minus', 'orange'],
-  orgInvite: ['people-group', 'blue'], staffInvite: ['envelope-open-text', 'blue']
+  orgInvite: ['people-group', 'blue'], staffInvite: ['envelope-open-text', 'blue'],
+  accountRequest: ['user-clock', 'orange'], accountRequestOrg: ['user-clock', 'orange'], orgRegistered: ['building', 'orange'],
+  accountApproved: ['user-check', 'green'], accountOnHold: ['circle-pause', 'orange'], accountRejected: ['user-xmark', 'red']
 };
 
 /* ---------- Page search (search box at the top of a list page) ---------- */
@@ -162,7 +168,7 @@ function useNotifications(t, isOrg) {
       const res = await api.http('GET', '/notifications');
       const server = (res.data || []).map((n) => {
         const [icon, color] = SERVER_NOTIF[n.key] || ['bell', 'blue'];
-        return { id: 'srv-' + n.id, serverId: n.id, serverRead: Boolean(n.read_at), icon, color, title: t(`notifications.${n.key}.title`, n.vars || {}), sub: t(`notifications.${n.key}.body`, n.vars || {}), link: n.link || '/' };
+        return { id: 'srv-' + n.id, serverId: n.id, serverRead: Boolean(n.read_at), icon, color, title: t(`notifications.${n.key}.title`, n.vars || {}), sub: t(`notifications.${n.key}.body`, n.vars || {}), link: n.link && !WEB_ONLY_LINKS.test(n.link) ? n.link : '/' };
       });
       if (isOrg) { if (!cancelled) setItems(server); return; }
       const [tasks, animals, health, breeding] = await Promise.all([

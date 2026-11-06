@@ -25,7 +25,9 @@ const SERVER_NOTIF = {
   orgApproved: ['fa-circle-check', 'green'], orgSuspended: ['fa-circle-pause', 'red'], orgReactivated: ['fa-circle-play', 'green'],
   orgLimitChanged: ['fa-gauge', 'blue'], orgUsage80: ['fa-gauge-high', 'orange'], orgUsage100: ['fa-gauge-high', 'red'],
   farmerJoined: ['fa-user-plus', 'green'], farmerLeft: ['fa-user-minus', 'orange'], farmerRemoved: ['fa-user-minus', 'orange'],
-  orgInvite: ['fa-people-group', 'blue'], staffInvite: ['fa-envelope-open-text', 'blue']
+  orgInvite: ['fa-people-group', 'blue'], staffInvite: ['fa-envelope-open-text', 'blue'],
+  accountRequest: ['fa-user-clock', 'orange'], accountRequestOrg: ['fa-user-clock', 'orange'], orgRegistered: ['fa-building', 'orange'],
+  accountApproved: ['fa-user-check', 'green'], accountOnHold: ['fa-circle-pause', 'orange'], accountRejected: ['fa-user-xmark', 'red']
 };
 
 function useNotifications(t, isOrg) {

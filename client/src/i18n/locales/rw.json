@@ -1292,6 +1292,30 @@
       "runHint": "Bikora nta murandasi: icyitegererezo kiri muri telefone gishakisha indwara ku mafoto kikerekana ibyo cyabonye.",
       "again": "Suzuma indi foto",
       "nothing": "Nta cyamenyekanye"
+    },
+    "local": {
+      "title": "AI idakeneye murandasi",
+      "intro": "Kuramo {{model}} ({{mb}} MB) rimwe ubone isuzuma rya AI na Baza LivestockPro nta murandasi. Ikorana n’isuzuma ry’amafoto kuri iyi telefone.",
+      "ready": "AI idakeneye murandasi yiteguye kuri iyi telefone.",
+      "remove": "Kuraho ({{mb}} MB)",
+      "downloading": "Birimo gukururwa: {{pct}}% bya {{mb}} MB",
+      "keepOpen": "Reka porogaramu ifunguye kugeza igihe bizarangirira gukururwa.",
+      "needs": "Bisaba umwanya wa {{mb}} MB n’telefone ifite ububiko bwa GB 4 cyangwa burenga. Koresha Wi-Fi niba bishoboka.",
+      "download": "Kuramo AI idakeneye murandasi ({{mb}} MB)",
+      "failed": "AI idakeneye murandasi ntiyashoboye kurangiza: {{message}}",
+      "limits": "AI idakeneye murandasi ni icyitegererezo gito gikora kuri iyi telefone. Iratinda kurusha AI yo kuri murandasi kandi ikora amakosa menshi, cyane cyane mu ndimi zitari Icyongereza. Buri gihe byemeze na veterineri.",
+      "terms": "Amabwiriza yo gukoresha Gemma",
+      "unsupported": "Iyi telefone ntishobora gukoresha AI idakeneye murandasi (bisaba telefone ya bits 64). Isuzuma ry’amafoto kuri iyi telefone rirakora.",
+      "onMobileData": "Uri kuri interineti ya telefone: AI idakeneye murandasi ifite {{mb}} MB.",
+      "assistant": "AI ya LivestockPro (idakeneye murandasi)",
+      "writing": "Irimo kwandikira kuri iyi telefone...",
+      "stop": "Hagarika",
+      "chatNeedsModel": "Nta murandasi. Kuramo AI idakeneye murandasi mu Igenamiterere kugira ngo ubaze ibibazo nta murandasi.",
+      "diagnoseNeedsModel": "Nta murandasi. Kuramo AI idakeneye murandasi mu Igenamiterere ubone isuzuma nta murandasi, cyangwa ukoreshe Suzumira kuri iyi telefone ku byagaragaye ku mafoto.",
+      "writingWords": "Irimo kwandika isuzuma idakeneye murandasi: amagambo {{count}} kugeza ubu",
+      "starting": "Iratangiza AI idakeneye murandasi...",
+      "takesAMinute": "Bishobora gutwara umunota umwe kugeza kuri itatu kuri telefone.",
+      "reportNote": "Byanditswe nta murandasi kuri iyi telefone na {{model}}, hakoreshejwe isuzuma ry’amafoto, ibimenyetso n’inyandiko z’iri tungo. Ni iby’ibanze: ongera usuzume na AI yo kuri murandasi uri ku murandasi, kandi byemeze na veterineri."
     }
   },
   "org": {
@@ -1387,7 +1411,8 @@
       "state": {
         "already_member": "Usanzwe uri umunyamuryango w'iki kigo.",
         "other_org": "Ubu uri muri {{name}}. Banza uvemo muri Igenamiterere, cyangwa uvugane n'ubufasha.",
-        "org_account": "Iyi ni konti y'ikigo. Injira ukoresheje konti y'umworozi kugira ngo winjire."
+        "org_account": "Iyi ni konti y'ikigo. Injira ukoresheje konti y'umworozi kugira ngo winjire.",
+        "account_blocked": "Konti yawe yahagaritswe by’agateganyo cyangwa ntiyemewe, bityo ntishobora kwinjira mu kigo. Vugana n’umuyobozi w’urubuga."
       },
       "openInApp": "Fungura muri porogaramu ya LivestockPro",
       "pendingMessage": "Uhujwe na {{name}}. Ubu umuyobozi wa LivestockPro agomba kwemeza konti yawe. Uzamenyeshwa ikimara kwemezwa, hanyuma utangire kwandika amatungo yawe."
@@ -1418,7 +1443,9 @@
       "INVITE_FAILED": "Imeri y’ubutumire ntiyashoboye koherezwa. Ongera ugerageze.",
       "ORG_LIMIT_REACHED": "Ikigo cyawe cyageze ku mubare ntarengwa w’aborozi. Saba umuyobozi w’urubuga kuwongera.",
       "BAD_EMAIL": "Andika imeri nyayo.",
-      "FARMER_NAME_REQUIRED": "Andika izina ry’umworozi."
+      "FARMER_NAME_REQUIRED": "Andika izina ry’umworozi.",
+      "ACCOUNT_BLOCKED": "Konti yawe yahagaritswe by’agateganyo cyangwa ntiyemewe, bityo ntishobora kwinjira mu kigo. Vugana n’umuyobozi w’urubuga.",
+      "FARMER_ACCOUNT_BLOCKED": "Konti y’uyu mworozi yahagaritswe by’agateganyo cyangwa ntiyemewe. Vugana n’umuyobozi w’urubuga."
     },
     "dash": {
       "overview": "Incamake",
@@ -1608,7 +1635,15 @@
       "settings_update": "Igenamiterere rya sisitemu ryahinduwe",
       "limitDetail": "{{from}} kugeza {{to}}: {{reason}}",
       "expires": "Rirangira {{time}}",
-      "importDetail": "Imirongo {{rows}}, {{added}} bongewe"
+      "importDetail": "Imirongo {{rows}}, {{added}} bongewe",
+      "account_status": "Konti yasuzumwe",
+      "user_ban": "Ukoresha yabujijwe",
+      "user_unban": "Ukoresha yafunguriwe",
+      "user_role": "Uruhare rwahinduwe",
+      "user_delete": "Konti yasibwe",
+      "user_ai_limit": "Umubare wa AI wahinduwe",
+      "aiLimitDefault": "gusubira ku busanzwe",
+      "aiLimitTo": "ibisabwa {{limit}} ku munsi"
     },
     "my": {
       "title": "Ikigo cyanjye",
@@ -1693,7 +1728,9 @@
         "member": "Abakozi",
         "link": "Amahuza",
         "farmer": "Aborozi",
-        "settings": "Igenamiterere"
+        "settings": "Igenamiterere",
+        "account": "Isuzuma rya konti",
+        "user": "Abakoresha n’inshingano"
       },
       "page": "Ipaji {{page}} kuri {{pages}}",
       "settingsTitle": "Igenamiterere rya sisitemu",
@@ -1776,6 +1813,30 @@
     "staffInvite": {
       "title": "Ubutumire bw'ikigo",
       "body": "Watumiwe kwinjira muri {{name}}."
+    },
+    "accountRequest": {
+      "title": "Icyifuzo gishya cya konti",
+      "body": "{{name}} ategereje kwemezwa."
+    },
+    "accountRequestOrg": {
+      "title": "Konti nshya y’umworozi yo kwemeza",
+      "body": "{{name}} yinjiye abinyujije muri {{org}} kandi ategereje kwemezwa."
+    },
+    "orgRegistered": {
+      "title": "Ikigo gishya cyo kwemeza",
+      "body": "{{name}} yanditse ikigo kandi ategereje kwemezwa."
+    },
+    "accountApproved": {
+      "title": "Konti yemejwe",
+      "body": "Konti yawe ya LivestockPro irakora. Murakaza neza! {{note}}"
+    },
+    "accountOnHold": {
+      "title": "Konti yahagaritswe by’agateganyo",
+      "body": "Konti yawe ya LivestockPro yahagaritswe by’agateganyo. {{note}}"
+    },
+    "accountRejected": {
+      "title": "Icyifuzo cya konti nticyemewe",
+      "body": "Icyifuzo cyawe cya konti ya LivestockPro nticyemewe. {{note}}"
     }
   },
   "search": {

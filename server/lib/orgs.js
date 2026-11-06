@@ -111,7 +111,15 @@ const PUSH_TEXT = {
   farmerLeft: ['Farmer left', '{{farmer}} left {{name}}.'],
   farmerRemoved: ['Removed from organization', 'You are no longer linked to {{name}}.'],
   orgInvite: ['Join your organization', 'You have been added to {{name}}. Please confirm sharing your farm summary.'],
-  staffInvite: ['Organization invitation', 'You have been invited to {{name}} as {{role}}.']
+  staffInvite: ['Organization invitation', 'You have been invited to {{name}} as {{role}}.'],
+  /* Account review, like CropManager: admins hear about new requests, the
+     account owner hears the outcome (with the reviewer's note). */
+  accountRequest: ['New account request', '{{name}} is waiting for approval.'],
+  accountRequestOrg: ['New farmer account to approve', '{{name}} joined through {{org}} and is waiting for approval.'],
+  orgRegistered: ['New organization to approve', '{{name}} registered an organization and is waiting for approval.'],
+  accountApproved: ['Account approved', 'Your LivestockPro account is active. Welcome! {{note}}'],
+  accountOnHold: ['Account on hold', 'Your LivestockPro account has been put on hold. {{note}}'],
+  accountRejected: ['Account request not approved', 'Your request for a LivestockPro account was not approved. {{note}}']
 };
 const fill = (s, vars) => String(s).replace(/\{\{(\w+)\}\}/g, (_, k) => (vars && vars[k] != null ? vars[k] : ''));
 
@@ -190,6 +198,13 @@ async function hasFarmData(userId) {
   return false;
 }
 
+/* Accounts a system admin put on hold or rejected cannot join an
+   organization (as in CropManager). */
+async function isBlockedAccount(userId) {
+  const account = await col('accounts').findOne({ _id: userId }, { projection: { status: 1 } });
+  return Boolean(account && ['on_hold', 'rejected'].includes(account.status));
+}
+
 /* Organization members are not farmers: the farm data API refuses them. */
 async function isOrgAccount(userId) {
   return Boolean(await col('organization_members').findOne({ user_id: userId, status: 'active' }, { projection: { _id: 1 } }));
@@ -243,6 +258,7 @@ function requireOrgRole(roles, { write = false } = {}) {
 async function joinOrganization({ userId, token, consent, detailAccess = false, profile = null }) {
   if (!consent) throw new OrgError(400, 'CONSENT_REQUIRED', 'Please agree to share your farm summary with the organization.');
   if (await isOrgAccount(userId)) throw new OrgError(409, 'ORG_ACCOUNT', 'Organization accounts cannot join as farmers. Please sign in with a farmer account.');
+  if (await isBlockedAccount(userId)) throw new OrgError(403, 'ACCOUNT_BLOCKED', 'Your account is on hold or was not approved, so it cannot join an organization. Please contact the platform administrator.');
   const { link, org } = await findLink(token);
   const existing = await farmerLink(userId);
   if (existing) {
@@ -299,6 +315,10 @@ async function joinOrganization({ userId, token, consent, detailAccess = false, 
   const fresh = await col('organizations').findOne({ _id: org._id });
   refreshFarmerStats(userId).catch(() => {});
   usageNotices(fresh, org.active_farmers).catch(() => {});
+  if (accountStatus === 'pending') {
+    const name = (profile && profile.full_name) || (before && (before.full_name || before.email)) || 'A farmer';
+    require('./platformAdmins').notifyAdmins('accountRequestOrg', { name, org: org.name });
+  }
   return { org: fresh, membershipId: rowId, accountStatus };
 }
 
@@ -363,6 +383,7 @@ async function registerFarmer({ org, by, details, clerkClient }) {
 
   if (userId) {
     if (await isOrgAccount(userId)) throw new OrgError(409, 'EMAIL_IS_ORG_ACCOUNT', 'This email belongs to an organization account, not a farmer.');
+    if (await isBlockedAccount(userId)) throw new OrgError(409, 'FARMER_ACCOUNT_BLOCKED', 'This farmer\'s account is on hold or was not approved. Please contact the platform administrator.');
     const current = await farmerLink(userId);
     if (current) throw new OrgError(409, current.org._id === org._id ? 'FARMER_ALREADY_IN_ORG' : 'FARMER_IN_OTHER_ORG', current.org._id === org._id ? 'This farmer is already in your organization.' : 'This farmer already belongs to another organization.');
     await reservePlace(org);
@@ -464,6 +485,7 @@ async function claimFarmerInvite(userId, email) {
     { upsert: true }
   );
   await notifyOrgAdmins(org._id, 'farmerJoined', { name: org.name, farmer: invite.full_name || address }, '/organization/farmers');
+  require('./platformAdmins').notifyAdmins('accountRequestOrg', { name: invite.full_name || address, org: org.name });
   refreshFarmerStats(userId).catch(() => {});
   return { org, invite };
 }
@@ -619,7 +641,7 @@ module.exports = {
   ORG_TYPES, ORG_STATUSES, MEMBER_ROLES, FARMER_COLLECTIONS, OrgError, sendOrgError,
   getSettings, updateSettings, audit, notify, notifyOrgAdmins,
   newToken, hashToken, linkState, joinError, findLink,
-  activeMembership, farmerLink, hasFarmData, isOrgAccount, requireOrgRole,
+  activeMembership, farmerLink, hasFarmData, isOrgAccount, isBlockedAccount, requireOrgRole,
   joinOrganization, endFarmerLink, usageNotices, refreshFarmerStats, refreshAllFarmerStats, startStatsJob, farmerName,
   registerFarmer, revokeFarmerInvite, claimFarmerInvite, expireFarmerInvites,
   col, nowIso, uuid

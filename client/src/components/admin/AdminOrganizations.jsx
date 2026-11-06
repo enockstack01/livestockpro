@@ -282,7 +282,7 @@ export function AdminAudit() {
   const qs = new URLSearchParams(Object.entries({ ...query, page }).filter(([, v]) => v !== '' && v !== undefined)).toString();
   const log = useOrgData(api, `/admin/audit?${qs}`);
   const set = (k) => (e) => setDraft((d) => ({ ...d, [k]: e.target.value }));
-  const ACTIONS = ['organization', 'member', 'link', 'farmer', 'settings'];
+  const ACTIONS = ['account', 'user', 'organization', 'member', 'link', 'farmer', 'settings'];
   return (
     <div className="admin-fade-in">
       <div className="card org-filters">

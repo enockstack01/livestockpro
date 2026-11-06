@@ -177,9 +177,19 @@ app.get('*', (req, res) => {
 /* Clerk's middleware throws (rather than just leaving the request signed-out)
    when it's handed a malformed Authorization header — e.g. a stale/corrupted
    token. Without this, that would fall through to Express's default HTML
-   error page, which also leaks server file paths. */
+   error page, which also leaks server file paths. Body parser errors (a
+   request over the size limit, broken JSON) keep their own status, so a
+   too-large upload is not reported as a sign-in problem. */
+const BODY_ERRORS = {
+  'entity.too.large': ['REQUEST_TOO_LARGE', 'The request is too large. Send fewer or smaller photos.'],
+  'entity.parse.failed': ['BAD_JSON', 'The request could not be read.']
+};
 app.use((err, req, res, next) => {
   if (res.headersSent) return next(err);
+  const body = BODY_ERRORS[err.type];
+  if (body && err.status) {
+    return res.status(err.status).json({ error: { code: body[0], message: body[1] } });
+  }
   console.error('Unhandled request error:', err.message);
   res.status(401).json({ error: { message: 'Not authenticated.' } });
 });

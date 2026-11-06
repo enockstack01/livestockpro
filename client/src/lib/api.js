@@ -129,8 +129,11 @@ export function useApi() {
     async adminStats() {
       return request(getToken, '/admin/stats');
     },
-    async adminUsers() {
-      return request(getToken, '/admin/users');
+    /* One page of accounts: { page, perPage, q, role, status, requests, sort,
+       dir, summary } (server/routes/adminRoutes.js). */
+    async adminUsers(params = {}) {
+      const qs = new URLSearchParams(Object.entries(params).filter(([, v]) => v !== '' && v !== null && v !== undefined)).toString();
+      return request(getToken, '/admin/users' + (qs ? '?' + qs : ''));
     },
     async adminSpatial() {
       return request(getToken, '/admin/spatial');

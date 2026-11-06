@@ -8,6 +8,7 @@ const {
   registerFarmer, revokeFarmerInvite, expireFarmerInvites
 } = require('../lib/orgs');
 const { computeDashboard, farmerList } = require('../lib/orgDashboard');
+const { notifyAdmins } = require('../lib/platformAdmins');
 
 /* /api/organizations: organization registration and everything an
    organization's admins and field officers do. Every route checks the
@@ -108,6 +109,7 @@ router.post('/register', async (req, res) => {
     );
     forgetApproval(userId);
     await audit(req, 'organization.register', { targetType: 'organization', targetId: orgId, organizationId: orgId, details: { name: fields.name } });
+    await notifyAdmins('orgRegistered', { name: fields.name });
     res.status(201).json({ data: orgOut(await col('organizations').findOne({ _id: orgId })), error: null });
   } catch (err) {
     if (err && err.code === 11000) return res.status(409).json({ error: { message: 'An organization with this name already exists.', code: 'NAME_TAKEN' } });
@@ -169,6 +171,10 @@ router.post('/invites/:inviteId', async (req, res) => {
     );
     forgetApproval(userId);
     await audit(req, 'member.join', { targetType: 'member', targetId: invite._id, organizationId: invite.organization_id, details: { role: invite.role } });
+    if (status === 'pending') {
+      const org = await col('organizations').findOne({ _id: invite.organization_id }, { projection: { name: 1 } });
+      await notifyAdmins('accountRequestOrg', { name: primaryEmail(user), org: (org && org.name) || '' });
+    }
     res.json({ data: { ok: true }, error: null });
   } catch (err) {
     sendOrgError(res, err);

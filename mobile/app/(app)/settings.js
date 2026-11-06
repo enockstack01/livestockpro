@@ -18,6 +18,7 @@ import { useSignOut } from '../../src/ui/AppShell';
 import { useAccount } from '../../src/account/AccountProvider';
 import { accountDisplayName } from '../../../shared/account';
 import MyOrganizationCard from '../../src/screens/org/MyOrganization';
+import OfflineAiCard from '../../src/screens/OfflineAiCard';
 import { CURRENCIES, currencyName } from '../../../shared/currency';
 import * as Clipboard from 'expo-clipboard';
 
@@ -207,6 +208,7 @@ export default function SettingsScreen() {
           </CardBody>
         </Card> : null}
         {!isOrgAccount ? <MyOrganizationCard /> : null}
+        {!isOrgAccount ? <OfflineAiCard /> : null}
 
         <Card>
           <CardHeader title={t('settings.language')} icon="globe" />

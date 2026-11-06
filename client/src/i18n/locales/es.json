@@ -1292,6 +1292,30 @@
       "runHint": "Funciona sin internet: el modelo integrado busca enfermedades en las fotos y muestra sus hallazgos.",
       "again": "Revisar otra foto",
       "nothing": "No se reconoció nada"
+    },
+    "local": {
+      "title": "IA sin conexión",
+      "intro": "Descargue {{model}} ({{mb}} MB) una vez para tener el diagnóstico con IA y Preguntar a LivestockPro sin internet. Funciona junto con la revisión de fotos en este teléfono.",
+      "ready": "La IA sin conexión está lista en este teléfono.",
+      "remove": "Eliminar ({{mb}} MB)",
+      "downloading": "Descargando: {{pct}} % de {{mb}} MB",
+      "keepOpen": "Mantenga la app abierta hasta que termine la descarga.",
+      "needs": "Necesita unos {{mb}} MB de espacio y un teléfono con 4 GB de memoria o más. Use Wi-Fi si puede.",
+      "download": "Descargar IA sin conexión ({{mb}} MB)",
+      "failed": "La IA sin conexión no pudo terminar: {{message}}",
+      "limits": "La IA sin conexión es un modelo pequeño que funciona en este teléfono. Es más lenta que la IA en línea y comete más errores, sobre todo en idiomas distintos del inglés. Confirme siempre con un veterinario.",
+      "terms": "Condiciones de uso de Gemma",
+      "unsupported": "Este teléfono no puede usar la IA sin conexión (necesita un teléfono de 64 bits). La revisión de fotos en este teléfono sigue funcionando.",
+      "onMobileData": "Está usando datos móviles: la IA sin conexión es una descarga de {{mb}} MB.",
+      "assistant": "IA de LivestockPro (sin conexión)",
+      "writing": "Escribiendo en este teléfono...",
+      "stop": "Detener",
+      "chatNeedsModel": "Sin internet. Descargue la IA sin conexión en Ajustes para hacer preguntas sin conexión.",
+      "diagnoseNeedsModel": "Sin internet. Descargue la IA sin conexión en Ajustes para obtener un diagnóstico sin conexión, o use Revisar en este teléfono para los hallazgos de las fotos.",
+      "writingWords": "Escribiendo el diagnóstico sin conexión: {{count}} palabras por ahora",
+      "starting": "Iniciando la IA sin conexión...",
+      "takesAMinute": "Puede tardar de uno a tres minutos en un teléfono.",
+      "reportNote": "Escrito sin conexión en este teléfono por {{model}}, con la revisión de fotos, los síntomas y los registros de este animal. Es preliminar: repítalo con la IA en línea cuando tenga conexión y confirme con un veterinario."
     }
   },
   "org": {
@@ -1387,7 +1411,8 @@
       "state": {
         "already_member": "Ya es miembro de esta organización.",
         "other_org": "Actualmente está vinculado a {{name}}. Déjela primero en Ajustes o contacte con soporte.",
-        "org_account": "Esta es una cuenta de organización. Inicie sesión con una cuenta de ganadero para unirse."
+        "org_account": "Esta es una cuenta de organización. Inicie sesión con una cuenta de ganadero para unirse.",
+        "account_blocked": "Su cuenta está en espera o no fue aprobada, por lo que no puede unirse a una organización. Contacte al administrador de la plataforma."
       },
       "openInApp": "Abrir en la app LivestockPro",
       "pendingMessage": "Estás vinculado a {{name}}. Ahora un administrador de LivestockPro debe aprobar tu cuenta. Te avisaremos en cuanto se apruebe y entonces podrás empezar a registrar tu ganado."
@@ -1418,7 +1443,9 @@
       "INVITE_FAILED": "No se pudo enviar el correo de invitación. Inténtelo de nuevo.",
       "ORG_LIMIT_REACHED": "Su organización alcanzó su límite de ganaderos. Pida al administrador de la plataforma que lo amplíe.",
       "BAD_EMAIL": "Introduzca un correo válido.",
-      "FARMER_NAME_REQUIRED": "Introduzca el nombre del ganadero."
+      "FARMER_NAME_REQUIRED": "Introduzca el nombre del ganadero.",
+      "ACCOUNT_BLOCKED": "Su cuenta está en espera o no fue aprobada, por lo que no puede unirse a una organización. Contacte al administrador de la plataforma.",
+      "FARMER_ACCOUNT_BLOCKED": "La cuenta de este ganadero está en espera o no fue aprobada. Contacte al administrador de la plataforma."
     },
     "dash": {
       "overview": "Resumen",
@@ -1608,7 +1635,15 @@
       "settings_update": "Ajustes del sistema cambiados",
       "limitDetail": "{{from}} a {{to}}: {{reason}}",
       "expires": "Vence {{time}}",
-      "importDetail": "{{rows}} filas, {{added}} añadidos"
+      "importDetail": "{{rows}} filas, {{added}} añadidos",
+      "account_status": "Cuenta revisada",
+      "user_ban": "Usuario bloqueado",
+      "user_unban": "Usuario desbloqueado",
+      "user_role": "Rol cambiado",
+      "user_delete": "Cuenta eliminada",
+      "user_ai_limit": "Límite de IA cambiado",
+      "aiLimitDefault": "vuelve al valor predeterminado",
+      "aiLimitTo": "{{limit}} solicitudes al día"
     },
     "my": {
       "title": "Mi organización",
@@ -1693,7 +1728,9 @@
         "member": "Equipo",
         "link": "Enlaces",
         "farmer": "Ganaderos",
-        "settings": "Ajustes"
+        "settings": "Ajustes",
+        "account": "Revisiones de cuentas",
+        "user": "Usuarios y roles"
       },
       "page": "Página {{page}} de {{pages}}",
       "settingsTitle": "Ajustes del sistema",
@@ -1776,6 +1813,30 @@
     "staffInvite": {
       "title": "Invitación de organización",
       "body": "Ha sido invitado a {{name}}."
+    },
+    "accountRequest": {
+      "title": "Nueva solicitud de cuenta",
+      "body": "{{name}} espera la aprobación."
+    },
+    "accountRequestOrg": {
+      "title": "Nueva cuenta de ganadero por aprobar",
+      "body": "{{name}} se unió a través de {{org}} y espera la aprobación."
+    },
+    "orgRegistered": {
+      "title": "Nueva organización por aprobar",
+      "body": "{{name}} registró una organización y espera la aprobación."
+    },
+    "accountApproved": {
+      "title": "Cuenta aprobada",
+      "body": "Su cuenta de LivestockPro está activa. ¡Bienvenido! {{note}}"
+    },
+    "accountOnHold": {
+      "title": "Cuenta en espera",
+      "body": "Su cuenta de LivestockPro se ha puesto en espera. {{note}}"
+    },
+    "accountRejected": {
+      "title": "Solicitud de cuenta no aprobada",
+      "body": "Su solicitud de cuenta de LivestockPro no fue aprobada. {{note}}"
     }
   },
   "search": {

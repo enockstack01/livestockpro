@@ -177,6 +177,10 @@ export function AuditTable({ rows, lang, t, showOrg = false }) {
 function auditDetails(t, r) {
   const d = r.details || {};
   if (r.action === 'organization.limit') return t('org.audit.limitDetail', { from: d.from, to: d.to, reason: d.reason || '' });
+  /* Account management (admin dashboard): who, what changed, the note. */
+  if (r.action === 'account.status') return [d.email, `${t(`account.status.${d.from}`, { defaultValue: d.from })} → ${t(`account.status.${d.to}`, { defaultValue: d.to })}`, d.note].filter(Boolean).join(' · ');
+  if (r.action === 'user.role') return [d.email, `${t(`adminDashboard.role${d.from === 'super_admin' ? 'SuperAdmin' : d.from === 'admin' ? 'Admin' : 'User'}`)} → ${t(`adminDashboard.role${d.to === 'super_admin' ? 'SuperAdmin' : d.to === 'admin' ? 'Admin' : 'User'}`)}`].filter(Boolean).join(' · ');
+  if (r.action === 'user.ai_limit') return [d.email, d.to === null ? t('org.audit.aiLimitDefault') : t('org.audit.aiLimitTo', { limit: d.to })].filter(Boolean).join(' · ');
   if (d.reason) return d.reason;
   if (d.email) return `${d.email}${d.role ? ` · ${t(`org.roles.${d.role}`, { defaultValue: d.role })}` : ''}`;
   if (d.name) return d.name;

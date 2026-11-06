@@ -1292,6 +1292,30 @@
       "runHint": "无需联网：内置模型在照片中查找疾病并显示检测结果。",
       "again": "检查另一张照片",
       "nothing": "未识别出任何内容"
+    },
+    "local": {
+      "title": "离线 AI",
+      "intro": "下载一次 {{model}}（{{mb}} MB），即可在没有网络时使用 AI 诊断和“问 LivestockPro”。它与本手机上的照片检查一起工作。",
+      "ready": "离线 AI 已在本手机上就绪。",
+      "remove": "删除（{{mb}} MB）",
+      "downloading": "正在下载：{{mb}} MB 中的 {{pct}}%",
+      "keepOpen": "请保持应用打开，直到下载完成。",
+      "needs": "需要约 {{mb}} MB 空间，以及 4 GB 或以上内存的手机。尽量使用 Wi-Fi。",
+      "download": "下载离线 AI（{{mb}} MB）",
+      "failed": "离线 AI 未能完成：{{message}}",
+      "limits": "离线 AI 是在本手机上运行的小模型。它比在线 AI 慢，出错更多，尤其是英语以外的语言。请务必与兽医确认。",
+      "terms": "Gemma 使用条款",
+      "unsupported": "本手机无法运行离线 AI（需要 64 位手机）。本手机上的照片检查仍可使用。",
+      "onMobileData": "你正在使用移动数据：离线 AI 下载大小为 {{mb}} MB。",
+      "assistant": "LivestockPro AI（离线）",
+      "writing": "正在本手机上撰写...",
+      "stop": "停止",
+      "chatNeedsModel": "没有网络。请在设置中下载离线 AI，以便在无网络时提问。",
+      "diagnoseNeedsModel": "没有网络。请在设置中下载离线 AI，以便在无网络时获得诊断，或使用“在本手机上检查”查看照片结果。",
+      "writingWords": "正在撰写离线诊断：已写 {{count}} 个词",
+      "starting": "正在启动离线 AI...",
+      "takesAMinute": "在手机上可能需要一到三分钟。",
+      "reportNote": "由 {{model}} 在本手机上离线撰写，依据照片检查、症状和这头动物的记录。这是初步结果：联网后请用在线 AI 再检查一次，并与兽医确认。"
     }
   },
   "org": {
@@ -1387,7 +1411,8 @@
       "state": {
         "already_member": "您已是该机构成员。",
         "other_org": "您目前与 {{name}} 关联。请先在设置中退出，或联系客服。",
-        "org_account": "这是机构账户。请使用养殖户账户登录后加入。"
+        "org_account": "这是机构账户。请使用养殖户账户登录后加入。",
+        "account_blocked": "你的账户已暂停或未获批准，因此无法加入机构。请联系平台管理员。"
       },
       "openInApp": "在 LivestockPro 应用中打开",
       "pendingMessage": "您已关联到 {{name}}。现在需要 LivestockPro 管理员批准您的账户。账户获批后我们会立即通知您，届时您即可开始记录畜群。"
@@ -1418,7 +1443,9 @@
       "INVITE_FAILED": "邀请邮件发送失败，请重试。",
       "ORG_LIMIT_REACHED": "贵机构已达到养殖户上限，请联系平台管理员提高上限。",
       "BAD_EMAIL": "请输入有效的电子邮箱。",
-      "FARMER_NAME_REQUIRED": "请输入养殖户的姓名。"
+      "FARMER_NAME_REQUIRED": "请输入养殖户的姓名。",
+      "ACCOUNT_BLOCKED": "你的账户已暂停或未获批准，因此无法加入机构。请联系平台管理员。",
+      "FARMER_ACCOUNT_BLOCKED": "该养殖户的账户已暂停或未获批准。请联系平台管理员。"
     },
     "dash": {
       "overview": "概况",
@@ -1608,7 +1635,15 @@
       "settings_update": "系统设置已更改",
       "limitDetail": "{{from}} 改为 {{to}}：{{reason}}",
       "expires": "失效于 {{time}}",
-      "importDetail": "{{rows}} 行，新增 {{added}}"
+      "importDetail": "{{rows}} 行，新增 {{added}}",
+      "account_status": "账户已审核",
+      "user_ban": "用户已封禁",
+      "user_unban": "用户已解封",
+      "user_role": "角色已更改",
+      "user_delete": "账户已删除",
+      "user_ai_limit": "AI 限额已更改",
+      "aiLimitDefault": "恢复默认",
+      "aiLimitTo": "每天 {{limit}} 次请求"
     },
     "my": {
       "title": "我的机构",
@@ -1693,7 +1728,9 @@
         "member": "工作人员",
         "link": "链接",
         "farmer": "养殖户",
-        "settings": "设置"
+        "settings": "设置",
+        "account": "账户审核",
+        "user": "用户和角色"
       },
       "page": "第 {{page}}/{{pages}} 页",
       "settingsTitle": "系统设置",
@@ -1776,6 +1813,30 @@
     "staffInvite": {
       "title": "机构邀请",
       "body": "您受邀加入 {{name}}。"
+    },
+    "accountRequest": {
+      "title": "新的账户申请",
+      "body": "{{name}} 正在等待批准。"
+    },
+    "accountRequestOrg": {
+      "title": "待批准的新养殖户账户",
+      "body": "{{name}} 通过 {{org}} 加入，正在等待批准。"
+    },
+    "orgRegistered": {
+      "title": "待批准的新机构",
+      "body": "{{name}} 登记了一个机构，正在等待批准。"
+    },
+    "accountApproved": {
+      "title": "账户已批准",
+      "body": "你的 LivestockPro 账户已启用。欢迎！{{note}}"
+    },
+    "accountOnHold": {
+      "title": "账户已暂停",
+      "body": "你的 LivestockPro 账户已被暂停。{{note}}"
+    },
+    "accountRejected": {
+      "title": "账户申请未获批准",
+      "body": "你的 LivestockPro 账户申请未获批准。{{note}}"
     }
   },
   "search": {

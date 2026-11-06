@@ -1292,6 +1292,30 @@
       "runHint": "Works without internet: the built-in model looks for disease in the photos and shows its findings.",
       "again": "Check another photo",
       "nothing": "Nothing recognised"
+    },
+    "local": {
+      "title": "Offline AI",
+      "intro": "Download {{model}} ({{mb}} MB) once to get the AI diagnosis and Ask LivestockPro with no internet. It works with the photo check on this phone.",
+      "ready": "Offline AI is ready on this phone.",
+      "remove": "Remove ({{mb}} MB)",
+      "downloading": "Downloading: {{pct}}% of {{mb}} MB",
+      "keepOpen": "Keep the app open until the download finishes.",
+      "needs": "Needs about {{mb}} MB of space and a phone with 4 GB of memory or more. Use Wi-Fi if you can.",
+      "download": "Download offline AI ({{mb}} MB)",
+      "failed": "The offline AI could not finish: {{message}}",
+      "limits": "The offline AI is a small model running on this phone. It is slower than the online AI and makes more mistakes, especially in languages other than English. Always confirm with a vet.",
+      "terms": "Gemma Terms of Use",
+      "unsupported": "This phone cannot run the offline AI (it needs a 64-bit phone). The photo check on this phone still works.",
+      "onMobileData": "You are on mobile data: the offline AI is a {{mb}} MB download.",
+      "assistant": "LivestockPro AI (offline)",
+      "writing": "Writing on this phone...",
+      "stop": "Stop",
+      "chatNeedsModel": "No internet. Download the offline AI in Settings to ask questions without a connection.",
+      "diagnoseNeedsModel": "No internet. Download the offline AI in Settings to get a diagnosis without a connection, or use Check on this phone for the photo findings.",
+      "writingWords": "Writing the offline diagnosis: {{count}} words so far",
+      "starting": "Starting the offline AI...",
+      "takesAMinute": "This can take one to three minutes on a phone.",
+      "reportNote": "Written offline on this phone by {{model}}, using the photo check, the symptoms and this animal's records. It is preliminary: check it again with the online AI when you are connected, and confirm with a vet."
     }
   },
   "org": {
@@ -1387,7 +1411,8 @@
       "state": {
         "already_member": "You are already a member of this organization.",
         "other_org": "You are currently linked to {{name}}. Leave it first in Settings, or contact support.",
-        "org_account": "This is an organization account. Please sign in with a farmer account to join."
+        "org_account": "This is an organization account. Please sign in with a farmer account to join.",
+        "account_blocked": "Your account is on hold or was not approved, so it cannot join an organization. Please contact the platform administrator."
       },
       "openInApp": "Open in the LivestockPro app",
       "pendingMessage": "You are linked to {{name}}. A LivestockPro administrator now needs to approve your account. You will be notified as soon as it is approved, and then you can start recording your herd."
@@ -1418,7 +1443,9 @@
       "INVITE_FAILED": "The invitation email could not be sent. Please try again.",
       "ORG_LIMIT_REACHED": "Your organization has reached its farmer limit. Ask the platform administrator to raise it.",
       "BAD_EMAIL": "Please enter a valid email address.",
-      "FARMER_NAME_REQUIRED": "Please enter the farmer's name."
+      "FARMER_NAME_REQUIRED": "Please enter the farmer's name.",
+      "ACCOUNT_BLOCKED": "Your account is on hold or was not approved, so it cannot join an organization. Please contact the platform administrator.",
+      "FARMER_ACCOUNT_BLOCKED": "This farmer's account is on hold or was not approved. Please contact the platform administrator."
     },
     "dash": {
       "overview": "Overview",
@@ -1608,7 +1635,15 @@
       "settings_update": "System settings changed",
       "limitDetail": "{{from}} to {{to}}: {{reason}}",
       "expires": "Expires {{time}}",
-      "importDetail": "{{rows}} rows, {{added}} added"
+      "importDetail": "{{rows}} rows, {{added}} added",
+      "account_status": "Account reviewed",
+      "user_ban": "User banned",
+      "user_unban": "User unbanned",
+      "user_role": "Role changed",
+      "user_delete": "Account deleted",
+      "user_ai_limit": "AI limit changed",
+      "aiLimitDefault": "back to the default",
+      "aiLimitTo": "{{limit}} requests a day"
     },
     "my": {
       "title": "My organization",
@@ -1693,7 +1728,9 @@
         "member": "Staff",
         "link": "Referral links",
         "farmer": "Farmers",
-        "settings": "Settings"
+        "settings": "Settings",
+        "account": "Account reviews",
+        "user": "Users and roles"
       },
       "page": "Page {{page}} of {{pages}}",
       "settingsTitle": "System settings",
@@ -1776,6 +1813,30 @@
     "staffInvite": {
       "title": "Organization invitation",
       "body": "You have been invited to {{name}}."
+    },
+    "accountRequest": {
+      "title": "New account request",
+      "body": "{{name}} is waiting for approval."
+    },
+    "accountRequestOrg": {
+      "title": "New farmer account to approve",
+      "body": "{{name}} joined through {{org}} and is waiting for approval."
+    },
+    "orgRegistered": {
+      "title": "New organization to approve",
+      "body": "{{name}} registered an organization and is waiting for approval."
+    },
+    "accountApproved": {
+      "title": "Account approved",
+      "body": "Your LivestockPro account is active. Welcome! {{note}}"
+    },
+    "accountOnHold": {
+      "title": "Account on hold",
+      "body": "Your LivestockPro account has been put on hold. {{note}}"
+    },
+    "accountRejected": {
+      "title": "Account request not approved",
+      "body": "Your request for a LivestockPro account was not approved. {{note}}"
     }
   },
   "search": {

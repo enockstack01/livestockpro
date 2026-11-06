@@ -5,6 +5,7 @@ const { requireAuth, getRole, primaryEmail, verifiedPrimaryEmail, clerkClient } 
 const { ACCOUNT_TYPES, CURRENCY_RE, DEFAULT_CURRENCY, accounts, getAccount, forgetApproval } = require('../lib/accounts');
 const { activeMembership, farmerLink, claimFarmerInvite } = require('../lib/orgs');
 const { ensureLivestockId } = require('../lib/livestockId');
+const { notifyAdmins, forgetUsers } = require('../lib/platformAdmins');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -105,6 +106,9 @@ router.post('/request', async (req, res) => {
     }
 
     const [account, role, livestockId] = await Promise.all([accounts().findOne({ _id: userId }), getRole(userId), ensureLivestockId(userId)]);
+    // Like CropManager: every administrator hears about a new request.
+    forgetUsers(); // the new account shows in the admin list at once
+    await notifyAdmins('accountRequest', { name: fields.full_name || primaryEmail(user) });
     res.json({ data: toClient(account, role, null, livestockId), error: null });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });

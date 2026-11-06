@@ -15,6 +15,8 @@ import { AGRICODERS_LOGO, LIVESTOCKPRO_LOGO } from './brandLogos.js';
 
 const esc = (s) => String(s == null ? '' : s)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+// Saved report photos are image data (server/routes/aiRoutes.js thumbnails); anything else is dropped.
+const imageSrc = (s) => (/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(String(s || '')) ? String(s) : '');
 
 const PILL = {
   emergency: 'red', urgent: 'red', soon: 'amber', routine: 'green',
@@ -77,7 +79,7 @@ function photosBlock(r, t, caseInfo) {
       const [x1, y1, x2, y2] = d.box.map((n) => Number(n) * 100);
       return `<span class="bx${d.label === 'healthy' ? ' bx-ok' : ''}" style="left:${x1}%;top:${y1}%;width:${x2 - x1}%;height:${y2 - y1}%"><em style="top:${stack * 1.6}em">${esc(label(d.label))}</em></span>`;
     }).join('');
-    const shot = (inner, caption) => `<figure class="shot"><div class="frame"><img src="${src}" alt="">${inner}</div><figcaption>${esc(caption)}</figcaption></figure>`;
+    const shot = (inner, caption) => `<figure class="shot"><div class="frame"><img src="${esc(imageSrc(src))}" alt="">${inner}</div><figcaption>${esc(caption)}</figcaption></figure>`;
     return `<div class="pair">${shot('', tv('uploaded') + num(i))}${checked ? shot(marks, tv('checked') + num(i)) : ''}</div>`;
   }).join('');
   const note = checked && !(v.detections || []).length ? `<p class="small">${esc(tv('none'))}</p>` : v && !v.available ? `<p class="small">${esc(tv('unavailable'))}</p>` : '';

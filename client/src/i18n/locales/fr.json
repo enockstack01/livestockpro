@@ -1292,6 +1292,30 @@
       "runHint": "Fonctionne sans internet : le modèle intégré recherche les maladies sur les photos et affiche ses résultats.",
       "again": "Vérifier une autre photo",
       "nothing": "Rien de reconnu"
+    },
+    "local": {
+      "title": "IA hors ligne",
+      "intro": "Téléchargez {{model}} ({{mb}} Mo) une fois pour obtenir le diagnostic IA et Demander à LivestockPro sans internet. Elle fonctionne avec la vérification des photos sur ce téléphone.",
+      "ready": "L’IA hors ligne est prête sur ce téléphone.",
+      "remove": "Supprimer ({{mb}} Mo)",
+      "downloading": "Téléchargement : {{pct}} % de {{mb}} Mo",
+      "keepOpen": "Gardez l’application ouverte jusqu’à la fin du téléchargement.",
+      "needs": "Il faut environ {{mb}} Mo d’espace et un téléphone avec 4 Go de mémoire ou plus. Utilisez le Wi-Fi si possible.",
+      "download": "Télécharger l’IA hors ligne ({{mb}} Mo)",
+      "failed": "L’IA hors ligne n’a pas pu terminer : {{message}}",
+      "limits": "L’IA hors ligne est un petit modèle qui tourne sur ce téléphone. Elle est plus lente que l’IA en ligne et fait plus d’erreurs, surtout dans d’autres langues que l’anglais. Confirmez toujours avec un vétérinaire.",
+      "terms": "Conditions d’utilisation de Gemma",
+      "unsupported": "Ce téléphone ne peut pas exécuter l’IA hors ligne (il faut un téléphone 64 bits). La vérification des photos sur ce téléphone fonctionne toujours.",
+      "onMobileData": "Vous êtes en données mobiles : l’IA hors ligne pèse {{mb}} Mo.",
+      "assistant": "IA LivestockPro (hors ligne)",
+      "writing": "Rédaction sur ce téléphone...",
+      "stop": "Arrêter",
+      "chatNeedsModel": "Pas d’internet. Téléchargez l’IA hors ligne dans les Paramètres pour poser des questions sans connexion.",
+      "diagnoseNeedsModel": "Pas d’internet. Téléchargez l’IA hors ligne dans les Paramètres pour un diagnostic sans connexion, ou utilisez Vérifier sur ce téléphone pour les résultats des photos.",
+      "writingWords": "Rédaction du diagnostic hors ligne : {{count}} mots pour l’instant",
+      "starting": "Démarrage de l’IA hors ligne...",
+      "takesAMinute": "Cela peut prendre une à trois minutes sur un téléphone.",
+      "reportNote": "Rédigé hors ligne sur ce téléphone par {{model}}, à partir de la vérification des photos, des symptômes et des fiches de cet animal. C’est préliminaire : refaites-le avec l’IA en ligne une fois connecté et confirmez avec un vétérinaire."
     }
   },
   "org": {
@@ -1387,7 +1411,8 @@
       "state": {
         "already_member": "Vous êtes déjà membre de cette organisation.",
         "other_org": "Vous êtes actuellement lié à {{name}}. Quittez-la d'abord dans les paramètres ou contactez le support.",
-        "org_account": "Ceci est un compte d'organisation. Connectez-vous avec un compte éleveur pour rejoindre."
+        "org_account": "Ceci est un compte d'organisation. Connectez-vous avec un compte éleveur pour rejoindre.",
+        "account_blocked": "Votre compte est en attente ou n’a pas été approuvé ; il ne peut donc pas rejoindre une organisation. Contactez l’administrateur de la plateforme."
       },
       "openInApp": "Ouvrir dans l'application LivestockPro",
       "pendingMessage": "Vous êtes lié à {{name}}. Un administrateur LivestockPro doit maintenant approuver votre compte. Vous serez averti dès son approbation, puis vous pourrez commencer à enregistrer votre troupeau."
@@ -1418,7 +1443,9 @@
       "INVITE_FAILED": "L’e-mail d’invitation n’a pas pu être envoyé. Réessayez.",
       "ORG_LIMIT_REACHED": "Votre organisation a atteint sa limite d’éleveurs. Demandez à l’administrateur de la plateforme de l’augmenter.",
       "BAD_EMAIL": "Saisissez une adresse e-mail valide.",
-      "FARMER_NAME_REQUIRED": "Saisissez le nom de l’éleveur."
+      "FARMER_NAME_REQUIRED": "Saisissez le nom de l’éleveur.",
+      "ACCOUNT_BLOCKED": "Votre compte est en attente ou n’a pas été approuvé ; il ne peut donc pas rejoindre une organisation. Contactez l’administrateur de la plateforme.",
+      "FARMER_ACCOUNT_BLOCKED": "Le compte de cet éleveur est en attente ou n’a pas été approuvé. Contactez l’administrateur de la plateforme."
     },
     "dash": {
       "overview": "Vue d'ensemble",
@@ -1608,7 +1635,15 @@
       "settings_update": "Paramètres système modifiés",
       "limitDetail": "{{from}} à {{to}} : {{reason}}",
       "expires": "Expire le {{time}}",
-      "importDetail": "{{rows}} lignes, {{added}} ajoutés"
+      "importDetail": "{{rows}} lignes, {{added}} ajoutés",
+      "account_status": "Compte examiné",
+      "user_ban": "Utilisateur bloqué",
+      "user_unban": "Utilisateur débloqué",
+      "user_role": "Rôle modifié",
+      "user_delete": "Compte supprimé",
+      "user_ai_limit": "Limite IA modifiée",
+      "aiLimitDefault": "retour à la valeur par défaut",
+      "aiLimitTo": "{{limit}} requêtes par jour"
     },
     "my": {
       "title": "Mon organisation",
@@ -1693,7 +1728,9 @@
         "member": "Équipe",
         "link": "Liens",
         "farmer": "Éleveurs",
-        "settings": "Paramètres"
+        "settings": "Paramètres",
+        "account": "Examens de comptes",
+        "user": "Utilisateurs et rôles"
       },
       "page": "Page {{page}} sur {{pages}}",
       "settingsTitle": "Paramètres système",
@@ -1776,6 +1813,30 @@
     "staffInvite": {
       "title": "Invitation d'organisation",
       "body": "Vous êtes invité à rejoindre {{name}}."
+    },
+    "accountRequest": {
+      "title": "Nouvelle demande de compte",
+      "body": "{{name}} attend une approbation."
+    },
+    "accountRequestOrg": {
+      "title": "Nouveau compte d’éleveur à approuver",
+      "body": "{{name}} a rejoint {{org}} et attend une approbation."
+    },
+    "orgRegistered": {
+      "title": "Nouvelle organisation à approuver",
+      "body": "{{name}} a inscrit une organisation et attend une approbation."
+    },
+    "accountApproved": {
+      "title": "Compte approuvé",
+      "body": "Votre compte LivestockPro est actif. Bienvenue ! {{note}}"
+    },
+    "accountOnHold": {
+      "title": "Compte en attente",
+      "body": "Votre compte LivestockPro a été mis en attente. {{note}}"
+    },
+    "accountRejected": {
+      "title": "Demande de compte refusée",
+      "body": "Votre demande de compte LivestockPro n’a pas été approuvée. {{note}}"
     }
   },
   "search": {

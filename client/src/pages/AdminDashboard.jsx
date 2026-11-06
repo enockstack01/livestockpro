@@ -87,6 +87,37 @@ function StatCard({ icon, color, label, value, link }) {
   );
 }
 
+/* One page of GET /admin/users for the given filters, loaded when `active`
+   (the tab is open) and again when the filters or `reloadKey` change. */
+function useUserPage(api, active, params, reloadKey) {
+  const [state, setState] = useState({ data: [], total: 0, totalPages: 1, page: 1, loading: false });
+  const key = JSON.stringify(params);
+  useEffect(() => {
+    if (!active) return undefined;
+    let live = true;
+    setState((s) => ({ ...s, loading: true }));
+    api.adminUsers(params).then((res) => {
+      if (!live) return;
+      setState(res.error ? { data: [], total: 0, totalPages: 1, page: 1, loading: false, error: res.error } : { data: res.data || [], total: res.total || 0, totalPages: res.totalPages || 1, page: res.page || 1, loading: false });
+    });
+    return () => { live = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, key, reloadKey]);
+  return state;
+}
+
+function Pager({ page, totalPages, onPage }) {
+  const { t } = useTranslation();
+  if (totalPages <= 1) return null;
+  return (
+    <div className="org-pager">
+      <button className="btn btn-secondary btn-sm" disabled={page <= 1} onClick={() => onPage(page - 1)}>{t('common.prev')}</button>
+      <span>{t('org.admin.page', { page, pages: totalPages })}</span>
+      <button className="btn btn-secondary btn-sm" disabled={page >= totalPages} onClick={() => onPage(page + 1)}>{t('common.next')}</button>
+    </div>
+  );
+}
+
 function SortHeader({ label, sortKey, active, dir, onSort }) {
   return (
     <th className="sortable-th" onClick={() => onSort(sortKey)}>
@@ -104,7 +135,11 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
 
   const [stats, setStats] = useState(null);
-  const [users, setUsers] = useState([]);
+  /* Like CropManager's admin user list, accounts come from the server a page
+     at a time (GET /admin/users); the overview figures for every account
+     come with the first load (summary=1). */
+  const [summary, setSummary] = useState(null);
+  const [reloadKey, setReloadKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [busyId, setBusyId] = useState(null);
@@ -115,6 +150,9 @@ export default function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState('');
   const [sortKey, setSortKey] = useState('createdAt');
   const [sortDir, setSortDir] = useState('desc');
+  const [userPage, setUserPage] = useState(1);
+  const [requestPage, setRequestPage] = useState(1);
+  const [promoteQuery, setPromoteQuery] = useState('');
 
   const [banTarget, setBanTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -127,6 +165,7 @@ export default function AdminDashboard() {
   const [bulkBusy, setBulkBusy] = useState(false);
 
   const isSuperAdmin = role === 'super_admin';
+  const isAdminRole = role === 'admin' || role === 'super_admin';
 
   useTopbarSearch(t('adminDashboard.searchUsersPlaceholder'), setSearch);
 
@@ -136,68 +175,43 @@ export default function AdminDashboard() {
 
   async function loadAll(isRefresh) {
     if (isRefresh) setRefreshing(true);
-    const [statsRes, usersRes] = await Promise.all([api.adminStats(), api.adminUsers()]);
+    const [statsRes, sumRes] = await Promise.all([api.adminStats(), api.adminUsers({ summary: 1, perPage: 1 })]);
     if (statsRes.error) showToast(t('adminDashboard.failedLoadStats', { message: statsRes.error.message }), 'error');
     else if (!statsRes.data) showToast(t('adminDashboard.failedLoadStatsEmpty'), 'error');
     else setStats(statsRes.data);
-    if (usersRes.error) showToast(t('adminDashboard.failedLoadUsers', { message: usersRes.error.message }), 'error');
-    else setUsers(usersRes.data || []);
+    if (sumRes.error) showToast(t('adminDashboard.failedLoadUsers', { message: sumRes.error.message }), 'error');
+    else setSummary(sumRes.summary || null);
+    setReloadKey((k) => k + 1);
     setLoading(false);
     setRefreshing(false);
   }
 
   useEffect(() => {
-    if (role === 'admin' || role === 'super_admin') loadAll(false);
+    if (isAdminRole) loadAll(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role]);
+
+  /* A searched, filtered, sorted page of accounts. */
+  const usersPage = useUserPage(api, isAdminRole && tab === 'users', { page: userPage, perPage: 25, q: search, role: roleFilter, status: statusFilter, sort: sortKey, dir: sortDir }, reloadKey);
+  const requestsPage = useUserPage(api, isAdminRole && tab === 'requests', { page: requestPage, perPage: 30, requests: 1, role: 'user', status: requestFilter === 'all' ? '' : requestFilter }, reloadKey);
+  const adminsPage = useUserPage(api, isAdminRole && tab === 'admins', { role: 'admins', perPage: 100, sort: 'createdAt' }, reloadKey);
+  const promotePage = useUserPage(api, isAdminRole && tab === 'admins', { role: 'user', perPage: 20, q: promoteQuery }, reloadKey);
+  useEffect(() => { setUserPage(1); }, [search, roleFilter, statusFilter, sortKey, sortDir]);
+  useEffect(() => { setRequestPage(1); setSelected(new Set()); }, [requestFilter]);
 
   function toggleSort(key) {
     if (sortKey === key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
     else { setSortKey(key); setSortDir('desc'); }
   }
 
-  const filteredUsers = useMemo(() => {
-    const q = search.toLowerCase();
-    let list = users.filter((u) => {
-      const matchSearch = !q || u.email.toLowerCase().includes(q) || (u.farmName || '').toLowerCase().includes(q) || (u.livestockId || '').toLowerCase().includes(q);
-      const matchRole = !roleFilter || u.role === roleFilter;
-      const matchStatus = !statusFilter || (statusFilter === 'banned' ? u.banned : u.accountStatus === statusFilter && !u.banned);
-      return matchSearch && matchRole && matchStatus;
-    });
-    list = list.slice().sort((a, b) => {
-      let av = a[sortKey], bv = b[sortKey];
-      if (typeof av === 'string') { av = av.toLowerCase(); bv = bv.toLowerCase(); }
-      if (av == null) av = sortDir === 'asc' ? Infinity : -Infinity;
-      if (bv == null) bv = sortDir === 'asc' ? Infinity : -Infinity;
-      if (av < bv) return sortDir === 'asc' ? -1 : 1;
-      if (av > bv) return sortDir === 'asc' ? 1 : -1;
-      return 0;
-    });
-    return list;
-  }, [users, search, roleFilter, statusFilter, sortKey, sortDir]);
-
-  const pendingCount = useMemo(() => users.filter((u) => u.role === 'user' && u.accountStatus === 'pending').length, [users]);
-  const requests = useMemo(() => users
-    .filter((u) => u.role === 'user' && (requestFilter === 'all' ? u.request : u.accountStatus === requestFilter))
-    .sort((a, b) => String((b.request && b.request.submittedAt) || '').localeCompare(String((a.request && a.request.submittedAt) || ''))), [users, requestFilter]);
-  const admins = useMemo(() => users.filter((u) => u.role !== 'user').sort((a, b) => b.createdAt - a.createdAt), [users]);
-  const promotableUsers = useMemo(() => users.filter((u) => u.role === 'user' && u.id !== currentUser?.id), [users, currentUser]);
-  const recentSignups = useMemo(() => users.slice().sort((a, b) => b.createdAt - a.createdAt).slice(0, 5), [users]);
-  const topFarms = useMemo(() => users.filter((u) => u.recordCount > 0).slice().sort((a, b) => b.recordCount - a.recordCount).slice(0, 5), [users]);
-
-  const engagement = useMemo(() => {
-    const now = Date.now();
-    const day = 24 * 60 * 60 * 1000;
-    let today = 0, week = 0, month = 0, inactive = 0;
-    users.forEach((u) => {
-      const age = u.lastSignInAt ? now - u.lastSignInAt : Infinity;
-      if (age <= day) today++;
-      else if (age <= 7 * day) week++;
-      else if (age <= 30 * day) month++;
-      else inactive++;
-    });
-    return { today, week, month, inactive };
-  }, [users]);
+  const filteredUsers = usersPage.data;
+  const pendingCount = summary ? summary.pending : 0;
+  const requests = requestsPage.data;
+  const admins = adminsPage.data;
+  const promotableUsers = promotePage.data.filter((u) => u.id !== currentUser?.id);
+  const recentSignups = summary ? summary.recentSignups : [];
+  const topFarms = summary ? summary.topFarms : [];
+  const engagement = summary ? summary.engagement : { today: 0, week: 0, month: 0, inactive: 0 };
 
   const signupTrend = useMemo(() => {
     const days = 14;
@@ -208,12 +222,12 @@ export default function AdminDashboard() {
       d.setDate(d.getDate() - i);
       buckets.push({ label: d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }), start: d.getTime(), end: d.getTime() + 24 * 60 * 60 * 1000, count: 0 });
     }
-    users.forEach((u) => {
-      const bucket = buckets.find((b) => u.createdAt >= b.start && u.createdAt < b.end);
+    ((summary && summary.signups14d) || []).forEach((createdAt) => {
+      const bucket = buckets.find((b) => createdAt >= b.start && createdAt < b.end);
       if (bucket) bucket.count++;
     });
     return buckets;
-  }, [users]);
+  }, [summary]);
 
   async function toggleBan(target) {
     setBusyId(target.id);
@@ -318,8 +332,8 @@ export default function AdminDashboard() {
           <div className="tabs">
             <button className={`tab-btn${tab === 'overview' ? ' active' : ''}`} onClick={() => setTab('overview')}><i className="fas fa-chart-line"></i> {t('adminDashboard.tabOverview')}</button>
             <button className={`tab-btn${tab === 'requests' ? ' active' : ''}`} onClick={() => setTab('requests')}><i className="fas fa-user-clock"></i> {t('adminDashboard.tabRequests')} <span className="tab-count">{pendingCount}</span></button>
-            <button className={`tab-btn${tab === 'users' ? ' active' : ''}`} onClick={() => setTab('users')}><i className="fas fa-users"></i> {t('adminDashboard.tabUsers')} <span className="tab-count">{users.length}</span></button>
-            <button className={`tab-btn${tab === 'admins' ? ' active' : ''}`} onClick={() => setTab('admins')}><i className="fas fa-user-shield"></i> {t('adminDashboard.tabAdmins')} <span className="tab-count">{admins.length}</span></button>
+            <button className={`tab-btn${tab === 'users' ? ' active' : ''}`} onClick={() => setTab('users')}><i className="fas fa-users"></i> {t('adminDashboard.tabUsers')} <span className="tab-count">{summary ? summary.total : 0}</span></button>
+            <button className={`tab-btn${tab === 'admins' ? ' active' : ''}`} onClick={() => setTab('admins')}><i className="fas fa-user-shield"></i> {t('adminDashboard.tabAdmins')} <span className="tab-count">{summary ? summary.admins : 0}</span></button>
             <button className={`tab-btn${tab === 'map' ? ' active' : ''}`} onClick={() => setTab('map')}><i className="fas fa-map-location-dot"></i> {t('adminDashboard.tabMap')}</button>
             <button className={`tab-btn${tab === 'orgs' ? ' active' : ''}`} onClick={() => setTab('orgs')}><i className="fas fa-building"></i> {t('org.admin.tabOrgs')}</button>
             <button className={`tab-btn${tab === 'audit' ? ' active' : ''}`} onClick={() => setTab('audit')}><i className="fas fa-clock-rotate-left"></i> {t('org.admin.tabAudit')}</button>
@@ -345,7 +359,7 @@ export default function AdminDashboard() {
                 </div>
                 <div className="card">
                   <div className="card-header"><h3>{t('adminDashboard.usersByRole')}</h3></div>
-                  <div className="card-body"><RoleChart users={users} /></div>
+                  <div className="card-body"><RoleChart roles={(summary && summary.roles) || {}} /></div>
                 </div>
               </div>
 
@@ -416,7 +430,7 @@ export default function AdminDashboard() {
           {tab === 'requests' && (
             <div className="admin-fade-in">
               <div className="filter-bar">
-                <select className="form-control" value={requestFilter} onChange={(e) => { setRequestFilter(e.target.value); setSelected(new Set()); }}>
+                <select className="form-control" value={requestFilter} onChange={(e) => setRequestFilter(e.target.value)}>
                   <option value="pending">{t('account.status.pending')}</option>
                   <option value="on_hold">{t('account.status.on_hold')}</option>
                   <option value="rejected">{t('account.status.rejected')}</option>
@@ -434,7 +448,9 @@ export default function AdminDashboard() {
                   </>
                 ) : null}
               </div>
-              {requests.length === 0 ? (
+              {requestsPage.loading && !requests.length ? (
+                <div className="card"><div className="empty-state"><i className="fas fa-spinner fa-spin"></i></div></div>
+              ) : requests.length === 0 ? (
                 <div className="card"><div className="empty-state"><i className="fas fa-inbox"></i><h3>{t('adminDashboard.noRequests')}</h3><p>{t('adminDashboard.noRequestsHint')}</p></div></div>
               ) : (
                 <div className="request-grid">
@@ -483,6 +499,7 @@ export default function AdminDashboard() {
                   })}
                 </div>
               )}
+              <Pager page={requestsPage.page} totalPages={requestsPage.totalPages} onPage={(p) => { setRequestPage(p); setSelected(new Set()); }} />
             </div>
           )}
 
@@ -512,7 +529,7 @@ export default function AdminDashboard() {
               </div>
 
               <div className="card">
-                <div className="card-header"><h3>{t('adminDashboard.userManagement')}</h3><span className="badge badge-green">{t('adminDashboard.xOfY', { filtered: filteredUsers.length, total: users.length })}</span></div>
+                <div className="card-header"><h3>{t('adminDashboard.userManagement')}</h3><span className="badge badge-green">{t('adminDashboard.xOfY', { filtered: usersPage.total, total: summary ? summary.total : usersPage.total })}</span></div>
                 <div className="card-body" style={{ padding: 0 }}>
                   <div className="table-wrapper">
                     <table className="data-table">
@@ -529,7 +546,9 @@ export default function AdminDashboard() {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredUsers.length === 0 ? (
+                        {usersPage.loading && !filteredUsers.length ? (
+                          <tr><td colSpan={8}><div className="empty-state"><i className="fas fa-spinner fa-spin"></i></div></td></tr>
+                        ) : filteredUsers.length === 0 ? (
                           <tr><td colSpan={8}><div className="empty-state"><i className="fas fa-users-slash"></i><h3>{t('adminDashboard.noMatchingUsers')}</h3><p>{t('adminDashboard.tryDifferentSearch')}</p></div></td></tr>
                         ) : filteredUsers.map((u) => {
                           const isSelf = u.id === currentUser?.id;
@@ -584,6 +603,7 @@ export default function AdminDashboard() {
                       </tbody>
                     </table>
                   </div>
+                  <Pager page={usersPage.page} totalPages={usersPage.totalPages} onPage={setUserPage} />
                 </div>
               </div>
             </div>
@@ -598,6 +618,7 @@ export default function AdminDashboard() {
                     {isSuperAdmin ? t('adminDashboard.grantAdminDescSuper') : t('adminDashboard.grantAdminDescAdmin')}
                   </p>
                   <div className="filter-bar" style={{ marginBottom: 0 }}>
+                    <input className="form-control" style={{ minWidth: 220 }} placeholder={t('adminDashboard.searchUsersPlaceholder')} value={promoteQuery} onChange={(e) => { setPromoteQuery(e.target.value); setGrantUserId(''); }} />
                     <select className="form-control" style={{ minWidth: 280 }} value={grantUserId} onChange={(e) => setGrantUserId(e.target.value)}>
                       <option value="">{t('adminDashboard.selectUserToPromote')}</option>
                       {promotableUsers.map((u) => <option key={u.id} value={u.id}>{u.email}{u.farmName ? ` (${u.farmName})` : ''}</option>)}
@@ -606,7 +627,7 @@ export default function AdminDashboard() {
                       <i className="fas fa-shield"></i> {t('adminDashboard.grantAdmin')}
                     </button>
                   </div>
-                  {promotableUsers.length === 0 && <p className="text-muted mt-16" style={{ fontSize: 13 }}>{t('adminDashboard.allUsersElevated')}</p>}
+                  {promotableUsers.length === 0 && !promotePage.loading && <p className="text-muted mt-16" style={{ fontSize: 13 }}>{promoteQuery ? t('adminDashboard.noMatchingUsers') : t('adminDashboard.allUsersElevated')}</p>}
                 </div>
               </div>
 
@@ -725,11 +746,11 @@ function ResourceChart({ byCollection }) {
   return <div className="chart-container"><canvas ref={canvasRef}></canvas></div>;
 }
 
-function RoleChart({ users }) {
+function RoleChart({ roles }) {
   const { t } = useTranslation();
-  const superAdmins = users.filter((u) => u.role === 'super_admin').length;
-  const admins = users.filter((u) => u.role === 'admin').length;
-  const plain = users.filter((u) => u.role === 'user').length;
+  const superAdmins = roles.super_admin || 0;
+  const admins = roles.admin || 0;
+  const plain = roles.user || 0;
   const total = superAdmins + admins + plain;
 
   const canvasRef = useCanvasChart(() => {

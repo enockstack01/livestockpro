@@ -2,8 +2,9 @@ const express = require('express');
 const { getDb } = require('../db');
 const { requireAuth, requireRole, getRole, roleOf, roleFromEmail, primaryEmail, clerkClient } = require('../authMiddleware');
 const { ACCOUNT_STATUSES, accounts, getAccount, forgetApproval } = require('../lib/accounts');
-const { farmerLink, endFarmerLink, notifyOrgAdmins } = require('../lib/orgs');
+const { farmerLink, endFarmerLink, notifyOrgAdmins, notify, audit } = require('../lib/orgs');
 const { livestockIdsFor } = require('../lib/livestockId');
+const { allClerkUsers, forgetUsers } = require('../lib/platformAdmins');
 
 const router = express.Router();
 
@@ -137,70 +138,175 @@ router.get('/spatial', async (req, res) => {
   }
 });
 
-/* GET /api/admin/users — every platform user + their resource footprint */
+/* GET /api/admin/users — the platform's accounts, a page at a time (like
+   CropManager's admin user list): every Clerk account is read (no 500
+   account ceiling), record counts come from one aggregation per collection,
+   and the details are filled in for the requested page only.
+   Query: page, perPage (1 to 100), q (email, name, farm, Livestock ID),
+   role (user | admin | super_admin | admins), status (approved | pending |
+   on_hold | rejected | none | banned), requests=1 (only submitted
+   requests), sort (createdAt | lastSignInAt | email | recordCount |
+   submittedAt), dir (asc | desc).
+   With summary=1 the overview figures for the whole platform come too. */
+const USER_SORTS = ['createdAt', 'lastSignInAt', 'email', 'recordCount', 'submittedAt'];
+
+/* The bell notification an account owner gets when their account is
+   reviewed (like CropManager): approved, put on hold or rejected, with the
+   reviewer's note. */
+const ACCOUNT_NOTICE = { approved: 'accountApproved', on_hold: 'accountOnHold', rejected: 'accountRejected' };
+
+/* An account's email for the activity log, read before a change. */
+async function emailOf(userId) {
+  try { return primaryEmail(await clerkClient.users.getUser(userId)); } catch { return ''; }
+}
+
 router.get('/users', async (req, res) => {
   try {
     const db = getDb();
-    const list = await clerkClient.users.getUserList({ limit: 500 });
-    const sorted = list.data.slice().sort((a, b) => b.createdAt - a.createdAt);
-    const accountDocs = await accounts().find({ _id: { $in: sorted.map((u) => u.id) } }).toArray();
+    let [clerkUsers, accountDocs, profileDocs, ...countLists] = await Promise.all([
+      allClerkUsers(),
+      accounts().find({}).toArray(),
+      db.collection('profiles').find({ deleted_at: null }, { projection: { user_id: 1, farm_name: 1, location: 1 } }).toArray(),
+      ...RESOURCE_COLLECTIONS.map((name) => db.collection(name).aggregate([{ $match: { deleted_at: null } }, { $group: { _id: '$user_id', n: { $sum: 1 } } }]).toArray())
+    ]);
+    /* The account list is cached for a few seconds; an account the database
+       already knows but the cache does not (a new sign-up) reloads it, so
+       new accounts show at once. */
+    const known = new Set(clerkUsers.map((u) => u.id));
+    if (accountDocs.some((a) => !known.has(a._id))) {
+      forgetUsers();
+      clerkUsers = await allClerkUsers();
+    }
     const accountById = new Map(accountDocs.map((a) => [a._id, a]));
-    const today = new Date().toISOString().slice(0, 10);
-    const usageDocs = await db.collection('ai_usage').find({ day: today, user_id: { $in: sorted.map((u) => u.id) } }).toArray();
-    const aiUsedById = new Map(usageDocs.map((d) => [d.user_id, d.total || 0]));
-    const livestockIds = await livestockIdsFor(sorted.map((u) => u.id));
-    /* The organization each farmer came through (link or registration), so a
-       reviewer can see who vouches for them. */
-    const orgLinks = await db.collection('farmer_organization').find({ farmer_id: { $in: sorted.map((u) => u.id) }, status: { $in: ['active', 'pending_consent'] } }).toArray();
-    const orgNames = new Map((await db.collection('organizations').find({ _id: { $in: [...new Set(orgLinks.map((l) => l.organization_id))] } }, { projection: { name: 1 } }).toArray()).map((o) => [o._id, o.name]));
-    const orgByUser = new Map(orgLinks.map((l) => [l.farmer_id, { id: l.organization_id, name: orgNames.get(l.organization_id) || '', via: l.consent_source || 'referral_link' }]));
+    const profileById = new Map(profileDocs.map((p) => [p.user_id, p]));
+    const countsBy = RESOURCE_COLLECTIONS.map((_, i) => new Map(countLists[i].map((c) => [c._id, c.n])));
 
-    const users = await Promise.all(sorted.map(async (u) => {
-      const [profile, ...counts] = await Promise.all([
-        db.collection('profiles').findOne({ user_id: u.id, deleted_at: null }),
-        ...RESOURCE_COLLECTIONS.map((name) => db.collection(name).countDocuments({ user_id: u.id, deleted_at: null }))
-      ]);
-      const byCollection = {};
-      RESOURCE_COLLECTIONS.forEach((name, i) => { byCollection[name] = counts[i]; });
-      const recordCount = counts.reduce((s, c) => s + c, 0);
+    /* A light row per account: enough to search, filter, sort and count. */
+    const rows = clerkUsers.map((u) => {
       const role = roleOf(u);
       const account = accountById.get(u.id);
+      const profile = profileById.get(u.id);
+      const byCollection = {};
+      RESOURCE_COLLECTIONS.forEach((name, i) => { byCollection[name] = countsBy[i].get(u.id) || 0; });
+      const recordCount = Object.values(byCollection).reduce((a, b) => a + b, 0);
       /* Same rule as lib/accounts.js: admins are always in, and users who
          had data before approval existed are grandfathered as approved. */
       let accountStatus = (account && account.status) || ((profile || recordCount > 0) ? 'approved' : 'none');
       if (role !== 'user') accountStatus = 'approved';
-      return {
-        id: u.id,
-        livestockId: livestockIds[u.id] || null,
-        email: primaryEmail(u),
-        createdAt: u.createdAt,
-        lastSignInAt: u.lastSignInAt,
-        banned: !!u.banned,
-        role,
-        farmName: (profile && profile.farm_name) || '',
-        location: (profile && profile.location) || '',
-        recordCount,
-        byCollection,
-        accountStatus,
-        accountType: (account && account.account_type) || (role === 'user' ? 'farmer' : null),
-        request: account && account.submitted_at ? {
-          fullName: account.full_name || '', farmName: account.farm_name || '', location: account.location || '',
-          phone: account.phone || '', herdSize: account.herd_size || '', livestockTypes: account.livestock_types || '',
-          notes: account.notes || '', submittedAt: account.submitted_at
-        } : null,
-        reviewNote: (account && account.review_note) || '',
-        reviewedAt: (account && account.reviewed_at) || null,
-        organization: orgByUser.get(u.id) || null,
-        aiUsedToday: aiUsedById.get(u.id) || 0,
-        aiDailyLimit: account && Number.isFinite(account.ai_daily_limit) ? account.ai_daily_limit : null
-      };
-    }));
+      return { u, role, account, profile, byCollection, recordCount, accountStatus, email: primaryEmail(u) };
+    });
 
-    res.json({ data: users, error: null });
+    const q = String(req.query.q || '').trim().toLowerCase();
+    const roleFilter = String(req.query.role || '');
+    const statusFilter = String(req.query.status || '');
+    const onlyRequests = req.query.requests === '1';
+    const livestockIds = q ? await livestockIdsFor(rows.map((r) => r.u.id)) : {};
+    let list = rows.filter((r) => {
+      if (roleFilter === 'admins' ? r.role === 'user' : roleFilter && r.role !== roleFilter) return false;
+      if (statusFilter === 'banned' ? !r.u.banned : statusFilter && (r.accountStatus !== statusFilter || r.u.banned)) return false;
+      if (onlyRequests && !(r.account && r.account.submitted_at) && r.accountStatus !== 'pending') return false;
+      if (q) {
+        const hay = [r.email, r.account && r.account.full_name, r.profile && r.profile.farm_name, r.account && r.account.farm_name, livestockIds[r.u.id]];
+        if (!hay.some((v) => String(v || '').toLowerCase().includes(q))) return false;
+      }
+      return true;
+    });
+
+    const sort = USER_SORTS.includes(req.query.sort) ? req.query.sort : (onlyRequests ? 'submittedAt' : 'createdAt');
+    const dir = req.query.dir === 'asc' ? 1 : -1;
+    const key = (r) => (sort === 'email' ? r.email : sort === 'recordCount' ? r.recordCount : sort === 'submittedAt' ? String((r.account && r.account.submitted_at) || '') : r.u[sort] || 0);
+    list = list.sort((a, b) => (key(a) < key(b) ? -dir : key(a) > key(b) ? dir : 0));
+
+    const perPage = Math.min(100, Math.max(1, parseInt(req.query.perPage, 10) || 25));
+    const total = list.length;
+    const totalPages = Math.max(1, Math.ceil(total / perPage));
+    const page = Math.min(totalPages, Math.max(1, parseInt(req.query.page, 10) || 1));
+    const data = await detailRows(db, list.slice((page - 1) * perPage, page * perPage));
+
+    const body = { data, page, perPage, total, totalPages, error: null };
+    if (req.query.summary === '1') body.summary = await usersSummary(db, rows);
+    res.json(body);
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
   }
 });
+
+/* The full admin row for the accounts on one page. */
+async function detailRows(db, pageRows) {
+  const ids = pageRows.map((r) => r.u.id);
+  const today = new Date().toISOString().slice(0, 10);
+  const [usageDocs, livestockIds, orgLinks] = await Promise.all([
+    db.collection('ai_usage').find({ day: today, user_id: { $in: ids } }).toArray(),
+    livestockIdsFor(ids),
+    /* The organization each farmer came through (link or registration), so a
+       reviewer can see who vouches for them. */
+    db.collection('farmer_organization').find({ farmer_id: { $in: ids }, status: { $in: ['active', 'pending_consent'] } }).toArray()
+  ]);
+  const aiUsedById = new Map(usageDocs.map((d) => [d.user_id, d.total || 0]));
+  const orgNames = new Map((await db.collection('organizations').find({ _id: { $in: [...new Set(orgLinks.map((l) => l.organization_id))] } }, { projection: { name: 1 } }).toArray()).map((o) => [o._id, o.name]));
+  const orgByUser = new Map(orgLinks.map((l) => [l.farmer_id, { id: l.organization_id, name: orgNames.get(l.organization_id) || '', via: l.consent_source || 'referral_link' }]));
+  return pageRows.map(({ u, role, account, profile, byCollection, recordCount, accountStatus, email }) => ({
+    id: u.id,
+    livestockId: livestockIds[u.id] || null,
+    email,
+    createdAt: u.createdAt,
+    lastSignInAt: u.lastSignInAt,
+    banned: !!u.banned,
+    role,
+    farmName: (profile && profile.farm_name) || '',
+    location: (profile && profile.location) || '',
+    recordCount,
+    byCollection,
+    accountStatus,
+    accountType: (account && account.account_type) || (role === 'user' ? 'farmer' : null),
+    request: account && account.submitted_at ? {
+      fullName: account.full_name || '', farmName: account.farm_name || '', location: account.location || '',
+      phone: account.phone || '', herdSize: account.herd_size || '', livestockTypes: account.livestock_types || '',
+      notes: account.notes || '', submittedAt: account.submitted_at
+    } : null,
+    reviewNote: (account && account.review_note) || '',
+    reviewedAt: (account && account.reviewed_at) || null,
+    organization: orgByUser.get(u.id) || null,
+    aiUsedToday: aiUsedById.get(u.id) || 0,
+    aiDailyLimit: account && Number.isFinite(account.ai_daily_limit) ? account.ai_daily_limit : null
+  }));
+}
+
+/* Overview figures for every account (the dashboard's first tab). */
+async function usersSummary(db, rows) {
+  const now = Date.now();
+  const day = 24 * 60 * 60 * 1000;
+  const engagement = { today: 0, week: 0, month: 0, inactive: 0 };
+  const roles = { super_admin: 0, admin: 0, user: 0 };
+  const statuses = {};
+  rows.forEach((r) => {
+    const age = r.u.lastSignInAt ? now - r.u.lastSignInAt : Infinity;
+    if (age <= day) engagement.today++;
+    else if (age <= 7 * day) engagement.week++;
+    else if (age <= 30 * day) engagement.month++;
+    else engagement.inactive++;
+    roles[r.role] = (roles[r.role] || 0) + 1;
+    if (r.role === 'user') statuses[r.accountStatus] = (statuses[r.accountStatus] || 0) + 1;
+  });
+  const since14 = new Date();
+  since14.setHours(0, 0, 0, 0);
+  since14.setDate(since14.getDate() - 13);
+  const byNewest = rows.slice().sort((a, b) => b.u.createdAt - a.u.createdAt);
+  const byRecords = rows.filter((r) => r.recordCount > 0).sort((a, b) => b.recordCount - a.recordCount);
+  const [recentSignups, topFarms] = await Promise.all([detailRows(db, byNewest.slice(0, 5)), detailRows(db, byRecords.slice(0, 5))]);
+  return {
+    total: rows.length,
+    pending: statuses.pending || 0,
+    banned: rows.filter((r) => r.u.banned).length,
+    admins: roles.admin + roles.super_admin,
+    roles,
+    statuses,
+    engagement,
+    signups14d: rows.filter((r) => r.u.createdAt >= since14.getTime()).map((r) => r.u.createdAt),
+    recentSignups,
+    topFarms
+  };
+}
 
 /* PATCH /api/admin/users/:id/status  { banned } — admin or super_admin.
    A plain admin may only act on regular users; only a super_admin may
@@ -218,6 +324,8 @@ router.patch('/users/:id/status', async (req, res) => {
     const banned = !!req.body.banned;
     if (banned) await clerkClient.users.banUser(targetId);
     else await clerkClient.users.unbanUser(targetId);
+    forgetUsers();
+    await audit(req, banned ? 'user.ban' : 'user.unban', { targetType: 'user', targetId, details: { email: await emailOf(targetId) } });
     res.json({ data: { id: targetId, banned }, error: null });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
@@ -243,7 +351,7 @@ router.patch('/users/:id/account', async (req, res) => {
     if (targetRole !== 'user' && req.user.role !== 'super_admin') {
       return res.status(403).json({ error: { message: "Only a super admin can change an admin's account." } });
     }
-    await getAccount(targetId);
+    const before = await getAccount(targetId);
     const now = new Date().toISOString();
     const note = typeof (req.body && req.body.note) === 'string' ? req.body.note.trim().slice(0, 500) : '';
     await accounts().updateOne(
@@ -265,6 +373,9 @@ router.patch('/users/:id/account', async (req, res) => {
         await notifyOrgAdmins(orgLink.org._id, 'farmerLeft', { name: orgLink.org.name, farmer: (await accounts().findOne({ _id: targetId }, { projection: { full_name: 1 } }) || {}).full_name || 'A farmer' }, '/organization/farmers');
       }
     }
+    const from = (before && before.status) || 'none';
+    await audit(req, 'account.status', { targetType: 'user', targetId, details: { email: await emailOf(targetId), from, to: status, note } });
+    if (from !== status || note) await notify(targetId, ACCOUNT_NOTICE[status], { note }, status === 'approved' ? '/dashboard' : '/settings');
     res.json({ data: { id: targetId, status }, error: null });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
@@ -294,6 +405,7 @@ router.patch('/users/:id/ai-limit', async (req, res) => {
         : { $set: { ai_daily_limit: limit, updated_at: now }, $setOnInsert: { user_id: targetId, created_at: now } },
       { upsert: limit !== null }
     );
+    await audit(req, 'user.ai_limit', { targetType: 'user', targetId, details: { email: await emailOf(targetId), to: limit } });
     res.json({ data: { id: targetId, aiDailyLimit: limit }, error: null });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
@@ -327,14 +439,17 @@ router.patch('/users/:id/role', async (req, res) => {
       return res.status(400).json({ error: { message: 'This account is a built in administrator; its role cannot be changed here.' } });
     }
 
+    const targetUser = await clerkClient.users.getUser(targetId);
+    const fromRole = roleOf(targetUser);
     if (role !== 'super_admin') {
-      const list = await clerkClient.users.getUserList({ limit: 500 });
-      const superAdmins = list.data.filter((u) => roleOf(u) === 'super_admin');
+      const superAdmins = (await allClerkUsers()).filter((u) => roleOf(u) === 'super_admin');
       if (superAdmins.length <= 1 && superAdmins.some((u) => u.id === targetId)) {
         return res.status(400).json({ error: { message: 'Cannot remove the last super admin.' } });
       }
     }
     await clerkClient.users.updateUserMetadata(targetId, { publicMetadata: { role } });
+    forgetUsers();
+    await audit(req, 'user.role', { targetType: 'user', targetId, details: { email: primaryEmail(targetUser), from: fromRole, to: role } });
     res.json({ data: { id: targetId, role }, error: null });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
@@ -678,6 +793,7 @@ router.delete('/users/:id', async (req, res) => {
       return res.status(403).json({ error: { message: 'Only a super admin can delete an admin account.' } });
     }
     const db = getDb();
+    await audit(req, 'user.delete', { targetType: 'user', targetId, details: { email: await emailOf(targetId) } });
     const orgLink = await farmerLink(targetId);
     if (orgLink) await endFarmerLink(targetId, orgLink.org._id, 'removed', req.user.id);
     await db.collection('organization_members').updateMany({ user_id: targetId, status: 'active' }, { $set: { status: 'removed', removed_at: new Date().toISOString() } });
@@ -685,6 +801,7 @@ router.delete('/users/:id', async (req, res) => {
     await db.collection('farmer_stats').deleteMany({ farmer_id: targetId });
     await clerkClient.users.deleteUser(targetId);
     forgetApproval(targetId);
+    forgetUsers();
     res.json({ data: {}, error: null });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
