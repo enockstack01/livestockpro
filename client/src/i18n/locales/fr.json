@@ -1305,7 +1305,7 @@
       "failed": "L’IA hors ligne n’a pas pu terminer : {{message}}",
       "limits": "L’IA hors ligne est un petit modèle qui tourne sur ce téléphone. Elle est plus lente que l’IA en ligne et fait plus d’erreurs, surtout dans d’autres langues que l’anglais. Confirmez toujours avec un vétérinaire.",
       "terms": "Licence du modèle d’IA hors ligne",
-      "unsupported": "Ce téléphone ne peut pas exécuter l’IA hors ligne (il faut un téléphone 64 bits avec au moins 6 Go de mémoire). La vérification des photos sur ce téléphone fonctionne toujours.",
+      "unsupported": "Ce téléphone ne peut pas exécuter l’IA hors ligne (il faut un téléphone 64 bits). La vérification des photos sur ce téléphone fonctionne toujours.",
       "onMobileData": "Vous êtes en données mobiles : l’IA hors ligne pèse {{mb}} Mo.",
       "assistant": "IA LivestockPro (hors ligne)",
       "writing": "Rédaction sur ce téléphone...",

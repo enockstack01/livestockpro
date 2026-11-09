@@ -1305,7 +1305,7 @@
       "failed": "La IA sin conexión no pudo terminar: {{message}}",
       "limits": "La IA sin conexión es un modelo pequeño que funciona en este teléfono. Es más lenta que la IA en línea y comete más errores, sobre todo en idiomas distintos del inglés. Confirme siempre con un veterinario.",
       "terms": "Licencia del modelo de IA sin conexión",
-      "unsupported": "Este teléfono no puede usar la IA sin conexión (necesita un teléfono de 64 bits con al menos 6 GB de memoria). La revisión de fotos en este teléfono sigue funcionando.",
+      "unsupported": "Este teléfono no puede usar la IA sin conexión (necesita un teléfono de 64 bits). La revisión de fotos en este teléfono sigue funcionando.",
       "onMobileData": "Está usando datos móviles: la IA sin conexión es una descarga de {{mb}} MB.",
       "assistant": "IA de LivestockPro (sin conexión)",
       "writing": "Escribiendo en este teléfono...",

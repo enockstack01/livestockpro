@@ -1305,7 +1305,7 @@
       "failed": "AI idakeneye murandasi ntiyashoboye kurangiza: {{message}}",
       "limits": "AI idakeneye murandasi ni icyitegererezo gito gikora kuri iyi telefone. Iratinda kurusha AI yo kuri murandasi kandi ikora amakosa menshi, cyane cyane mu ndimi zitari Icyongereza. Buri gihe byemeze na veterineri.",
       "terms": "Uruhushya rwa AI ikora nta murandasi",
-      "unsupported": "Iyi telefone ntishobora gukoresha AI idakeneye murandasi (bisaba telefone ya bits 64 ifite nibura GB 6 z’ububiko bw’akanya gato). Isuzuma ry’amafoto kuri iyi telefone rirakora.",
+      "unsupported": "Iyi telefone ntishobora gukoresha AI idakeneye murandasi (bisaba telefone ya bits 64). Isuzuma ry’amafoto kuri iyi telefone rirakora.",
       "onMobileData": "Uri kuri interineti ya telefone: AI idakeneye murandasi ifite {{mb}} MB.",
       "assistant": "AI ya LivestockPro (idakeneye murandasi)",
       "writing": "Irimo kwandikira kuri iyi telefone...",

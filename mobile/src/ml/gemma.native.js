@@ -6,8 +6,8 @@ import { connectivity, subscribeConnectivity } from '../lib/connectivity';
 import { DIAGNOSIS_SCHEMA, SAMPLING, chatMessages, cleanAnswer, diagnosisMessages } from './offlinePrompts';
 import { parseReport } from './offlineAi';
 
-/* The offline AI: Gemma 4 E2B (instruction tuned, 4-bit Q4_0 GGUF from the
-   llama.cpp team, 2.8 GB, Apache 2.0) run on the phone by llama.rn, next to
+/* The offline AI: Gemma 3 1B (instruction tuned, 4-bit Q4_0 GGUF, 722 MB)
+   run on the phone by llama.rn, next to
    the YOLO11n detector (src/ml/detector). Online, the server's AI does this
    work; offline, this model writes the diagnosis and answers questions.
 
@@ -16,27 +16,24 @@ import { parseReport } from './offlineAi';
    revision of the Hugging Face repository, carrying on where it stopped
    after a dropped connection or a restart. Its size is checked and it is
    kept in the app's files. Settings can also start it on mobile data.
-   llama.rn ships 64-bit ARM libraries only, and the model needs a phone
-   with about 6 GB of memory; on other phones the offline AI is not offered
-   (supported() is false). */
+   llama.rn ships 64-bit ARM libraries only, so on 32-bit phones the offline
+   AI is not offered (supported() is false). */
 
 /* name is what the app shows: the model itself is not named to users. */
 export const GEMMA = {
   name: 'LivestockPro offline AI',
-  file: 'gemma-4-E2B-it-Q4_0.gguf',
-  url: 'https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF/resolve/6938c58e698502037401a5f19f6905f2fb2f7dee/gemma-4-E2B-it-Q4_0.gguf',
-  bytes: 2841481184,
-  sha256: '8e30dff3ac4c8434c49a7036fa15564bdbb6044e42bf04550bf1a096ad7e6a52',
-  terms: 'https://www.apache.org/licenses/LICENSE-2.0'
+  file: 'gemma-3-1b-it-Q4_0.gguf',
+  url: 'https://huggingface.co/unsloth/gemma-3-1b-it-GGUF/resolve/f0b45be0aac41bd6a100a4b5734cad5f67255bfb/gemma-3-1b-it-Q4_0.gguf',
+  bytes: 721918496,
+  sha256: '27ee88e03be02e9ba73def9a819d570d8ad73716e50769e87f374ae394b0276e',
+  terms: 'https://ai.google.dev/gemma/terms'
 };
 
 const DIR = `${FileSystem.documentDirectory}models/`;
 const PATH = `${DIR}${GEMMA.file}`;
 const PART = `${PATH}.part`;
-// The earlier, smaller offline model: removed to give its space back.
-const OLD_FILES = ['gemma-3-1b-it-Q4_0.gguf', 'gemma-3-1b-it-Q4_0.gguf.part'];
-// Phones sold with 6 GB report a little less; 4 GB phones cannot hold the model.
-const MIN_MEMORY_BYTES = 5e9;
+// The larger model tried before (Gemma 4 E2B, 2.8 GB): removed to give its space back.
+const OLD_FILES = ['gemma-4-E2B-it-Q4_0.gguf', 'gemma-4-E2B-it-Q4_0.gguf.part'];
 // Room for the file plus some to spare, so the phone is not left full.
 const SPARE_BYTES = 300 * 1024 * 1024;
 // Free the model's memory when it has not been used for a while.
@@ -50,12 +47,15 @@ function llama() {
   return llamaModule;
 }
 
-/* Whether this phone can run the offline AI at all: the 64-bit ARM build of
-   llama.rn is present and there is enough memory (unknown memory: allowed). */
+/* Whether this phone can run the offline AI at all: the 64-bit build of
+   llama.rn is present and the phone itself is 64-bit. */
 export function supported() {
   const m = llama();
   if (!m) return false;
-  if (Device.totalMemory && Device.totalMemory < MIN_MEMORY_BYTES) return false;
+  // 32-bit phones (armeabi-v7a) install the app but have no llama.rn library:
+  // they keep the photo check and the online AI, and are never offered the download.
+  const abis = Device.supportedCpuArchitectures;
+  if (Array.isArray(abis) && abis.length && !abis.some((a) => /arm64|x86_64/i.test(a))) return false;
   try {
     const { NativeModules, TurboModuleRegistry } = require('react-native');
     return Boolean((TurboModuleRegistry && TurboModuleRegistry.get && TurboModuleRegistry.get('RNLlama')) || NativeModules.RNLlama);
@@ -178,7 +178,7 @@ async function autoTry() {
 
 /* Called once when the app starts (app/_layout.js): fetches the model on
    Wi-Fi as soon as it can, and again whenever Wi-Fi comes back. Mobile data
-   is not used by itself, as 2.8 GB can cost a farmer a lot. */
+   is not used by itself, as 722 MB can cost a farmer a lot. */
 export async function startAutoDownload() {
   if (autoStarted) return;
   autoStarted = true;
@@ -260,8 +260,8 @@ function context() {
       if (!m || !supported()) throw new Error('This phone cannot run the offline AI.');
       const info = await FileSystem.getInfoAsync(PATH);
       if (!info.exists) throw new Error('The offline AI is not downloaded yet. Download it in Settings.');
-      // The largest diagnosis prompt is about 2,000 tokens; a report is up to 2,400 more.
-      return m.initLlama({ model: PATH, n_ctx: 5120, n_batch: 512, n_gpu_layers: 0, use_mlock: false });
+      // The largest diagnosis prompt is about 2,000 tokens; a report is up to 1,500 more.
+      return m.initLlama({ model: PATH, n_ctx: 4096, n_batch: 512, n_gpu_layers: 0, use_mlock: false });
     })().catch((err) => { contextPromise = null; throw err; });
   }
   touch();
@@ -339,8 +339,8 @@ export function diagnose({ language, facts, vision, photoCount, reference, onPro
       // No thinking first: on a phone it would add minutes before the report.
       enable_thinking: false,
       response_format: { type: 'json_schema', json_schema: { strict: true, schema: DIAGNOSIS_SCHEMA } },
-      // A report is usually about 700 tokens; this leaves room inside the 5,120 context.
-      n_predict: 2400,
+      // A report is usually about 700 tokens; this leaves room inside the 4,096 context.
+      n_predict: 1500,
       temperature: SAMPLING.temperature,
       top_p: SAMPLING.top_p,
       top_k: SAMPLING.top_k,

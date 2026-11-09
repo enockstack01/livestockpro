@@ -1305,7 +1305,7 @@
       "failed": "The offline AI could not finish: {{message}}",
       "limits": "The offline AI is a small model running on this phone. It is slower than the online AI and makes more mistakes, especially in languages other than English. Always confirm with a vet.",
       "terms": "Offline AI model licence",
-      "unsupported": "This phone cannot run the offline AI (it needs a 64-bit phone with at least 6 GB of memory). The photo check on this phone still works.",
+      "unsupported": "This phone cannot run the offline AI (it needs a 64-bit phone). The photo check on this phone still works.",
       "onMobileData": "You are on mobile data: the offline AI is a {{mb}} MB download.",
       "assistant": "LivestockPro AI (offline)",
       "writing": "Writing on this phone...",

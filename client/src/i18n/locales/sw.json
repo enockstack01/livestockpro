@@ -1305,7 +1305,7 @@
       "failed": "AI bila mtandao haikuweza kumaliza: {{message}}",
       "limits": "AI bila mtandao ni modeli ndogo inayoendeshwa kwenye simu hii. Ni polepole kuliko AI ya mtandaoni na hukosea zaidi, hasa kwa lugha zisizo Kiingereza. Thibitisha kila mara na daktari wa mifugo.",
       "terms": "Leseni ya modeli ya AI ya nje ya mtandao",
-      "unsupported": "Simu hii haiwezi kuendesha AI bila mtandao (inahitaji simu ya biti 64 yenye kumbukumbu ya angalau GB 6). Ukaguzi wa picha kwenye simu hii bado unafanya kazi.",
+      "unsupported": "Simu hii haiwezi kuendesha AI bila mtandao (inahitaji simu ya biti 64). Ukaguzi wa picha kwenye simu hii bado unafanya kazi.",
       "onMobileData": "Uko kwenye data ya simu: AI bila mtandao ni upakuaji wa {{mb}} MB.",
       "assistant": "AI ya LivestockPro (bila mtandao)",
       "writing": "Inaandika kwenye simu hii...",

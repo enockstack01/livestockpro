@@ -1305,7 +1305,7 @@
       "failed": "离线 AI 未能完成：{{message}}",
       "limits": "离线 AI 是在本手机上运行的小模型。它比在线 AI 慢，出错更多，尤其是英语以外的语言。请务必与兽医确认。",
       "terms": "离线 AI 模型许可",
-      "unsupported": "本手机无法运行离线 AI（需要内存至少 6 GB 的 64 位手机）。本手机上的照片检查仍可使用。",
+      "unsupported": "本手机无法运行离线 AI（需要 64 位手机）。本手机上的照片检查仍可使用。",
       "onMobileData": "你正在使用移动数据：离线 AI 下载大小为 {{mb}} MB。",
       "assistant": "LivestockPro AI（离线）",
       "writing": "正在本手机上撰写...",

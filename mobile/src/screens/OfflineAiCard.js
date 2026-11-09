@@ -7,8 +7,8 @@ import { useTheme } from '../theme/ThemeProvider';
 import { useToast } from '../lib/toast';
 import { Button, Card, CardBody, CardHeader, Muted } from '../ui/kit';
 
-/* Settings: the offline AI (Gemma 4 E2B with the YOLO11n detector, src/ml).
-   The app downloads it by itself on Wi-Fi (about 2.8 GB); here it can be
+/* Settings: the offline AI (Gemma 3 1B with the YOLO11n detector, src/ml).
+   The app downloads it by itself on Wi-Fi (about 722 MB); here it can be
    fetched now on mobile data, stopped or removed. Then the diagnosis and
    Ask LivestockPro work on the phone with no internet. */
 export default function OfflineAiCard() {

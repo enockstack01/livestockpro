@@ -1305,7 +1305,7 @@
       "failed": "A IA offline não conseguiu terminar: {{message}}",
       "limits": "A IA offline é um modelo pequeno que funciona neste telemóvel. É mais lenta do que a IA online e erra mais, sobretudo em línguas que não o inglês. Confirme sempre com um veterinário.",
       "terms": "Licença do modelo de IA offline",
-      "unsupported": "Este telemóvel não consegue executar a IA offline (precisa de um telemóvel de 64 bits com pelo menos 6 GB de memória). A verificação de fotos neste telemóvel continua a funcionar.",
+      "unsupported": "Este telemóvel não consegue executar a IA offline (precisa de um telemóvel de 64 bits). A verificação de fotos neste telemóvel continua a funcionar.",
       "onMobileData": "Está a usar dados móveis: a IA offline é uma transferência de {{mb}} MB.",
       "assistant": "IA do LivestockPro (offline)",
       "writing": "A escrever neste telemóvel...",

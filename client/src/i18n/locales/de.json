@@ -1305,7 +1305,7 @@
       "failed": "Die Offline-KI konnte nicht abschließen: {{message}}",
       "limits": "Die Offline-KI ist ein kleines Modell, das auf diesem Telefon läuft. Sie ist langsamer als die Online-KI und macht mehr Fehler, besonders in anderen Sprachen als Englisch. Bestätigen Sie immer mit einem Tierarzt.",
       "terms": "Lizenz des Offline-KI-Modells",
-      "unsupported": "Dieses Telefon kann die Offline-KI nicht ausführen (es braucht ein 64-Bit-Telefon mit mindestens 6 GB Arbeitsspeicher). Die Fotoprüfung auf diesem Telefon funktioniert weiterhin.",
+      "unsupported": "Dieses Telefon kann die Offline-KI nicht ausführen (es braucht ein 64-Bit-Telefon). Die Fotoprüfung auf diesem Telefon funktioniert weiterhin.",
       "onMobileData": "Sie nutzen mobile Daten: Die Offline-KI ist ein Download von {{mb}} MB.",
       "assistant": "LivestockPro-KI (offline)",
       "writing": "Wird auf diesem Telefon geschrieben...",

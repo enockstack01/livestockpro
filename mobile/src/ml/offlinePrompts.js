@@ -1,4 +1,4 @@
-/* The offline AI's instructions (Gemma 4 E2B on the phone, src/ml/gemma.js).
+/* The offline AI's instructions (Gemma 3 1B on the phone, src/ml/gemma.js).
    They follow the online rules Claude Haiku gets in server/lib/ai.js and
    server/routes/aiRoutes.js, so offline answers read like online ones:
    same voice, same diagnosis rules (medicines and doses included), the same

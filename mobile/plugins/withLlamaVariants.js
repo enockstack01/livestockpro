@@ -15,10 +15,18 @@ const VARIANTS = [
   'rnllama_x86_64'
 ].join(',');
 
+/* The APK carries every Android CPU type, so it installs on 32-bit phones
+   (armeabi-v7a, x86) as well as 64-bit ones. llama.rn has no 32-bit build:
+   there the offline AI is simply not offered (gemma.native.js supported()),
+   and the photo check, the records and the online AI work as everywhere. */
+const ARCHITECTURES = 'armeabi-v7a,arm64-v8a,x86,x86_64';
+
 module.exports = function withLlamaVariants(config) {
   return withGradleProperties(config, (cfg) => {
-    cfg.modResults = cfg.modResults.filter((item) => !(item.type === 'property' && item.key === 'rnllamaVariants'));
+    const ours = ['rnllamaVariants', 'reactNativeArchitectures'];
+    cfg.modResults = cfg.modResults.filter((item) => !(item.type === 'property' && ours.includes(item.key)));
     cfg.modResults.push({ type: 'property', key: 'rnllamaVariants', value: VARIANTS });
+    cfg.modResults.push({ type: 'property', key: 'reactNativeArchitectures', value: ARCHITECTURES });
     return cfg;
   });
 };
