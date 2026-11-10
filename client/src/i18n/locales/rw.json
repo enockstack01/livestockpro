@@ -431,7 +431,10 @@
     "appVersion": "LivestockPro Mobile v{{version}}",
     "livestockId": "Nomero ya Livestock",
     "copyId": "Koporora nomero yawe ya Livestock",
-    "idCopied": "Nomero ya Livestock yakoporowe"
+    "idCopied": "Nomero ya Livestock yakoporowe",
+    "myData": "Amakuru yanjye",
+    "myDataHelp": "Manura ibyo wanditse byose (amatungo, ubuzima, kugaburira, korora, umusaruro, imari n'imirimo, hamwe n'amakuru y'ubworozi bwawe) igihe cyose ushaka. Hitamo Excel, CSV, PDF cyangwa JSON kugira ngo ubike kopi yuzuye.",
+    "downloadMyData": "Manura amakuru yanjye yose"
   },
   "dashboardPage": {
     "title": "Ikibaho",
@@ -1946,12 +1949,14 @@
     "formats": {
       "pdf": "PDF",
       "xlsx": "Excel",
-      "csv": "CSV"
+      "csv": "CSV",
+      "json": "JSON"
     },
     "formatHints": {
       "pdf": "Inyandiko iriho ikirango yo gucapa cyangwa gusangiza",
       "xlsx": "Imbonerahamwe, urupapuro rumwe kuri buri gice",
-      "csv": "Amakuru gusa ku porogaramu iyo ari yo yose"
+      "csv": "Amakuru gusa ku porogaramu iyo ari yo yose",
+      "json": "Kopi yuzuye ya buri nyandiko, yo kubika"
     },
     "fields": {
       "district": "Akarere",
@@ -1962,7 +1967,8 @@
     "farm": "Ifamu",
     "generated": "Byakozwe",
     "filters": "Iyungurura",
-    "page": "Urupapuro {{page}} kuri {{pages}}"
+    "page": "Urupapuro {{page}} kuri {{pages}}",
+    "allDataTitle": "Amakuru yanjye yose ya LivestockPro"
   },
   "calendar": {
     "title": "Kalendari",

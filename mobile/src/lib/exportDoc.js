@@ -15,9 +15,10 @@ import { sheetsToXlsx } from './xlsx';
 const MIME = {
   pdf: 'application/pdf',
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  csv: 'text/csv'
+  csv: 'text/csv',
+  json: 'application/json'
 };
-const UTI = { pdf: 'com.adobe.pdf', xlsx: 'org.openxmlformats.spreadsheetml.sheet', csv: 'public.comma-separated-values-text' };
+const UTI = { pdf: 'com.adobe.pdf', xlsx: 'org.openxmlformats.spreadsheetml.sheet', csv: 'public.comma-separated-values-text', json: 'public.json' };
 
 /* A4 in points; landscape for wide tables. */
 const A4 = { width: 595, height: 842 };
@@ -39,6 +40,15 @@ async function share(file, format) {
 
 export async function exportDoc(doc, format, t, lang) {
   const name = exportFileName(doc.title, format);
+
+  if (format === 'json') {
+    const text = JSON.stringify(doc.raw, null, 2);
+    if (Platform.OS === 'web') { downloadOnWeb(text, name, MIME.json); return true; }
+    const file = new File(Paths.cache, name);
+    file.create({ overwrite: true });
+    file.write(text);
+    return share(file, format);
+  }
 
   if (format === 'csv') {
     const csv = docToCsv(doc);

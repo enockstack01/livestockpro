@@ -9,12 +9,13 @@ import { buildRecordExport } from '../../../shared/recordExport.js';
 const FORMATS = [
   { key: 'pdf', icon: 'fa-file-pdf' },
   { key: 'xlsx', icon: 'fa-file-excel' },
-  { key: 'csv', icon: 'fa-file-csv' }
+  { key: 'csv', icon: 'fa-file-csv' },
+  { key: 'json', icon: 'fa-file-code' }
 ];
 
 /* "Export" button with PDF, Excel and CSV. `build` returns the export
    document (shared/recordExport.js) for what the page shows right now. */
-export default function ExportMenu({ build, disabled, label, primary }) {
+export default function ExportMenu({ build, disabled, label, primary, formats = ['pdf', 'xlsx', 'csv'] }) {
   const { t, i18n } = useTranslation();
   const showToast = useToast();
   const [open, setOpen] = useState(false);
@@ -49,7 +50,7 @@ export default function ExportMenu({ build, disabled, label, primary }) {
         <i className={`fas ${busy ? 'fa-spinner fa-spin' : 'fa-file-export'}`}></i> {busy ? t('exports.preparing') : label || t('exports.export')} <i className="fas fa-chevron-down export-caret"></i>
       </button>
       <div className={`export-dropdown${open ? ' show' : ''}`} role="menu">
-        {FORMATS.map((f) => (
+        {FORMATS.filter((f) => formats.includes(f.key)).map((f) => (
           <button key={f.key} type="button" role="menuitem" className="export-option" onClick={() => run(f.key)}>
             <span className={`export-icon ${f.key}`}><i className={`fas ${f.icon}`}></i></span>
             <span><strong>{t(`exports.formats.${f.key}`)}</strong><small>{t(`exports.formatHints.${f.key}`)}</small></span>

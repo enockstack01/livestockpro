@@ -431,7 +431,10 @@
     "appVersion": "LivestockPro Mobile v{{version}}",
     "livestockId": "ID de Livestock",
     "copyId": "Copiar su ID de Livestock",
-    "idCopied": "ID de Livestock copiado"
+    "idCopied": "ID de Livestock copiado",
+    "myData": "Mis datos",
+    "myDataHelp": "Descargue en cualquier momento todo lo que ha registrado (animales, salud, alimentación, reproducción, producción, finanzas y tareas, con el perfil de su granja). Elija Excel, CSV, PDF o JSON para una copia de seguridad completa.",
+    "downloadMyData": "Descargar todos mis datos"
   },
   "dashboardPage": {
     "title": "Panel",
@@ -1946,12 +1949,14 @@
     "formats": {
       "pdf": "PDF",
       "xlsx": "Excel",
-      "csv": "CSV"
+      "csv": "CSV",
+      "json": "JSON"
     },
     "formatHints": {
       "pdf": "Documento con la marca para imprimir o compartir",
       "xlsx": "Hoja de cálculo, una hoja por sección",
-      "csv": "Datos simples para cualquier programa"
+      "csv": "Datos simples para cualquier programa",
+      "json": "Copia completa de cada registro, para copias de seguridad"
     },
     "fields": {
       "district": "Distrito",
@@ -1962,7 +1967,8 @@
     "farm": "Granja",
     "generated": "Generado",
     "filters": "Filtros",
-    "page": "Página {{page}} de {{pages}}"
+    "page": "Página {{page}} de {{pages}}",
+    "allDataTitle": "Todos mis datos de LivestockPro"
   },
   "calendar": {
     "title": "Calendario",

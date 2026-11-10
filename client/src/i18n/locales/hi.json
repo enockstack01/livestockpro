@@ -431,7 +431,10 @@
     "appVersion": "LivestockPro Mobile v{{version}}",
     "livestockId": "Livestock आईडी",
     "copyId": "अपनी Livestock आईडी कॉपी करें",
-    "idCopied": "Livestock आईडी कॉपी हो गई"
+    "idCopied": "Livestock आईडी कॉपी हो गई",
+    "myData": "मेरा डेटा",
+    "myDataHelp": "आपने जो कुछ दर्ज किया है (पशु, स्वास्थ्य, आहार, प्रजनन, उत्पादन, वित्त और कार्य, आपके फ़ार्म प्रोफ़ाइल सहित) उसे जब चाहें डाउनलोड करें। पूरे बैकअप के लिए Excel, CSV, PDF या JSON चुनें।",
+    "downloadMyData": "मेरा सारा डेटा डाउनलोड करें"
   },
   "dashboardPage": {
     "title": "डैशबोर्ड",
@@ -1946,12 +1949,14 @@
     "formats": {
       "pdf": "PDF",
       "xlsx": "Excel",
-      "csv": "CSV"
+      "csv": "CSV",
+      "json": "JSON"
     },
     "formatHints": {
       "pdf": "प्रिंट या साझा करने के लिए ब्रांड वाला दस्तावेज़",
       "xlsx": "स्प्रेडशीट, हर भाग के लिए एक शीट",
-      "csv": "किसी भी प्रोग्राम के लिए सादा डेटा"
+      "csv": "किसी भी प्रोग्राम के लिए सादा डेटा",
+      "json": "बैकअप के लिए हर रिकॉर्ड की पूरी प्रति"
     },
     "fields": {
       "district": "ज़िला",
@@ -1962,7 +1967,8 @@
     "farm": "फ़ार्म",
     "generated": "बनाया गया",
     "filters": "फ़िल्टर",
-    "page": "पृष्ठ {{page}} / {{pages}}"
+    "page": "पृष्ठ {{page}} / {{pages}}",
+    "allDataTitle": "मेरा सारा LivestockPro डेटा"
   },
   "calendar": {
     "title": "कैलेंडर",

@@ -10,6 +10,7 @@ import Modal from '../components/Modal.jsx';
 import { useAccount } from '../components/AccountGate.jsx';
 import { accountDisplayName } from '../../../shared/account';
 import MyOrganizationCard from '../components/org/MyOrganization.jsx';
+import MyDataCard from '../components/MyDataCard.jsx';
 import { CURRENCIES, currencyName } from '../../../shared/currency';
 import { IMAGE_ACCEPT, isImageFile, toJpegFile } from '../lib/imageFile.js';
 
@@ -237,6 +238,8 @@ export default function Settings() {
         </div>
 
       </div>
+
+      {!isOrgAccount ? <MyDataCard /> : null}
 
       <div className="card mt-24" style={{ border: '1.5px solid var(--red)' }}>
         <div className="card-header"><h3 style={{ color: 'var(--red)' }}><i className="fas fa-triangle-exclamation"></i> {t('settings.dangerZone')}</h3></div>

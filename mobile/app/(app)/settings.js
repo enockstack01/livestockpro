@@ -19,6 +19,7 @@ import { useAccount } from '../../src/account/AccountProvider';
 import { accountDisplayName } from '../../../shared/account';
 import MyOrganizationCard from '../../src/screens/org/MyOrganization';
 import OfflineAiCard from '../../src/screens/OfflineAiCard';
+import MyDataCard from '../../src/screens/MyDataCard';
 import { CURRENCIES, currencyName } from '../../../shared/currency';
 import * as Clipboard from 'expo-clipboard';
 
@@ -227,6 +228,8 @@ export default function SettingsScreen() {
               options={[{ value: 'system', label: t('settings.themeSystem') }, { value: 'light', label: t('settings.themeLight') }, { value: 'dark', label: t('settings.themeDark') }]} />
           </CardBody>
         </Card>
+
+        {!isOrgAccount ? <MyDataCard /> : null}
 
         <Card>
           <CardHeader title={t('settings.accountSecurity')} icon="shield-halved" />

@@ -431,7 +431,10 @@
     "appVersion": "LivestockPro Mobile v{{version}}",
     "livestockId": "Kitambulisho cha Livestock",
     "copyId": "Nakili Kitambulisho chako cha Livestock",
-    "idCopied": "Kitambulisho cha Livestock kimenakiliwa"
+    "idCopied": "Kitambulisho cha Livestock kimenakiliwa",
+    "myData": "Data yangu",
+    "myDataHelp": "Pakua kila ulichorekodi (wanyama, afya, ulishaji, uzazi, uzalishaji, fedha na kazi, pamoja na wasifu wa shamba lako) wakati wowote. Chagua Excel, CSV, PDF au JSON kwa hifadhi nakala kamili.",
+    "downloadMyData": "Pakua data yangu yote"
   },
   "dashboardPage": {
     "title": "Dashibodi",
@@ -1946,12 +1949,14 @@
     "formats": {
       "pdf": "PDF",
       "xlsx": "Excel",
-      "csv": "CSV"
+      "csv": "CSV",
+      "json": "JSON"
     },
     "formatHints": {
       "pdf": "Hati yenye chapa ya kuchapisha au kushiriki",
       "xlsx": "Lahajedwali, karatasi moja kwa kila sehemu",
-      "csv": "Data tupu kwa programu yoyote"
+      "csv": "Data tupu kwa programu yoyote",
+      "json": "Nakala kamili ya kila rekodi, kwa hifadhi nakala"
     },
     "fields": {
       "district": "Wilaya",
@@ -1962,7 +1967,8 @@
     "farm": "Shamba",
     "generated": "Imetengenezwa",
     "filters": "Vichujio",
-    "page": "Ukurasa {{page}} kati ya {{pages}}"
+    "page": "Ukurasa {{page}} kati ya {{pages}}",
+    "allDataTitle": "Data yangu yote ya LivestockPro"
   },
   "calendar": {
     "title": "Kalenda",

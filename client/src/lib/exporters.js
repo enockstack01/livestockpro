@@ -245,7 +245,13 @@ export function printDoc(doc, t, lang) {
   return true;
 }
 
+/* The complete copy of everything (doc.raw, shared/dataExport.js). */
+export function exportJson(doc) {
+  download(new Blob([JSON.stringify(doc.raw, null, 2)], { type: 'application/json' }), exportFileName(doc.title, 'json'));
+}
+
 export async function exportDoc(doc, format, t, lang) {
+  if (format === 'json') return exportJson(doc);
   if (format === 'csv') return exportCsv(doc);
   if (format === 'xlsx') return exportXlsx(doc);
   return exportPdf(doc, t, lang);

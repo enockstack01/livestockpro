@@ -431,7 +431,10 @@
     "appVersion": "LivestockPro Mobile v{{version}}",
     "livestockId": "ID Livestock",
     "copyId": "Copier votre ID Livestock",
-    "idCopied": "ID Livestock copié"
+    "idCopied": "ID Livestock copié",
+    "myData": "Mes données",
+    "myDataHelp": "Téléchargez à tout moment tout ce que vous avez enregistré (animaux, santé, alimentation, reproduction, production, finances et tâches, avec le profil de votre ferme). Choisissez Excel, CSV, PDF ou JSON pour une sauvegarde complète.",
+    "downloadMyData": "Télécharger toutes mes données"
   },
   "dashboardPage": {
     "title": "Tableau de bord",
@@ -1946,12 +1949,14 @@
     "formats": {
       "pdf": "PDF",
       "xlsx": "Excel",
-      "csv": "CSV"
+      "csv": "CSV",
+      "json": "JSON"
     },
     "formatHints": {
       "pdf": "Document à l’image de la marque, à imprimer ou partager",
       "xlsx": "Tableur, une feuille par section",
-      "csv": "Données brutes pour tout logiciel"
+      "csv": "Données brutes pour tout logiciel",
+      "json": "Copie complète de chaque enregistrement, pour les sauvegardes"
     },
     "fields": {
       "district": "District",
@@ -1962,7 +1967,8 @@
     "farm": "Exploitation",
     "generated": "Généré le",
     "filters": "Filtres",
-    "page": "Page {{page}} sur {{pages}}"
+    "page": "Page {{page}} sur {{pages}}",
+    "allDataTitle": "Toutes mes données LivestockPro"
   },
   "calendar": {
     "title": "Calendrier",

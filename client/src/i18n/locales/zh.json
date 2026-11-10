@@ -431,7 +431,10 @@
     "appVersion": "LivestockPro Mobile v{{version}}",
     "livestockId": "Livestock 编号",
     "copyId": "复制您的 Livestock 编号",
-    "idCopied": "已复制 Livestock 编号"
+    "idCopied": "已复制 Livestock 编号",
+    "myData": "我的数据",
+    "myDataHelp": "随时下载您记录的全部内容（动物、健康、饲喂、繁殖、生产、财务和任务，以及您的农场资料）。选择 Excel、CSV、PDF 或 JSON 以获得完整备份。",
+    "downloadMyData": "下载我的全部数据"
   },
   "dashboardPage": {
     "title": "仪表板",
@@ -1945,12 +1948,14 @@
     "formats": {
       "pdf": "PDF",
       "xlsx": "Excel",
-      "csv": "CSV"
+      "csv": "CSV",
+      "json": "JSON"
     },
     "formatHints": {
       "pdf": "带品牌标识的文档，可打印或分享",
       "xlsx": "电子表格，每个板块一张工作表",
-      "csv": "适用于任何程序的纯数据"
+      "csv": "适用于任何程序的纯数据",
+      "json": "每条记录的完整副本，用于备份"
     },
     "fields": {
       "district": "区",
@@ -1960,7 +1965,8 @@
     "farm": "农场",
     "generated": "生成时间",
     "filters": "筛选条件",
-    "page": "第 {{page}} 页，共 {{pages}} 页"
+    "page": "第 {{page}} 页，共 {{pages}} 页",
+    "allDataTitle": "我的全部 LivestockPro 数据"
   },
   "calendar": {
     "title": "日历",

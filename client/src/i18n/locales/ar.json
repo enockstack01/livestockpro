@@ -431,7 +431,10 @@
     "appVersion": "LivestockPro Mobile v{{version}}",
     "livestockId": "معرّف Livestock",
     "copyId": "نسخ معرّف Livestock الخاص بك",
-    "idCopied": "تم نسخ معرّف Livestock"
+    "idCopied": "تم نسخ معرّف Livestock",
+    "myData": "بياناتي",
+    "myDataHelp": "نزّل كل ما سجّلته (الحيوانات والصحة والتغذية والتكاثر والإنتاج والمالية والمهام، مع ملف مزرعتك) في أي وقت. اختر Excel أو CSV أو PDF أو JSON لنسخة احتياطية كاملة.",
+    "downloadMyData": "تنزيل جميع بياناتي"
   },
   "dashboardPage": {
     "title": "لوحة التحكم",
@@ -1950,12 +1953,14 @@
     "formats": {
       "pdf": "PDF",
       "xlsx": "Excel",
-      "csv": "CSV"
+      "csv": "CSV",
+      "json": "JSON"
     },
     "formatHints": {
       "pdf": "مستند بهوية العلامة للطباعة أو المشاركة",
       "xlsx": "جدول بيانات، ورقة لكل قسم",
-      "csv": "بيانات مجرّدة لأي برنامج"
+      "csv": "بيانات مجرّدة لأي برنامج",
+      "json": "نسخة كاملة من كل سجل للنسخ الاحتياطي"
     },
     "fields": {
       "district": "المنطقة",
@@ -1970,7 +1975,8 @@
     "farm": "المزرعة",
     "generated": "تاريخ الإنشاء",
     "filters": "عوامل التصفية",
-    "page": "الصفحة {{page}} من {{pages}}"
+    "page": "الصفحة {{page}} من {{pages}}",
+    "allDataTitle": "جميع بياناتي في LivestockPro"
   },
   "calendar": {
     "title": "التقويم",

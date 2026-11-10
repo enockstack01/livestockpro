@@ -13,12 +13,13 @@ import { buildRecordExport } from '../../../shared/recordExport';
 const FORMATS = [
   { key: 'pdf', icon: 'file-pdf', bg: '#C62828', fg: '#FFFFFF' },
   { key: 'xlsx', icon: 'file-excel', bg: '#2E7D32', fg: '#FFFFFF' },
-  { key: 'csv', icon: 'file-csv', bg: '#F9A825', fg: '#1C2B1E' }
+  { key: 'csv', icon: 'file-csv', bg: '#F9A825', fg: '#1C2B1E' },
+  { key: 'json', icon: 'file-code', bg: '#455A64', fg: '#FFFFFF' }
 ];
 
 /* "Export" with PDF, Excel and CSV (twin of the web's ExportMenu). `build`
    returns the export document for what the screen shows. */
-export default function ExportButton({ build, disabled, label, variant = 'secondary' }) {
+export default function ExportButton({ build, disabled, label, variant = 'secondary', formats = ['pdf', 'xlsx', 'csv'] }) {
   const { t, i18n } = useTranslation();
   const { colors } = useTheme();
   const showToast = useToast();
@@ -44,7 +45,7 @@ export default function ExportButton({ build, disabled, label, variant = 'second
     <>
       <Button variant={variant} icon="file-export" title={busy ? t('exports.preparing') : label || t('exports.export')} loading={busy} disabled={disabled || busy} onPress={() => setOpen(true)} />
       <Modal open={open} onClose={() => setOpen(false)} title={label || t('exports.export')} maxWidth={420}>
-        {FORMATS.map((f) => (
+        {FORMATS.filter((f) => formats.includes(f.key)).map((f) => (
           <Pressable key={f.key} onPress={() => run(f.key)} accessibilityRole="button" style={({ pressed }) => [styles.option, { borderColor: colors.border, backgroundColor: pressed ? colors.bg : 'transparent' }]}>
             <View style={[styles.icon, { backgroundColor: f.bg }]}><Icon name={f.icon} size={16} color={f.fg} /></View>
             <View style={{ flex: 1 }}>
