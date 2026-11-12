@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { setAiUsage } from '../../../shared/aiUsage';
 import { getDeviceId } from '../lib/deviceId';
 import { isOffline } from '../lib/connectivity';
+import { tidyDeep } from '../../../shared/tidyText';
 
 /* Absolute URL required on native (no page origin to be relative to, unlike
    client/src/lib/api.js's '/api'). Set per environment in .env / EAS build
@@ -48,6 +49,8 @@ async function request(getToken, path, options = {}) {
     return { data: null, error: { message, status: res.status, code: err.code, kind: err.kind, usage: err.usage } };
   }
   if (json && json.usage) setAiUsage(json.usage);
+  // AI text is shown as plain, clean sentences (shared/tidyText.js), saved reports too.
+  if (json && json.data && path.startsWith('/ai/')) json.data = tidyDeep(json.data);
   return json || { data: null, error: null };
 }
 

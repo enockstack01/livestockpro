@@ -1,4 +1,5 @@
 import { findDisease } from './diseases';
+import { tidyDeep } from '../../../shared/tidyText';
 import { DIAGNOSIS_SCHEMA, VET_NOTICE } from './offlinePrompts';
 
 /* Reads the offline AI's report. A small model on a slow phone can stop at
@@ -18,7 +19,7 @@ export function parseReport(text) {
     data = salvage(body);
     cut = true;
   }
-  const out = withDefaults(data, DIAGNOSIS_SCHEMA);
+  const out = tidyDeep(withDefaults(data, DIAGNOSIS_SCHEMA));
   if (cut) out.data_gaps = [...out.data_gaps, 'The offline report was cut short on this phone: check it again with the online AI.'];
   return out;
 }

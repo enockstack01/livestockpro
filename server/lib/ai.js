@@ -3,6 +3,7 @@ const AnthropicModule = require('@anthropic-ai/sdk');
 const Anthropic = AnthropicModule.default || AnthropicModule;
 
 const { currentModel, logModelCall } = require('./aiSettings');
+const { tidyText, tidyDeep } = require('./tidyText');
 
 /* LivestockPro AI. AI_API_KEY turns it on; without it every /api/ai
    route answers 503 so the clients can show "AI is not set up yet" instead
@@ -61,6 +62,7 @@ function brandVoice(language) {
     `Write every piece of text for the user in ${languageName(language)}, even if the records are in another language. Keep record values such as tag IDs and drug names as they are.`,
     'Use plain, practical language a farmer can act on today. Prefer short sentences. Use sentence case for any titles.',
     'Do not use em dashes, en dashes or spaced hyphens to join words or sentences; use a colon or a comma instead. Write ranges with "to" (for example "7 to 14 days").',
+    'Write plain text only, the way a person writes a message: no markdown, no asterisks, no hash signs, no bold or italics, no emoji, no tables and no bullet symbols. Never use dashes between words or sentences (use a comma, a colon or a new sentence instead). Put each list item on its own line, or write numbered steps as 1. 2. 3.',
     'Write money as the amount followed by the currency code (for example "25,000 RWF"), except US dollars which take the $ sign first ("$20").',
     'Base what you say on the farm records you are given. When the records do not say something, say that you do not know rather than guessing.',
     'Never name the AI model, its maker or the technology you run on. If asked who or what you are, say you are the LivestockPro AI assistant by Agricoders.',
@@ -122,16 +124,17 @@ async function ask({ system, messages, schema, tools, effort = 'medium', maxToke
   }
 
   const text = response.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
-  if (!schema) return { text, response };
+  if (!schema) return { text: tidyText(text), response };
   try {
-    return { data: JSON.parse(text), response };
+    // Plain, clean sentences whatever the AI wrote (lib/tidyText.js).
+    return { data: tidyDeep(JSON.parse(text)), response };
   } catch {
     throw new AiError(502, 'AI_BAD_OUTPUT', 'The AI answer could not be read. Please try again.');
   }
 }
 
 function textOf(response) {
-  return response.content.filter((b) => b.type === 'text').map((b) => b.text).join('').trim();
+  return tidyText(response.content.filter((b) => b.type === 'text').map((b) => b.text).join('').trim());
 }
 
 /* Image blocks for photos the user took: [{ media_type, data }] in base64. */

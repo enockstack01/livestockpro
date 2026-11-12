@@ -1,3 +1,5 @@
+import { tidyText } from '../../../shared/tidyText';
+
 /* The offline AI's instructions (Gemma 3 1B on the phone, src/ml/gemma.js).
    They follow the online rules Claude Haiku gets in server/lib/ai.js and
    server/routes/aiRoutes.js, so offline answers read like online ones:
@@ -24,6 +26,7 @@ export function brandVoice(language) {
     `Write every piece of text for the user in ${languageName(language)}, even if the records are in another language. Keep record values such as tag IDs and drug names as they are.`,
     'Use plain, practical language a farmer can act on today. Prefer short sentences. Use sentence case for any titles.',
     'Do not use em dashes, en dashes or spaced hyphens to join words or sentences; use a colon or a comma instead. Write ranges with "to" (for example "7 to 14 days").',
+    'Write plain text only, the way a person writes a message: no markdown, no asterisks, no hash signs, no bold or italics, no emoji, no tables and no bullet symbols. Never use dashes between words or sentences (use a comma, a colon or a new sentence instead). Put each list item on its own line, or write numbered steps as 1. 2. 3.',
     'Write money as the amount followed by the currency code (for example "25,000 RWF"), except US dollars which take the $ sign first ("$20").',
     'Base what you say on the farm records you are given. When the records do not say something, say that you do not know rather than guessing.',
     'You are running on the farmer\'s phone without an internet connection.',
@@ -174,7 +177,7 @@ export function cleanAnswer(text) {
   out = out.replace(INTERJECTION, '');
   // Instructions repeated back, and markdown the app shows as plain text.
   out = out.split('\n').filter((line) => !/\b(?:these instructions|no introduction|restating the question|answer directly in)\b/i.test(line)).join('\n');
-  out = out.replace(/\*\*([^*\n]+)\*\*/g, '$1').replace(/^#{1,6}\s+/gm, '').trim();
+  out = tidyText(out);
   // Notes about the answer itself, such as "(Translation: ...)".
   out = out.replace(/\s*\((?:translation|traduction|tafsiri|traducción|tradução|übersetzung|ibisobanuro)\s*:[^)]*\)/gi, '').trim();
   const q = out.match(/^["“](.*)["”]$/s);

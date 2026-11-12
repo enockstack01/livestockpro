@@ -1,4 +1,5 @@
 import * as Crypto from 'expo-crypto';
+import { tidyDeep } from '../../../shared/tidyText';
 
 /* Photos checked on the phone with the embedded detector (src/ml): the
    detection findings and small previews of the photos, kept on this phone
@@ -28,7 +29,7 @@ export async function listScans(db, userId, limit = 10) {
   const rows = await db.getAllAsync('SELECT id, created_at, preliminary, summary FROM ai_scans WHERE user_id = ? ORDER BY created_at DESC LIMIT ?', userId, limit);
   return rows.map((r) => {
     const p = JSON.parse(r.preliminary);
-    return { id: r.id, created_at: r.created_at, summary: r.summary, vision: p.vision || p, thumbs: p.thumbs || [], report: p.report || null };
+    return { id: r.id, created_at: r.created_at, summary: r.summary, vision: p.vision || p, thumbs: p.thumbs || [], report: p.report ? tidyDeep(p.report) : null };
   });
 }
 
