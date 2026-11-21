@@ -47,11 +47,15 @@
       "planning": "Igenamigambi",
       "analytics": "Isesengura",
       "administration": "Ubuyobozi",
-      "system": "Sisitemu"
+      "system": "Sisitemu",
+      "team": "Itsinda",
+      "recordData": "Andika amakuru",
+      "myWork": "Akazi kanjye"
     },
     "assistant": "Umufasha wa AI",
     "calendar": "Kalendari",
-    "home": "Ahabanza"
+    "home": "Ahabanza",
+    "team": "Itsinda"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -996,7 +1000,8 @@
       "cooperative": "Koperative",
       "researcher": "Umushakashatsi",
       "student": "Umunyeshuri",
-      "other": "Ikindi"
+      "other": "Ikindi",
+      "data_collector": "Ukusanya amakuru"
     },
     "status": {
       "none": "Ntibyasabwe",
@@ -1865,6 +1870,10 @@
     "accountRejected": {
       "title": "Icyifuzo cya konti nticyemewe",
       "body": "Icyifuzo cyawe cya konti ya LivestockPro nticyemewe. {{note}}"
+    },
+    "collectorInvite": {
+      "title": "Ubutumire bw'ukusanya amakuru",
+      "body": "Watumiwe kwandika amakuru ya {{farm}}."
     }
   },
   "search": {
@@ -2011,5 +2020,87 @@
     "subtitle": "LivestockPro ya Agricoders",
     "intro": "Nta murandasi uhari, bityo kwinjira n’ibisaba seriveri byahagaritswe. Umufasha wa AI akora kuri iyi telefoni. Porogaramu isubira uko isanzwe ubwayo umaze kubona murandasi.",
     "banner": "Gukora nta murandasi: amakuru yawe abikwa kuri iyi telefoni kandi AI ikora kuri telefoni. Ibisaba murandasi bigaruka wongeye kubona murandasi."
+  },
+  "team": {
+    "managerRole": "Umuyobozi w'umurima",
+    "title": "Itsinda",
+    "subtitle": "Abakusanya amakuru bandika mu murima wawe",
+    "cardTitle": "Abakusanya amakuru bawe",
+    "manage": "Gucunga itsinda",
+    "addCollector": "Ongeramo ukusanya amakuru",
+    "cardEmpty": "Tumira ukusanya amakuru urebe hano ibyo itsinda ryawe ryandika buri munsi.",
+    "entries14": "Ibyanditswe mu minsi 14 ishize",
+    "entriesWeek": "Ibyanditswe muri iki cyumweru",
+    "lastActive": "Yanditse bwa nyuma: {{when}}",
+    "notYet": "ntarandika",
+    "waitingInvites_one": "Ubutumire {{count}} bategereje",
+    "waitingInvites_other": "Ubutumire {{count}} bategereje",
+    "collectors": "Abakusanya amakuru",
+    "waiting": "Ubutumire butegereje",
+    "members": "Abagize itsinda",
+    "empty": "Nta bakusanya amakuru bahari. Tumira umwe kuri imeri.",
+    "colName": "Izina",
+    "colContact": "Uko wavugana",
+    "colWeek": "Iki cyumweru",
+    "colLast": "Yanditse bwa nyuma",
+    "colJoined": "Yinjiye",
+    "colInvited": "Yatumiwe",
+    "remove": "Kuramo mu itsinda",
+    "removeTitle": "Kuramo ukusanya amakuru",
+    "removeMessage": "{{name}} ntazongera kwandika amakuru mu murima wawe. Ibyo yanditse mbere bizaguma mu nyandiko zawe.",
+    "removed": "{{name}} yakuwe mu itsinda ryawe.",
+    "waitingTitle": "Ubutumire butegereje ({{count}})",
+    "recent": "Ibyanditswe vuba n'itsinda ryawe",
+    "noActivity": "Itsinda ryawe ntiriranyandika ikintu.",
+    "inviteTitle": "Ongeramo ukusanya amakuru",
+    "inviteIntro": "Ukusanya amakuru yandika amatungo, isuzuma ry'ubuzima, ubworozi, ibiryo n'umusaruro w'umurima wawe. Ntabona amafaranga, raporo cyangwa umufasha, kandi ntashobora gusiba.",
+    "inviteAfter": "Azohabwa imeri yo gushyiraho ijambobanga. Umuyobozi wa sisitemu yemeza konti mbere yo kuyikoresha.",
+    "email": "Imeri",
+    "sendInvite": "Ohereza ubutumire",
+    "required": "Andika izina n'imeri.",
+    "invited": "Ubutumire bwoherejwe kuri {{email}}.",
+    "inviteCancelled": "Ubutumire bwa {{email}} bwahagaritswe.",
+    "errors": {
+      "NAME_REQUIRED": "Andika izina ry'ukusanya amakuru.",
+      "EMAIL_INVALID": "Andika imeri yemewe.",
+      "TEAM_FULL": "Itsinda ryawe ryuzuye. Kuramo umuntu cyangwa uhagarike ubutumire.",
+      "ALREADY_INVITED": "Uyu muntu afite ubutumire butegereje.",
+      "HAS_ACCOUNT": "Iyi imeri isanzwe ifite konti ya LivestockPro. Ukusanya amakuru akeneye konti nshya, koresha indi meri.",
+      "SELF": "Ntushobora kwitumira ubwawe.",
+      "INVITE_FAILED": "Imeri y'ubutumire ntiyashoboye koherezwa. Genzura aderesi ugerageze nanone.",
+      "MANAGER_ONLY": "Umuyobozi w'umurima gusa ni we ucunga itsinda.",
+      "NOT_FOUND": "Uyu muntu cyangwa ubutumire ntibyabonetse."
+    }
+  },
+  "collectorDash": {
+    "role": "Ukusanya amakuru",
+    "subtitle": "Andika ibyo ubona mu murima uyu munsi",
+    "recordingFor": "Wandikira {{farm}}",
+    "recording": "Wandikira umuyobozi w'umurima wawe",
+    "entriesToday_one": "icyanditswe uyu munsi",
+    "entriesToday_other": "ibyanditswe uyu munsi",
+    "thisWeek_one": "Icyanditswe {{count}} muri iki cyumweru",
+    "thisWeek_other": "Ibyanditswe {{count}} muri iki cyumweru",
+    "streak_one": "Umunsi {{count}} ukurikiranye",
+    "streak_other": "Iminsi {{count}} ikurikiranye",
+    "whatRecording": "Urandika iki?",
+    "add": {
+      "animal": "Ongeramo itungo",
+      "health": "Isuzuma ry'ubuzima",
+      "breeding": "Ubworozi",
+      "feeding": "Kugaburira",
+      "production": "Umusaruro",
+      "task": "Ongeramo umurimo"
+    },
+    "myTasks": "Imirimo igomba gukorwa",
+    "noTasks": "Nta mirimo ifunguye",
+    "markDone": "Shyira nk'ikozwe",
+    "taskDone": "Umurimo washyizwe nk'ukozwe.",
+    "due": "Igomba gukorwa {{date}}",
+    "noDueDate": "Nta tariki ntarengwa",
+    "toCheck": "Amatungo agomba gusuzumwa",
+    "allWell": "Nta tungo rikeneye kwitabwaho",
+    "myEntries": "Ibyo nanditse vuba",
+    "noEntries": "Nta kintu wanditse muri iki cyumweru."
   }
 }

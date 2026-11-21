@@ -5,6 +5,7 @@ const { requireAuth } = require('../authMiddleware');
 const { requireApproved } = require('../lib/accounts');
 const { isOrgAccount } = require('../lib/orgs');
 const { sendPushToUser } = require('../lib/pushNotify');
+const { farmScope } = require('../lib/farmTeam');
 
 const router = express.Router();
 
@@ -75,11 +76,41 @@ router.use(async (req, res, next) => {
   }
 });
 
+/* Data collectors record into their farm manager's farm: every query below
+   runs against the manager's rows (req.farmId), and new rows are tagged with
+   who recorded them (recorded_by). A collector sees no money records and
+   cannot delete anything, change the farm profile, or edit a colleague's
+   entries (tasks can be updated by anyone on the team). */
+router.use(async (req, res, next) => {
+  try {
+    const scope = await farmScope(req.user.id);
+    req.farmId = scope.ownerId;
+    req.farmRole = scope.role;
+    next();
+  } catch (err) {
+    res.status(500).json({ error: { message: err.message } });
+  }
+});
+
+/* Device registrations stay with the person, not the farm. */
+const owner = (req) => (req.params.table === 'push_tokens' ? req.user.id : req.farmId);
+
+const COLLECTOR_FORBIDDEN = { error: { message: 'Your data collector account cannot do this.', code: 'COLLECTOR_FORBIDDEN' } };
+
 router.param('table', (req, res, next, table) => {
   if (!Object.prototype.hasOwnProperty.call(SCHEMAS, table)) {
     return res.status(404).json({ error: { message: 'Unknown table: ' + table } });
   }
   req.fields = SCHEMAS[table];
+  if (req.farmRole === 'collector') {
+    const isRead = req.method === 'GET';
+    /* Money is for the manager only; reading answers empty so the phone's
+       sync keeps working. */
+    if (table === 'finance_records') return isRead ? res.json({ data: [], error: null }) : res.status(403).json(COLLECTOR_FORBIDDEN);
+    /* A collector may only clear their own device registration. */
+    if (req.method === 'DELETE' && table !== 'push_tokens') return res.status(403).json(COLLECTOR_FORBIDDEN);
+    if (table === 'profiles' && !isRead) return res.status(403).json(COLLECTOR_FORBIDDEN);
+  }
   next();
 });
 
@@ -102,7 +133,9 @@ function toClient(doc) {
    updated_since=<ISO> powers that same delta pull: only rows changed after
    that timestamp. */
 function buildFilter(req) {
-  const filter = { user_id: req.user.id };
+  const filter = { user_id: owner(req) };
+  /* A collector changes only what they recorded themselves (tasks excepted). */
+  if (req.farmRole === 'collector' && req.method === 'PATCH' && req.params.table !== 'tasks') filter.recorded_by = req.user.id;
   if (req.query.include_deleted !== 'true') filter.deleted_at = null;
   if (req.query.updated_since) {
     const since = new Date(req.query.updated_since);
@@ -182,7 +215,7 @@ router.post('/:table', async (req, res) => {
 
     const now = new Date().toISOString();
     const docs = records.map((rec) => {
-      const doc = { _id: isUuid(rec.id) ? rec.id : crypto.randomUUID(), user_id: req.user.id, created_at: now, updated_at: now };
+      const doc = { _id: isUuid(rec.id) ? rec.id : crypto.randomUUID(), user_id: owner(req), recorded_by: req.user.id, created_at: now, updated_at: now };
       for (const key of req.fields) {
         if (Object.prototype.hasOwnProperty.call(rec, key)) doc[key] = rec[key];
       }
@@ -199,7 +232,7 @@ router.post('/:table', async (req, res) => {
     if (trigger) {
       docs.forEach((doc) => {
         if (trigger.values.includes(doc[trigger.field])) {
-          notifyCriticalChange(req.params.table, doc, req.user.id);
+          notifyCriticalChange(req.params.table, doc, req.farmId);
         }
       });
     }
@@ -242,7 +275,7 @@ router.patch('/:table', async (req, res) => {
       docs.forEach((doc) => {
         const prior = priorValues.get(String(doc._id));
         if (prior !== undefined && prior !== set[trigger.field]) {
-          notifyCriticalChange(req.params.table, doc, req.user.id);
+          notifyCriticalChange(req.params.table, doc, req.farmId);
         }
       });
     }

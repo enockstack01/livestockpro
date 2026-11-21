@@ -25,7 +25,13 @@
     "reports": "Ripoti",
     "settings": "Mipangilio",
     "more": "Zaidi",
-    "signOut": "Toka"
+    "signOut": "Toka",
+    "team": "Timu",
+    "sections": {
+      "team": "Timu",
+      "recordData": "Rekodi data",
+      "myWork": "Kazi yangu"
+    }
   },
   "menu": {
     "title": "Menyu"
@@ -382,5 +388,166 @@
     "birthTodayTitle": "Kuzaliwa kunatarajiwa leo",
     "birthTodayBody": "{{tag}} anatarajiwa kuzaa leo.",
     "animalFallback": "Mnyama"
+  },
+  "account": {
+    "types": {
+      "data_collector": "Mkusanya data"
+    }
+  },
+  "team": {
+    "managerRole": "Meneja wa shamba",
+    "title": "Timu",
+    "subtitle": "Wakusanya data wanaorekodi katika shamba lako",
+    "cardTitle": "Wakusanya data wako",
+    "manage": "Simamia timu",
+    "addCollector": "Ongeza mkusanya data",
+    "cardEmpty": "Mwalike mkusanya data uone hapa timu yako inarekodi nini kila siku.",
+    "entries14": "Rekodi za siku 14 zilizopita",
+    "entriesWeek": "Rekodi wiki hii",
+    "lastActive": "Alirekodi mara ya mwisho: {{when}}",
+    "notYet": "bado",
+    "waitingInvites_one": "{{count}} mwaliko unasubiri",
+    "waitingInvites_other": "Mialiko {{count}} inasubiri",
+    "collectors": "Wakusanya data",
+    "waiting": "Mialiko inayosubiri",
+    "members": "Wanachama wa timu",
+    "empty": "Hakuna wakusanya data bado. Mwalike mmoja kwa barua pepe.",
+    "colName": "Jina",
+    "colContact": "Mawasiliano",
+    "colWeek": "Wiki hii",
+    "colLast": "Rekodi ya mwisho",
+    "colJoined": "Alijiunga",
+    "colInvited": "Alialikwa",
+    "remove": "Ondoa kwenye timu",
+    "removeTitle": "Ondoa mkusanya data",
+    "removeMessage": "{{name}} hataweza tena kurekodi data kwa shamba lako. Rekodi alizoingiza awali zitabaki.",
+    "removed": "{{name}} ameondolewa kwenye timu yako.",
+    "waitingTitle": "Mialiko inayosubiri ({{count}})",
+    "recent": "Rekodi za hivi karibuni za timu yako",
+    "noActivity": "Timu yako haijarekodi chochote bado.",
+    "inviteTitle": "Ongeza mkusanya data",
+    "inviteIntro": "Mkusanya data hurekodi wanyama, ukaguzi wa afya, uzalishaji, ulishaji na mazao ya shamba lako. Haoni fedha, ripoti wala msaidizi, na hawezi kufuta rekodi.",
+    "inviteAfter": "Atapokea barua pepe ya kuweka nenosiri. Msimamizi wa mfumo huidhinisha akaunti kabla ya kutumika.",
+    "email": "Barua pepe",
+    "sendInvite": "Tuma mwaliko",
+    "required": "Weka jina na barua pepe.",
+    "invited": "Mwaliko umetumwa kwa {{email}}.",
+    "inviteCancelled": "Mwaliko kwa {{email}} umeghairiwa.",
+    "errors": {
+      "NAME_REQUIRED": "Weka jina la mkusanya data.",
+      "EMAIL_INVALID": "Weka barua pepe halali.",
+      "TEAM_FULL": "Timu yako imejaa. Ondoa mtu au ghairi mwaliko.",
+      "ALREADY_INVITED": "Mtu huyu tayari ana mwaliko unaosubiri.",
+      "HAS_ACCOUNT": "Barua pepe hii tayari ina akaunti ya LivestockPro. Mkusanya data anahitaji akaunti mpya, tumia barua pepe nyingine.",
+      "SELF": "Huwezi kujialika mwenyewe.",
+      "INVITE_FAILED": "Barua pepe ya mwaliko haikuweza kutumwa. Angalia anwani na ujaribu tena.",
+      "MANAGER_ONLY": "Meneja wa shamba pekee ndiye anaweza kusimamia timu.",
+      "NOT_FOUND": "Mtu huyu au mwaliko haukupatikana."
+    }
+  },
+  "collectorDash": {
+    "role": "Mkusanya data",
+    "subtitle": "Rekodi unachoona shambani leo",
+    "recordingFor": "Unarekodi kwa {{farm}}",
+    "recording": "Unarekodi kwa meneja wa shamba lako",
+    "entriesToday_one": "rekodi leo",
+    "entriesToday_other": "rekodi leo",
+    "thisWeek_one": "Rekodi {{count}} wiki hii",
+    "thisWeek_other": "Rekodi {{count}} wiki hii",
+    "streak_one": "Siku {{count}} mfululizo",
+    "streak_other": "Siku {{count}} mfululizo",
+    "whatRecording": "Unarekodi nini?",
+    "add": {
+      "animal": "Ongeza mnyama",
+      "health": "Ukaguzi wa afya",
+      "breeding": "Uzalishaji",
+      "feeding": "Ulishaji",
+      "production": "Mazao",
+      "task": "Ongeza kazi"
+    },
+    "myTasks": "Kazi za kufanya",
+    "noTasks": "Hakuna kazi zilizo wazi",
+    "markDone": "Weka kama imekamilika",
+    "taskDone": "Kazi imewekwa kama imekamilika.",
+    "due": "Inatakiwa {{date}}",
+    "noDueDate": "Hakuna tarehe ya mwisho",
+    "toCheck": "Wanyama wa kukagua",
+    "allWell": "Hakuna mnyama anayehitaji uangalizi",
+    "myEntries": "Rekodi zangu za hivi karibuni",
+    "noEntries": "Hujarekodi chochote wiki hii."
+  },
+  "notifications": {
+    "orgApproved": {
+      "title": "Shirika limeidhinishwa",
+      "body": "{{name}} sasa ni hai. Unaweza kualika wafugaji."
+    },
+    "orgSuspended": {
+      "title": "Shirika limesimamishwa",
+      "body": "{{name}} limesimamishwa. Viungo vya mwaliko vimesitishwa."
+    },
+    "orgReactivated": {
+      "title": "Shirika limerejeshwa",
+      "body": "{{name}} ni hai tena."
+    },
+    "orgLimitChanged": {
+      "title": "Kikomo cha wafugaji kimebadilishwa",
+      "body": "{{name}} sasa linaweza kuwa na hadi wafugaji {{limit}}."
+    },
+    "orgUsage80": {
+      "title": "Kikomo cha wafugaji kinakaribia",
+      "body": "{{name}} lina wafugaji {{count}} kati ya {{limit}}."
+    },
+    "orgUsage100": {
+      "title": "Kikomo cha wafugaji kimefikiwa",
+      "body": "{{name}} limefikia kikomo cha wafugaji {{limit}}."
+    },
+    "farmerJoined": {
+      "title": "Mfugaji mpya amejiunga",
+      "body": "{{farmer}} amejiunga na {{name}}."
+    },
+    "farmerLeft": {
+      "title": "Mfugaji ameondoka",
+      "body": "{{farmer}} ameondoka {{name}}."
+    },
+    "farmerRemoved": {
+      "title": "Umeondolewa kwenye shirika",
+      "body": "Hujaunganishwa tena na {{name}}."
+    },
+    "orgInvite": {
+      "title": "Ombi la shirika",
+      "body": "{{name}} lingependa kukuongeza. Tafadhali kubali au kataa."
+    },
+    "staffInvite": {
+      "title": "Mwaliko wa shirika",
+      "body": "Umealikwa kujiunga na {{name}}."
+    },
+    "accountRequest": {
+      "title": "Ombi jipya la akaunti",
+      "body": "{{name}} anasubiri idhini."
+    },
+    "accountRequestOrg": {
+      "title": "Akaunti mpya ya mfugaji ya kuidhinisha",
+      "body": "{{name}} alijiunga kupitia {{org}} na anasubiri idhini."
+    },
+    "orgRegistered": {
+      "title": "Shirika jipya la kuidhinisha",
+      "body": "{{name}} amesajili shirika na anasubiri idhini."
+    },
+    "accountApproved": {
+      "title": "Akaunti imeidhinishwa",
+      "body": "Akaunti yako ya LivestockPro iko hai. Karibu! {{note}}"
+    },
+    "accountOnHold": {
+      "title": "Akaunti imesimamishwa",
+      "body": "Akaunti yako ya LivestockPro imesimamishwa kwa muda. {{note}}"
+    },
+    "accountRejected": {
+      "title": "Ombi la akaunti halikuidhinishwa",
+      "body": "Ombi lako la akaunti ya LivestockPro halikuidhinishwa. {{note}}"
+    },
+    "collectorInvite": {
+      "title": "Mwaliko wa mkusanya data",
+      "body": "Umealikwa kurekodi data kwa {{farm}}."
+    }
   }
 }

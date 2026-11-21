@@ -1,5 +1,6 @@
 const express = require('express');
 const { farmerLink, endFarmerLink } = require('../lib/orgs');
+const { forgetTeamRole } = require('../lib/farmTeam');
 const { getDb } = require('../db');
 const { requireAuth, clerkClient } = require('../authMiddleware');
 
@@ -32,6 +33,11 @@ router.post('/:fn', async (req, res) => {
       const link = await farmerLink(req.user.id);
       if (link) await endFarmerLink(req.user.id, link.org._id, 'left', req.user.id);
       await db.collection('organization_members').updateMany({ user_id: req.user.id, status: 'active' }, { $set: { status: 'removed', removed_at: new Date().toISOString() } });
+      /* Leaving a farm team: a collector's membership ends; a manager's collectors lose access. */
+      const gone = { $set: { status: 'removed', removed_at: new Date().toISOString() } };
+      await db.collection('farm_members').updateMany({ $or: [{ _id: req.user.id }, { owner_id: req.user.id }], status: 'active' }, gone);
+      await db.collection('farm_invites').updateMany({ owner_id: req.user.id, status: 'invited' }, { $set: { status: 'revoked' } });
+      forgetTeamRole(req.user.id);
       await Promise.all(COLLECTIONS.map((name) => db.collection(name).deleteMany({ user_id: req.user.id })));
       await db.collection('farmer_stats').deleteMany({ farmer_id: req.user.id });
       await clerkClient.users.deleteUser(req.user.id);

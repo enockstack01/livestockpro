@@ -14,6 +14,8 @@ import { computeAlerts, computeRecentActivity, computeUpcoming } from '../../../
 import { greeting } from '../../../shared/navigation';
 import { accountDisplayName } from '../../../shared/account';
 import { useAccount } from '../../src/account/AccountProvider';
+import CollectorDashboard from '../../src/screens/CollectorDashboard';
+import TeamCard from '../../src/screens/dashboard/TeamCard';
 
 /* Dashboard, laid out like the CropManager dashboard and identical to the
    web's (client/src/pages/Dashboard.jsx): greeting, the Herd Profile card
@@ -21,7 +23,14 @@ import { useAccount } from '../../src/account/AccountProvider';
    Analytics & Insights (insight tiles, then chart cards at least two per
    row), then Recent Activity, Upcoming Events, Alerts and Quick Actions —
    in pairs on tablets. */
+/* One route, two dashboards: a data collector gets the field-work screen,
+   a farm manager the overview below (client/src/pages/Dashboard.jsx). */
 export default function DashboardScreen() {
+  const { account } = useAccount();
+  return account && account.farmRole === 'collector' ? <CollectorDashboard /> : <ManagerDashboard />;
+}
+
+function ManagerDashboard() {
   const { t, i18n } = useTranslation();
   const repo = useRepository();
   const router = useRouter();
@@ -68,6 +77,9 @@ export default function DashboardScreen() {
       <QuickActions />
 
       <HerdProfileCard animals={data.animals} health={data.health} breeding={data.breeding} profile={profile} glance={glance} onOpen={(link) => router.replace(link)} />
+
+      <TeamCard />
+      <View style={{ height: 20 }} />
 
       <FarmAnalytics data={data} />
 

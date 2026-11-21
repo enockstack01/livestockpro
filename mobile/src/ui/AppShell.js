@@ -15,7 +15,7 @@ import { useSync } from '../sync/SyncProvider';
 import { useRepository } from '../db/repository';
 import { wipeLocalData, getPendingSyncCount } from '../db/schema';
 import { isOverdueTask } from '../lib/shared';
-import { NAV_SECTIONS, ORG_NAV_SECTIONS } from '../../../shared/navigation';
+import { NAV_SECTIONS, ORG_NAV_SECTIONS, COLLECTOR_NAV_SECTIONS } from '../../../shared/navigation';
 import { useApi } from '../api/client';
 import { ConsentRequest, useMyOrganization } from '../screens/org/MyOrganization';
 import { accountDisplayName } from '../../../shared/account';
@@ -49,6 +49,8 @@ export const MOBILE_SECTIONS = NAV_SECTIONS.filter((s) => !s.adminOnly);
 export const orgSections = (role) => ORG_NAV_SECTIONS
   .map((sec) => ({ ...sec, items: sec.items.filter((it) => !it.webOnly && (!it.roles || it.roles.includes(role))) }))
   .filter((sec) => sec.items.length);
+/* Data collectors: the entry screens only. */
+export const COLLECTOR_SECTIONS = COLLECTOR_NAV_SECTIONS;
 export { mobilePath };
 
 /* The phone's bottom tabs. */
@@ -57,6 +59,13 @@ const FARMER_TABS = [
   { href: '/animals', icon: 'cow', labelKey: 'nav.animals' },
   { href: '/assistant', icon: 'wand-magic-sparkles', labelKey: 'nav.assistant', center: true },
   { href: '/reports', icon: 'chart-bar', labelKey: 'nav.reports' },
+  { href: '/more', icon: 'bars', labelKey: 'nav.more' },
+];
+const COLLECTOR_TABS = [
+  { href: '/', icon: 'house', labelKey: 'nav.home' },
+  { href: '/animals', icon: 'cow', labelKey: 'nav.animals' },
+  { href: '/health', icon: 'stethoscope', labelKey: 'nav.health', center: true },
+  { href: '/tasks', icon: 'list-check', labelKey: 'nav.tasks' },
   { href: '/more', icon: 'bars', labelKey: 'nav.more' },
 ];
 const ORG_TABS = [
@@ -90,7 +99,7 @@ const SERVER_NOTIF = {
   orgApproved: ['circle-check', 'green'], orgSuspended: ['circle-pause', 'red'], orgReactivated: ['circle-play', 'green'],
   orgLimitChanged: ['gauge', 'blue'], orgUsage80: ['gauge-high', 'orange'], orgUsage100: ['gauge-high', 'red'],
   farmerJoined: ['user-plus', 'green'], farmerLeft: ['user-minus', 'orange'], farmerRemoved: ['user-minus', 'orange'],
-  orgInvite: ['people-group', 'blue'], staffInvite: ['envelope-open-text', 'blue'],
+  orgInvite: ['people-group', 'blue'], staffInvite: ['envelope-open-text', 'blue'], collectorInvite: ['clipboard-list', 'blue'],
   accountRequest: ['user-clock', 'orange'], accountRequestOrg: ['user-clock', 'orange'], orgRegistered: ['building', 'orange'],
   accountApproved: ['user-check', 'green'], accountOnHold: ['circle-pause', 'orange'], accountRejected: ['user-xmark', 'red']
 };
@@ -257,8 +266,9 @@ export default function AppShell({ children }) {
   const toggleCollapsed = () => setCollapsed((c) => { SecureStore.setItemAsync(COLLAPSED_KEY, c ? '0' : '1').catch(() => {}); return !c; });
   const rail = isTablet && collapsed;
 
-  const sections = isOrg ? orgSections(account.organization && account.organization.role) : MOBILE_SECTIONS;
-  const tabs = isOrg ? ORG_TABS : FARMER_TABS;
+  const isCollector = Boolean(account && account.farmRole === 'collector');
+  const sections = isOrg ? orgSections(account.organization && account.organization.role) : isCollector ? COLLECTOR_SECTIONS : MOBILE_SECTIONS;
+  const tabs = isOrg ? ORG_TABS : isCollector ? COLLECTOR_TABS : FARMER_TABS;
   const onTab = tabs.some((tb) => isOn(pathname, tb.href));
   const title = titleFor(pathname, sections, t);
 

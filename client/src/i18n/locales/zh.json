@@ -47,11 +47,15 @@
       "planning": "计划",
       "analytics": "分析",
       "administration": "管理",
-      "system": "系统"
+      "system": "系统",
+      "team": "团队",
+      "recordData": "录入数据",
+      "myWork": "我的工作"
     },
     "assistant": "AI 助手",
     "calendar": "日历",
-    "home": "首页"
+    "home": "首页",
+    "team": "团队"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -996,7 +1000,8 @@
       "cooperative": "合作社",
       "researcher": "研究人员",
       "student": "学生",
-      "other": "其他"
+      "other": "其他",
+      "data_collector": "数据采集员"
     },
     "status": {
       "none": "未申请",
@@ -1865,6 +1870,10 @@
     "accountRejected": {
       "title": "账户申请未获批准",
       "body": "你的 LivestockPro 账户申请未获批准。{{note}}"
+    },
+    "collectorInvite": {
+      "title": "数据采集员邀请",
+      "body": "您被邀请为 {{farm}} 录入数据。"
     }
   },
   "search": {
@@ -2006,5 +2015,83 @@
     "subtitle": "Agricoders 出品的 LivestockPro",
     "intro": "当前没有网络，因此登录和所有需要服务器的功能已暂停。AI 助手在此手机上运行。重新联网后，应用会自动恢复正常。",
     "banner": "离线模式：您的记录保存在此手机上，AI 在手机上运行。重新连接后，在线功能会恢复。"
+  },
+  "team": {
+    "managerRole": "农场经理",
+    "title": "团队",
+    "subtitle": "在您的农场录入数据的采集员",
+    "cardTitle": "您的数据采集员",
+    "manage": "管理团队",
+    "addCollector": "添加数据采集员",
+    "cardEmpty": "邀请一名数据采集员,在这里查看团队每天的录入情况。",
+    "entries14": "最近14天的录入",
+    "entriesWeek": "本周录入",
+    "lastActive": "最近录入:{{when}}",
+    "notYet": "尚未录入",
+    "waitingInvites_other": "{{count}} 个邀请待处理",
+    "collectors": "数据采集员",
+    "waiting": "待处理邀请",
+    "members": "团队成员",
+    "empty": "还没有数据采集员。请通过电子邮件邀请。",
+    "colName": "姓名",
+    "colContact": "联系方式",
+    "colWeek": "本周",
+    "colLast": "最近录入",
+    "colJoined": "加入时间",
+    "colInvited": "邀请时间",
+    "remove": "移出团队",
+    "removeTitle": "移除数据采集员",
+    "removeMessage": "{{name}} 将无法再为您的农场录入数据,之前的录入仍会保留。",
+    "removed": "{{name}} 已移出您的团队。",
+    "waitingTitle": "待处理邀请({{count}})",
+    "recent": "团队最近的录入",
+    "noActivity": "团队还没有录入任何内容。",
+    "inviteTitle": "添加数据采集员",
+    "inviteIntro": "数据采集员为您的农场录入动物、健康检查、繁殖、饲喂和生产记录。他们看不到资金、报告和助手,也不能删除记录。",
+    "inviteAfter": "对方会收到设置密码的电子邮件。账户需由系统管理员批准后才能使用。",
+    "email": "电子邮件地址",
+    "sendInvite": "发送邀请",
+    "required": "请输入姓名和电子邮件地址。",
+    "invited": "已向 {{email}} 发送邀请。",
+    "inviteCancelled": "已取消对 {{email}} 的邀请。",
+    "errors": {
+      "NAME_REQUIRED": "请输入数据采集员的姓名。",
+      "EMAIL_INVALID": "请输入有效的电子邮件地址。",
+      "TEAM_FULL": "团队已满。请移除成员或取消邀请。",
+      "ALREADY_INVITED": "此人已有待处理的邀请。",
+      "HAS_ACCOUNT": "该邮箱已有 LivestockPro 账户。数据采集员需要新账户,请使用其他邮箱。",
+      "SELF": "不能邀请自己。",
+      "INVITE_FAILED": "邀请邮件发送失败。请检查地址后重试。",
+      "MANAGER_ONLY": "只有农场经理可以管理团队。",
+      "NOT_FOUND": "未找到该成员或邀请。"
+    }
+  },
+  "collectorDash": {
+    "role": "数据采集员",
+    "subtitle": "录入您今天在农场看到的情况",
+    "recordingFor": "为 {{farm}} 录入",
+    "recording": "为您的农场经理录入",
+    "entriesToday_other": "今日录入",
+    "thisWeek_other": "本周 {{count}} 条录入",
+    "streak_other": "连续 {{count}} 天",
+    "whatRecording": "您要录入什么?",
+    "add": {
+      "animal": "添加动物",
+      "health": "健康检查",
+      "breeding": "繁殖",
+      "feeding": "饲喂",
+      "production": "生产",
+      "task": "添加任务"
+    },
+    "myTasks": "待办任务",
+    "noTasks": "没有待办任务",
+    "markDone": "标记为完成",
+    "taskDone": "任务已标记为完成。",
+    "due": "截止 {{date}}",
+    "noDueDate": "无截止日期",
+    "toCheck": "需检查的动物",
+    "allWell": "没有需要关注的动物",
+    "myEntries": "我最近的录入",
+    "noEntries": "本周您还没有录入内容。"
   }
 }

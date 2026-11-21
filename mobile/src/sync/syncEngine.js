@@ -17,7 +17,8 @@ async function applyServerDoc(db, table, doc, syncState) {
   const columns = ['id', 'user_id', ...schemaFields, 'created_at', 'updated_at', 'deleted_at', 'sync_state'];
   const values = [
     doc.id,
-    doc.user_id,
+    /* The recorder, so a data collector's own entries can be told apart from the farm's. */
+    doc.recorded_by || doc.user_id,
     ...schemaFields.map((f) => (doc[f] !== undefined ? doc[f] : null)),
     doc.created_at || null,
     doc.updated_at || null,

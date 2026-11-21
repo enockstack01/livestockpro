@@ -9,6 +9,7 @@ import { useConnectivity } from '../../src/lib/connectivity';
 import { useAccount } from '../../src/account/AccountProvider';
 import { useSplashReady } from '../../src/components/AppSplash';
 import { pendingJoinToken } from '../../src/lib/joinToken';
+import { COLLECTOR_PATHS } from '../../../shared/navigation';
 
 /* The CropManager app's frame (src/ui/AppShell.js): a forest app bar and,
    on phones, the bottom tabs with More; on tablets the sidebar. Pages are
@@ -47,6 +48,9 @@ export default function AppLayout() {
   if (isOrg && offline) return <OfflineMode />;
   if (isOrg && !pathname.startsWith('/organization') && !pathname.startsWith('/settings') && pathname !== '/more') return <Redirect href="/organization" />;
   if (!isOrg && pathname.startsWith('/organization')) return <Redirect href="/" />;
+
+  /* A data collector reaches the entry screens only (the server enforces it too). */
+  if (account && account.farmRole === 'collector' && !['/', '/more', '/settings', ...COLLECTOR_PATHS].includes(pathname)) return <Redirect href="/" />;
 
   return (
     <AppShell>

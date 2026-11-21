@@ -25,7 +25,13 @@
     "reports": "Reports",
     "settings": "Settings",
     "more": "More",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "team": "Team",
+    "sections": {
+      "team": "Team",
+      "recordData": "Record data",
+      "myWork": "My work"
+    }
   },
   "menu": {
     "title": "Menu"
@@ -382,5 +388,166 @@
     "birthTodayTitle": "Birth expected today",
     "birthTodayBody": "{{tag}} is expected to give birth today.",
     "animalFallback": "An animal"
+  },
+  "account": {
+    "types": {
+      "data_collector": "Data collector"
+    }
+  },
+  "team": {
+    "managerRole": "Farm manager",
+    "title": "Team",
+    "subtitle": "Data collectors who record into your farm",
+    "cardTitle": "Your data collectors",
+    "manage": "Manage team",
+    "addCollector": "Add data collector",
+    "cardEmpty": "Invite a data collector and see here what your team records each day.",
+    "entries14": "Entries in the last 14 days",
+    "entriesWeek": "Entries this week",
+    "lastActive": "Last recorded: {{when}}",
+    "notYet": "not yet",
+    "waitingInvites_one": "{{count}} invitation waiting",
+    "waitingInvites_other": "{{count}} invitations waiting",
+    "collectors": "Data collectors",
+    "waiting": "Invitations waiting",
+    "members": "Team members",
+    "empty": "No data collectors yet. Invite one by email.",
+    "colName": "Name",
+    "colContact": "Contact",
+    "colWeek": "This week",
+    "colLast": "Last recorded",
+    "colJoined": "Joined",
+    "colInvited": "Invited",
+    "remove": "Remove from team",
+    "removeTitle": "Remove data collector",
+    "removeMessage": "{{name}} will no longer be able to record data for your farm. Their earlier entries stay in your records.",
+    "removed": "{{name}} was removed from your team.",
+    "waitingTitle": "Invitations waiting ({{count}})",
+    "recent": "Recent entries by your team",
+    "noActivity": "Nothing recorded by your team yet.",
+    "inviteTitle": "Add a data collector",
+    "inviteIntro": "A data collector records animals, health checks, breeding, feeding and production for your farm. They cannot see money, reports or the assistant, and cannot delete records.",
+    "inviteAfter": "They receive an email to set a password. A system administrator approves the account before it can be used.",
+    "email": "Email address",
+    "sendInvite": "Send invitation",
+    "required": "Enter the name and email address.",
+    "invited": "Invitation sent to {{email}}.",
+    "inviteCancelled": "Invitation to {{email}} cancelled.",
+    "errors": {
+      "NAME_REQUIRED": "Enter the data collector's name.",
+      "EMAIL_INVALID": "Enter a valid email address.",
+      "TEAM_FULL": "Your team is full. Remove someone or cancel an invitation first.",
+      "ALREADY_INVITED": "This person already has an invitation waiting.",
+      "HAS_ACCOUNT": "This email already has a LivestockPro account. A data collector needs a new account, so use another email address.",
+      "SELF": "You cannot invite yourself.",
+      "INVITE_FAILED": "The invitation email could not be sent. Check the address and try again.",
+      "MANAGER_ONLY": "Only a farm manager can manage a team.",
+      "NOT_FOUND": "That person or invitation was not found."
+    }
+  },
+  "collectorDash": {
+    "role": "Data collector",
+    "subtitle": "Record what you see on the farm today",
+    "recordingFor": "Recording for {{farm}}",
+    "recording": "Recording for your farm manager",
+    "entriesToday_one": "entry today",
+    "entriesToday_other": "entries today",
+    "thisWeek_one": "{{count}} entry this week",
+    "thisWeek_other": "{{count}} entries this week",
+    "streak_one": "{{count}} day in a row",
+    "streak_other": "{{count}} days in a row",
+    "whatRecording": "What are you recording?",
+    "add": {
+      "animal": "Add animal",
+      "health": "Health check",
+      "breeding": "Breeding",
+      "feeding": "Feeding",
+      "production": "Production",
+      "task": "Add task"
+    },
+    "myTasks": "Tasks to do",
+    "noTasks": "No open tasks",
+    "markDone": "Mark as done",
+    "taskDone": "Task marked as done.",
+    "due": "Due {{date}}",
+    "noDueDate": "No due date",
+    "toCheck": "Animals to check",
+    "allWell": "No animals need attention",
+    "myEntries": "My recent entries",
+    "noEntries": "You have not recorded anything this week."
+  },
+  "notifications": {
+    "orgApproved": {
+      "title": "Organization approved",
+      "body": "{{name}} is active. You can now invite farmers."
+    },
+    "orgSuspended": {
+      "title": "Organization suspended",
+      "body": "{{name}} has been suspended. Referral links are paused."
+    },
+    "orgReactivated": {
+      "title": "Organization reactivated",
+      "body": "{{name}} is active again."
+    },
+    "orgLimitChanged": {
+      "title": "Farmer limit changed",
+      "body": "{{name}} can now have up to {{limit}} farmers."
+    },
+    "orgUsage80": {
+      "title": "Farmer limit almost reached",
+      "body": "{{name}} has {{count}} of {{limit}} farmers."
+    },
+    "orgUsage100": {
+      "title": "Farmer limit reached",
+      "body": "{{name}} has reached its limit of {{limit}} farmers."
+    },
+    "farmerJoined": {
+      "title": "New farmer joined",
+      "body": "{{farmer}} joined {{name}}."
+    },
+    "farmerLeft": {
+      "title": "A farmer left",
+      "body": "{{farmer}} left {{name}}."
+    },
+    "farmerRemoved": {
+      "title": "Removed from organization",
+      "body": "You are no longer linked to {{name}}."
+    },
+    "orgInvite": {
+      "title": "Organization request",
+      "body": "{{name}} would like to add you. Please accept or decline."
+    },
+    "staffInvite": {
+      "title": "Organization invitation",
+      "body": "You have been invited to {{name}}."
+    },
+    "accountRequest": {
+      "title": "New account request",
+      "body": "{{name}} is waiting for approval."
+    },
+    "accountRequestOrg": {
+      "title": "New farmer account to approve",
+      "body": "{{name}} joined through {{org}} and is waiting for approval."
+    },
+    "orgRegistered": {
+      "title": "New organization to approve",
+      "body": "{{name}} registered an organization and is waiting for approval."
+    },
+    "accountApproved": {
+      "title": "Account approved",
+      "body": "Your LivestockPro account is active. Welcome! {{note}}"
+    },
+    "accountOnHold": {
+      "title": "Account on hold",
+      "body": "Your LivestockPro account has been put on hold. {{note}}"
+    },
+    "accountRejected": {
+      "title": "Account request not approved",
+      "body": "Your request for a LivestockPro account was not approved. {{note}}"
+    },
+    "collectorInvite": {
+      "title": "Data collector invitation",
+      "body": "You have been invited to record data for {{farm}}."
+    }
   }
 }

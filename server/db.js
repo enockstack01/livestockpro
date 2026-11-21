@@ -44,6 +44,10 @@ async function ensureIndexes(database) {
     // Farmers registered by an organization: one waiting invitation per email.
     database.collection('farmer_invites').createIndex({ email: 1 }, { unique: true, partialFilterExpression: { status: 'invited' } }),
     database.collection('farmer_invites').createIndex({ organization_id: 1, status: 1 }),
+    // Farm teams (lib/farmTeam.js): data collectors working inside a manager's farm
+    database.collection('farm_members').createIndex({ owner_id: 1, status: 1 }),
+    database.collection('farm_invites').createIndex({ email: 1 }, { unique: true, partialFilterExpression: { status: 'invited' } }),
+    database.collection('farm_invites').createIndex({ owner_id: 1, status: 1 }),
     database.collection('audit_logs').createIndex({ at: -1 }),
     database.collection('audit_logs').createIndex({ organization_id: 1, at: -1 }),
     database.collection('notifications').createIndex({ user_id: 1, created_at: -1 }),

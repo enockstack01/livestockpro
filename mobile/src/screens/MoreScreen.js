@@ -12,7 +12,7 @@ import { haptics } from '../lib/haptics';
 import { accountDisplayName } from '../../../shared/account';
 import { LanguagePanel } from '../ui/HeaderTools';
 import { Page } from '../ui/kit';
-import { MOBILE_SECTIONS, mobilePath, orgSections, useSignOut } from '../ui/AppShell';
+import { COLLECTOR_SECTIONS, MOBILE_SECTIONS, mobilePath, orgSections, useSignOut } from '../ui/AppShell';
 
 /* The phone's menu page (the More tab), as in the CropManager app: your
    profile on a forest card (photo, name, email, Livestock ID), every page
@@ -31,7 +31,7 @@ export default function MoreScreen() {
   const [badImage, setBadImage] = useState(false);
 
   const isOrg = Boolean(account && account.kind === 'organization');
-  const sections = isOrg ? orgSections(account.organization && account.organization.role) : MOBILE_SECTIONS;
+  const sections = isOrg ? orgSections(account.organization && account.organization.role) : account && account.farmRole === 'collector' ? COLLECTOR_SECTIONS : MOBILE_SECTIONS;
   const roleName = accountDisplayName(t, account, account?.role);
   const name = (!isOrg && user?.fullName) || roleName;
   const initials = (name.match(/\b\w/g) || ['U']).slice(0, 2).join('').toUpperCase();

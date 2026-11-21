@@ -47,11 +47,15 @@
       "planning": "Planificación",
       "analytics": "Análisis",
       "administration": "Administración",
-      "system": "Sistema"
+      "system": "Sistema",
+      "team": "Equipo",
+      "recordData": "Registrar datos",
+      "myWork": "Mi trabajo"
     },
     "assistant": "Asistente IA",
     "calendar": "Calendario",
-    "home": "Inicio"
+    "home": "Inicio",
+    "team": "Equipo"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -996,7 +1000,8 @@
       "cooperative": "Cooperativa",
       "researcher": "Investigador",
       "student": "Estudiante",
-      "other": "Otro"
+      "other": "Otro",
+      "data_collector": "Recolector de datos"
     },
     "status": {
       "none": "No solicitado",
@@ -1865,6 +1870,10 @@
     "accountRejected": {
       "title": "Solicitud de cuenta no aprobada",
       "body": "Su solicitud de cuenta de LivestockPro no fue aprobada. {{note}}"
+    },
+    "collectorInvite": {
+      "title": "Invitación de recolector de datos",
+      "body": "Le han invitado a registrar datos para {{farm}}."
     }
   },
   "search": {
@@ -2011,5 +2020,91 @@
     "subtitle": "LivestockPro de Agricoders",
     "intro": "No hay internet, así que el inicio de sesión y todo lo que necesita el servidor están en pausa. El asistente de IA funciona en este teléfono. La aplicación vuelve a la normalidad sola cuando vuelvas a tener conexión.",
     "banner": "Modo sin conexión: tus registros se guardan en este teléfono y la IA funciona en el teléfono. Las funciones en línea vuelven al reconectarte."
+  },
+  "team": {
+    "managerRole": "Gerente de granja",
+    "title": "Equipo",
+    "subtitle": "Recolectores de datos que registran en su granja",
+    "cardTitle": "Sus recolectores de datos",
+    "manage": "Gestionar equipo",
+    "addCollector": "Añadir recolector de datos",
+    "cardEmpty": "Invite a un recolector de datos y vea aquí lo que su equipo registra cada día.",
+    "entries14": "Registros de los últimos 14 días",
+    "entriesWeek": "Registros esta semana",
+    "lastActive": "Último registro: {{when}}",
+    "notYet": "aún no",
+    "waitingInvites_one": "{{count}} invitación pendiente",
+    "waitingInvites_many": "{{count}} invitaciones pendientes",
+    "waitingInvites_other": "{{count}} invitaciones pendientes",
+    "collectors": "Recolectores de datos",
+    "waiting": "Invitaciones pendientes",
+    "members": "Miembros del equipo",
+    "empty": "Aún no hay recolectores de datos. Invite a uno por correo electrónico.",
+    "colName": "Nombre",
+    "colContact": "Contacto",
+    "colWeek": "Esta semana",
+    "colLast": "Último registro",
+    "colJoined": "Se unió",
+    "colInvited": "Invitado",
+    "remove": "Quitar del equipo",
+    "removeTitle": "Quitar al recolector de datos",
+    "removeMessage": "{{name}} ya no podrá registrar datos en su granja. Sus registros anteriores permanecen.",
+    "removed": "{{name}} fue quitado de su equipo.",
+    "waitingTitle": "Invitaciones pendientes ({{count}})",
+    "recent": "Registros recientes de su equipo",
+    "noActivity": "Su equipo aún no ha registrado nada.",
+    "inviteTitle": "Añadir un recolector de datos",
+    "inviteIntro": "Un recolector de datos registra animales, controles de salud, reproducción, alimentación y producción de su granja. No ve dinero, informes ni el asistente, y no puede eliminar registros.",
+    "inviteAfter": "Recibe un correo para crear una contraseña. Un administrador del sistema aprueba la cuenta antes de usarla.",
+    "email": "Correo electrónico",
+    "sendInvite": "Enviar invitación",
+    "required": "Introduzca el nombre y el correo electrónico.",
+    "invited": "Invitación enviada a {{email}}.",
+    "inviteCancelled": "Invitación a {{email}} cancelada.",
+    "errors": {
+      "NAME_REQUIRED": "Introduzca el nombre del recolector de datos.",
+      "EMAIL_INVALID": "Introduzca un correo electrónico válido.",
+      "TEAM_FULL": "Su equipo está completo. Quite a alguien o cancele una invitación.",
+      "ALREADY_INVITED": "Esta persona ya tiene una invitación pendiente.",
+      "HAS_ACCOUNT": "Este correo ya tiene una cuenta de LivestockPro. Un recolector de datos necesita una cuenta nueva: use otro correo.",
+      "SELF": "No puede invitarse a sí mismo.",
+      "INVITE_FAILED": "No se pudo enviar el correo de invitación. Compruebe la dirección e inténtelo de nuevo.",
+      "MANAGER_ONLY": "Solo un gerente de granja puede gestionar un equipo.",
+      "NOT_FOUND": "No se encontró a esa persona o invitación."
+    }
+  },
+  "collectorDash": {
+    "role": "Recolector de datos",
+    "subtitle": "Registre lo que ve hoy en la granja",
+    "recordingFor": "Registrando para {{farm}}",
+    "recording": "Registrando para su gerente de granja",
+    "entriesToday_one": "registro hoy",
+    "entriesToday_many": "registros hoy",
+    "entriesToday_other": "registros hoy",
+    "thisWeek_one": "{{count}} registro esta semana",
+    "thisWeek_many": "{{count}} registros esta semana",
+    "thisWeek_other": "{{count}} registros esta semana",
+    "streak_one": "{{count}} día seguido",
+    "streak_many": "{{count}} días seguidos",
+    "streak_other": "{{count}} días seguidos",
+    "whatRecording": "¿Qué está registrando?",
+    "add": {
+      "animal": "Añadir animal",
+      "health": "Control de salud",
+      "breeding": "Reproducción",
+      "feeding": "Alimentación",
+      "production": "Producción",
+      "task": "Añadir tarea"
+    },
+    "myTasks": "Tareas pendientes",
+    "noTasks": "Sin tareas abiertas",
+    "markDone": "Marcar como hecha",
+    "taskDone": "Tarea marcada como hecha.",
+    "due": "Vence {{date}}",
+    "noDueDate": "Sin fecha límite",
+    "toCheck": "Animales a revisar",
+    "allWell": "Ningún animal necesita atención",
+    "myEntries": "Mis registros recientes",
+    "noEntries": "No ha registrado nada esta semana."
   }
 }

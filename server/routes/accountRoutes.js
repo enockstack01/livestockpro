@@ -4,6 +4,7 @@ const { getDb } = require('../db');
 const { requireAuth, getRole, primaryEmail, verifiedPrimaryEmail, clerkClient } = require('../authMiddleware');
 const { ACCOUNT_TYPES, CURRENCY_RE, DEFAULT_CURRENCY, accounts, getAccount, forgetApproval } = require('../lib/accounts');
 const { activeMembership, farmerLink, claimFarmerInvite } = require('../lib/orgs');
+const { farmScope, claimCollectorInvite, ownerName } = require('../lib/farmTeam');
 const { ensureLivestockId } = require('../lib/livestockId');
 const { notifyAdmins, forgetUsers } = require('../lib/platformAdmins');
 
@@ -18,7 +19,7 @@ function clean(value, max = 200) {
 
 /* What the clients need to decide which screen to show. Admins are always
    let in, whatever their own request says. */
-function toClient(account, role, org = null, livestockId = null) {
+function toClient(account, role, org = null, livestockId = null, team = null) {
   const status = role !== 'user' ? 'approved' : ((account && account.status) || 'none');
   const request = {};
   if (account) REQUEST_FIELDS.forEach((k) => { request[k] = account[k] || ''; });
@@ -31,6 +32,9 @@ function toClient(account, role, org = null, livestockId = null) {
     submittedAt: (account && account.submitted_at) || null,
     reviewedAt: (account && account.reviewed_at) || null,
     kind: (account && account.kind) || 'farmer',
+    /* 'manager' keeps the farm; 'collector' records into a manager's farm. */
+    farmRole: team ? team.role : 'manager',
+    farm: team && team.farm ? team.farm : null,
     livestockId,
     organization: org,
     request
@@ -54,13 +58,16 @@ router.get('/', async (req, res) => {
        invitation becomes their account request and organization link. */
     if (!(await getAccount(req.user.id))) {
       try {
-        await claimFarmerInvite(req.user.id, verifiedPrimaryEmail(await clerkClient.users.getUser(req.user.id)));
+        const email = verifiedPrimaryEmail(await clerkClient.users.getUser(req.user.id));
+        if (!(await claimCollectorInvite(req.user.id, email))) await claimFarmerInvite(req.user.id, email);
       } catch (err) {
         console.error('Claiming a farmer invitation failed:', err.message);
       }
     }
+    const scope = await farmScope(req.user.id);
+    const team = { role: scope.role, farm: scope.role === 'collector' ? await ownerName(scope.ownerId) : null };
     const [account, role, org, livestockId] = await Promise.all([getAccount(req.user.id), getRole(req.user.id), orgSummary(req.user.id), ensureLivestockId(req.user.id)]);
-    res.json({ data: toClient(account, role, org, livestockId), error: null });
+    res.json({ data: toClient(account, role, org, livestockId, team), error: null });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
   }

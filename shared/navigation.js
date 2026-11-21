@@ -40,6 +40,11 @@ export const NAV_SECTIONS = [
       { key: 'assistant', path: '/assistant', icon: 'wand-magic-sparkles', labelKey: 'nav.assistant' },
     ],
   },
+  /* The farm manager's data collectors (managers only; a collector never sees it). */
+  {
+    labelKey: 'nav.sections.team',
+    items: [{ key: 'team', path: '/team', icon: 'people-group', labelKey: 'nav.team' }],
+  },
   /* Web-only, and only for admin / super_admin accounts. */
   {
     labelKey: 'nav.sections.administration',
@@ -67,6 +72,33 @@ export function greeting(t, name) {
   const text = t(greetingKey(), { name: name || '' });
   return name ? text : text.replace(/[\s,，،、]+$/u, '');
 }
+
+/* Sidebar for data collectors, who record data into their farm manager's
+   farm: the entry screens only, with no money, reports or assistant. */
+export const COLLECTOR_NAV_SECTIONS = [
+  { items: [{ key: 'dashboard', path: '/dashboard', icon: 'gauge-high', labelKey: 'nav.dashboard' }] },
+  {
+    labelKey: 'nav.sections.recordData',
+    items: [
+      { key: 'animals', path: '/animals', icon: 'cow', labelKey: 'nav.animals' },
+      { key: 'health', path: '/health', icon: 'stethoscope', labelKey: 'nav.health' },
+      { key: 'breeding', path: '/breeding', icon: 'venus-mars', labelKey: 'nav.breeding' },
+      { key: 'feeding', path: '/feeding', icon: 'wheat-awn', labelKey: 'nav.feeding' },
+      { key: 'production', path: '/production', icon: 'gauge', labelKey: 'nav.production' },
+    ],
+  },
+  {
+    labelKey: 'nav.sections.myWork',
+    items: [{ key: 'tasks', path: '/tasks', icon: 'list-check', labelKey: 'nav.tasks' }],
+  },
+  {
+    labelKey: 'nav.sections.system',
+    items: [{ key: 'settings', path: '/settings', icon: 'gear', labelKey: 'nav.settings' }],
+  },
+];
+
+/* Paths a data collector may open (everything else sends them to the dashboard). */
+export const COLLECTOR_PATHS = COLLECTOR_NAV_SECTIONS.flatMap((s) => s.items.map((i) => i.path));
 
 /* Sidebar for organization accounts (cooperatives, NGOs, companies,
    government programmes): web at /organization/*, mobile at the same

@@ -111,6 +111,7 @@ const PUSH_TEXT = {
   farmerLeft: ['Farmer left', '{{farmer}} left {{name}}.'],
   farmerRemoved: ['Removed from organization', 'You are no longer linked to {{name}}.'],
   orgInvite: ['Join your organization', 'You have been added to {{name}}. Please confirm sharing your farm summary.'],
+  collectorInvite: ['Data collector invitation', 'You have been invited to record data for {{farm}}.'],
   staffInvite: ['Organization invitation', 'You have been invited to {{name}} as {{role}}.'],
   /* Account review, like CropManager: admins hear about new requests, the
      account owner hears the outcome (with the reviewer's note). */

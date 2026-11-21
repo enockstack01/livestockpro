@@ -25,7 +25,13 @@
     "reports": "Informes",
     "settings": "Ajustes",
     "more": "Más",
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "team": "Equipo",
+    "sections": {
+      "team": "Equipo",
+      "recordData": "Registrar datos",
+      "myWork": "Mi trabajo"
+    }
   },
   "menu": {
     "title": "Menú"
@@ -382,5 +388,170 @@
     "birthTodayTitle": "Nacimiento esperado hoy",
     "birthTodayBody": "Se espera que {{tag}} dé a luz hoy.",
     "animalFallback": "Un animal"
+  },
+  "account": {
+    "types": {
+      "data_collector": "Recolector de datos"
+    }
+  },
+  "team": {
+    "managerRole": "Gerente de granja",
+    "title": "Equipo",
+    "subtitle": "Recolectores de datos que registran en su granja",
+    "cardTitle": "Sus recolectores de datos",
+    "manage": "Gestionar equipo",
+    "addCollector": "Añadir recolector de datos",
+    "cardEmpty": "Invite a un recolector de datos y vea aquí lo que su equipo registra cada día.",
+    "entries14": "Registros de los últimos 14 días",
+    "entriesWeek": "Registros esta semana",
+    "lastActive": "Último registro: {{when}}",
+    "notYet": "aún no",
+    "waitingInvites_one": "{{count}} invitación pendiente",
+    "waitingInvites_many": "{{count}} invitaciones pendientes",
+    "waitingInvites_other": "{{count}} invitaciones pendientes",
+    "collectors": "Recolectores de datos",
+    "waiting": "Invitaciones pendientes",
+    "members": "Miembros del equipo",
+    "empty": "Aún no hay recolectores de datos. Invite a uno por correo electrónico.",
+    "colName": "Nombre",
+    "colContact": "Contacto",
+    "colWeek": "Esta semana",
+    "colLast": "Último registro",
+    "colJoined": "Se unió",
+    "colInvited": "Invitado",
+    "remove": "Quitar del equipo",
+    "removeTitle": "Quitar al recolector de datos",
+    "removeMessage": "{{name}} ya no podrá registrar datos en su granja. Sus registros anteriores permanecen.",
+    "removed": "{{name}} fue quitado de su equipo.",
+    "waitingTitle": "Invitaciones pendientes ({{count}})",
+    "recent": "Registros recientes de su equipo",
+    "noActivity": "Su equipo aún no ha registrado nada.",
+    "inviteTitle": "Añadir un recolector de datos",
+    "inviteIntro": "Un recolector de datos registra animales, controles de salud, reproducción, alimentación y producción de su granja. No ve dinero, informes ni el asistente, y no puede eliminar registros.",
+    "inviteAfter": "Recibe un correo para crear una contraseña. Un administrador del sistema aprueba la cuenta antes de usarla.",
+    "email": "Correo electrónico",
+    "sendInvite": "Enviar invitación",
+    "required": "Introduzca el nombre y el correo electrónico.",
+    "invited": "Invitación enviada a {{email}}.",
+    "inviteCancelled": "Invitación a {{email}} cancelada.",
+    "errors": {
+      "NAME_REQUIRED": "Introduzca el nombre del recolector de datos.",
+      "EMAIL_INVALID": "Introduzca un correo electrónico válido.",
+      "TEAM_FULL": "Su equipo está completo. Quite a alguien o cancele una invitación.",
+      "ALREADY_INVITED": "Esta persona ya tiene una invitación pendiente.",
+      "HAS_ACCOUNT": "Este correo ya tiene una cuenta de LivestockPro. Un recolector de datos necesita una cuenta nueva: use otro correo.",
+      "SELF": "No puede invitarse a sí mismo.",
+      "INVITE_FAILED": "No se pudo enviar el correo de invitación. Compruebe la dirección e inténtelo de nuevo.",
+      "MANAGER_ONLY": "Solo un gerente de granja puede gestionar un equipo.",
+      "NOT_FOUND": "No se encontró a esa persona o invitación."
+    }
+  },
+  "collectorDash": {
+    "role": "Recolector de datos",
+    "subtitle": "Registre lo que ve hoy en la granja",
+    "recordingFor": "Registrando para {{farm}}",
+    "recording": "Registrando para su gerente de granja",
+    "entriesToday_one": "registro hoy",
+    "entriesToday_many": "registros hoy",
+    "entriesToday_other": "registros hoy",
+    "thisWeek_one": "{{count}} registro esta semana",
+    "thisWeek_many": "{{count}} registros esta semana",
+    "thisWeek_other": "{{count}} registros esta semana",
+    "streak_one": "{{count}} día seguido",
+    "streak_many": "{{count}} días seguidos",
+    "streak_other": "{{count}} días seguidos",
+    "whatRecording": "¿Qué está registrando?",
+    "add": {
+      "animal": "Añadir animal",
+      "health": "Control de salud",
+      "breeding": "Reproducción",
+      "feeding": "Alimentación",
+      "production": "Producción",
+      "task": "Añadir tarea"
+    },
+    "myTasks": "Tareas pendientes",
+    "noTasks": "Sin tareas abiertas",
+    "markDone": "Marcar como hecha",
+    "taskDone": "Tarea marcada como hecha.",
+    "due": "Vence {{date}}",
+    "noDueDate": "Sin fecha límite",
+    "toCheck": "Animales a revisar",
+    "allWell": "Ningún animal necesita atención",
+    "myEntries": "Mis registros recientes",
+    "noEntries": "No ha registrado nada esta semana."
+  },
+  "notifications": {
+    "orgApproved": {
+      "title": "Organización aprobada",
+      "body": "{{name}} está activa. Ya puede invitar ganaderos."
+    },
+    "orgSuspended": {
+      "title": "Organización suspendida",
+      "body": "{{name}} ha sido suspendida. Los enlaces de invitación están en pausa."
+    },
+    "orgReactivated": {
+      "title": "Organización reactivada",
+      "body": "{{name}} vuelve a estar activa."
+    },
+    "orgLimitChanged": {
+      "title": "Límite de ganaderos cambiado",
+      "body": "{{name}} ahora puede tener hasta {{limit}} ganaderos."
+    },
+    "orgUsage80": {
+      "title": "Límite de ganaderos casi alcanzado",
+      "body": "{{name}} tiene {{count}} de {{limit}} ganaderos."
+    },
+    "orgUsage100": {
+      "title": "Límite de ganaderos alcanzado",
+      "body": "{{name}} alcanzó su límite de {{limit}} ganaderos."
+    },
+    "farmerJoined": {
+      "title": "Nuevo ganadero",
+      "body": "{{farmer}} se unió a {{name}}."
+    },
+    "farmerLeft": {
+      "title": "Un ganadero se fue",
+      "body": "{{farmer}} dejó {{name}}."
+    },
+    "farmerRemoved": {
+      "title": "Retirado de la organización",
+      "body": "Ya no está vinculado a {{name}}."
+    },
+    "orgInvite": {
+      "title": "Solicitud de organización",
+      "body": "{{name}} quiere añadirle. Acepte o rechace."
+    },
+    "staffInvite": {
+      "title": "Invitación de organización",
+      "body": "Ha sido invitado a {{name}}."
+    },
+    "accountRequest": {
+      "title": "Nueva solicitud de cuenta",
+      "body": "{{name}} espera la aprobación."
+    },
+    "accountRequestOrg": {
+      "title": "Nueva cuenta de ganadero por aprobar",
+      "body": "{{name}} se unió a través de {{org}} y espera la aprobación."
+    },
+    "orgRegistered": {
+      "title": "Nueva organización por aprobar",
+      "body": "{{name}} registró una organización y espera la aprobación."
+    },
+    "accountApproved": {
+      "title": "Cuenta aprobada",
+      "body": "Su cuenta de LivestockPro está activa. ¡Bienvenido! {{note}}"
+    },
+    "accountOnHold": {
+      "title": "Cuenta en espera",
+      "body": "Su cuenta de LivestockPro se ha puesto en espera. {{note}}"
+    },
+    "accountRejected": {
+      "title": "Solicitud de cuenta no aprobada",
+      "body": "Su solicitud de cuenta de LivestockPro no fue aprobada. {{note}}"
+    },
+    "collectorInvite": {
+      "title": "Invitación de recolector de datos",
+      "body": "Le han invitado a registrar datos para {{farm}}."
+    }
   }
 }

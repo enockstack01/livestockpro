@@ -47,11 +47,15 @@
       "planning": "Planification",
       "analytics": "Analyses",
       "administration": "Administration",
-      "system": "Système"
+      "system": "Système",
+      "team": "Équipe",
+      "recordData": "Saisir des données",
+      "myWork": "Mon travail"
     },
     "assistant": "Assistant IA",
     "calendar": "Calendrier",
-    "home": "Accueil"
+    "home": "Accueil",
+    "team": "Équipe"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -996,7 +1000,8 @@
       "cooperative": "Coopérative",
       "researcher": "Chercheur",
       "student": "Étudiant",
-      "other": "Autre"
+      "other": "Autre",
+      "data_collector": "Collecteur de données"
     },
     "status": {
       "none": "Non demandé",
@@ -1865,6 +1870,10 @@
     "accountRejected": {
       "title": "Demande de compte refusée",
       "body": "Votre demande de compte LivestockPro n’a pas été approuvée. {{note}}"
+    },
+    "collectorInvite": {
+      "title": "Invitation de collecteur de données",
+      "body": "Vous êtes invité à saisir des données pour {{farm}}."
     }
   },
   "search": {
@@ -2011,5 +2020,91 @@
     "subtitle": "LivestockPro par Agricoders",
     "intro": "Il n’y a pas d’internet : la connexion et tout ce qui a besoin du serveur sont en pause. L’assistant IA fonctionne sur ce téléphone. L’application revient à la normale toute seule dès que vous êtes de nouveau en ligne.",
     "banner": "Mode hors ligne : vos registres sont enregistrés sur ce téléphone et l’IA fonctionne sur le téléphone. Les fonctions en ligne reviennent dès la reconnexion."
+  },
+  "team": {
+    "managerRole": "Gestionnaire de ferme",
+    "title": "Équipe",
+    "subtitle": "Les collecteurs de données qui saisissent dans votre ferme",
+    "cardTitle": "Vos collecteurs de données",
+    "manage": "Gérer l'équipe",
+    "addCollector": "Ajouter un collecteur de données",
+    "cardEmpty": "Invitez un collecteur de données et voyez ici ce que votre équipe saisit chaque jour.",
+    "entries14": "Saisies des 14 derniers jours",
+    "entriesWeek": "Saisies cette semaine",
+    "lastActive": "Dernière saisie : {{when}}",
+    "notYet": "pas encore",
+    "waitingInvites_one": "{{count}} invitation en attente",
+    "waitingInvites_many": "{{count}} invitations en attente",
+    "waitingInvites_other": "{{count}} invitations en attente",
+    "collectors": "Collecteurs de données",
+    "waiting": "Invitations en attente",
+    "members": "Membres de l'équipe",
+    "empty": "Aucun collecteur de données pour le moment. Invitez-en un par e-mail.",
+    "colName": "Nom",
+    "colContact": "Contact",
+    "colWeek": "Cette semaine",
+    "colLast": "Dernière saisie",
+    "colJoined": "Arrivé le",
+    "colInvited": "Invité le",
+    "remove": "Retirer de l'équipe",
+    "removeTitle": "Retirer le collecteur de données",
+    "removeMessage": "{{name}} ne pourra plus saisir de données pour votre ferme. Ses saisies précédentes restent dans vos enregistrements.",
+    "removed": "{{name}} a été retiré de votre équipe.",
+    "waitingTitle": "Invitations en attente ({{count}})",
+    "recent": "Saisies récentes de votre équipe",
+    "noActivity": "Votre équipe n'a encore rien saisi.",
+    "inviteTitle": "Ajouter un collecteur de données",
+    "inviteIntro": "Un collecteur de données enregistre les animaux, contrôles de santé, reproduction, alimentation et production de votre ferme. Il ne voit ni l'argent, ni les rapports, ni l'assistant, et ne peut rien supprimer.",
+    "inviteAfter": "Il reçoit un e-mail pour définir un mot de passe. Un administrateur système approuve le compte avant son utilisation.",
+    "email": "Adresse e-mail",
+    "sendInvite": "Envoyer l'invitation",
+    "required": "Saisissez le nom et l'adresse e-mail.",
+    "invited": "Invitation envoyée à {{email}}.",
+    "inviteCancelled": "Invitation à {{email}} annulée.",
+    "errors": {
+      "NAME_REQUIRED": "Saisissez le nom du collecteur de données.",
+      "EMAIL_INVALID": "Saisissez une adresse e-mail valide.",
+      "TEAM_FULL": "Votre équipe est complète. Retirez quelqu'un ou annulez une invitation.",
+      "ALREADY_INVITED": "Cette personne a déjà une invitation en attente.",
+      "HAS_ACCOUNT": "Cet e-mail a déjà un compte LivestockPro. Un collecteur de données a besoin d'un nouveau compte : utilisez une autre adresse.",
+      "SELF": "Vous ne pouvez pas vous inviter vous-même.",
+      "INVITE_FAILED": "L'e-mail d'invitation n'a pas pu être envoyé. Vérifiez l'adresse et réessayez.",
+      "MANAGER_ONLY": "Seul un gestionnaire de ferme peut gérer une équipe.",
+      "NOT_FOUND": "Cette personne ou invitation est introuvable."
+    }
+  },
+  "collectorDash": {
+    "role": "Collecteur de données",
+    "subtitle": "Saisissez ce que vous voyez aujourd'hui à la ferme",
+    "recordingFor": "Saisie pour {{farm}}",
+    "recording": "Saisie pour votre gestionnaire de ferme",
+    "entriesToday_one": "saisie aujourd'hui",
+    "entriesToday_many": "saisies aujourd'hui",
+    "entriesToday_other": "saisies aujourd'hui",
+    "thisWeek_one": "{{count}} saisie cette semaine",
+    "thisWeek_many": "{{count}} saisies cette semaine",
+    "thisWeek_other": "{{count}} saisies cette semaine",
+    "streak_one": "{{count}} jour de suite",
+    "streak_many": "{{count}} jours de suite",
+    "streak_other": "{{count}} jours de suite",
+    "whatRecording": "Que saisissez-vous ?",
+    "add": {
+      "animal": "Ajouter un animal",
+      "health": "Contrôle de santé",
+      "breeding": "Reproduction",
+      "feeding": "Alimentation",
+      "production": "Production",
+      "task": "Ajouter une tâche"
+    },
+    "myTasks": "Tâches à faire",
+    "noTasks": "Aucune tâche ouverte",
+    "markDone": "Marquer comme terminée",
+    "taskDone": "Tâche marquée comme terminée.",
+    "due": "Échéance {{date}}",
+    "noDueDate": "Sans échéance",
+    "toCheck": "Animaux à contrôler",
+    "allWell": "Aucun animal ne demande d'attention",
+    "myEntries": "Mes saisies récentes",
+    "noEntries": "Vous n'avez rien saisi cette semaine."
   }
 }

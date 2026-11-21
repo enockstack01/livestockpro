@@ -16,6 +16,7 @@ import { Badge, Button, Card, CardBody, CardHeader, EmptyState, FilterBar, Finan
 import { Grid, useBreakpoint } from '../ui/layout';
 import DataTable from '../ui/DataTable';
 import { usePageSearch } from '../ui/AppShell';
+import { useAccount } from '../account/AccountProvider';
 import { RECORD_PAGES } from '../config/recordPages';
 import { RecordExportButton } from '../components/ExportButton';
 import { formatMoney, getCurrency, moneyOf, recordCurrency } from '../../../shared/currency';
@@ -61,6 +62,9 @@ export default function RecordListScreen({ config }) {
   const [viewRow, setViewRow] = useState(null);
 
   const params = useLocalSearchParams();
+  /* Data collectors cannot delete records or open the assistant. */
+  const { account } = useAccount();
+  const isCollector = Boolean(account && account.farmRole === 'collector');
   const searchBox = usePageSearch(t('records.searchPlaceholder', { label: label.toLowerCase() }), (v) => { setSearch(v); setPageNum(1); }, params.search);
 
   const load = useCallback(async () => {
@@ -215,9 +219,9 @@ export default function RecordListScreen({ config }) {
             actionsLabel={t('adminDashboard.colActions')}
             actions={(r) => (
               <>
-                {config.table === 'health_records' ? <IconButton icon="wand-magic-sparkles" label={t('ai.diagnose.fromRecord')} onPress={() => router.push({ pathname: '/assistant', params: { tab: 'diagnose', record: r.id } })} /> : null}
+                {config.table === 'health_records' && !isCollector ? <IconButton icon="wand-magic-sparkles" label={t('ai.diagnose.fromRecord')} onPress={() => router.push({ pathname: '/assistant', params: { tab: 'diagnose', record: r.id } })} /> : null}
                 <IconButton icon="pen-to-square" label={t('common.edit')} onPress={() => openEdit(r)} />
-                <IconButton icon="trash" danger label={t('common.delete')} onPress={() => remove(r)} />
+                {isCollector ? null : <IconButton icon="trash" danger label={t('common.delete')} onPress={() => remove(r)} />}
               </>
             )}
             empty={filtersActive

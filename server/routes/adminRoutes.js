@@ -796,6 +796,11 @@ router.delete('/users/:id', async (req, res) => {
     await audit(req, 'user.delete', { targetType: 'user', targetId, details: { email: await emailOf(targetId) } });
     const orgLink = await farmerLink(targetId);
     if (orgLink) await endFarmerLink(targetId, orgLink.org._id, 'removed', req.user.id);
+    /* A farm team ends with its manager; a collector's membership ends with their account. */
+    const ended = { $set: { status: 'removed', removed_at: new Date().toISOString() } };
+    await db.collection('farm_members').updateMany({ $or: [{ _id: targetId }, { owner_id: targetId }], status: 'active' }, ended);
+    await db.collection('farm_invites').updateMany({ owner_id: targetId, status: 'invited' }, { $set: { status: 'revoked' } });
+    require('../lib/farmTeam').forgetTeamRole(targetId);
     await db.collection('organization_members').updateMany({ user_id: targetId, status: 'active' }, { $set: { status: 'removed', removed_at: new Date().toISOString() } });
     await Promise.all(['profiles', 'push_tokens', 'accounts', 'ai_reports', 'ai_usage', 'notifications', ...RESOURCE_COLLECTIONS].map((name) => db.collection(name).deleteMany({ user_id: targetId })));
     await db.collection('farmer_stats').deleteMany({ farmer_id: targetId });

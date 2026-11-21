@@ -22,6 +22,19 @@ router.get('/status', async (req, res) => {
 
 router.use(requireApproved);
 
+/* The assistant is for the farm manager: a data collector has no records of
+   their own for it to read, and the calls cost AI allowance. */
+router.use(async (req, res, next) => {
+  try {
+    if ((await require('../lib/farmTeam').farmScope(req.user.id)).role === 'collector') {
+      return res.status(403).json({ error: { message: 'The assistant is available to your farm manager.', code: 'COLLECTOR_FORBIDDEN' } });
+    }
+    next();
+  } catch (err) {
+    res.status(500).json({ error: { message: err.message } });
+  }
+});
+
 /* AI rate limits, per user (server/lib/aiQuota.js has the daily quotas):
    1. burst: a few requests a minute, so one person cannot hammer the model
    2. hourly: a ceiling on a busy hour

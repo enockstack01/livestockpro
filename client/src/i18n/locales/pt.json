@@ -47,11 +47,15 @@
       "planning": "Planejamento",
       "analytics": "Análises",
       "administration": "Administração",
-      "system": "Sistema"
+      "system": "Sistema",
+      "team": "Equipa",
+      "recordData": "Registar dados",
+      "myWork": "O meu trabalho"
     },
     "assistant": "Assistente IA",
     "calendar": "Calendário",
-    "home": "Início"
+    "home": "Início",
+    "team": "Equipa"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -996,7 +1000,8 @@
       "cooperative": "Cooperativa",
       "researcher": "Pesquisador",
       "student": "Estudante",
-      "other": "Outro"
+      "other": "Outro",
+      "data_collector": "Recolhedor de dados"
     },
     "status": {
       "none": "Não solicitado",
@@ -1865,6 +1870,10 @@
     "accountRejected": {
       "title": "Pedido de conta não aprovado",
       "body": "O seu pedido de conta LivestockPro não foi aprovado. {{note}}"
+    },
+    "collectorInvite": {
+      "title": "Convite de recolhedor de dados",
+      "body": "Foi convidado a registar dados para {{farm}}."
     }
   },
   "search": {
@@ -2011,5 +2020,91 @@
     "subtitle": "LivestockPro da Agricoders",
     "intro": "Não há internet, por isso o início de sessão e tudo o que precisa do servidor estão em pausa. O assistente de IA funciona neste telefone. A aplicação volta ao normal sozinha quando voltar a estar online.",
     "banner": "Modo offline: os seus registos são guardados neste telefone e a IA funciona no telefone. As funções online voltam quando voltar a ligar-se."
+  },
+  "team": {
+    "managerRole": "Gestor da quinta",
+    "title": "Equipa",
+    "subtitle": "Recolhedores de dados que registam na sua quinta",
+    "cardTitle": "Os seus recolhedores de dados",
+    "manage": "Gerir equipa",
+    "addCollector": "Adicionar recolhedor de dados",
+    "cardEmpty": "Convide um recolhedor de dados e veja aqui o que a sua equipa regista todos os dias.",
+    "entries14": "Registos dos últimos 14 dias",
+    "entriesWeek": "Registos esta semana",
+    "lastActive": "Último registo: {{when}}",
+    "notYet": "ainda não",
+    "waitingInvites_one": "{{count}} convite pendente",
+    "waitingInvites_many": "{{count}} convites pendentes",
+    "waitingInvites_other": "{{count}} convites pendentes",
+    "collectors": "Recolhedores de dados",
+    "waiting": "Convites pendentes",
+    "members": "Membros da equipa",
+    "empty": "Ainda não há recolhedores de dados. Convide um por e-mail.",
+    "colName": "Nome",
+    "colContact": "Contacto",
+    "colWeek": "Esta semana",
+    "colLast": "Último registo",
+    "colJoined": "Aderiu",
+    "colInvited": "Convidado",
+    "remove": "Remover da equipa",
+    "removeTitle": "Remover o recolhedor de dados",
+    "removeMessage": "{{name}} deixará de poder registar dados na sua quinta. Os registos anteriores permanecem.",
+    "removed": "{{name}} foi removido da sua equipa.",
+    "waitingTitle": "Convites pendentes ({{count}})",
+    "recent": "Registos recentes da sua equipa",
+    "noActivity": "A sua equipa ainda não registou nada.",
+    "inviteTitle": "Adicionar um recolhedor de dados",
+    "inviteIntro": "Um recolhedor de dados regista animais, controlos de saúde, reprodução, alimentação e produção da sua quinta. Não vê dinheiro, relatórios nem o assistente, e não pode eliminar registos.",
+    "inviteAfter": "Recebe um e-mail para definir uma palavra-passe. Um administrador do sistema aprova a conta antes de ser usada.",
+    "email": "Endereço de e-mail",
+    "sendInvite": "Enviar convite",
+    "required": "Introduza o nome e o e-mail.",
+    "invited": "Convite enviado para {{email}}.",
+    "inviteCancelled": "Convite para {{email}} cancelado.",
+    "errors": {
+      "NAME_REQUIRED": "Introduza o nome do recolhedor de dados.",
+      "EMAIL_INVALID": "Introduza um e-mail válido.",
+      "TEAM_FULL": "A sua equipa está completa. Remova alguém ou cancele um convite.",
+      "ALREADY_INVITED": "Esta pessoa já tem um convite pendente.",
+      "HAS_ACCOUNT": "Este e-mail já tem uma conta LivestockPro. Um recolhedor de dados precisa de uma conta nova: use outro e-mail.",
+      "SELF": "Não pode convidar-se a si próprio.",
+      "INVITE_FAILED": "Não foi possível enviar o e-mail de convite. Verifique o endereço e tente novamente.",
+      "MANAGER_ONLY": "Só um gestor da quinta pode gerir uma equipa.",
+      "NOT_FOUND": "Essa pessoa ou convite não foi encontrado."
+    }
+  },
+  "collectorDash": {
+    "role": "Recolhedor de dados",
+    "subtitle": "Registe o que vê hoje na quinta",
+    "recordingFor": "A registar para {{farm}}",
+    "recording": "A registar para o seu gestor da quinta",
+    "entriesToday_one": "registo hoje",
+    "entriesToday_many": "registos hoje",
+    "entriesToday_other": "registos hoje",
+    "thisWeek_one": "{{count}} registo esta semana",
+    "thisWeek_many": "{{count}} registos esta semana",
+    "thisWeek_other": "{{count}} registos esta semana",
+    "streak_one": "{{count}} dia seguido",
+    "streak_many": "{{count}} dias seguidos",
+    "streak_other": "{{count}} dias seguidos",
+    "whatRecording": "O que está a registar?",
+    "add": {
+      "animal": "Adicionar animal",
+      "health": "Controlo de saúde",
+      "breeding": "Reprodução",
+      "feeding": "Alimentação",
+      "production": "Produção",
+      "task": "Adicionar tarefa"
+    },
+    "myTasks": "Tarefas por fazer",
+    "noTasks": "Sem tarefas abertas",
+    "markDone": "Marcar como concluída",
+    "taskDone": "Tarefa marcada como concluída.",
+    "due": "Vence {{date}}",
+    "noDueDate": "Sem data limite",
+    "toCheck": "Animais a verificar",
+    "allWell": "Nenhum animal precisa de atenção",
+    "myEntries": "Os meus registos recentes",
+    "noEntries": "Não registou nada esta semana."
   }
 }

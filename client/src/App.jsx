@@ -18,6 +18,7 @@ import AdminDashboard from './pages/AdminDashboard.jsx';
 import OneHealth from './pages/OneHealth.jsx';
 import Assistant from './pages/Assistant.jsx';
 import Join from './pages/Join.jsx';
+import Team from './pages/Team.jsx';
 import OrgDashboard from './pages/org/OrgDashboard.jsx';
 import OrgFarmers, { OrgFarmerRecords } from './pages/org/OrgFarmers.jsx';
 import OrgLinks from './pages/org/OrgLinks.jsx';
@@ -41,6 +42,14 @@ function OrgOnly({ children }) {
   const { account } = useAccount();
   return account.kind === 'organization' ? children : <Navigate to="/dashboard" replace />;
 }
+/* Money, reports, the assistant, the calendar and the team belong to the farm
+   manager: a data collector is sent back to their dashboard. */
+function ManagerOnly({ children }) {
+  const { account } = useAccount();
+  if (account.kind === 'organization') return <Navigate to="/organization" replace />;
+  return account.farmRole === 'collector' ? <Navigate to="/dashboard" replace /> : children;
+}
+const M = (el) => <ManagerOnly>{el}</ManagerOnly>;
 const F = (el) => <FarmerOnly>{el}</FarmerOnly>;
 const O = (el) => <OrgOnly>{el}</OrgOnly>;
 
@@ -56,11 +65,12 @@ export default function App() {
         <Route path="/feeding" element={F(<Feeding />)} />
         <Route path="/breeding" element={F(<Breeding />)} />
         <Route path="/production" element={F(<Production />)} />
-        <Route path="/finance" element={F(<Finance />)} />
+        <Route path="/finance" element={M(<Finance />)} />
         <Route path="/tasks" element={F(<Tasks />)} />
-        <Route path="/calendar" element={F(<Calendar />)} />
-        <Route path="/reports" element={F(<Reports />)} />
-        <Route path="/assistant" element={F(<Assistant />)} />
+        <Route path="/calendar" element={M(<Calendar />)} />
+        <Route path="/reports" element={M(<Reports />)} />
+        <Route path="/assistant" element={M(<Assistant />)} />
+        <Route path="/team" element={M(<Team />)} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/onehealth" element={<OneHealth />} />

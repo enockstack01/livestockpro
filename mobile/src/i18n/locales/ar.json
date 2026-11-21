@@ -25,7 +25,13 @@
     "reports": "التقارير",
     "settings": "الإعدادات",
     "more": "المزيد",
-    "signOut": "تسجيل الخروج"
+    "signOut": "تسجيل الخروج",
+    "team": "الفريق",
+    "sections": {
+      "team": "الفريق",
+      "recordData": "تسجيل البيانات",
+      "myWork": "عملي"
+    }
   },
   "menu": {
     "title": "القائمة"
@@ -382,5 +388,182 @@
     "birthTodayTitle": "الولادة متوقعة اليوم",
     "birthTodayBody": "من المتوقع أن تلد {{tag}} اليوم.",
     "animalFallback": "حيوان"
+  },
+  "account": {
+    "types": {
+      "data_collector": "جامع بيانات"
+    }
+  },
+  "team": {
+    "managerRole": "مدير المزرعة",
+    "title": "الفريق",
+    "subtitle": "جامعو البيانات الذين يسجلون في مزرعتك",
+    "cardTitle": "جامعو البيانات لديك",
+    "manage": "إدارة الفريق",
+    "addCollector": "إضافة جامع بيانات",
+    "cardEmpty": "ادعُ جامع بيانات وشاهد هنا ما يسجله فريقك كل يوم.",
+    "entries14": "السجلات في آخر 14 يوماً",
+    "entriesWeek": "السجلات هذا الأسبوع",
+    "lastActive": "آخر تسجيل: {{when}}",
+    "notYet": "لم يسجل بعد",
+    "waitingInvites_zero": "{{count}} دعوات قيد الانتظار",
+    "waitingInvites_one": "دعوة واحدة قيد الانتظار",
+    "waitingInvites_two": "{{count}} دعوات قيد الانتظار",
+    "waitingInvites_few": "{{count}} دعوات قيد الانتظار",
+    "waitingInvites_many": "{{count}} دعوات قيد الانتظار",
+    "waitingInvites_other": "{{count}} دعوات قيد الانتظار",
+    "collectors": "جامعو البيانات",
+    "waiting": "دعوات قيد الانتظار",
+    "members": "أعضاء الفريق",
+    "empty": "لا يوجد جامعو بيانات بعد. ادعُ واحداً عبر البريد الإلكتروني.",
+    "colName": "الاسم",
+    "colContact": "التواصل",
+    "colWeek": "هذا الأسبوع",
+    "colLast": "آخر تسجيل",
+    "colJoined": "تاريخ الانضمام",
+    "colInvited": "تاريخ الدعوة",
+    "remove": "إزالة من الفريق",
+    "removeTitle": "إزالة جامع البيانات",
+    "removeMessage": "لن يتمكن {{name}} من التسجيل في مزرعتك. تبقى سجلاته السابقة.",
+    "removed": "تمت إزالة {{name}} من فريقك.",
+    "waitingTitle": "دعوات قيد الانتظار ({{count}})",
+    "recent": "أحدث سجلات فريقك",
+    "noActivity": "لم يسجل فريقك أي شيء بعد.",
+    "inviteTitle": "إضافة جامع بيانات",
+    "inviteIntro": "يسجل جامع البيانات الحيوانات والفحوصات الصحية والتربية والتغذية والإنتاج في مزرعتك. لا يرى الأموال أو التقارير أو المساعد ولا يستطيع حذف السجلات.",
+    "inviteAfter": "يتلقى بريداً إلكترونياً لتعيين كلمة مرور. يوافق مدير النظام على الحساب قبل استخدامه.",
+    "email": "البريد الإلكتروني",
+    "sendInvite": "إرسال الدعوة",
+    "required": "أدخل الاسم والبريد الإلكتروني.",
+    "invited": "تم إرسال الدعوة إلى {{email}}.",
+    "inviteCancelled": "تم إلغاء الدعوة إلى {{email}}.",
+    "errors": {
+      "NAME_REQUIRED": "أدخل اسم جامع البيانات.",
+      "EMAIL_INVALID": "أدخل بريداً إلكترونياً صالحاً.",
+      "TEAM_FULL": "فريقك مكتمل. أزل أحداً أو ألغِ دعوة.",
+      "ALREADY_INVITED": "لدى هذا الشخص دعوة قيد الانتظار.",
+      "HAS_ACCOUNT": "هذا البريد لديه حساب LivestockPro بالفعل. يحتاج جامع البيانات إلى حساب جديد، فاستخدم بريداً آخر.",
+      "SELF": "لا يمكنك دعوة نفسك.",
+      "INVITE_FAILED": "تعذر إرسال بريد الدعوة. تحقق من العنوان وحاول مجدداً.",
+      "MANAGER_ONLY": "يمكن لمدير المزرعة فقط إدارة الفريق.",
+      "NOT_FOUND": "لم يتم العثور على هذا الشخص أو الدعوة."
+    }
+  },
+  "collectorDash": {
+    "role": "جامع بيانات",
+    "subtitle": "سجّل ما تراه اليوم في المزرعة",
+    "recordingFor": "التسجيل لصالح {{farm}}",
+    "recording": "التسجيل لصالح مدير مزرعتك",
+    "entriesToday_zero": "سجلات اليوم",
+    "entriesToday_one": "سجل اليوم",
+    "entriesToday_two": "سجلات اليوم",
+    "entriesToday_few": "سجلات اليوم",
+    "entriesToday_many": "سجلات اليوم",
+    "entriesToday_other": "سجلات اليوم",
+    "thisWeek_zero": "{{count}} سجلات هذا الأسبوع",
+    "thisWeek_one": "سجل واحد هذا الأسبوع",
+    "thisWeek_two": "{{count}} سجلات هذا الأسبوع",
+    "thisWeek_few": "{{count}} سجلات هذا الأسبوع",
+    "thisWeek_many": "{{count}} سجلات هذا الأسبوع",
+    "thisWeek_other": "{{count}} سجلات هذا الأسبوع",
+    "streak_zero": "{{count}} أيام متتالية",
+    "streak_one": "يوم واحد متتالٍ",
+    "streak_two": "{{count}} أيام متتالية",
+    "streak_few": "{{count}} أيام متتالية",
+    "streak_many": "{{count}} أيام متتالية",
+    "streak_other": "{{count}} أيام متتالية",
+    "whatRecording": "ماذا تسجّل؟",
+    "add": {
+      "animal": "إضافة حيوان",
+      "health": "فحص صحي",
+      "breeding": "التربية",
+      "feeding": "التغذية",
+      "production": "الإنتاج",
+      "task": "إضافة مهمة"
+    },
+    "myTasks": "المهام المطلوبة",
+    "noTasks": "لا توجد مهام مفتوحة",
+    "markDone": "وضع علامة منجز",
+    "taskDone": "تم وضع علامة منجز على المهمة.",
+    "due": "الاستحقاق {{date}}",
+    "noDueDate": "بلا موعد استحقاق",
+    "toCheck": "حيوانات تحتاج فحصاً",
+    "allWell": "لا حيوان يحتاج إلى اهتمام",
+    "myEntries": "أحدث سجلاتي",
+    "noEntries": "لم تسجّل شيئاً هذا الأسبوع."
+  },
+  "notifications": {
+    "orgApproved": {
+      "title": "تمت الموافقة على المنظمة",
+      "body": "{{name}} نشطة الآن. يمكنك دعوة المربين."
+    },
+    "orgSuspended": {
+      "title": "تم تعليق المنظمة",
+      "body": "تم تعليق {{name}}. روابط الدعوة متوقفة مؤقتًا."
+    },
+    "orgReactivated": {
+      "title": "أعيد تفعيل المنظمة",
+      "body": "{{name}} نشطة مرة أخرى."
+    },
+    "orgLimitChanged": {
+      "title": "تغير الحد الأقصى للمربين",
+      "body": "يمكن لـ {{name}} الآن أن تضم حتى {{limit}} مربيًا."
+    },
+    "orgUsage80": {
+      "title": "الحد الأقصى للمربين على وشك الاكتمال",
+      "body": "لدى {{name}} {{count}} من {{limit}} مربيًا."
+    },
+    "orgUsage100": {
+      "title": "تم بلوغ الحد الأقصى للمربين",
+      "body": "بلغت {{name}} حدها الأقصى البالغ {{limit}} مربيًا."
+    },
+    "farmerJoined": {
+      "title": "انضم مربٍّ جديد",
+      "body": "انضم {{farmer}} إلى {{name}}."
+    },
+    "farmerLeft": {
+      "title": "غادر مربٍّ",
+      "body": "غادر {{farmer}} {{name}}."
+    },
+    "farmerRemoved": {
+      "title": "أُزلت من المنظمة",
+      "body": "لم تعد مرتبطًا بـ {{name}}."
+    },
+    "orgInvite": {
+      "title": "طلب من منظمة",
+      "body": "ترغب {{name}} في إضافتك. يرجى القبول أو الرفض."
+    },
+    "staffInvite": {
+      "title": "دعوة من منظمة",
+      "body": "تمت دعوتك إلى {{name}}."
+    },
+    "accountRequest": {
+      "title": "طلب حساب جديد",
+      "body": "{{name}} بانتظار الموافقة."
+    },
+    "accountRequestOrg": {
+      "title": "حساب مربٍّ جديد للموافقة",
+      "body": "انضم {{name}} عبر {{org}} وهو بانتظار الموافقة."
+    },
+    "orgRegistered": {
+      "title": "منظمة جديدة للموافقة",
+      "body": "سجّل {{name}} منظمة وهو بانتظار الموافقة."
+    },
+    "accountApproved": {
+      "title": "تمت الموافقة على الحساب",
+      "body": "حسابك في LivestockPro مفعّل. أهلاً بك! {{note}}"
+    },
+    "accountOnHold": {
+      "title": "الحساب معلّق",
+      "body": "تم تعليق حسابك في LivestockPro. {{note}}"
+    },
+    "accountRejected": {
+      "title": "لم تتم الموافقة على طلب الحساب",
+      "body": "لم تتم الموافقة على طلبك لحساب LivestockPro. {{note}}"
+    },
+    "collectorInvite": {
+      "title": "دعوة جامع بيانات",
+      "body": "تمت دعوتك لتسجيل البيانات لصالح {{farm}}."
+    }
   }
 }

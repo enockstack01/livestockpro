@@ -47,11 +47,15 @@
       "planning": "Planung",
       "analytics": "Auswertungen",
       "administration": "Verwaltung",
-      "system": "System"
+      "system": "System",
+      "team": "Team",
+      "recordData": "Daten erfassen",
+      "myWork": "Meine Arbeit"
     },
     "assistant": "KI-Assistent",
     "calendar": "Kalender",
-    "home": "Start"
+    "home": "Start",
+    "team": "Team"
   },
   "auth": {
     "brandName": "LivestockPro",
@@ -996,7 +1000,8 @@
       "cooperative": "Genossenschaft",
       "researcher": "Forscher",
       "student": "Student",
-      "other": "Sonstiges"
+      "other": "Sonstiges",
+      "data_collector": "Datenerfasser"
     },
     "status": {
       "none": "Nicht beantragt",
@@ -1865,6 +1870,10 @@
     "accountRejected": {
       "title": "Kontoanfrage abgelehnt",
       "body": "Ihre Anfrage für ein LivestockPro-Konto wurde nicht freigegeben. {{note}}"
+    },
+    "collectorInvite": {
+      "title": "Einladung als Datenerfasser",
+      "body": "Sie wurden eingeladen, Daten für {{farm}} zu erfassen."
     }
   },
   "search": {
@@ -2011,5 +2020,87 @@
     "subtitle": "LivestockPro von Agricoders",
     "intro": "Es gibt kein Internet, daher sind die Anmeldung und alles, was den Server braucht, pausiert. Der KI-Assistent arbeitet auf diesem Telefon. Die App kehrt von selbst zum Normalbetrieb zurück, sobald Sie wieder online sind.",
     "banner": "Offline-Modus: Ihre Daten werden auf diesem Telefon gespeichert und die KI läuft auf dem Telefon. Online-Funktionen kommen zurück, sobald Sie wieder verbunden sind."
+  },
+  "team": {
+    "managerRole": "Betriebsleiter",
+    "title": "Team",
+    "subtitle": "Datenerfasser, die in Ihrem Betrieb erfassen",
+    "cardTitle": "Ihre Datenerfasser",
+    "manage": "Team verwalten",
+    "addCollector": "Datenerfasser hinzufügen",
+    "cardEmpty": "Laden Sie einen Datenerfasser ein und sehen Sie hier, was Ihr Team täglich erfasst.",
+    "entries14": "Einträge der letzten 14 Tage",
+    "entriesWeek": "Einträge diese Woche",
+    "lastActive": "Zuletzt erfasst: {{when}}",
+    "notYet": "noch nicht",
+    "waitingInvites_one": "{{count}} Einladung wartet",
+    "waitingInvites_other": "{{count}} Einladungen warten",
+    "collectors": "Datenerfasser",
+    "waiting": "Wartende Einladungen",
+    "members": "Teammitglieder",
+    "empty": "Noch keine Datenerfasser. Laden Sie einen per E-Mail ein.",
+    "colName": "Name",
+    "colContact": "Kontakt",
+    "colWeek": "Diese Woche",
+    "colLast": "Zuletzt erfasst",
+    "colJoined": "Beigetreten",
+    "colInvited": "Eingeladen",
+    "remove": "Aus dem Team entfernen",
+    "removeTitle": "Datenerfasser entfernen",
+    "removeMessage": "{{name}} kann nicht mehr für Ihren Betrieb erfassen. Frühere Einträge bleiben erhalten.",
+    "removed": "{{name}} wurde aus Ihrem Team entfernt.",
+    "waitingTitle": "Wartende Einladungen ({{count}})",
+    "recent": "Neueste Einträge Ihres Teams",
+    "noActivity": "Ihr Team hat noch nichts erfasst.",
+    "inviteTitle": "Datenerfasser hinzufügen",
+    "inviteIntro": "Ein Datenerfasser erfasst Tiere, Gesundheitskontrollen, Zucht, Fütterung und Produktion Ihres Betriebs. Er sieht keine Finanzen, Berichte oder den Assistenten und kann nichts löschen.",
+    "inviteAfter": "Er erhält eine E-Mail, um ein Passwort festzulegen. Ein Systemadministrator genehmigt das Konto vor der Nutzung.",
+    "email": "E-Mail-Adresse",
+    "sendInvite": "Einladung senden",
+    "required": "Geben Sie Name und E-Mail-Adresse ein.",
+    "invited": "Einladung an {{email}} gesendet.",
+    "inviteCancelled": "Einladung an {{email}} zurückgezogen.",
+    "errors": {
+      "NAME_REQUIRED": "Geben Sie den Namen des Datenerfassers ein.",
+      "EMAIL_INVALID": "Geben Sie eine gültige E-Mail-Adresse ein.",
+      "TEAM_FULL": "Ihr Team ist voll. Entfernen Sie jemanden oder ziehen Sie eine Einladung zurück.",
+      "ALREADY_INVITED": "Diese Person hat bereits eine wartende Einladung.",
+      "HAS_ACCOUNT": "Diese E-Mail-Adresse hat bereits ein LivestockPro-Konto. Ein Datenerfasser braucht ein neues Konto, verwenden Sie eine andere Adresse.",
+      "SELF": "Sie können sich nicht selbst einladen.",
+      "INVITE_FAILED": "Die Einladungs-E-Mail konnte nicht gesendet werden. Prüfen Sie die Adresse und versuchen Sie es erneut.",
+      "MANAGER_ONLY": "Nur ein Betriebsleiter kann ein Team verwalten.",
+      "NOT_FOUND": "Diese Person oder Einladung wurde nicht gefunden."
+    }
+  },
+  "collectorDash": {
+    "role": "Datenerfasser",
+    "subtitle": "Erfassen Sie, was Sie heute auf dem Betrieb sehen",
+    "recordingFor": "Erfassung für {{farm}}",
+    "recording": "Erfassung für Ihren Betriebsleiter",
+    "entriesToday_one": "Eintrag heute",
+    "entriesToday_other": "Einträge heute",
+    "thisWeek_one": "{{count}} Eintrag diese Woche",
+    "thisWeek_other": "{{count}} Einträge diese Woche",
+    "streak_one": "{{count}} Tag in Folge",
+    "streak_other": "{{count}} Tage in Folge",
+    "whatRecording": "Was erfassen Sie?",
+    "add": {
+      "animal": "Tier hinzufügen",
+      "health": "Gesundheitskontrolle",
+      "breeding": "Zucht",
+      "feeding": "Fütterung",
+      "production": "Produktion",
+      "task": "Aufgabe hinzufügen"
+    },
+    "myTasks": "Offene Aufgaben",
+    "noTasks": "Keine offenen Aufgaben",
+    "markDone": "Als erledigt markieren",
+    "taskDone": "Aufgabe als erledigt markiert.",
+    "due": "Fällig {{date}}",
+    "noDueDate": "Kein Fälligkeitsdatum",
+    "toCheck": "Tiere zur Kontrolle",
+    "allWell": "Kein Tier braucht Aufmerksamkeit",
+    "myEntries": "Meine letzten Einträge",
+    "noEntries": "Sie haben diese Woche nichts erfasst."
   }
 }

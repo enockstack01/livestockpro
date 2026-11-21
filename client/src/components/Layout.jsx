@@ -8,7 +8,7 @@ import GlobalSearch from './GlobalSearch.jsx';
 import LanguageMenu from './LanguageMenu.jsx';
 import { useTheme } from '../theme/ThemeProvider.jsx';
 import { isOverdueTask } from '../../../shared/businessRules';
-import { NAV_SECTIONS, ORG_NAV_SECTIONS } from '../../../shared/navigation';
+import { NAV_SECTIONS, ORG_NAV_SECTIONS, COLLECTOR_NAV_SECTIONS } from '../../../shared/navigation';
 import { ConsentRequest, useMyOrganization } from './org/MyOrganization.jsx';
 import { accountDisplayName } from '../../../shared/account';
 import { useAccount } from './AccountGate.jsx';
@@ -25,7 +25,7 @@ const SERVER_NOTIF = {
   orgApproved: ['fa-circle-check', 'green'], orgSuspended: ['fa-circle-pause', 'red'], orgReactivated: ['fa-circle-play', 'green'],
   orgLimitChanged: ['fa-gauge', 'blue'], orgUsage80: ['fa-gauge-high', 'orange'], orgUsage100: ['fa-gauge-high', 'red'],
   farmerJoined: ['fa-user-plus', 'green'], farmerLeft: ['fa-user-minus', 'orange'], farmerRemoved: ['fa-user-minus', 'orange'],
-  orgInvite: ['fa-people-group', 'blue'], staffInvite: ['fa-envelope-open-text', 'blue'],
+  orgInvite: ['fa-people-group', 'blue'], staffInvite: ['fa-envelope-open-text', 'blue'], collectorInvite: ['fa-clipboard-list', 'blue'],
   accountRequest: ['fa-user-clock', 'orange'], accountRequestOrg: ['fa-user-clock', 'orange'], orgRegistered: ['fa-building', 'orange'],
   accountApproved: ['fa-user-check', 'green'], accountOnHold: ['fa-circle-pause', 'orange'], accountRejected: ['fa-user-xmark', 'red']
 };
@@ -147,6 +147,12 @@ function LayoutInner() {
   const navigate = useNavigate();
   const { account } = useAccount();
   const isOrg = account.kind === 'organization';
+  const isCollector = account.farmRole === 'collector';
+  /* Collectors cannot delete records: the delete buttons are hidden for them (the server refuses too). */
+  useEffect(() => {
+    document.body.classList.toggle('collector-mode', isCollector);
+    return () => document.body.classList.remove('collector-mode');
+  }, [isCollector]);
   const orgRole = account.organization && account.organization.as === 'member' ? account.organization.role : null;
   const notifItems = useNotifications(t, isOrg);
   const { readIds: localRead, markRead: markLocal, markAllRead: markAllLocal } = useReadNotifications(user?.id);
@@ -199,7 +205,7 @@ function LayoutInner() {
           <button className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fas fa-xmark"></i></button>
         </div>
         <nav className="sidebar-nav">
-          {(isOrg ? ORG_NAV_SECTIONS : NAV_SECTIONS).filter((section) => !section.adminOnly || isAdmin).map((section) => (
+          {(isOrg ? ORG_NAV_SECTIONS : isCollector ? COLLECTOR_NAV_SECTIONS : NAV_SECTIONS).filter((section) => !section.adminOnly || isAdmin).map((section) => (
             <div key={section.labelKey || 'main'} className="nav-section">
               {section.labelKey && <div className="nav-section-label">{t(section.labelKey)}</div>}
               {section.items.filter((item) => !item.roles || item.roles.includes(orgRole)).map((item) => (
