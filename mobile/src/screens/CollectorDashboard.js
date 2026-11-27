@@ -20,8 +20,8 @@ import { COLLECTOR_KINDS, animalsToCheck, computeCollectorStats, openTasks } fro
 /* The data collector's dashboard, matching the web's CollectorDashboard:
    today's count in a Pine hero, one big button per kind of record, open
    tasks with a one tap "done", animals to check and their recent entries.
-   Entries are the rows this phone recorded (the local user_id column holds
-   the recorder), so the count is right even before the next sync. */
+   recorded_by identifies the recorder. The user_id fallback keeps older
+   local rows and not-yet-synced inserts visible during the auth transition. */
 export default function CollectorDashboard() {
   const { t, i18n } = useTranslation();
   const { colors } = useTheme();
@@ -43,7 +43,7 @@ export default function CollectorDashboard() {
   }, [repo]);
   useEffect(() => { load(); }, [load, lastSyncedAt]);
 
-  const stats = useMemo(() => (data && user ? computeCollectorStats(data, user.id, { by: (r) => r.user_id }) : null), [data, user]);
+  const stats = useMemo(() => (data && user ? computeCollectorStats(data, user.id, { by: (r) => r.recorded_by || r.user_id }) : null), [data, user]);
   if (!data || !stats) return <Spinner />;
 
   const tasks = openTasks(data.tasks);

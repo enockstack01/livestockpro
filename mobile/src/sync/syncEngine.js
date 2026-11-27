@@ -14,11 +14,21 @@ export async function runSync(db, api) {
 
 async function applyServerDoc(db, table, doc, syncState) {
   const schemaFields = SCHEMAS[table];
-  const columns = ['id', 'user_id', ...schemaFields, 'created_at', 'updated_at', 'deleted_at', 'sync_state'];
+  const hasRecorder = table !== 'profiles';
+  const columns = [
+    'id',
+    'user_id',
+    ...(hasRecorder ? ['recorded_by'] : []),
+    ...schemaFields,
+    'created_at',
+    'updated_at',
+    'deleted_at',
+    'sync_state',
+  ];
   const values = [
     doc.id,
-    /* The recorder, so a data collector's own entries can be told apart from the farm's. */
-    doc.recorded_by || doc.user_id,
+    doc.user_id,
+    ...(hasRecorder ? [doc.recorded_by || doc.user_id || null] : []),
     ...schemaFields.map((f) => (doc[f] !== undefined ? doc[f] : null)),
     doc.created_at || null,
     doc.updated_at || null,
@@ -30,86 +40,220 @@ async function applyServerDoc(db, table, doc, syncState) {
 }
 
 async function pushChanges(db, api) {
-  const rows = await db.getAllAsync('SELECT * FROM sync_queue ORDER BY queue_id ASC');
+  const rows = await db.getAllAsync(
+    'SELECT * FROM sync_queue ORDER BY queue_id ASC'
+  );
+
   let flushed = 0;
   let failed = 0;
 
+  // A conflict blocks later operations for that same record during this run.
+  const blockedRecords = new Set();
+
+  // After a successful write, later queued operations use the new server version.
+  const latestUpdatedAt = new Map();
+
   for (const row of rows) {
-    const payload = JSON.parse(row.payload);
+    const recordKey = `${row.table_name}:${row.record_id}`;
+
+    if (blockedRecords.has(recordKey)) {
+      continue;
+    }
+
+    const baseUpdatedAt = latestUpdatedAt.has(recordKey)
+      ? latestUpdatedAt.get(recordKey)
+      : row.base_updated_at;
+
     let result;
+
     if (row.op === 'insert') {
-      result = await api.insert(row.table_name, [payload]);
+      result = await api.insert(row.table_name, [JSON.parse(row.payload)]);
     } else if (row.op === 'update') {
-      result = await api.update(row.table_name, row.record_id, payload);
+      result = await api.update(
+        row.table_name,
+        row.record_id,
+        JSON.parse(row.payload),
+        baseUpdatedAt
+      );
     } else {
-      result = await api.remove(row.table_name, row.record_id);
+      result = await api.remove(
+        row.table_name,
+        row.record_id,
+        baseUpdatedAt
+      );
     }
 
     if (result.error && result.error.networkError) {
-      break; // offline mid-push — stop here, everything left in the queue retries next trigger
+      break;
     }
 
     if (result.error) {
       failed += 1;
+      blockedRecords.add(recordKey);
+
       await db.runAsync(
         'UPDATE sync_queue SET attempts = attempts + 1, last_error = ? WHERE queue_id = ?',
-        result.error.message, row.queue_id
+        result.error.message,
+        row.queue_id
       );
-      continue; // don't let one bad record block the rest of the queue
+
+      continue;
     }
 
-    await db.runAsync('DELETE FROM sync_queue WHERE queue_id = ?', row.queue_id);
+    await db.runAsync(
+      'DELETE FROM sync_queue WHERE queue_id = ?',
+      row.queue_id
+    );
+
     if (row.op === 'delete') {
-      await db.runAsync(`DELETE FROM ${row.table_name} WHERE id = ?`, row.record_id);
+      // A successful delete makes all later queued edits obsolete.
+      await db.runAsync(
+        'DELETE FROM sync_queue WHERE table_name = ? AND record_id = ?',
+        row.table_name,
+        row.record_id
+      );
+
+      await db.runAsync(
+        `DELETE FROM ${row.table_name} WHERE id = ?`,
+        row.record_id
+      );
+
+      latestUpdatedAt.delete(recordKey);
     } else {
-      const serverDoc = Array.isArray(result.data) ? result.data[0] : result.data;
-      if (serverDoc) await applyServerDoc(db, row.table_name, serverDoc, 'synced');
+      const serverDoc = Array.isArray(result.data)
+        ? result.data[0]
+        : result.data;
+
+      if (serverDoc?.updated_at) {
+        latestUpdatedAt.set(recordKey, serverDoc.updated_at);
+
+        // Rebase all remaining queued operations for this record.
+        await db.runAsync(
+          `UPDATE sync_queue
+           SET base_updated_at = ?
+           WHERE table_name = ?
+             AND record_id = ?
+             AND queue_id > ?`,
+          serverDoc.updated_at,
+          row.table_name,
+          row.record_id,
+          row.queue_id
+        );
+      }
+
+      const hasLaterOperation = rows.some(
+        (candidate) =>
+          candidate.queue_id > row.queue_id &&
+          candidate.table_name === row.table_name &&
+          candidate.record_id === row.record_id
+      );
+
+      // Keep the optimistic local version while later edits remain queued.
+      if (serverDoc && !hasLaterOperation) {
+        await applyServerDoc(
+          db,
+          row.table_name,
+          serverDoc,
+          'synced'
+        );
+      }
     }
+
     flushed += 1;
   }
 
   return { flushed, failed };
 }
-
 async function pullChanges(db, api) {
   let pulled = 0;
+  const pageSize = 500;
 
   for (const table of SYNCED_TABLES) {
-    const metaRow = await db.getFirstAsync('SELECT last_synced_at FROM sync_meta WHERE table_name = ?', table);
+    const metaRow = await db.getFirstAsync(
+      'SELECT last_synced_at FROM sync_meta WHERE table_name = ?',
+      table
+    );
     const since = metaRow ? metaRow.last_synced_at : null;
 
-    const result = await api.listSince(table, since, { includeDeleted: true });
-    if (result.error) {
-      if (result.error.networkError) break; // offline — stop pulling entirely, retry next trigger
-      continue; // this table's pull failed server-side; don't let it block the others
-    }
-
+    let offset = 0;
     let maxUpdatedAt = since;
-    for (const doc of result.data || []) {
-      if (doc.deleted_at) {
-        await db.runAsync(`DELETE FROM ${table} WHERE id = ?`, doc.id);
-        // The record is gone server-side (another device deleted it); a
-        // locally-queued mutation for it — e.g. an update that raced that
-        // delete — can never succeed and would otherwise retry forever.
-        await db.runAsync('DELETE FROM sync_queue WHERE table_name = ? AND record_id = ?', table, doc.id);
-      } else {
-        // A record with a still-queued local edit shouldn't be clobbered by a
-        // stale pull (can happen after a partial push failure above).
-        const pending = await db.getFirstAsync(
-          'SELECT COUNT(*) as c FROM sync_queue WHERE table_name = ? AND record_id = ?', table, doc.id
-        );
-        if (pending && pending.c > 0) continue;
-        await applyServerDoc(db, table, doc, 'synced');
+    let tableFailed = false;
+
+    while (true) {
+      const result = await api.listSince(table, since, {
+        includeDeleted: true,
+        limit: pageSize,
+        offset
+      });
+
+      if (result.error) {
+        if (result.error.networkError) return { pulled, interrupted: true };
+        tableFailed = true;
+        break;
       }
-      if (doc.updated_at && (!maxUpdatedAt || doc.updated_at > maxUpdatedAt)) maxUpdatedAt = doc.updated_at;
-      pulled += 1;
+
+      const docs = result.data || [];
+
+      for (const doc of docs) {
+        if (doc.deleted_at) {
+          const pendingRows = await db.getAllAsync(
+            'SELECT op FROM sync_queue WHERE table_name = ? AND record_id = ?',
+            table,
+            doc.id
+          );
+
+          const hasPendingNonDelete = pendingRows.some(
+            (pendingRow) => pendingRow.op !== 'delete'
+          );
+
+          if (!hasPendingNonDelete) {
+            // No unsynced edits remain, or the local record was also deleted.
+            await db.runAsync(
+              `DELETE FROM ${table} WHERE id = ?`,
+              doc.id
+            );
+
+            await db.runAsync(
+              'DELETE FROM sync_queue WHERE table_name = ? AND record_id = ?',
+              table,
+              doc.id
+            );
+          }
+          // Preserve local data and queued edits if an insert/update is pending.
+          // The next push will detect the server-side deletion as a conflict.
+        } else {
+          const pending = await db.getFirstAsync(
+            'SELECT COUNT(*) as c FROM sync_queue WHERE table_name = ? AND record_id = ?',
+            table,
+            doc.id
+          );
+
+          if (!(pending && pending.c > 0)) {
+            await applyServerDoc(db, table, doc, 'synced');
+          }
+        }
+
+        if (
+          doc.updated_at &&
+          (!maxUpdatedAt || doc.updated_at > maxUpdatedAt)
+        ) {
+          maxUpdatedAt = doc.updated_at;
+        }
+
+        pulled += 1;
+      }
+
+      if (docs.length < pageSize) break;
+      offset += pageSize;
     }
 
-    if (maxUpdatedAt && maxUpdatedAt !== since) {
+    // Never advance this table's checkpoint after a failed page.
+    if (!tableFailed && maxUpdatedAt && maxUpdatedAt !== since) {
       await db.runAsync(
         `INSERT INTO sync_meta (table_name, last_synced_at) VALUES (?, ?)
          ON CONFLICT(table_name) DO UPDATE SET last_synced_at = excluded.last_synced_at`,
-        table, maxUpdatedAt
+        table,
+        maxUpdatedAt
       );
     }
   }

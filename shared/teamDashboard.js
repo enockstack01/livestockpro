@@ -1,7 +1,7 @@
 /* Figures for the data collector dashboard, shared by the web and mobile
    apps. A collector's entries are the records they recorded themselves:
-   `by(row)` says who recorded a row (web: row.recorded_by; mobile: the
-   local user_id column, which holds the recorder). */
+   `by(row)` says who recorded a row (recorded_by in both apps; mobile keeps
+   a temporary user_id fallback for older local rows during the auth transition). */
 
 export const COLLECTOR_KINDS = [
   { key: 'animals', kind: 'animal', icon: 'cow', path: '/animals', labelKey: 'nav.animals', tone: 'green' },
