@@ -63,12 +63,13 @@ export function useApi() {
   const { getToken } = useAuth();
 
   return useMemo(() => ({
-    async list(table, { select, eq, order, limit, updatedSince, includeDeleted } = {}) {
+    async list(table, { select, eq, order, limit, offset, updatedSince, includeDeleted } = {}) {
       const params = new URLSearchParams();
       if (select) params.set('select', select);
       if (eq) Object.entries(eq).forEach(([k, v]) => { if (v !== undefined && v !== null) params.set(k, v); });
       if (order) params.set('order', order);
       if (limit) params.set('limit', limit);
+      if (offset !== undefined && offset !== null) params.set('offset', offset);
       if (updatedSince) params.set('updated_since', updatedSince);
       if (includeDeleted) params.set('include_deleted', 'true');
       const qs = params.toString();
@@ -77,8 +78,14 @@ export function useApi() {
     /* Delta pull for the sync engine: every row changed since the last sync,
        tombstones included so locally-cached rows deleted elsewhere can be
        removed on-device too. */
-    async listSince(table, updatedSince, { includeDeleted = true } = {}) {
-      return this.list(table, { updatedSince, includeDeleted, order: 'created_at.asc' });
+    async listSince(table, updatedSince, { includeDeleted = true, limit = 500, offset = 0 } = {}) {
+      return this.list(table, {
+        updatedSince,
+        includeDeleted,
+        order: 'updated_at.asc',
+        limit,
+        offset
+      });
     },
     async getById(table, id) {
       const result = await request(getToken, `/data/${table}?id=${encodeURIComponent(id)}`);
@@ -89,13 +96,23 @@ export function useApi() {
     async insert(table, records) {
       return request(getToken, `/data/${table}`, { method: 'POST', body: JSON.stringify(records) });
     },
-    async update(table, id, patch) {
-      return request(getToken, `/data/${table}?id=${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(patch) });
+    async update(table, id, patch, baseUpdatedAt) {
+      const body = {
+        ...patch,
+        ...(baseUpdatedAt ? { base_updated_at: baseUpdatedAt } : {})
+      };
+      return request(getToken, `/data/${table}?id=${encodeURIComponent(id)}`, {
+        method: 'PATCH',
+        body: JSON.stringify(body)
+      });
     },
-    async remove(table, id) {
-      return request(getToken, `/data/${table}?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
-    },
-    async rpc(fn, args) {
+    async remove(table, id, baseUpdatedAt) {
+      const params = new URLSearchParams({ id });
+      if (baseUpdatedAt) params.set('base_updated_at', baseUpdatedAt);
+      return request(getToken, `/data/${table}?${params.toString()}`, {
+        method: 'DELETE'
+      });
+    },    async rpc(fn, args) {
       return request(getToken, `/rpc/${fn}`, { method: 'POST', body: JSON.stringify(args || {}) });
     },
     async myRole() {

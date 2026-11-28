@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import { SCHEMAS, SYNCED_TABLES } from '../lib/shared';
 
 export const DB_NAME = 'livestockpro.db';
-const DATABASE_VERSION = 5;
+const DATABASE_VERSION = 6;
 
 /* Fields known to hold numbers, so their SQLite column gets NUMERIC affinity
    (matters for correct ORDER BY / range comparisons — SQLite is otherwise
@@ -80,6 +80,24 @@ export async function migrateDbIfNeeded(db) {
     version = 5;
   }
 
+  /* v6: distinguish the farm owner from the person who recorded a row.
+     Existing local rows are backfilled so collector dashboards keep working.
+     Profiles are account records and do not have a recorded_by column. */
+  if (version < 6) {
+    for (const table of SYNCED_TABLES) {
+      if (table === 'profiles') continue;
+
+      const cols = await db.getAllAsync(`PRAGMA table_info(${table})`);
+      if (!cols.some((c) => c.name === 'recorded_by')) {
+        await db.execAsync(`ALTER TABLE ${table} ADD COLUMN recorded_by TEXT;`);
+      }
+
+      await db.runAsync(
+        `UPDATE ${table} SET recorded_by = user_id WHERE recorded_by IS NULL`
+      );
+    }
+    version = 6;
+  }
   await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION};`);
 }
 
